@@ -1,5 +1,19 @@
 # BAAM Review
 
+
+lsof -ti:4001 | xargs kill -9
+rm -rf .next
+npm run dev
+
+npm install
+npm run build
+
+git add .
+git commit -m "Update: describe your changes"
+git push
+
+
+
 Standalone review collection SaaS, built on the BAAM Studio stack. Served from `review.baamplatform.com`.
 
 The full vision and roadmap live in [`docs/BAAM_REVIEW_MASTER_PLAN.md`](docs/BAAM_REVIEW_MASTER_PLAN.md). This README is the operator's guide.
