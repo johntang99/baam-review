@@ -66,16 +66,70 @@ const SERVICE_CHIPS: Record<string, ChipSet> = {
   },
 };
 
+export interface PromptQuestions {
+  service_chips?: Partial<Record<Language, string[]>>;
+  descriptor_chips?: Partial<Record<Language, string[]>>;
+}
+
 export function getServiceChips(
   businessType: string | null | undefined,
   lang: Language,
+  override?: PromptQuestions | null,
 ): readonly string[] {
+  const customForLang = override?.service_chips?.[lang];
+  if (customForLang && customForLang.length > 0) return customForLang;
   const key = normalizeBusinessType(businessType);
   const chips = SERVICE_CHIPS[key];
   if (chips) return chips[lang];
   return STRINGS[lang].default_service_chips;
 }
 
-export function getDescriptorChips(lang: Language): readonly string[] {
+export function getDescriptorChips(
+  lang: Language,
+  override?: PromptQuestions | null,
+): readonly string[] {
+  const customForLang = override?.descriptor_chips?.[lang];
+  if (customForLang && customForLang.length > 0) return customForLang;
   return STRINGS[lang].default_descriptor_chips;
+}
+
+/**
+ * Coerce arbitrary jsonb (could be old data, or invalid) into a typed
+ * PromptQuestions shape. Returns null if the input doesn't look like ours.
+ */
+export function parsePromptQuestions(
+  raw: unknown,
+): PromptQuestions | null {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const obj = raw as Record<string, unknown>;
+  const result: PromptQuestions = {};
+
+  const sc = obj.service_chips;
+  if (sc && typeof sc === "object" && !Array.isArray(sc)) {
+    result.service_chips = pickStringArrayMap(sc as Record<string, unknown>);
+  }
+
+  const dc = obj.descriptor_chips;
+  if (dc && typeof dc === "object" && !Array.isArray(dc)) {
+    result.descriptor_chips = pickStringArrayMap(dc as Record<string, unknown>);
+  }
+
+  return result.service_chips || result.descriptor_chips ? result : null;
+}
+
+function pickStringArrayMap(
+  input: Record<string, unknown>,
+): Partial<Record<Language, string[]>> {
+  const out: Partial<Record<Language, string[]>> = {};
+  for (const lang of ["en", "zh", "es"] as const) {
+    const v = input[lang];
+    if (Array.isArray(v)) {
+      const cleaned = v
+        .filter((s): s is string => typeof s === "string")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (cleaned.length > 0) out[lang] = cleaned;
+    }
+  }
+  return out;
 }

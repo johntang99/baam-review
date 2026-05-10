@@ -53,15 +53,9 @@ export async function updateLocation(locationId: string, formData: FormData) {
     defaultLang = supported[0];
   }
 
-  const promptQuestionsRaw = formData.get("prompt_questions");
-  let promptQuestions: Json | null = null;
-  if (typeof promptQuestionsRaw === "string" && promptQuestionsRaw.trim() !== "") {
-    try {
-      promptQuestions = JSON.parse(promptQuestionsRaw);
-    } catch {
-      throw new Error("Custom prompts: invalid JSON");
-    }
-  }
+  const serviceChips = collectChipsByLang(formData, "service_chips", supported);
+  const descriptorChips = collectChipsByLang(formData, "descriptor_chips", supported);
+  const promptQuestions = buildPromptQuestions(serviceChips, descriptorChips);
 
   const update: LocationUpdate = {
     display_name: getString(formData, "display_name") ?? "Untitled",
@@ -89,6 +83,38 @@ export async function updateLocation(locationId: string, formData: FormData) {
 
   revalidatePath(`/app/locations/${locationId}`);
   revalidatePath("/app/locations");
+}
+
+function collectChipsByLang(
+  fd: FormData,
+  prefix: string,
+  langs: Lang[],
+): Partial<Record<Lang, string[]>> {
+  const result: Partial<Record<Lang, string[]>> = {};
+  for (const lang of langs) {
+    const v = fd.get(`${prefix}_${lang}`);
+    if (typeof v !== "string") continue;
+    const items = v
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (items.length > 0) result[lang] = items;
+  }
+  return result;
+}
+
+function buildPromptQuestions(
+  service: Partial<Record<Lang, string[]>>,
+  descriptor: Partial<Record<Lang, string[]>>,
+): Json | null {
+  const out: Record<string, Json> = {};
+  if (Object.keys(service).length > 0) {
+    out.service_chips = service as Json;
+  }
+  if (Object.keys(descriptor).length > 0) {
+    out.descriptor_chips = descriptor as Json;
+  }
+  return Object.keys(out).length > 0 ? (out as Json) : null;
 }
 
 export async function deleteLocation(locationId: string) {

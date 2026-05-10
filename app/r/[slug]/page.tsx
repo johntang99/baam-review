@@ -7,7 +7,11 @@ import {
   isLanguage,
   type Language,
 } from "@/lib/i18n/review";
-import { getServiceChips, getDescriptorChips } from "@/lib/business-prompts";
+import {
+  getServiceChips,
+  getDescriptorChips,
+  parsePromptQuestions,
+} from "@/lib/business-prompts";
 import { isWeChatBrowser } from "@/lib/wechat";
 import { ReviewFlow } from "@/components/review/review-flow";
 import { LanguageSwitcher } from "@/components/review/language-switcher";
@@ -26,6 +30,7 @@ type Loc = {
   default_language: Language;
   supported_languages: string[];
   welcome_message: Record<string, string> | null;
+  prompt_questions: unknown;
   google_review_url: string | null;
   yelp_url: string | null;
   custom_url: string | null;
@@ -66,7 +71,7 @@ export default async function ReviewLandingPage({
   const { data: location } = await supabase
     .from("locations")
     .select(
-      "id, account_id, slug, display_name, brand_color, logo_url, business_type, default_language, supported_languages, welcome_message, google_review_url, yelp_url, custom_url, custom_url_label",
+      "id, account_id, slug, display_name, brand_color, logo_url, business_type, default_language, supported_languages, welcome_message, prompt_questions, google_review_url, yelp_url, custom_url, custom_url_label",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -106,8 +111,9 @@ export default async function ReviewLandingPage({
   const welcome = loc.welcome_message?.[lang] || s.welcome_default;
   const customLabel = loc.custom_url_label?.[lang] || null;
 
-  const serviceChips = getServiceChips(loc.business_type, lang);
-  const descriptorChips = getDescriptorChips(lang);
+  const overrides = parsePromptQuestions(loc.prompt_questions);
+  const serviceChips = getServiceChips(loc.business_type, lang, overrides);
+  const descriptorChips = getDescriptorChips(lang, overrides);
 
   const supportedLangs = loc.supported_languages.filter(isLanguage);
   const wechat = isWeChatBrowser(userAgent);

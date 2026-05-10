@@ -6,12 +6,12 @@ import { Save, Trash2 } from "lucide-react";
 import type { Database } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Section, Field } from "@/components/ui/section";
 import { LogoUploader } from "@/components/locations/logo-uploader";
 import { BrandColorPicker } from "@/components/locations/brand-color-picker";
 import { LanguageFields } from "@/components/locations/language-fields";
 import { LocalizedField } from "@/components/locations/localized-textarea";
+import { parsePromptQuestions } from "@/lib/business-prompts";
 import { updateLocation, deleteLocation } from "./actions";
 
 type Location = Database["public"]["Tables"]["locations"]["Row"];
@@ -42,9 +42,10 @@ export function SettingsForm({ location, accountId }: SettingsFormProps) {
 
   const welcomeInitial = (location.welcome_message ?? {}) as Record<string, string>;
   const customLabelInitial = (location.custom_url_label ?? {}) as Record<string, string>;
-  const promptQuestionsInitial = location.prompt_questions
-    ? JSON.stringify(location.prompt_questions, null, 2)
-    : "";
+
+  const promptOverride = parsePromptQuestions(location.prompt_questions);
+  const serviceChipsInitial = chipMapToTextMap(promptOverride?.service_chips);
+  const descriptorChipsInitial = chipMapToTextMap(promptOverride?.descriptor_chips);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -178,20 +179,40 @@ export function SettingsForm({ location, accountId }: SettingsFormProps) {
       </Section>
 
       <Section
-        title="Custom prompts"
-        description="Override the default chip questions for AI-assisted writing. Leave blank to use the defaults for your business type."
+        title="Review prompts"
+        description="Customize the chip options shown on your public review page. One option per line. Leave blank to use the defaults for your business type."
       >
         <Field
-          label="Custom prompt questions (advanced)"
-          htmlFor="prompt_questions"
-          hint="JSON. Format will be documented in Session 6 when the AI flow lands."
+          label="Service options"
+          hint='Shown under "Service you received". e.g., Acupuncture, Massage, Cupping.'
         >
-          <Textarea
-            id="prompt_questions"
-            name="prompt_questions"
-            rows={6}
-            defaultValue={promptQuestionsInitial}
-            className="font-mono text-[12.5px]"
+          <LocalizedField
+            name="service_chips"
+            languages={location.supported_languages}
+            initialValues={serviceChipsInitial}
+            placeholder={{
+              en: "Acupuncture\nMassage\nCupping",
+              zh: "针灸\n按摩\n拔罐",
+              es: "Acupuntura\nMasaje\nVentosas",
+            }}
+            rows={5}
+          />
+        </Field>
+
+        <Field
+          label="One-word descriptors"
+          hint='Shown under "In one word". e.g., Professional, Warm, Knowledgeable.'
+        >
+          <LocalizedField
+            name="descriptor_chips"
+            languages={location.supported_languages}
+            initialValues={descriptorChipsInitial}
+            placeholder={{
+              en: "Professional\nWarm\nKnowledgeable",
+              zh: "专业\n热情\n有经验",
+              es: "Profesional\nCálido\nExperto",
+            }}
+            rows={5}
           />
         </Field>
       </Section>
@@ -224,6 +245,21 @@ export function SettingsForm({ location, accountId }: SettingsFormProps) {
       </div>
     </form>
   );
+}
+
+function chipMapToTextMap(
+  chips:
+    | Partial<Record<"en" | "zh" | "es", string[]>>
+    | undefined
+    | null,
+): Record<string, string> {
+  if (!chips) return {};
+  const out: Record<string, string> = {};
+  for (const lang of ["en", "zh", "es"] as const) {
+    const arr = chips[lang];
+    if (arr && arr.length > 0) out[lang] = arr.join("\n");
+  }
+  return out;
 }
 
 function CustomLabelField({
