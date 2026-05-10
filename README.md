@@ -117,6 +117,20 @@ lib/
 middleware.ts           Wires updateSession into the request pipeline
 ```
 
+## Database
+
+Schema lives in [`supabase/migrations/`](supabase/) and mirrors §8 of the master plan. See [`supabase/README.md`](supabase/README.md) for how to apply migrations (dashboard SQL editor or `supabase db push`).
+
+| Layer | Where it lives |
+|---|---|
+| Tables, indexes, FK constraints | `supabase/migrations/0001_init.sql` |
+| RLS policies + `current_account_id()` helper | `supabase/migrations/0002_rls.sql` |
+| `handle_new_user` trigger + backfill | `supabase/migrations/0003_auth_trigger.sql` |
+| Optional demo location | `supabase/seed.sql` |
+| TypeScript types | `lib/database.types.ts` |
+
+The browser, server, and proxy Supabase clients in `lib/supabase/` are typed against `Database`. A separate `lib/supabase/service.ts` exposes a service-role client for trusted server code that needs to bypass RLS (public review page reads, webhooks).
+
 ## What's next
 
-Session 2 — schema + RLS. See `docs/BAAM_REVIEW_MASTER_PLAN.md` §13.
+Session 3 — Google Business Profile OAuth + place lookup. See `docs/BAAM_REVIEW_MASTER_PLAN.md` §13.

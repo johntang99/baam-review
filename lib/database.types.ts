@@ -1,0 +1,273 @@
+// Hand-maintained for Session 2.
+// In a later session we'll replace this with `supabase gen types typescript --linked`.
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
+export type SubscriptionTier = "trial" | "free" | "starter" | "growth" | "agency";
+export type SubscriptionStatus =
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled"
+  | "incomplete";
+export type UserRole = "owner" | "admin" | "staff";
+export type Language = "en" | "zh" | "es";
+export type Channel = "sms" | "email";
+export type CompletedPlatform = "google" | "yelp" | "custom" | "private_feedback";
+export type LandingEventType =
+  | "page_view"
+  | "language_selected"
+  | "question_answered"
+  | "draft_generated"
+  | "draft_regenerated"
+  | "draft_edited"
+  | "platform_clicked"
+  | "private_feedback_submitted";
+
+export interface Database {
+  public: {
+    Tables: {
+      accounts: {
+        Row: {
+          id: string;
+          name: string;
+          primary_email: string;
+          stripe_customer_id: string | null;
+          subscription_tier: SubscriptionTier;
+          subscription_status: SubscriptionStatus;
+          trial_ends_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          primary_email: string;
+          stripe_customer_id?: string | null;
+          subscription_tier?: SubscriptionTier;
+          subscription_status?: SubscriptionStatus;
+          trial_ends_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["accounts"]["Insert"]>;
+        Relationships: [];
+      };
+      users: {
+        Row: {
+          id: string;
+          account_id: string;
+          full_name: string | null;
+          role: UserRole;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          account_id: string;
+          full_name?: string | null;
+          role?: UserRole;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["users"]["Insert"]>;
+        Relationships: [];
+      };
+      locations: {
+        Row: {
+          id: string;
+          account_id: string;
+          slug: string;
+          google_place_id: string | null;
+          google_review_url: string | null;
+          display_name: string;
+          address: string | null;
+          business_type: string | null;
+          brand_color: string | null;
+          logo_url: string | null;
+          default_language: Language;
+          supported_languages: Language[];
+          welcome_message: Json;
+          prompt_questions: Json | null;
+          yelp_url: string | null;
+          custom_url: string | null;
+          custom_url_label: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          account_id: string;
+          slug: string;
+          google_place_id?: string | null;
+          google_review_url?: string | null;
+          display_name: string;
+          address?: string | null;
+          business_type?: string | null;
+          brand_color?: string | null;
+          logo_url?: string | null;
+          default_language?: Language;
+          supported_languages?: Language[];
+          welcome_message?: Json;
+          prompt_questions?: Json | null;
+          yelp_url?: string | null;
+          custom_url?: string | null;
+          custom_url_label?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["locations"]["Insert"]>;
+        Relationships: [];
+      };
+      review_requests: {
+        Row: {
+          id: string;
+          location_id: string;
+          recipient_name: string;
+          recipient_phone: string | null;
+          recipient_email: string | null;
+          language: Language;
+          channel: Channel;
+          tracking_token: string;
+          message_sent: string | null;
+          scheduled_for: string | null;
+          sent_at: string | null;
+          delivered_at: string | null;
+          opened_at: string | null;
+          clicked_at: string | null;
+          draft_generated_at: string | null;
+          completed_platform: CompletedPlatform | null;
+          completed_at: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          recipient_name: string;
+          recipient_phone?: string | null;
+          recipient_email?: string | null;
+          language?: Language;
+          channel: Channel;
+          tracking_token: string;
+          message_sent?: string | null;
+          scheduled_for?: string | null;
+          sent_at?: string | null;
+          delivered_at?: string | null;
+          opened_at?: string | null;
+          clicked_at?: string | null;
+          draft_generated_at?: string | null;
+          completed_platform?: CompletedPlatform | null;
+          completed_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["review_requests"]["Insert"]>;
+        Relationships: [];
+      };
+      landing_events: {
+        Row: {
+          id: string;
+          request_id: string | null;
+          location_id: string;
+          event_type: LandingEventType;
+          metadata: Json;
+          language: string | null;
+          user_agent: string | null;
+          occurred_at: string;
+        };
+        Insert: {
+          id?: string;
+          request_id?: string | null;
+          location_id: string;
+          event_type: LandingEventType;
+          metadata?: Json;
+          language?: string | null;
+          user_agent?: string | null;
+          occurred_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["landing_events"]["Insert"]>;
+        Relationships: [];
+      };
+      private_feedback: {
+        Row: {
+          id: string;
+          location_id: string;
+          request_id: string | null;
+          rating: number | null;
+          message: string;
+          contact_email: string | null;
+          contact_phone: string | null;
+          language: Language;
+          read_at: string | null;
+          responded_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          request_id?: string | null;
+          rating?: number | null;
+          message: string;
+          contact_email?: string | null;
+          contact_phone?: string | null;
+          language?: Language;
+          read_at?: string | null;
+          responded_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["private_feedback"]["Insert"]>;
+        Relationships: [];
+      };
+      embed_loads: {
+        Row: {
+          id: string;
+          location_id: string;
+          origin_url: string | null;
+          occurred_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          origin_url?: string | null;
+          occurred_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["embed_loads"]["Insert"]>;
+        Relationships: [];
+      };
+      subscription_events: {
+        Row: {
+          id: string;
+          account_id: string;
+          event_type: string;
+          stripe_event_id: string | null;
+          payload: Json;
+          occurred_at: string;
+        };
+        Insert: {
+          id?: string;
+          account_id: string;
+          event_type: string;
+          stripe_event_id?: string | null;
+          payload?: Json;
+          occurred_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["subscription_events"]["Insert"]>;
+        Relationships: [];
+      };
+    };
+    Views: Record<string, never>;
+    Functions: {
+      current_account_id: {
+        Args: Record<string, never>;
+        Returns: string | null;
+      };
+    };
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
+  };
+}
