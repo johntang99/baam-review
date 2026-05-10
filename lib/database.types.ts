@@ -259,6 +259,30 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["subscription_events"]["Insert"]>;
         Relationships: [];
       };
+      google_oauth_tokens: {
+        Row: {
+          account_id: string;
+          access_token: string;
+          refresh_token: string;
+          expiry: string;
+          scope: string;
+          google_email: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          account_id: string;
+          access_token: string;
+          refresh_token: string;
+          expiry: string;
+          scope: string;
+          google_email?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["google_oauth_tokens"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

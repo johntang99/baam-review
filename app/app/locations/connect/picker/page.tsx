@@ -1,0 +1,223 @@
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, ExternalLink, AlertCircle } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import {
+  getValidAccessToken,
+  listGoogleAccounts,
+  listGoogleLocations,
+  type GoogleLocation,
+} from "@/lib/google/business-profile";
+import { PageHeader } from "@/components/admin/page-header";
+import { Button } from "@/components/ui/button";
+import { createLocationFromGoogle } from "./actions";
+
+export const metadata = {
+  title: "Pick a location — BAAM Review",
+};
+
+export const dynamic = "force-dynamic";
+
+export default async function PickerPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/app/locations");
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("account_id")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile?.account_id) redirect("/app/locations?error=no_account");
+
+  // Existing slugs so we can mark already-added places.
+  const { data: existing } = await supabase
+    .from("locations")
+    .select("google_place_id")
+    .eq("account_id", profile.account_id);
+  const claimedPlaceIds = new Set(
+    (existing ?? [])
+      .map((r) => r.google_place_id)
+      .filter((v): v is string => !!v),
+  );
+
+  let locations: GoogleLocation[] = [];
+  let fatal: string | null = null;
+  let googleEmail: string | null = null;
+
+  try {
+    const accessToken = await getValidAccessToken(profile.account_id);
+
+    const { data: tokenRow } = await supabase
+      .from("google_oauth_tokens")
+      .select("google_email")
+      .eq("account_id", profile.account_id)
+      .maybeSingle();
+    googleEmail = tokenRow?.google_email ?? null;
+
+    const accounts = await listGoogleAccounts(accessToken);
+    const collected: GoogleLocation[] = [];
+    for (const acct of accounts) {
+      const locs = await listGoogleLocations(accessToken, acct.name);
+      collected.push(...locs);
+    }
+    locations = collected;
+  } catch (e) {
+    console.error("Picker fetch failed", e);
+    fatal = e instanceof Error ? e.message : "Unknown error";
+  }
+
+  return (
+    <main className="px-10 py-10 space-y-8">
+      <div>
+        <Link
+          href="/app/locations"
+          className="inline-flex items-center gap-1.5 text-[12.5px] text-text-soft hover:text-text mb-3"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to locations
+        </Link>
+        <PageHeader
+          eyebrow="Connect Google"
+          title="Pick a location"
+          description={
+            googleEmail
+              ? `Showing locations from ${googleEmail}. Pick one to add it to BAAM Review.`
+              : "Pick the location you want to collect reviews for."
+          }
+        />
+      </div>
+
+      {fatal && (
+        <div
+          role="alert"
+          className="flex gap-3 rounded-xl border border-alert/30 bg-alert/5 p-4 text-[13.5px] text-alert max-w-3xl"
+        >
+          <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+          <div className="space-y-1">
+            <p className="font-medium">Couldn&apos;t load locations from Google</p>
+            <p className="opacity-80">{fatal}</p>
+          </div>
+        </div>
+      )}
+
+      {!fatal && locations.length === 0 && (
+        <EmptyResult />
+      )}
+
+      {locations.length > 0 && (
+        <ul className="grid gap-3 max-w-3xl">
+          {locations.map((loc) => {
+            const claimed =
+              loc.placeId !== null && claimedPlaceIds.has(loc.placeId);
+            return (
+              <li
+                key={loc.name}
+                className="rounded-xl border border-border-base bg-paper p-5 shadow-sm"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="font-display text-[17px] text-ink leading-tight">
+                      {loc.title}
+                    </p>
+                    {loc.primaryCategory && (
+                      <p className="text-[11px] uppercase tracking-[0.12em] text-text-muted">
+                        {loc.primaryCategory}
+                      </p>
+                    )}
+                    {loc.formattedAddress && (
+                      <p className="text-[13.5px] text-text-soft">
+                        {loc.formattedAddress}
+                      </p>
+                    )}
+                    {loc.websiteUri && (
+                      <a
+                        href={loc.websiteUri}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-[12.5px] text-forest hover:underline"
+                      >
+                        {loc.websiteUri.replace(/^https?:\/\//, "")}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                  <div className="flex-shrink-0">
+                    {claimed ? (
+                      <span className="inline-flex items-center rounded-md bg-sage-soft px-2.5 py-1 text-[11.5px] font-medium text-forest-dark">
+                        Already added
+                      </span>
+                    ) : !loc.placeId ? (
+                      <span className="inline-flex items-center rounded-md bg-warn/10 px-2.5 py-1 text-[11.5px] font-medium text-warn">
+                        No place ID
+                      </span>
+                    ) : (
+                      <form action={createLocationFromGoogle}>
+                        <input
+                          type="hidden"
+                          name="place_id"
+                          value={loc.placeId}
+                        />
+                        <input
+                          type="hidden"
+                          name="title"
+                          value={loc.title}
+                        />
+                        <input
+                          type="hidden"
+                          name="address"
+                          value={loc.formattedAddress ?? ""}
+                        />
+                        <input
+                          type="hidden"
+                          name="website_uri"
+                          value={loc.websiteUri ?? ""}
+                        />
+                        <input
+                          type="hidden"
+                          name="primary_category"
+                          value={loc.primaryCategory ?? ""}
+                        />
+                        <Button type="submit" size="sm">
+                          Use this location
+                        </Button>
+                      </form>
+                    )}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </main>
+  );
+}
+
+function EmptyResult() {
+  return (
+    <div className="rounded-2xl border border-dashed border-border-base bg-paper/60 p-10 text-center max-w-2xl">
+      <h2 className="font-display text-[20px] text-ink">
+        No Google Business Profile locations
+      </h2>
+      <p className="mx-auto mt-1.5 max-w-md text-[14px] text-text-soft leading-relaxed">
+        We couldn&apos;t find any verified locations on the Google account you
+        connected. You may need to claim or verify your business at{" "}
+        <a
+          href="https://business.google.com"
+          target="_blank"
+          rel="noreferrer"
+          className="text-forest underline"
+        >
+          business.google.com
+        </a>
+        .
+      </p>
+      <Link href="/app/locations" className="mt-5 inline-block">
+        <Button variant="secondary">Back to locations</Button>
+      </Link>
+    </div>
+  );
+}
