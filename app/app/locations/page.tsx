@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Plus, AlertCircle } from "lucide-react";
+import { MapPin, Plus, AlertCircle, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ export default async function LocationsPage({
 
   const { data: locations } = await supabase
     .from("locations")
-    .select("id, slug, display_name, address, business_type, brand_color")
+    .select("id, slug, display_name, address, business_type, brand_color, logo_url")
     .order("created_at", { ascending: false });
 
   const errorMessage = params.error ? ERRORS[params.error] ?? params.error : null;
@@ -61,17 +61,26 @@ export default async function LocationsPage({
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 max-w-4xl">
           {locations.map((loc) => (
-            <li
-              key={loc.id}
-              className="rounded-xl border border-border-base bg-paper p-5 shadow-sm"
-            >
-              <div className="flex items-start gap-3">
-                <span
-                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md text-cream font-display text-[15px]"
-                  style={{ backgroundColor: loc.brand_color ?? "#1F4D3F" }}
-                >
-                  {loc.display_name.charAt(0).toUpperCase()}
-                </span>
+            <li key={loc.id}>
+              <Link
+                href={`/app/locations/${loc.id}`}
+                className="group flex items-start gap-3 rounded-xl border border-border-base bg-paper p-5 shadow-sm transition-colors hover:bg-hover"
+              >
+                {loc.logo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={loc.logo_url}
+                    alt=""
+                    className="h-9 w-9 flex-shrink-0 rounded-md object-cover"
+                  />
+                ) : (
+                  <span
+                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md text-cream font-display text-[15px]"
+                    style={{ backgroundColor: loc.brand_color ?? "#1F4D3F" }}
+                  >
+                    {loc.display_name.charAt(0).toUpperCase()}
+                  </span>
+                )}
                 <div className="min-w-0 flex-1 space-y-1">
                   <p className="font-display text-[17px] text-ink leading-tight truncate">
                     {loc.display_name}
@@ -90,7 +99,8 @@ export default async function LocationsPage({
                     /r/{loc.slug}
                   </p>
                 </div>
-              </div>
+                <ChevronRight className="h-4 w-4 mt-1 text-text-muted opacity-0 transition-opacity group-hover:opacity-100" />
+              </Link>
             </li>
           ))}
         </ul>
