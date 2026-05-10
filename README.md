@@ -42,7 +42,7 @@ Required variables:
 pnpm dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000).
+Visit [http://localhost:4001](http://localhost:4001). (Port 4001 is set in the `dev` and `start` scripts so it doesn't collide with other local services on 3000.)
 
 ## Routes (Session 1)
 
@@ -70,7 +70,7 @@ In the Supabase dashboard for the `baam-review` project:
 
 - **Authentication → URL Configuration**
   - Site URL: `https://review.baamplatform.com`
-  - Redirect URLs: add `http://localhost:3000/**` for local dev
+  - Redirect URLs: add `http://localhost:4001/**` for local dev
 - **Authentication → Providers → Email** — confirm email enabled
 
 ## Project structure
