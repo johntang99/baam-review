@@ -39,7 +39,7 @@ export function ReviewFlow({
   const s = STRINGS[lang];
 
   const [service, setService] = useState<string | null>(null);
-  const [rating, setRating] = useState<number>(0);
+  const [rating, setRating] = useState<number>(5);
   const [descriptor, setDescriptor] = useState<string | null>(null);
 
   // Fire page_view on mount.
@@ -80,18 +80,13 @@ export function ReviewFlow({
       </Section>
 
       <Section title={s.step_rating}>
-        <div className="space-y-2">
-          <StarRating
-            value={rating}
-            onChange={(n) => {
-              setRating(n);
-              commit("rating", n);
-            }}
-          />
-          {rating === 0 && (
-            <p className="text-[12px] text-text-muted">{s.rating_helper}</p>
-          )}
-        </div>
+        <StarRating
+          value={rating}
+          onChange={(n) => {
+            setRating(n);
+            commit("rating", n);
+          }}
+        />
       </Section>
 
       <Section title={s.step_descriptor}>
