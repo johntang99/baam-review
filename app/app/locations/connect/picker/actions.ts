@@ -55,5 +55,5 @@ export async function createLocationFromGoogle(formData: FormData) {
     throw new Error(`Failed to create location: ${error.message}`);
   }
 
-  redirect("/app/locations");
+  redirect("/app/locations/connect/picker");
 }

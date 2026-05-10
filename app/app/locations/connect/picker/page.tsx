@@ -69,6 +69,8 @@ export default async function PickerPage() {
     fatal = e instanceof Error ? e.message : "Unknown error";
   }
 
+  const claimedCount = claimedPlaceIds.size;
+
   return (
     <main className="px-10 py-10 space-y-8">
       <div>
@@ -81,13 +83,21 @@ export default async function PickerPage() {
         </Link>
         <PageHeader
           eyebrow="Connect Google"
-          title="Pick a location"
+          title="Pick locations"
           description={
             googleEmail
-              ? `Showing locations from ${googleEmail}. Pick one to add it to BAAM Review.`
-              : "Pick the location you want to collect reviews for."
+              ? `Showing locations from ${googleEmail}. Add as many as you'd like — tap "Use this location" on each one.`
+              : "Add as many locations as you'd like — tap \"Use this location\" on each one."
           }
-        />
+        >
+          {claimedCount > 0 && (
+            <Link href="/app/locations">
+              <Button variant="secondary">
+                Done — view {claimedCount === 1 ? "location" : `${claimedCount} locations`}
+              </Button>
+            </Link>
+          )}
+        </PageHeader>
       </div>
 
       {fatal && (
