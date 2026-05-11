@@ -61,10 +61,10 @@ export default async function ReviewLandingPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ t?: string; lang?: string }>;
+  searchParams: Promise<{ t?: string; lang?: string; source?: string }>;
 }) {
   const { slug } = await params;
-  const { t: token, lang: langOverride } = await searchParams;
+  const { t: token, lang: langOverride, source } = await searchParams;
 
   const supabase = createServiceClient();
 
@@ -118,10 +118,16 @@ export default async function ReviewLandingPage({
   const supportedLangs = loc.supported_languages.filter(isLanguage);
   const wechat = isWeChatBrowser(userAgent);
 
+  const sanitizedSource =
+    typeof source === "string" && source
+      ? source.slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, "")
+      : null;
+
   const ctx = {
     locationId: loc.id,
     requestId: request?.id ?? null,
     language: lang,
+    source: sanitizedSource,
   };
 
   const initialLetter = loc.display_name.charAt(0).toUpperCase();

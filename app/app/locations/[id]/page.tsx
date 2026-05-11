@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, QrCode } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
 import { SettingsForm } from "./settings-form";
@@ -57,6 +57,13 @@ export default async function LocationSettingsPage({
             title={location.display_name}
             description={location.address ?? undefined}
           >
+            <Link
+              href={`/app/locations/${location.id}/qr`}
+              className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-forest hover:underline"
+            >
+              <QrCode className="h-3.5 w-3.5" />
+              QR poster
+            </Link>
             {location.google_review_url && (
               <a
                 href={location.google_review_url}
