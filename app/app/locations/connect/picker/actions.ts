@@ -49,6 +49,10 @@ export async function createLocationFromGoogle(formData: FormData) {
         ? primaryCategory.toLowerCase()
         : null,
     custom_url: typeof websiteUri === "string" ? websiteUri || null : null,
+    // Multilingual is the BAAM Review wedge — default all three on. Owner can
+    // narrow this in Location Settings if their customer base is monolingual.
+    default_language: "en",
+    supported_languages: ["en", "zh", "es"],
   });
 
   if (error) {

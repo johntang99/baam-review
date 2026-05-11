@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/section";
 import { cn } from "@/lib/utils";
+import { buildSmsBody, buildEmail } from "@/lib/messaging/templates";
+import type { Language } from "@/lib/i18n/review";
 import { sendReviewRequest, type SendResult } from "./actions";
 
 interface LocationOption {
@@ -29,11 +31,16 @@ interface SendFormProps {
   smsEnabled: boolean;
 }
 
+const ALL_LANGS = ["en", "zh", "es"] as const;
 const LANG_LABEL: Record<string, string> = {
   en: "English",
   zh: "中文",
   es: "Español",
 };
+
+function isLang(s: string): s is Language {
+  return (ALL_LANGS as readonly string[]).includes(s);
+}
 
 export function SendForm({ locations, smsEnabled }: SendFormProps) {
   const initialLocation = locations[0];
@@ -53,6 +60,20 @@ export function SendForm({ locations, smsEnabled }: SendFormProps) {
 
   const currentLocation = locations.find((l) => l.id === locationId);
   const supported = currentLocation?.supported_languages ?? ["en"];
+  const missingLangs = ALL_LANGS.filter((l) => !supported.includes(l));
+
+  const previewName = name.trim() || (
+    language === "zh" ? "客户" : language === "es" ? "Cliente" : "Customer"
+  );
+  const previewLink = `${typeof window !== "undefined" ? window.location.origin : ""}/r/<slug>?t=<token>`;
+  const previewVars = {
+    name: previewName,
+    businessName: currentLocation?.display_name ?? "",
+    link: previewLink,
+  };
+  const previewLang: Language = isLang(language) ? language : "en";
+  const smsPreview = buildSmsBody(previewLang, previewVars);
+  const emailPreview = buildEmail(previewLang, previewVars);
 
   function onLocationChange(id: string) {
     setLocationId(id);
@@ -187,34 +208,59 @@ export function SendForm({ locations, smsEnabled }: SendFormProps) {
           </Field>
         )}
 
-        {supported.length > 1 && (
-          <div className="space-y-2">
-            <p className="text-[12.5px] font-medium tracking-tight text-text-soft">
-              Message language
-            </p>
-            <input type="hidden" name="language" value={language} />
-            <div className="flex flex-wrap gap-2">
-              {supported.map((code) => (
-                <button
-                  key={code}
-                  type="button"
-                  onClick={() => setLanguage(code)}
-                  className={cn(
-                    "rounded-lg border px-3 py-1.5 text-[13px] transition-colors",
-                    language === code
-                      ? "border-forest bg-forest text-cream"
-                      : "border-border-base bg-paper text-text-soft hover:bg-hover",
-                  )}
-                >
-                  {LANG_LABEL[code] ?? code.toUpperCase()}
-                </button>
-              ))}
-            </div>
+        <div className="space-y-2">
+          <p className="text-[12.5px] font-medium tracking-tight text-text-soft">
+            Message language
+          </p>
+          <input type="hidden" name="language" value={language} />
+          <div className="flex flex-wrap gap-2">
+            {supported.map((code) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => setLanguage(code)}
+                className={cn(
+                  "rounded-lg border px-3 py-1.5 text-[13px] transition-colors",
+                  language === code
+                    ? "border-forest bg-forest text-cream"
+                    : "border-border-base bg-paper text-text-soft hover:bg-hover",
+                )}
+              >
+                {LANG_LABEL[code] ?? code.toUpperCase()}
+              </button>
+            ))}
           </div>
-        )}
-        {supported.length === 1 && (
-          <input type="hidden" name="language" value={supported[0]} />
-        )}
+          {missingLangs.length > 0 && currentLocation && (
+            <p className="text-[11.5px] text-text-muted pt-1">
+              To send in {missingLangs.map((l) => LANG_LABEL[l]).join(" / ")},{" "}
+              <Link
+                href={`/app/locations/${currentLocation.id}`}
+                className="text-forest hover:underline"
+              >
+                enable those languages on this location
+              </Link>
+              .
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2 rounded-xl border border-border-soft bg-cream/40 p-3.5">
+          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">
+            Message preview
+          </p>
+          {channel === "sms" ? (
+            <SmsPreview body={smsPreview.body} />
+          ) : (
+            <EmailPreview
+              subject={emailPreview.subject}
+              body={emailPreview.body}
+            />
+          )}
+          <p className="text-[11px] text-text-muted">
+            Variables in <code className="font-mono">&lt;…&gt;</code> are filled
+            in when the message is sent.
+          </p>
+        </div>
 
         {result && !result.ok && (
           <div
@@ -276,6 +322,43 @@ function ChannelToggle({
       <span className="font-medium">{label}</span>
       {hint && <span className="text-[11px] text-text-muted ml-auto">{hint}</span>}
     </button>
+  );
+}
+
+function SmsPreview({ body }: { body: string }) {
+  const charCount = body.length;
+  const segments = Math.max(1, Math.ceil(charCount / 160));
+  return (
+    <div className="space-y-1.5">
+      <div className="rounded-lg bg-paper border border-border-base p-3 text-[13px] text-text whitespace-pre-wrap leading-relaxed">
+        {body}
+      </div>
+      <p className="text-[11px] text-text-muted">
+        {charCount} characters · {segments} SMS segment{segments === 1 ? "" : "s"}
+      </p>
+    </div>
+  );
+}
+
+function EmailPreview({
+  subject,
+  body,
+}: {
+  subject: string;
+  body: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="rounded-lg bg-paper border border-border-base px-3 py-2">
+        <p className="text-[11px] uppercase tracking-[0.14em] text-text-muted">
+          Subject
+        </p>
+        <p className="text-[13px] text-ink mt-0.5">{subject}</p>
+      </div>
+      <div className="rounded-lg bg-paper border border-border-base p-3 text-[13px] text-text whitespace-pre-wrap leading-relaxed">
+        {body}
+      </div>
+    </div>
   );
 }
 

@@ -53,33 +53,30 @@ export function buildEmail(lang: Language, vars: TemplateVars): EmailOutput {
   switch (lang) {
     case "zh":
       return emailHtml({
-        subject: `${vars.businessName}：邀您分享体验`,
-        greeting: `您好 ${first}，`,
-        body: `感谢您光临${vars.businessName}。能否花一分钟分享您的体验？我们准备好了几个快速选项，30 秒即可完成。`,
-        cta: "撰写评价",
-        footer:
-          "您之所以收到此邮件，是因为最近光临了我们。如不希望再收到此类邮件，请忽略本邮件。",
+        subject: `${first}，能耽误您一分钟吗？`,
+        greeting: `${first}，您好：`,
+        body: `感谢您今天来到${vars.businessName}。如果方便，能花一分钟跟我们说说您的体验吗？以下链接里有几个快速选项：`,
+        sign: `${vars.businessName} 团队`,
+        footer: "如不想收到此类邮件，可直接忽略。",
         link: vars.link,
       });
     case "es":
       return emailHtml({
-        subject: `${vars.businessName}: comparta su experiencia`,
+        subject: `${first}, ¿tendrá un minuto?`,
         greeting: `Hola ${first},`,
-        body: `Gracias por visitar ${vars.businessName}. ¿Le importaría compartir su experiencia? Le hemos preparado unas opciones rápidas, sólo 30 segundos.`,
-        cta: "Escribir reseña",
-        footer:
-          "Recibe este correo porque visitó recientemente. Si no desea recibir más, simplemente ignórelo.",
+        body: `Gracias por su visita a ${vars.businessName}. Si tiene un minuto, ¿podría contarnos cómo le fue? Le dejamos un enlace con algunas opciones rápidas:`,
+        sign: `El equipo de ${vars.businessName}`,
+        footer: "Si prefiere no recibir más, simplemente ignore este mensaje.",
         link: vars.link,
       });
     case "en":
     default:
       return emailHtml({
-        subject: `${vars.businessName}: a quick favor`,
+        subject: `${first}, do you have a minute?`,
         greeting: `Hi ${first},`,
-        body: `Thanks for visiting ${vars.businessName}. Would you mind sharing your experience? We've set up a few quick options — about 30 seconds.`,
-        cta: "Write a review",
-        footer:
-          "You're getting this because you visited recently. If you'd rather not, just ignore this email.",
+        body: `Thanks for stopping by ${vars.businessName} today. If you have a minute, we'd love to hear how it went — there are a few quick options at this link:`,
+        sign: `The team at ${vars.businessName}`,
+        footer: "If you'd rather not, just ignore this email — no worries.",
         link: vars.link,
       });
   }
@@ -89,29 +86,33 @@ function emailHtml(parts: {
   subject: string;
   greeting: string;
   body: string;
-  cta: string;
+  sign: string;
   footer: string;
   link: string;
 }): EmailOutput {
+  // Plain-text first. Gmail Promotions classifier strongly weights HTML-heavy
+  // marketing-style emails. Keep this looking like a personal note.
   const text = `${parts.greeting}
 
 ${parts.body}
 
-${parts.cta}: ${parts.link}
+${parts.link}
 
+${parts.sign}
+
+—
 ${parts.footer}`;
 
+  // Minimal HTML: same content, system font, single sentence link. No
+  // buttons, no card chrome, no images. Reads like a normal email.
   const html = `<!doctype html>
 <html>
-  <body style="font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif; background: #FAF7F2; padding: 24px; color: #1A1F1C;">
-    <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border: 1px solid #E8E2D5; border-radius: 16px; padding: 28px;">
-      <p style="font-size: 15px; margin: 0 0 12px 0;">${escapeHtml(parts.greeting)}</p>
-      <p style="font-size: 15px; line-height: 1.55; margin: 0 0 22px 0;">${escapeHtml(parts.body)}</p>
-      <p style="margin: 0 0 22px 0;">
-        <a href="${parts.link}" style="display: inline-block; background: #1F4D3F; color: #FAF7F2; text-decoration: none; padding: 11px 18px; border-radius: 10px; font-size: 14px; font-weight: 500;">${escapeHtml(parts.cta)}</a>
-      </p>
-      <p style="font-size: 12px; color: #8A938E; line-height: 1.5; margin: 0;">${escapeHtml(parts.footer)}</p>
-    </div>
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1A1F1C; line-height: 1.55; max-width: 560px; margin: 0; padding: 16px;">
+    <p style="margin: 0 0 14px 0;">${escapeHtml(parts.greeting)}</p>
+    <p style="margin: 0 0 14px 0;">${escapeHtml(parts.body)}</p>
+    <p style="margin: 0 0 14px 0;"><a href="${parts.link}" style="color: #1F4D3F;">${escapeHtml(parts.link)}</a></p>
+    <p style="margin: 0 0 22px 0;">${escapeHtml(parts.sign)}</p>
+    <p style="font-size: 12px; color: #8A938E; margin: 0;">${escapeHtml(parts.footer)}</p>
   </body>
 </html>`;
 

@@ -115,15 +115,14 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
   } else {
     const email = buildEmail(language, vars);
     messageBody = email.body;
+    // Reply-To set to the sending user's address so customer can reply to a
+    // real person, not no-reply@. Helps Gmail classify as personal, not bulk.
     const r = await sendEmailViaResend({
       to: recipientEmail!,
       subject: email.subject,
       text: email.body,
       html: email.html,
-      tags: [
-        { name: "location_id", value: location.id },
-        { name: "lang", value: language },
-      ],
+      replyTo: user.email ?? undefined,
     });
     providerId = r.providerId;
     sendError = r.error;
