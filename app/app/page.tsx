@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Send, Star, Code, ArrowRight } from "lucide-react";
+import { Send, Star, Code, ArrowRight, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import {
   buildFunnel,
@@ -79,6 +79,15 @@ export default async function DashboardPage() {
     .eq("event_type", "page_view")
     .gte("occurred_at", sinceIso);
 
+  // Google reviews — all-time, for rating average + recent activity.
+  const { data: googleReviews } = await supabase
+    .from("google_reviews")
+    .select(
+      "id, rating, comment, reviewer_display_name, review_create_time, reply_comment, location_id",
+    )
+    .order("review_create_time", { ascending: false })
+    .limit(50);
+
   const rs = requests ?? [];
   const sent = rs.filter((r) => r.sent_at).length;
   const delivered = rs.filter((r) => r.delivered_at).length;
@@ -118,7 +127,16 @@ export default async function DashboardPage() {
 
   const firstName = (profile?.full_name?.split(" ")[0]) || user?.email?.split("@")[0] || "there";
 
-  const hasData = (rs.length + (feedback?.length ?? 0)) > 0;
+  const gr = googleReviews ?? [];
+  const grRecent30 = gr.filter(
+    (r) => new Date(r.review_create_time).getTime() > Date.now() - WINDOW_DAYS * 86_400_000,
+  );
+  const grAvg30 = grRecent30.length === 0
+    ? 0
+    : grRecent30.reduce((s, r) => s + r.rating, 0) / grRecent30.length;
+  const grLowUnreplied = gr.filter((r) => r.rating <= 2 && !r.reply_comment);
+
+  const hasData = (rs.length + (feedback?.length ?? 0) + gr.length) > 0;
 
   return (
     <main className="px-10 py-10 space-y-8">
@@ -141,6 +159,14 @@ export default async function DashboardPage() {
         <EmptyDashboard />
       ) : (
         <>
+          {grLowUnreplied.length > 0 && (
+            <LowRatingBanner
+              count={grLowUnreplied.length}
+              firstLocationId={grLowUnreplied[0].location_id}
+              locationName={locationName.get(grLowUnreplied[0].location_id) ?? "your location"}
+            />
+          )}
+
           <section className="grid grid-cols-2 lg:grid-cols-5 gap-3">
             <StatCard label="Sent" value={sent} />
             <StatCard
@@ -186,6 +212,16 @@ export default async function DashboardPage() {
               </p>
             )}
           </section>
+
+          {gr.length > 0 && (
+            <GoogleReviewsCard
+              reviews={gr.slice(0, 5)}
+              total={gr.length}
+              avg30={grAvg30}
+              recentCount={grRecent30.length}
+              locationName={locationName}
+            />
+          )}
 
           <section className="grid gap-4 lg:grid-cols-3">
             <Breakdown
@@ -397,5 +433,120 @@ function PrivateFeedbackPeek({
         </ul>
       )}
     </div>
+  );
+}
+
+function LowRatingBanner({
+  count,
+  firstLocationId,
+  locationName,
+}: {
+  count: number;
+  firstLocationId: string;
+  locationName: string;
+}) {
+  return (
+    <div
+      role="alert"
+      className="flex items-start gap-3 rounded-2xl border border-alert/30 bg-alert/5 p-4"
+    >
+      <AlertTriangle className="h-5 w-5 mt-0.5 flex-shrink-0 text-alert" />
+      <div className="flex-1 space-y-1">
+        <p className="text-[14px] text-ink font-medium">
+          {count} low-rating review{count === 1 ? "" : "s"} need a reply
+        </p>
+        <p className="text-[13px] text-text-soft">
+          1- or 2-star reviews on Google without an owner response.{" "}
+          {count === 1 ? "Start at" : "Including"}{" "}
+          <Link
+            href={`/app/locations/${firstLocationId}/reviews`}
+            className="text-forest font-medium hover:underline"
+          >
+            {locationName}
+          </Link>
+          .
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface GoogleReview {
+  id: string;
+  rating: number;
+  comment: string | null;
+  reviewer_display_name: string | null;
+  review_create_time: string;
+  reply_comment: string | null;
+  location_id: string;
+}
+
+function GoogleReviewsCard({
+  reviews,
+  total,
+  avg30,
+  recentCount,
+  locationName,
+}: {
+  reviews: GoogleReview[];
+  total: number;
+  avg30: number;
+  recentCount: number;
+  locationName: Map<string, string>;
+}) {
+  return (
+    <section className="rounded-2xl border border-border-base bg-paper p-6 space-y-4">
+      <div className="flex items-baseline justify-between gap-3 flex-wrap">
+        <h2 className="font-display text-[18px] text-ink">
+          Google reviews
+        </h2>
+        <div className="flex items-baseline gap-3 text-[12.5px] text-text-soft">
+          {recentCount > 0 && (
+            <span>
+              <span className="text-gold">
+                {"★".repeat(Math.round(avg30))}
+                {"☆".repeat(5 - Math.round(avg30))}
+              </span>{" "}
+              {avg30.toFixed(1)} avg · last {WINDOW_DAYS}d
+            </span>
+          )}
+          <span className="text-text-muted">{total} total</span>
+        </div>
+      </div>
+
+      <ul className="divide-y divide-border-soft">
+        {reviews.map((r) => (
+          <li key={r.id} className="py-3 space-y-1">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-[13px] font-medium text-ink truncate">
+                {r.reviewer_display_name ?? "Anonymous"}
+              </span>
+              <span className="text-[11.5px] text-text-muted whitespace-nowrap">
+                {relativeTime(r.review_create_time)}
+              </span>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-gold text-[12.5px]">
+                {"★".repeat(r.rating)}
+                {"☆".repeat(5 - r.rating)}
+              </span>
+              <span className="text-[11.5px] text-text-muted">
+                {locationName.get(r.location_id) ?? "—"}
+              </span>
+              {!r.reply_comment && r.rating <= 2 && (
+                <span className="rounded-full bg-alert/12 text-alert text-[10.5px] font-medium uppercase tracking-wider px-1.5 py-0.5">
+                  Needs reply
+                </span>
+              )}
+            </div>
+            {r.comment && (
+              <p className="text-[13px] text-text-soft leading-snug line-clamp-2">
+                {r.comment}
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

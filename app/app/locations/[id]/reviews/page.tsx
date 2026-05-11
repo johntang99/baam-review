@@ -1,0 +1,72 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { PageHeader } from "@/components/admin/page-header";
+import { ReviewsList } from "./reviews-list";
+
+export const metadata = {
+  title: "Google reviews — BAAM Review",
+};
+
+export const dynamic = "force-dynamic";
+
+export default async function LocationReviewsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/login?next=/app/locations/${id}/reviews`);
+
+  const { data: location } = await supabase
+    .from("locations")
+    .select("id, slug, display_name, google_resource_name, reviews_synced_at")
+    .eq("id", id)
+    .maybeSingle();
+  if (!location) notFound();
+
+  const { data: reviews } = await supabase
+    .from("google_reviews")
+    .select(
+      "id, google_review_id, reviewer_display_name, reviewer_profile_photo_url, rating, comment, review_create_time, reply_comment, reply_update_time, alerted_at",
+    )
+    .eq("location_id", location.id)
+    .order("review_create_time", { ascending: false });
+
+  return (
+    <main className="px-10 py-10">
+      <div className="max-w-3xl space-y-6">
+        <div>
+          <Link
+            href={`/app/locations/${location.id}`}
+            className="inline-flex items-center gap-1.5 text-[12.5px] text-text-soft hover:text-text mb-3"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to {location.display_name}
+          </Link>
+          <PageHeader
+            eyebrow="Google reviews"
+            title={location.display_name}
+            description={
+              location.google_resource_name
+                ? "Reviews fetched from Google Business Profile. Sync pulls the latest; 1- and 2-star reviews fire an email alert."
+                : "We'll resolve this location's Google resource on first sync."
+            }
+          />
+        </div>
+
+        <ReviewsList
+          locationId={location.id}
+          reviews={reviews ?? []}
+          reviewsSyncedAt={location.reviews_synced_at}
+        />
+      </div>
+    </main>
+  );
+}

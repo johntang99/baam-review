@@ -103,6 +103,8 @@ export interface Database {
           sender_email: string | null;
           sender_name: string | null;
           sender_verified_at: string | null;
+          google_resource_name: string | null;
+          reviews_synced_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -127,6 +129,8 @@ export interface Database {
           sender_email?: string | null;
           sender_name?: string | null;
           sender_verified_at?: string | null;
+          google_resource_name?: string | null;
+          reviews_synced_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -271,6 +275,40 @@ export interface Database {
           occurred_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["subscription_events"]["Insert"]>;
+        Relationships: [];
+      };
+      google_reviews: {
+        Row: {
+          id: string;
+          location_id: string;
+          google_review_id: string;
+          reviewer_display_name: string | null;
+          reviewer_profile_photo_url: string | null;
+          rating: number;
+          comment: string | null;
+          review_create_time: string;
+          review_update_time: string;
+          reply_comment: string | null;
+          reply_update_time: string | null;
+          alerted_at: string | null;
+          fetched_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          google_review_id: string;
+          reviewer_display_name?: string | null;
+          reviewer_profile_photo_url?: string | null;
+          rating: number;
+          comment?: string | null;
+          review_create_time: string;
+          review_update_time: string;
+          reply_comment?: string | null;
+          reply_update_time?: string | null;
+          alerted_at?: string | null;
+          fetched_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["google_reviews"]["Insert"]>;
         Relationships: [];
       };
       google_oauth_tokens: {
