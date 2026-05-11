@@ -200,7 +200,9 @@ export function DraftPicker({
         </div>
       )}
 
-      <p className="text-[12px] text-text-muted italic">{s.ai_disclosure}</p>
+      <p className="text-[13px] text-text italic leading-relaxed">
+        {s.ai_disclosure}
+      </p>
 
       <div className="space-y-2">
         {googleReviewUrl && (
@@ -248,7 +250,7 @@ export function DraftPicker({
           </button>
         </div>
 
-        <p className="text-[12px] text-text-muted text-center pt-1">
+        <p className="text-[13px] text-text text-center pt-1">
           {s.drafts_helper}
         </p>
       </div>
