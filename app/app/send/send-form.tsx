@@ -30,6 +30,7 @@ interface LocationOption {
 interface SendFormProps {
   locations: LocationOption[];
   smsEnabled: boolean;
+  initialLocationId?: string | null;
 }
 
 const ALL_LANGS = ["en", "zh", "es"] as const;
@@ -43,8 +44,13 @@ function isLang(s: string): s is Language {
   return (ALL_LANGS as readonly string[]).includes(s);
 }
 
-export function SendForm({ locations, smsEnabled }: SendFormProps) {
-  const initialLocation = locations[0];
+export function SendForm({
+  locations,
+  smsEnabled,
+  initialLocationId,
+}: SendFormProps) {
+  const initialLocation =
+    locations.find((l) => l.id === initialLocationId) ?? locations[0];
   const [locationId, setLocationId] = useState<string>(initialLocation?.id ?? "");
   const [channel, setChannel] = useState<"sms" | "email">(
     smsEnabled ? "sms" : "email",

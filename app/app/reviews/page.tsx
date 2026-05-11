@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Mail, Phone, ExternalLink, Lock, Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getSelectedLocationId } from "@/lib/selected-location";
 import { PageHeader } from "@/components/admin/page-header";
 import {
   relativeTime,
@@ -34,33 +35,46 @@ export default async function ReviewsPage({
   const tab: Tab = (TABS.find((t) => t.id === tabRaw)?.id) ?? "all";
 
   const supabase = await createClient();
+  const selectedLocationId = await getSelectedLocationId();
 
   const { data: locations } = await supabase
     .from("locations")
     .select("id, display_name");
   const locName = new Map((locations ?? []).map((l) => [l.id, l.display_name]));
+  const selectedLocation = selectedLocationId
+    ? (locations ?? []).find((l) => l.id === selectedLocationId)
+    : null;
 
-  const { data: feedback } = await supabase
+  let feedbackQuery = supabase
     .from("private_feedback")
     .select(
       "id, message, rating, contact_email, contact_phone, language, read_at, created_at, location_id",
     )
     .order("created_at", { ascending: false });
+  if (selectedLocationId)
+    feedbackQuery = feedbackQuery.eq("location_id", selectedLocationId);
+  const { data: feedback } = await feedbackQuery;
 
-  const { data: completed } = await supabase
+  let completedQuery = supabase
     .from("review_requests")
     .select(
       "id, recipient_name, recipient_email, recipient_phone, language, channel, completed_platform, completed_at, location_id",
     )
     .not("completed_at", "is", null)
     .order("completed_at", { ascending: false });
+  if (selectedLocationId)
+    completedQuery = completedQuery.eq("location_id", selectedLocationId);
+  const { data: completed } = await completedQuery;
 
-  const { data: googleReviews } = await supabase
+  let googleReviewsQuery = supabase
     .from("google_reviews")
     .select(
       "id, google_review_id, reviewer_display_name, reviewer_profile_photo_url, rating, comment, review_create_time, reply_comment, reply_update_time, location_id",
     )
     .order("review_create_time", { ascending: false });
+  if (selectedLocationId)
+    googleReviewsQuery = googleReviewsQuery.eq("location_id", selectedLocationId);
+  const { data: googleReviews } = await googleReviewsQuery;
 
   const unreadCount = (feedback ?? []).filter((f) => !f.read_at).length;
   const tabCounts: Record<Tab, number> = {
@@ -78,8 +92,12 @@ export default async function ReviewsPage({
     <main className="px-10 py-10 space-y-6">
       <PageHeader
         eyebrow="Inbox"
-        title="Reviews"
-        description="Completed Google / Yelp posts and private feedback from your review pages, in one place."
+        title={selectedLocation ? `Reviews · ${selectedLocation.display_name}` : "Reviews"}
+        description={
+          selectedLocation
+            ? "Google reviews, private feedback, and click-throughs for this location."
+            : "All locations. Switch via the dropdown in the sidebar to focus on one."
+        }
       />
 
       <nav className="flex gap-1 border-b border-border-base">

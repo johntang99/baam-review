@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Send, Star, Code, ArrowRight, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getSelectedLocationId } from "@/lib/selected-location";
 import {
   buildFunnel,
   countBy,
@@ -46,47 +47,63 @@ export default async function DashboardPage() {
     Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000,
   ).toISOString();
 
+  const selectedLocationId = await getSelectedLocationId();
+
   // RLS scopes everything to the user's account automatically.
-  const { data: requests } = await supabase
+  let requestsQuery = supabase
     .from("review_requests")
     .select(
       "id, recipient_name, language, channel, sent_at, delivered_at, clicked_at, completed_platform, completed_at, created_at, location_id, flagged_at",
     )
     .gte("created_at", sinceIso)
     .order("created_at", { ascending: false });
+  if (selectedLocationId)
+    requestsQuery = requestsQuery.eq("location_id", selectedLocationId);
+  const { data: requests } = await requestsQuery;
 
   const { data: locations } = await supabase
     .from("locations")
     .select("id, display_name");
 
+  const selectedLocation = selectedLocationId
+    ? (locations ?? []).find((l) => l.id === selectedLocationId) ?? null
+    : null;
+
   const locationName = new Map(
     (locations ?? []).map((l) => [l.id, l.display_name]),
   );
 
-  const { data: feedback } = await supabase
+  let feedbackQuery = supabase
     .from("private_feedback")
     .select("id, message, rating, created_at, language, location_id")
     .gte("created_at", sinceIso)
     .order("created_at", { ascending: false })
     .limit(5);
+  if (selectedLocationId)
+    feedbackQuery = feedbackQuery.eq("location_id", selectedLocationId);
+  const { data: feedback } = await feedbackQuery;
 
   // Source attribution: page_view events carry source metadata.
-  // Filtered by RLS via the locations join (landing_events has no
-  // account_id directly; the RLS policy uses location → account).
-  const { data: pageViews } = await supabase
+  let pageViewsQuery = supabase
     .from("landing_events")
     .select("metadata")
     .eq("event_type", "page_view")
     .gte("occurred_at", sinceIso);
+  if (selectedLocationId)
+    pageViewsQuery = pageViewsQuery.eq("location_id", selectedLocationId);
+  const { data: pageViews } = await pageViewsQuery;
 
   // Google reviews — all-time, for rating average + recent activity.
-  const { data: googleReviews } = await supabase
+  let googleReviewsQuery = supabase
     .from("google_reviews")
     .select(
       "id, rating, comment, reviewer_display_name, review_create_time, reply_comment, location_id",
     )
     .order("review_create_time", { ascending: false })
     .limit(50);
+  if (selectedLocationId)
+    googleReviewsQuery = googleReviewsQuery.eq("location_id", selectedLocationId);
+  const { data: googleReviews } = await googleReviewsQuery;
 
   const rs = requests ?? [];
   const sent = rs.filter((r) => r.sent_at).length;
@@ -142,12 +159,14 @@ export default async function DashboardPage() {
     <main className="px-10 py-10 space-y-8">
       <header className="space-y-2">
         <p className="text-[11px] uppercase tracking-[0.14em] text-text-muted">
-          Last {WINDOW_DAYS} days
+          {selectedLocation
+            ? `${selectedLocation.display_name} · last ${WINDOW_DAYS} days`
+            : `All locations · last ${WINDOW_DAYS} days`}
         </p>
         <h1 className="font-display text-[30px] leading-tight text-ink">
           Hello, {firstName}.
         </h1>
-        {account?.name && (
+        {!selectedLocation && account?.name && (
           <p className="text-[14px] text-text-soft">
             {account.name} ·{" "}
             <span className="capitalize">{account.subscription_tier}</span> plan
