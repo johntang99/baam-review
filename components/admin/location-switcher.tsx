@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ChevronDown, Check, Plus, LayoutGrid, Globe } from "lucide-react";
 
 export interface LocationSwitcherLocation {
@@ -23,6 +23,7 @@ export function LocationSwitcher({
   selectedId,
 }: LocationSwitcherProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,7 +44,26 @@ export function LocationSwitcher({
     };
   }, [open]);
 
-  const selected = locations.find((l) => l.id === selectedId) ?? null;
+  // The switcher's displayed selection should match what's actually visible
+  // on the page. URL beats cookie when they disagree:
+  //   /app/locations              → "All locations" (manage hub)
+  //   /app/locations/<id>/...     → that <id>
+  //   anything else (workspace)   → cookie value (selectedId prop)
+  const displayedId = useMemo(() => {
+    if (pathname === "/app/locations") return null;
+    const match = pathname.match(/^\/app\/locations\/([^/]+)/);
+    if (match) {
+      const id = match[1];
+      // The picker / connect / connect-callback paths shouldn't be treated as
+      // location-specific even though they live under /app/locations.
+      if (id === "connect") return selectedId;
+      // If the URL id doesn't exist in our list, fall through to cookie.
+      if (locations.some((l) => l.id === id)) return id;
+    }
+    return selectedId;
+  }, [pathname, selectedId, locations]);
+
+  const selected = locations.find((l) => l.id === displayedId) ?? null;
 
   async function pick(value: string | null) {
     await fetch("/api/select-location", {
@@ -52,6 +72,33 @@ export function LocationSwitcher({
       body: JSON.stringify({ value }),
     });
     setOpen(false);
+
+    // Navigation behavior depends on where we are. Goal: picking a location
+    // always lands the user on a page that reflects that choice.
+    if (pathname === "/app/locations") {
+      // Manage-all hub. Picking a specific location → workspace dashboard for
+      // it. Picking "All locations" → stay (the hub already shows everything).
+      if (value !== null) {
+        router.push("/app");
+        return;
+      }
+      router.refresh();
+      return;
+    }
+
+    const perLocMatch = pathname.match(/^\/app\/locations\/([^/]+)(\/.*)?$/);
+    if (perLocMatch && perLocMatch[1] !== "connect") {
+      const sub = perLocMatch[2] ?? "";
+      if (value === null) {
+        // "All locations" from a per-location detail page → manage-all hub.
+        router.push("/app/locations");
+      } else {
+        // Swap the location id in the URL, preserving the subpath.
+        router.push(`/app/locations/${value}${sub}`);
+      }
+      return;
+    }
+
     router.refresh();
   }
 
@@ -98,7 +145,7 @@ export function LocationSwitcher({
               <Globe className="h-3.5 w-3.5" />
             </span>
             <span className="flex-1">All locations</span>
-            {selectedId === null && (
+            {displayedId === null && (
               <Check className="h-3.5 w-3.5 text-gold" />
             )}
           </button>
@@ -123,7 +170,7 @@ export function LocationSwitcher({
                   </span>
                 )}
               </span>
-              {selectedId === loc.id && (
+              {displayedId === loc.id && (
                 <Check className="h-3.5 w-3.5 text-gold flex-shrink-0" />
               )}
             </button>
