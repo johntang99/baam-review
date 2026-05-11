@@ -65,7 +65,11 @@ export function SendForm({ locations, smsEnabled }: SendFormProps) {
   const previewName = name.trim() || (
     language === "zh" ? "客户" : language === "es" ? "Cliente" : "Customer"
   );
-  const previewLink = `${typeof window !== "undefined" ? window.location.origin : ""}/r/<slug>?t=<token>`;
+  // Use the public env so server and client render identically — referring
+  // window inside render would mismatch on hydration.
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://review.baamplatform.com";
+  const previewLink = `${appUrl}/r/<slug>?t=<token>`;
   const previewVars = {
     name: previewName,
     businessName: currentLocation?.display_name ?? "",
