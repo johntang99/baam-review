@@ -140,7 +140,9 @@ A customer can add their own domain in `/app/locations/[id]/settings` → Email 
 
 ### Resend webhooks
 
-The Resend webhook endpoint is `https://review.baamplatform.com/api/webhooks/resend`. It handles `email.delivered`, `email.opened`, `email.bounced`, and `email.complained` events. Currently no signature verification — add `RESEND_WEBHOOK_SECRET` and verify the `svix-signature` header before going to scale.
+The Resend webhook endpoint is `https://review.baamplatform.com/api/webhooks/resend`. It handles `email.delivered`, `email.opened`, `email.bounced`, and `email.complained` events.
+
+**Signature verification** is enforced when `RESEND_WEBHOOK_SECRET` is set in Vercel. We verify the `svix-signature` header against the secret; unverified requests are rejected with 401. Without the secret set, the handler accepts all requests (useful for local testing).
 
 **Setup steps (one-time per environment)**:
 
@@ -148,6 +150,9 @@ The Resend webhook endpoint is `https://review.baamplatform.com/api/webhooks/res
 2. URL: `https://review.baamplatform.com/api/webhooks/resend`
 3. Events to subscribe: at minimum `email.delivered`, `email.opened`, `email.bounced`, `email.complained`
 4. Save
+5. Copy the **Signing Secret** (starts with `whsec_…`)
+6. Vercel → Project Settings → Environment Variables → add `RESEND_WEBHOOK_SECRET=whsec_…` for *Production* (and *Preview*/*Development* if you want)
+7. Redeploy so the env takes effect
 
 Until the webhook is configured, `delivered_at` is set optimistically when the Resend API accepts the send (see [actions.ts](../app/app/send/actions.ts)). `opened_at` is never populated without the webhook. After the webhook is active, bounces clear `delivered_at` so the dashboard funnel reflects reality.
 
