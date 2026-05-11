@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Phone, ExternalLink, Lock } from "lucide-react";
+import { Mail, Phone, ExternalLink, Lock, Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
 import {
@@ -15,12 +15,13 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-type Tab = "all" | "private" | "completed" | "unread";
+type Tab = "all" | "google" | "private" | "completed" | "unread";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "all", label: "All" },
+  { id: "google", label: "Google reviews" },
   { id: "private", label: "Private feedback" },
-  { id: "completed", label: "Completed reviews" },
+  { id: "completed", label: "Customer click-throughs" },
   { id: "unread", label: "Unread" },
 ];
 
@@ -54,9 +55,20 @@ export default async function ReviewsPage({
     .not("completed_at", "is", null)
     .order("completed_at", { ascending: false });
 
+  const { data: googleReviews } = await supabase
+    .from("google_reviews")
+    .select(
+      "id, google_review_id, reviewer_display_name, reviewer_profile_photo_url, rating, comment, review_create_time, reply_comment, reply_update_time, location_id",
+    )
+    .order("review_create_time", { ascending: false });
+
   const unreadCount = (feedback ?? []).filter((f) => !f.read_at).length;
   const tabCounts: Record<Tab, number> = {
-    all: (feedback?.length ?? 0) + (completed?.length ?? 0),
+    all:
+      (feedback?.length ?? 0) +
+      (completed?.length ?? 0) +
+      (googleReviews?.length ?? 0),
+    google: googleReviews?.length ?? 0,
     private: feedback?.length ?? 0,
     completed: completed?.length ?? 0,
     unread: unreadCount,
@@ -94,11 +106,17 @@ export default async function ReviewsPage({
       </nav>
 
       <div className="space-y-3 max-w-3xl">
-        {tab === "completed" ? (
+        {tab === "google" ? (
+          <GoogleReviewsList
+            items={googleReviews ?? []}
+            locName={locName}
+            emptyMessage="No Google reviews synced yet. Open a location and click Sync now."
+          />
+        ) : tab === "completed" ? (
           <CompletedList
             items={completed ?? []}
             locName={locName}
-            emptyMessage="No completed reviews yet."
+            emptyMessage="No click-throughs yet."
           />
         ) : tab === "private" ? (
           <FeedbackList
@@ -117,6 +135,7 @@ export default async function ReviewsPage({
           <UnifiedList
             feedback={feedback ?? []}
             completed={completed ?? []}
+            googleReviews={googleReviews ?? []}
             locName={locName}
           />
         )}
@@ -147,6 +166,125 @@ interface CompletedRow {
   completed_platform: string | null;
   completed_at: string | null;
   location_id: string;
+}
+
+interface GoogleReviewRow {
+  id: string;
+  google_review_id: string;
+  reviewer_display_name: string | null;
+  reviewer_profile_photo_url: string | null;
+  rating: number;
+  comment: string | null;
+  review_create_time: string;
+  reply_comment: string | null;
+  reply_update_time: string | null;
+  location_id: string;
+}
+
+function GoogleReviewsList({
+  items,
+  locName,
+  emptyMessage,
+}: {
+  items: GoogleReviewRow[];
+  locName: Map<string, string>;
+  emptyMessage: string;
+}) {
+  if (items.length === 0) return <EmptyState message={emptyMessage} />;
+  return (
+    <ul className="space-y-3">
+      {items.map((r) => (
+        <GoogleReviewCard key={r.id} r={r} locName={locName} />
+      ))}
+    </ul>
+  );
+}
+
+function GoogleReviewCard({
+  r,
+  locName,
+}: {
+  r: GoogleReviewRow;
+  locName: Map<string, string>;
+}) {
+  const low = r.rating <= 2;
+  return (
+    <li
+      className={`rounded-2xl border bg-paper p-5 ${
+        low ? "border-alert/30" : "border-border-base"
+      }`}
+    >
+      <div className="flex items-start gap-3 mb-2">
+        {r.reviewer_profile_photo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={r.reviewer_profile_photo_url}
+            alt=""
+            className="h-8 w-8 rounded-full flex-shrink-0 object-cover"
+          />
+        ) : (
+          <span className="h-8 w-8 rounded-full bg-sage-soft flex-shrink-0 flex items-center justify-center text-forest-dark font-medium text-[13px]">
+            {(r.reviewer_display_name ?? "?").charAt(0).toUpperCase()}
+          </span>
+        )}
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <div className="flex items-center gap-2">
+            <Star className="h-3 w-3 text-gold flex-shrink-0" />
+            <span className="text-[11px] uppercase tracking-[0.14em] text-text-muted">
+              Google review
+            </span>
+            {low && !r.reply_comment && (
+              <span className="rounded-full bg-alert/12 text-alert text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5">
+                Needs reply
+              </span>
+            )}
+          </div>
+          <p className="text-[13.5px] text-ink font-medium truncate">
+            {r.reviewer_display_name ?? "Anonymous"}
+          </p>
+          <p className="text-[11.5px] text-text-soft truncate">
+            {locName.get(r.location_id) ?? "—"}
+          </p>
+        </div>
+        <div className="flex items-baseline gap-3 flex-shrink-0">
+          <span className="text-gold text-[13px] tracking-tight">
+            {"★".repeat(r.rating)}
+            {"☆".repeat(5 - r.rating)}
+          </span>
+          <span className="text-[11.5px] text-text-muted whitespace-nowrap">
+            {relativeTime(r.review_create_time)}
+          </span>
+        </div>
+      </div>
+
+      {r.comment && (
+        <p className="text-[14px] text-text leading-relaxed whitespace-pre-wrap">
+          {r.comment}
+        </p>
+      )}
+
+      {r.reply_comment && (
+        <div className="mt-3 rounded-lg bg-cream-deep/40 p-3 text-[13px] text-text-soft space-y-1">
+          <p className="text-[11px] uppercase tracking-[0.14em] text-text-muted">
+            Your reply
+            {r.reply_update_time && (
+              <span> · {relativeTime(r.reply_update_time)}</span>
+            )}
+          </p>
+          <p className="whitespace-pre-wrap">{r.reply_comment}</p>
+        </div>
+      )}
+
+      <div className="mt-3 flex justify-end">
+        <Link
+          href={`/app/locations/${r.location_id}/reviews`}
+          className="text-[12px] text-forest hover:underline"
+        >
+          Open in location →
+        </Link>
+      </div>
+    </li>
+  );
 }
 
 function FeedbackList({
@@ -323,17 +461,25 @@ function CompletedCard({
 function UnifiedList({
   feedback,
   completed,
+  googleReviews,
   locName,
 }: {
   feedback: FeedbackRow[];
   completed: CompletedRow[];
+  googleReviews: GoogleReviewRow[];
   locName: Map<string, string>;
 }) {
   type Item =
+    | { kind: "google"; at: string; data: GoogleReviewRow }
     | { kind: "feedback"; at: string; data: FeedbackRow }
     | { kind: "completed"; at: string; data: CompletedRow };
 
   const items: Item[] = [
+    ...googleReviews.map((g) => ({
+      kind: "google" as const,
+      at: g.review_create_time,
+      data: g,
+    })),
     ...feedback.map((f) => ({
       kind: "feedback" as const,
       at: f.created_at,
@@ -357,7 +503,9 @@ function UnifiedList({
   return (
     <ul className="space-y-3">
       {items.map((it) =>
-        it.kind === "feedback" ? (
+        it.kind === "google" ? (
+          <GoogleReviewCard key={`g-${it.data.id}`} r={it.data} locName={locName} />
+        ) : it.kind === "feedback" ? (
           <FeedbackCard key={`f-${it.data.id}`} f={it.data} locName={locName} />
         ) : (
           <CompletedCard key={`c-${it.data.id}`} r={it.data} locName={locName} />

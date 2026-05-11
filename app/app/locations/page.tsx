@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Plus, AlertCircle, ChevronRight } from "lucide-react";
+import { MapPin, Plus, AlertCircle, Settings, Star, QrCode } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
@@ -61,11 +61,11 @@ export default async function LocationsPage({
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 max-w-4xl">
           {locations.map((loc) => (
-            <li key={loc.id}>
-              <Link
-                href={`/app/locations/${loc.id}`}
-                className="group flex items-start gap-3 rounded-xl border border-border-base bg-paper p-5 shadow-sm transition-colors hover:bg-hover"
-              >
+            <li
+              key={loc.id}
+              className="rounded-xl border border-border-base bg-paper p-5 shadow-sm space-y-4"
+            >
+              <div className="flex items-start gap-3">
                 {loc.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -82,9 +82,12 @@ export default async function LocationsPage({
                   </span>
                 )}
                 <div className="min-w-0 flex-1 space-y-1">
-                  <p className="font-display text-[17px] text-ink leading-tight truncate">
+                  <Link
+                    href={`/app/locations/${loc.id}`}
+                    className="block font-display text-[17px] text-ink leading-tight truncate hover:underline"
+                  >
                     {loc.display_name}
-                  </p>
+                  </Link>
                   {loc.business_type && (
                     <p className="text-[11px] uppercase tracking-[0.12em] text-text-muted">
                       {loc.business_type}
@@ -99,13 +102,43 @@ export default async function LocationsPage({
                     /r/{loc.slug}
                   </p>
                 </div>
-                <ChevronRight className="h-4 w-4 mt-1 text-text-muted opacity-0 transition-opacity group-hover:opacity-100" />
-              </Link>
+              </div>
+              <div className="flex flex-wrap gap-1.5 pt-3 border-t border-border-soft">
+                <CardLink href={`/app/locations/${loc.id}/reviews`} icon={Star}>
+                  Reviews
+                </CardLink>
+                <CardLink href={`/app/locations/${loc.id}/qr`} icon={QrCode}>
+                  QR poster
+                </CardLink>
+                <CardLink href={`/app/locations/${loc.id}`} icon={Settings}>
+                  Settings
+                </CardLink>
+              </div>
             </li>
           ))}
         </ul>
       )}
     </main>
+  );
+}
+
+function CardLink({
+  href,
+  icon: Icon,
+  children,
+}: {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[12.5px] font-medium text-text-soft hover:bg-hover hover:text-ink transition-colors"
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {children}
+    </Link>
   );
 }
 
