@@ -19,6 +19,8 @@ export function buildConsentUrl(opts: {
   state: string;
 }): string {
   const clientId = requireEnv("GOOGLE_CLIENT_ID");
+  const includeGrantedScopes =
+    process.env.GOOGLE_OAUTH_INCLUDE_GRANTED_SCOPES === "true";
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -27,9 +29,11 @@ export function buildConsentUrl(opts: {
     scope: GOOGLE_SCOPES.join(" "),
     access_type: "offline",
     prompt: "consent",
-    include_granted_scopes: "true",
     state: opts.state,
   });
+  if (includeGrantedScopes) {
+    params.set("include_granted_scopes", "true");
+  }
 
   return `${AUTH_URL}?${params.toString()}`;
 }
