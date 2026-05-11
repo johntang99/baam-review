@@ -33,6 +33,14 @@ export async function POST(request: NextRequest) {
     updates.delivered_at = new Date().toISOString();
   } else if (body.type === "email.opened") {
     updates.opened_at = new Date().toISOString();
+  } else if (
+    body.type === "email.bounced" ||
+    body.type === "email.complained"
+  ) {
+    // The send action sets delivered_at optimistically on a successful
+    // Resend API call. If a bounce / complaint comes in later, clear it
+    // so the dashboard funnel reflects reality.
+    updates.delivered_at = null;
   }
 
   if (Object.keys(updates).length === 0) {

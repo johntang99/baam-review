@@ -140,7 +140,16 @@ A customer can add their own domain in `/app/locations/[id]/settings` → Email 
 
 ### Resend webhooks
 
-The Resend webhook endpoint is `https://review.baamplatform.com/api/webhooks/resend`. It handles `email.delivered` and `email.opened` events. Currently no signature verification — add `RESEND_WEBHOOK_SECRET` and verify the `svix-signature` header before going to scale.
+The Resend webhook endpoint is `https://review.baamplatform.com/api/webhooks/resend`. It handles `email.delivered`, `email.opened`, `email.bounced`, and `email.complained` events. Currently no signature verification — add `RESEND_WEBHOOK_SECRET` and verify the `svix-signature` header before going to scale.
+
+**Setup steps (one-time per environment)**:
+
+1. Resend dashboard → Webhooks → Add endpoint
+2. URL: `https://review.baamplatform.com/api/webhooks/resend`
+3. Events to subscribe: at minimum `email.delivered`, `email.opened`, `email.bounced`, `email.complained`
+4. Save
+
+Until the webhook is configured, `delivered_at` is set optimistically when the Resend API accepts the send (see [actions.ts](../app/app/send/actions.ts)). `opened_at` is never populated without the webhook. After the webhook is active, bounces clear `delivered_at` so the dashboard funnel reflects reality.
 
 ---
 

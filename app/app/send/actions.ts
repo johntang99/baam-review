@@ -178,6 +178,14 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     velocity.kind === "flag" ? new Date().toISOString() : null;
   const flagReason = velocity.kind === "flag" ? velocity.reason : null;
 
+  const now = new Date().toISOString();
+  // Resend rejects malformed sends synchronously, so a successful API call
+  // is a strong signal the email is on its way. Mark delivered_at optimistically
+  // for email — the Resend webhook (when configured) can still confirm via
+  // email.delivered or revert via email.bounced. For SMS, leave it null;
+  // Twilio's delivery status comes from its callback webhook in real time.
+  const optimisticDeliveredAt = channel === "email" ? now : null;
+
   const { data: inserted, error: insertErr } = await service
     .from("review_requests")
     .insert({
@@ -189,7 +197,8 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
       channel,
       tracking_token: token,
       message_sent: messageBody,
-      sent_at: new Date().toISOString(),
+      sent_at: now,
+      delivered_at: optimisticDeliveredAt,
       flagged_at: flaggedAt,
       flag_reason: flagReason,
       created_by: user.id,
