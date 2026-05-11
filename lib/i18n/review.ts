@@ -54,6 +54,8 @@ export const STRINGS = {
     drafts_summary_rating: "{n}-star",
     drafts_failed: "We couldn't generate drafts right now. You can still post on Google without one.",
     drafts_skip: "Skip and go straight to Google",
+    drafts_copied: "Copied to clipboard",
+    drafts_copy_failed: "Tap to copy",
 
     // Private feedback
     private_link: "Or share privately with us",
@@ -134,6 +136,8 @@ export const STRINGS = {
     drafts_summary_rating: "{n} 星",
     drafts_failed: "暂时无法生成草稿，您仍可以直接前往 Google 评价。",
     drafts_skip: "跳过，直接去 Google",
+    drafts_copied: "已复制到剪贴板",
+    drafts_copy_failed: "点击复制",
 
     private_link: "或私下告诉我们",
     private_title: "发送私信",
@@ -208,6 +212,8 @@ export const STRINGS = {
     drafts_summary_rating: "{n} estrellas",
     drafts_failed: "No pudimos generar borradores ahora. Aún puede publicar directamente en Google.",
     drafts_skip: "Saltar e ir a Google",
+    drafts_copied: "Copiado al portapapeles",
+    drafts_copy_failed: "Toque para copiar",
 
     private_link: "O envíenos un mensaje privado",
     private_title: "Enviar un mensaje privado",

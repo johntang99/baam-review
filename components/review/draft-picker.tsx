@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, ArrowRight, RefreshCw, Pencil, Check, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  RefreshCw,
+  Pencil,
+  Check,
+  X,
+  ClipboardCheck,
+} from "lucide-react";
 import { STRINGS, type Language } from "@/lib/i18n/review";
 import { buttonVariants, Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,19 +60,33 @@ export function DraftPicker({
   const [editing, setEditing] = useState(false);
   const [editedText, setEditedText] = useState<string>(drafts[0]?.text ?? "");
   const [posting, setPosting] = useState(false);
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  // Reset edit state when drafts change (regenerated).
+  async function copyToClipboard(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyState("copied");
+    } catch {
+      setCopyState("failed");
+    }
+  }
+
+  // Reset + auto-copy when drafts change (initial render + regenerate).
   useEffect(() => {
     setSelectedIndex(0);
-    setEditedText(drafts[0]?.text ?? "");
+    const first = drafts[0]?.text ?? "";
+    setEditedText(first);
     setEditing(false);
+    if (first) void copyToClipboard(first);
   }, [drafts]);
 
   function pick(i: number) {
     setSelectedIndex(i);
-    setEditedText(drafts[i]?.text ?? "");
+    const text = drafts[i]?.text ?? "";
+    setEditedText(text);
     setEditing(false);
+    if (text) void copyToClipboard(text);
   }
 
   function startEdit() {
@@ -75,6 +97,7 @@ export function DraftPicker({
   function saveEdit() {
     track(ctx, "draft_edited", { tone: drafts[selectedIndex]?.tone });
     setEditing(false);
+    if (editedText) void copyToClipboard(editedText);
   }
 
   function cancelEdit() {
@@ -86,14 +109,9 @@ export function DraftPicker({
     if (!googleReviewUrl) return;
     setPosting(true);
 
-    // Copy to clipboard (best-effort).
-    try {
-      await navigator.clipboard.writeText(editedText);
-    } catch {
-      // Some browsers block clipboard without user gesture in the same task —
-      // the button click IS a gesture so this should usually work. If it fails,
-      // open Google anyway and the user types the draft themselves.
-    }
+    // Final guarantee — text is already on clipboard from pick/edit, but the
+    // user may have copied something else between selection and post.
+    await copyToClipboard(editedText);
 
     track(ctx, "platform_clicked", {
       platform: "google",
@@ -157,9 +175,22 @@ export function DraftPicker({
                     )}
                   </span>
                   <div className="min-w-0 flex-1 space-y-1.5">
-                    <p className="text-[10.5px] font-medium uppercase tracking-[0.14em] text-text-muted">
-                      {toneLabel}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-[10.5px] font-medium uppercase tracking-[0.14em] text-text-muted">
+                        {toneLabel}
+                      </p>
+                      {isSelected && copyState === "copied" && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[10.5px] font-medium text-success">
+                          <ClipboardCheck className="h-3 w-3" />
+                          {s.drafts_copied}
+                        </span>
+                      )}
+                      {isSelected && copyState === "failed" && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-warn/15 px-2 py-0.5 text-[10.5px] font-medium text-warn">
+                          {s.drafts_copy_failed}
+                        </span>
+                      )}
+                    </div>
                     {isSelected && editing ? null : (
                       <p className="text-[14px] text-text leading-relaxed whitespace-pre-wrap">
                         {isSelected ? editedText : d.text}
