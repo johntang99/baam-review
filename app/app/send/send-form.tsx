@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import {
   Send,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/ui/section";
 import { cn } from "@/lib/utils";
 import { buildSmsBody, buildEmail } from "@/lib/messaging/templates";
@@ -76,8 +77,47 @@ export function SendForm({ locations, smsEnabled }: SendFormProps) {
     link: previewLink,
   };
   const previewLang: Language = isLang(language) ? language : "en";
-  const smsPreview = buildSmsBody(previewLang, previewVars);
-  const emailPreview = buildEmail(previewLang, previewVars);
+
+  // Editable preview state. The defaults regenerate when the upstream
+  // template inputs change (language, channel, name, location) UNLESS the
+  // user has manually touched the field, in which case we preserve their edit.
+  const [subject, setSubject] = useState<string>(() =>
+    buildEmail(previewLang, previewVars).subject,
+  );
+  const [body, setBody] = useState<string>(() =>
+    channel === "sms"
+      ? buildSmsBody(previewLang, previewVars).body
+      : buildEmail(previewLang, previewVars).body,
+  );
+  const [subjectTouched, setSubjectTouched] = useState(false);
+  const [bodyTouched, setBodyTouched] = useState(false);
+
+  useEffect(() => {
+    const fresh =
+      channel === "sms"
+        ? { subject: "", body: buildSmsBody(previewLang, previewVars).body }
+        : (() => {
+            const e = buildEmail(previewLang, previewVars);
+            return { subject: e.subject, body: e.body };
+          })();
+    if (!subjectTouched) setSubject(fresh.subject);
+    if (!bodyTouched) setBody(fresh.body);
+    // intentionally narrow deps — recompute on the inputs that drive the template
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [previewLang, channel, previewName, currentLocation?.display_name]);
+
+  function resetPreview() {
+    setSubjectTouched(false);
+    setBodyTouched(false);
+    if (channel === "sms") {
+      setSubject("");
+      setBody(buildSmsBody(previewLang, previewVars).body);
+    } else {
+      const e = buildEmail(previewLang, previewVars);
+      setSubject(e.subject);
+      setBody(e.body);
+    }
+  }
 
   function onLocationChange(id: string) {
     setLocationId(id);
@@ -249,20 +289,70 @@ export function SendForm({ locations, smsEnabled }: SendFormProps) {
         </div>
 
         <div className="space-y-2 rounded-xl border border-border-soft bg-cream/40 p-3.5">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">
-            Message preview
-          </p>
-          {channel === "sms" ? (
-            <SmsPreview body={smsPreview.body} />
-          ) : (
-            <EmailPreview
-              subject={emailPreview.subject}
-              body={emailPreview.body}
-            />
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">
+              Message (editable)
+            </p>
+            {(subjectTouched || bodyTouched) && (
+              <button
+                type="button"
+                onClick={resetPreview}
+                className="text-[11.5px] text-text-soft hover:text-text underline"
+              >
+                Reset to default
+              </button>
+            )}
+          </div>
+
+          {channel === "email" && (
+            <div className="space-y-1.5">
+              <label
+                htmlFor="message_subject"
+                className="block text-[11.5px] font-medium tracking-tight text-text-soft"
+              >
+                Subject
+              </label>
+              <Input
+                id="message_subject"
+                name="message_subject"
+                value={subject}
+                onChange={(e) => {
+                  setSubject(e.target.value);
+                  setSubjectTouched(true);
+                }}
+              />
+            </div>
           )}
+
+          <div className="space-y-1.5">
+            <label
+              htmlFor="message_body"
+              className="block text-[11.5px] font-medium tracking-tight text-text-soft"
+            >
+              {channel === "sms" ? "Text message" : "Body"}
+            </label>
+            <Textarea
+              id="message_body"
+              name="message_body"
+              rows={channel === "sms" ? 5 : 10}
+              value={body}
+              onChange={(e) => {
+                setBody(e.target.value);
+                setBodyTouched(true);
+              }}
+              className="text-[13px] leading-relaxed"
+            />
+            {channel === "sms" && (
+              <p className="text-[11px] text-text-muted">
+                {body.length} characters · {Math.max(1, Math.ceil(body.length / 160))} SMS segment{Math.max(1, Math.ceil(body.length / 160)) === 1 ? "" : "s"}
+              </p>
+            )}
+          </div>
+
           <p className="text-[11px] text-text-muted">
-            Variables in <code className="font-mono">&lt;…&gt;</code> are filled
-            in when the message is sent.
+            Variables in <code className="font-mono">&lt;slug&gt;</code> /{" "}
+            <code className="font-mono">&lt;token&gt;</code> are filled in when the
+            message is sent. Other text sends exactly as written.
           </p>
         </div>
 
@@ -326,43 +416,6 @@ function ChannelToggle({
       <span className="font-medium">{label}</span>
       {hint && <span className="text-[11px] text-text-muted ml-auto">{hint}</span>}
     </button>
-  );
-}
-
-function SmsPreview({ body }: { body: string }) {
-  const charCount = body.length;
-  const segments = Math.max(1, Math.ceil(charCount / 160));
-  return (
-    <div className="space-y-1.5">
-      <div className="rounded-lg bg-paper border border-border-base p-3 text-[13px] text-text whitespace-pre-wrap leading-relaxed">
-        {body}
-      </div>
-      <p className="text-[11px] text-text-muted">
-        {charCount} characters · {segments} SMS segment{segments === 1 ? "" : "s"}
-      </p>
-    </div>
-  );
-}
-
-function EmailPreview({
-  subject,
-  body,
-}: {
-  subject: string;
-  body: string;
-}) {
-  return (
-    <div className="space-y-2">
-      <div className="rounded-lg bg-paper border border-border-base px-3 py-2">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-text-muted">
-          Subject
-        </p>
-        <p className="text-[13px] text-ink mt-0.5">{subject}</p>
-      </div>
-      <div className="rounded-lg bg-paper border border-border-base p-3 text-[13px] text-text whitespace-pre-wrap leading-relaxed">
-        {body}
-      </div>
-    </div>
   );
 }
 

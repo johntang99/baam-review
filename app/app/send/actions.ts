@@ -94,6 +94,18 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:4001";
   const trackingUrl = `${appUrl}/r/${location.slug}?t=${token}`;
 
+  // The form sends user-editable subject + body. Variables in the preview
+  // were the rendered values for a placeholder URL — at send time we
+  // substitute the real <slug>/<token> placeholders with the actual link.
+  const locSlug = location.slug;
+  const applyVars = (s: string) =>
+    s
+      .replaceAll("<slug>", locSlug)
+      .replaceAll("<token>", token);
+
+  const overrideSubjectRaw = getString(formData, "message_subject");
+  const overrideBodyRaw = getString(formData, "message_body");
+
   const vars = {
     name: recipientName,
     businessName: location.display_name,
@@ -105,18 +117,25 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
   let sendError: string | null = null;
 
   if (channel === "sms") {
-    const { body } = buildSmsBody(language, vars);
-    messageBody = body;
+    const defaultBody = buildSmsBody(language, vars).body;
+    messageBody = overrideBodyRaw ? applyVars(overrideBodyRaw) : defaultBody;
     const r = await sendSmsViaTwilio({
       to: recipientPhone!,
-      body,
+      body: messageBody,
       statusCallback: `${appUrl}/api/webhooks/twilio`,
     });
     providerId = r.providerId;
     sendError = r.error;
   } else {
-    const email = buildEmail(language, vars);
-    messageBody = email.body;
+    const defaultEmail = buildEmail(language, vars);
+    const subjectText = overrideSubjectRaw
+      ? applyVars(overrideSubjectRaw)
+      : defaultEmail.subject;
+    const bodyText = overrideBodyRaw
+      ? applyVars(overrideBodyRaw)
+      : defaultEmail.body;
+    messageBody = bodyText;
+    const html = bodyText === defaultEmail.body ? defaultEmail.html : plainToHtml(bodyText);
 
     // Sender selection (per-location):
     // 1. If the location has a verified custom sender_email, send from there.
@@ -138,9 +157,9 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     // real person, not no-reply@. Helps Gmail classify as personal, not bulk.
     const r = await sendEmailViaResend({
       to: recipientEmail!,
-      subject: email.subject,
-      text: email.body,
-      html: email.html,
+      subject: subjectText,
+      text: bodyText,
+      html,
       replyTo: user.email ?? undefined,
       from,
     });
@@ -199,6 +218,29 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     flagged: velocity.kind === "flag",
     trackingUrl,
   };
+}
+
+function plainToHtml(text: string): string {
+  // Escape HTML, linkify URLs, convert newlines to <br>. Same minimal,
+  // personal-style markup as the default template so deliverability stays
+  // consistent when the user edits the body.
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+  const linked = escaped.replace(
+    /(https?:\/\/[^\s<]+)/g,
+    (url) => `<a href="${url}" style="color: #1F4D3F;">${url}</a>`,
+  );
+  const html = linked.replace(/\n/g, "<br>");
+  return `<!doctype html>
+<html>
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1A1F1C; line-height: 1.55; max-width: 560px; margin: 0; padding: 16px;">
+    ${html}
+  </body>
+</html>`;
 }
 
 function formatFromHeader(name: string, email: string): string {
