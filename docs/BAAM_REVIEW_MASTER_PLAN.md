@@ -511,6 +511,21 @@ Three areas where getting it wrong costs money or distribution. Build assuming a
 
 **Privacy.** Customer phone numbers and emails are PII. Stored encrypted at rest (Supabase default), purged 90 days after the request lifecycle completes (configurable). No selling, no third-party data sharing. Standard privacy policy.
 
+**Fake-review prevention.** Google bans reviews from people who didn't actually visit, coordinated/inauthentic activity, employee reviews, and incentivized reviews. The business owner — not BAAM Review — gets punished when Google catches this (silent removal of suspect reviews, "Reviews disabled" warning on the GBP listing, profile suspension in extreme cases). We are not legally liable for owner misuse, but Google operates on a "what have you done to prevent this?" basis — if our tool is seen as systematically enabling abuse, our `business.manage` OAuth access can be revoked, which would break Connect-Google for every customer.
+
+Defenses we build into the product to be a good citizen:
+
+- **No bulk send in v1.** Send-request is one recipient at a time (master plan §2). Bulk CSV is phase 2, gated behind documented compliance steps.
+- **Per-token tracking.** Each SMS/email request mints a unique `tracking_token`. Token reuse (one URL opened many times) is a strong abuse signal.
+- **Velocity caps.** Tier-based monthly limits ([§12](#12-pricing--billing)) cap how many requests a small clinic can send. Session 7 adds hourly + daily velocity checks on top, marking requests with `review_requests.flagged_at` when triggered. Migration 0006.
+- **Fingerprint capture.** Every `landing_events` row records `user_agent` and IP. Foundation for same-IP / same-fingerprint detection in Session 10.
+- **Account-level suspension.** `accounts.suspended_at` + `suspension_reason` columns (migration 0006). Suspended accounts can't send new requests or accept new public submissions. Used when we observe systematic abuse.
+- **No incentive flow.** Banned by policy at the product level, regardless of customer demand.
+- **Pre-flight warning copy** in the send form (Session 7): a small inline note that the recipient should be a real customer.
+- **Terms of Service** (Session 12) explicitly prohibit fake reviews, employee reviews, and incentives, and reserve our right to suspend accounts that violate this.
+
+When Google flags a customer, our policy is to suspend that account immediately, freeze sending, and notify Google we did. The social contract is "we'll keep our house clean," not "every customer is your problem."
+
 ---
 
 ## 12. Pricing & Billing
@@ -548,7 +563,7 @@ Twelve sessions, sized for one focused 2–4 hour block each, structured to fit 
 
 ### Unblock paid use (Sessions 7–10)
 
-**Session 7 — Send review request via SMS + email.** Form in admin (`/app/send`), Twilio + Resend integrations, tracking token generation, message templates per language with opt-out language, status webhooks for delivery/open. Acceptance: sending updates `review_requests.sent_at`, customer receives message, click logs `clicked_at`.
+**Session 7 — Send review request via SMS + email.** Form in admin (`/app/send`), Twilio + Resend integrations, tracking token generation, message templates per language with opt-out language, status webhooks for delivery/open. Includes velocity checks (hourly + daily caps) that set `review_requests.flagged_at` when exceeded and a pre-flight warning copy reminding owners that recipients should be real customers. Acceptance: sending updates `review_requests.sent_at`, customer receives message, click logs `clicked_at`, abusive bursts surface a flag.
 
 **Session 8 — QR code generator.** Per-slug QR PDFs with optional venue suffix (e.g., `?source=front_desk`), printable layout, downloadable from admin. Acceptance: scanning QR loads public page, source tracked.
 

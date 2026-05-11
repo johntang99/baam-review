@@ -42,6 +42,8 @@ export interface Database {
           subscription_tier: SubscriptionTier;
           subscription_status: SubscriptionStatus;
           trial_ends_at: string | null;
+          suspended_at: string | null;
+          suspension_reason: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -53,6 +55,8 @@ export interface Database {
           subscription_tier?: SubscriptionTier;
           subscription_status?: SubscriptionStatus;
           trial_ends_at?: string | null;
+          suspended_at?: string | null;
+          suspension_reason?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -142,6 +146,8 @@ export interface Database {
           draft_generated_at: string | null;
           completed_platform: CompletedPlatform | null;
           completed_at: string | null;
+          flagged_at: string | null;
+          flag_reason: string | null;
           created_by: string | null;
           created_at: string;
         };
@@ -163,6 +169,8 @@ export interface Database {
           draft_generated_at?: string | null;
           completed_platform?: CompletedPlatform | null;
           completed_at?: string | null;
+          flagged_at?: string | null;
+          flag_reason?: string | null;
           created_by?: string | null;
           created_at?: string;
         };
