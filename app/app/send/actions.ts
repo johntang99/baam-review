@@ -37,7 +37,7 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
 
   const { data: account } = await supabase
     .from("accounts")
-    .select("suspended_at, sender_email, sender_name, sender_verified_at, name")
+    .select("suspended_at, name")
     .eq("id", profile.account_id)
     .maybeSingle();
   if (account?.suspended_at) {
@@ -75,7 +75,9 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
   // Fetch location via RLS-typed client to verify ownership.
   const { data: location } = await supabase
     .from("locations")
-    .select("id, slug, display_name, default_language, supported_languages")
+    .select(
+      "id, slug, display_name, default_language, supported_languages, sender_email, sender_name, sender_verified_at",
+    )
     .eq("id", locationId)
     .maybeSingle();
   if (!location) return { ok: false, error: "Location not found." };
@@ -116,17 +118,17 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     const email = buildEmail(language, vars);
     messageBody = email.body;
 
-    // Sender selection:
-    // 1. If account has a verified custom sender_email, use that.
+    // Sender selection (per-location):
+    // 1. If the location has a verified custom sender_email, send from there.
     // 2. Otherwise fall back to the shared no-reply but use the location's
-    //    display name (e.g., "Dr. Huang Acupuncture <no-reply@...>") so the
-    //    inbox preview is recognizable instead of generic "No-Reply".
+    //    display name (or its sender_name override) so the inbox preview
+    //    is recognizable instead of generic "No-Reply".
     let from: string | undefined;
-    if (account?.sender_email && account.sender_verified_at) {
-      const senderName = account.sender_name || location.display_name;
-      from = formatFromHeader(senderName, account.sender_email);
+    if (location.sender_email && location.sender_verified_at) {
+      const senderName = location.sender_name || location.display_name;
+      from = formatFromHeader(senderName, location.sender_email);
     } else {
-      const senderName = account?.sender_name || location.display_name;
+      const senderName = location.sender_name || location.display_name;
       const defaultAddr =
         extractEmail(process.env.RESEND_FROM ?? "") || process.env.RESEND_FROM;
       if (defaultAddr) from = formatFromHeader(senderName, defaultAddr);

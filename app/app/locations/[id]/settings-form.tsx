@@ -11,6 +11,7 @@ import { LogoUploader } from "@/components/locations/logo-uploader";
 import { BrandColorPicker } from "@/components/locations/brand-color-picker";
 import { LanguageFields } from "@/components/locations/language-fields";
 import { LocalizedField } from "@/components/locations/localized-textarea";
+import { SenderFields } from "@/components/locations/sender-fields";
 import { parsePromptQuestions } from "@/lib/business-prompts";
 import { updateLocation, deleteLocation } from "./actions";
 
@@ -19,6 +20,7 @@ type Location = Database["public"]["Tables"]["locations"]["Row"];
 interface SettingsFormProps {
   location: Location;
   accountId: string;
+  defaultFromAddress: string;
 }
 
 const WELCOME_PLACEHOLDERS = {
@@ -33,7 +35,11 @@ const CUSTOM_URL_LABEL_PLACEHOLDERS = {
   es: "Dejar una reseña en nuestro sitio",
 };
 
-export function SettingsForm({ location, accountId }: SettingsFormProps) {
+export function SettingsForm({
+  location,
+  accountId,
+  defaultFromAddress,
+}: SettingsFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [deletePending, setDeletePending] = useState(false);
@@ -176,6 +182,18 @@ export function SettingsForm({ location, accountId }: SettingsFormProps) {
         </Field>
 
         <CustomLabelField initialLabels={customLabelInitial} location={location} />
+      </Section>
+
+      <Section
+        title="Email sender"
+        description="Configure how review-request emails for this location appear in the recipient's inbox. Sending from your own domain is the single biggest lever for landing in Primary instead of Promotions."
+      >
+        <SenderFields
+          initialEmail={location.sender_email}
+          initialName={location.sender_name}
+          verified={!!location.sender_verified_at}
+          defaultFromAddress={defaultFromAddress}
+        />
       </Section>
 
       <Section

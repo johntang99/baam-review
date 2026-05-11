@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
 import { Section } from "@/components/ui/section";
-import { SenderForm } from "./sender-form";
 
 export const metadata = {
   title: "Settings — BAAM Review",
@@ -24,12 +25,9 @@ export default async function SettingsPage() {
 
   const { data: account } = await supabase
     .from("accounts")
-    .select("name, primary_email, sender_email, sender_name, sender_verified_at, subscription_tier")
+    .select("name, primary_email, subscription_tier")
     .eq("id", profile.account_id)
     .maybeSingle();
-
-  const defaultFromAddress =
-    process.env.RESEND_FROM ?? "no-reply@baamplatform.com";
 
   return (
     <main className="px-10 py-10">
@@ -42,20 +40,8 @@ export default async function SettingsPage() {
 
         <div className="pt-6">
           <Section
-            title="Email sender"
-            description="Send review-request emails from your own domain. This is the single biggest lever for deliverability — emails sent from your domain land in Primary, while emails from a shared address (the default) often go to Gmail's Promotions tab."
-          >
-            <SenderForm
-              initialEmail={account?.sender_email ?? null}
-              initialName={account?.sender_name ?? null}
-              verified={!!account?.sender_verified_at}
-              defaultFromAddress={defaultFromAddress}
-            />
-          </Section>
-
-          <Section
             title="Account"
-            description="Read-only for v1. Reach out to support for changes."
+            description="Read-only for v1. Contact support to update."
           >
             <dl className="grid grid-cols-[160px_1fr] gap-y-3 text-[13.5px]">
               <dt className="text-text-soft">Account name</dt>
@@ -63,8 +49,23 @@ export default async function SettingsPage() {
               <dt className="text-text-soft">Primary email</dt>
               <dd className="text-ink">{account?.primary_email ?? "—"}</dd>
               <dt className="text-text-soft">Plan</dt>
-              <dd className="text-ink capitalize">{account?.subscription_tier ?? "—"}</dd>
+              <dd className="text-ink capitalize">
+                {account?.subscription_tier ?? "—"}
+              </dd>
             </dl>
+          </Section>
+
+          <Section
+            title="Email sender"
+            description="Each location can send review-request emails from its own domain. Configure that per location."
+          >
+            <Link
+              href="/app/locations"
+              className="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-forest hover:underline"
+            >
+              Configure per-location senders
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </Section>
         </div>
       </div>

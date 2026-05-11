@@ -57,6 +57,26 @@ export async function updateLocation(locationId: string, formData: FormData) {
   const descriptorChips = collectChipsByLang(formData, "descriptor_chips", supported);
   const promptQuestions = buildPromptQuestions(serviceChips, descriptorChips);
 
+  const senderEmail = getString(formData, "sender_email")?.toLowerCase() ?? null;
+  const senderName = getString(formData, "sender_name");
+
+  // If sender_email changed, reset verification so BAAM Studio admin re-verifies
+  // in Resend before sends use it. Look up current to compare.
+  let resetSenderVerification = false;
+  if (senderEmail !== null) {
+    const { data: current } = await supabase
+      .from("locations")
+      .select("sender_email")
+      .eq("id", locationId)
+      .maybeSingle();
+    if (current && current.sender_email !== senderEmail) {
+      resetSenderVerification = true;
+    }
+  } else {
+    // Cleared the sender email; clear verification too.
+    resetSenderVerification = true;
+  }
+
   const update: LocationUpdate = {
     display_name: getString(formData, "display_name") ?? "Untitled",
     address: getString(formData, "address"),
@@ -70,6 +90,9 @@ export async function updateLocation(locationId: string, formData: FormData) {
     yelp_url: getString(formData, "yelp_url"),
     custom_url: getString(formData, "custom_url"),
     custom_url_label: getJsonbPerLang(formData, "custom_url_label", supported),
+    sender_email: senderEmail,
+    sender_name: senderName,
+    ...(resetSenderVerification ? { sender_verified_at: null } : {}),
   };
 
   const { error } = await supabase

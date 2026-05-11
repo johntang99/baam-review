@@ -38,6 +38,9 @@ export default async function LocationSettingsPage({
 
   if (!location) notFound();
 
+  const defaultFromAddress =
+    process.env.RESEND_FROM ?? "no-reply@baamplatform.com";
+
   return (
     <main className="px-10 py-10">
       <div className="max-w-4xl space-y-8">
@@ -71,7 +74,11 @@ export default async function LocationSettingsPage({
           </p>
         </div>
 
-        <SettingsForm location={location} accountId={profile.account_id} />
+        <SettingsForm
+          location={location}
+          accountId={profile.account_id}
+          defaultFromAddress={defaultFromAddress}
+        />
       </div>
     </main>
   );
