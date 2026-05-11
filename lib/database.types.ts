@@ -44,6 +44,9 @@ export interface Database {
           trial_ends_at: string | null;
           suspended_at: string | null;
           suspension_reason: string | null;
+          sender_email: string | null;
+          sender_name: string | null;
+          sender_verified_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -57,6 +60,9 @@ export interface Database {
           trial_ends_at?: string | null;
           suspended_at?: string | null;
           suspension_reason?: string | null;
+          sender_email?: string | null;
+          sender_name?: string | null;
+          sender_verified_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };

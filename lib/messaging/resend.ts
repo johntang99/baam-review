@@ -7,6 +7,8 @@ export interface SendEmailOpts {
   text: string;
   html: string;
   replyTo?: string;
+  /** Optional override of the From address. Falls back to RESEND_FROM. */
+  from?: string;
   /** Stable tags for tracking. */
   tags?: Array<{ name: string; value: string }>;
 }
@@ -21,7 +23,8 @@ export async function sendEmailViaResend(
   opts: SendEmailOpts,
 ): Promise<SendResult> {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM;
+  const defaultFrom = process.env.RESEND_FROM;
+  const from = opts.from ?? defaultFrom;
   if (!key || !from) {
     return {
       ok: false,

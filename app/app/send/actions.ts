@@ -37,7 +37,7 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
 
   const { data: account } = await supabase
     .from("accounts")
-    .select("suspended_at")
+    .select("suspended_at, sender_email, sender_name, sender_verified_at, name")
     .eq("id", profile.account_id)
     .maybeSingle();
   if (account?.suspended_at) {
@@ -115,6 +115,23 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
   } else {
     const email = buildEmail(language, vars);
     messageBody = email.body;
+
+    // Sender selection:
+    // 1. If account has a verified custom sender_email, use that.
+    // 2. Otherwise fall back to the shared no-reply but use the location's
+    //    display name (e.g., "Dr. Huang Acupuncture <no-reply@...>") so the
+    //    inbox preview is recognizable instead of generic "No-Reply".
+    let from: string | undefined;
+    if (account?.sender_email && account.sender_verified_at) {
+      const senderName = account.sender_name || location.display_name;
+      from = formatFromHeader(senderName, account.sender_email);
+    } else {
+      const senderName = account?.sender_name || location.display_name;
+      const defaultAddr =
+        extractEmail(process.env.RESEND_FROM ?? "") || process.env.RESEND_FROM;
+      if (defaultAddr) from = formatFromHeader(senderName, defaultAddr);
+    }
+
     // Reply-To set to the sending user's address so customer can reply to a
     // real person, not no-reply@. Helps Gmail classify as personal, not bulk.
     const r = await sendEmailViaResend({
@@ -123,6 +140,7 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
       text: email.body,
       html: email.html,
       replyTo: user.email ?? undefined,
+      from,
     });
     providerId = r.providerId;
     sendError = r.error;
@@ -179,6 +197,18 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     flagged: velocity.kind === "flag",
     trackingUrl,
   };
+}
+
+function formatFromHeader(name: string, email: string): string {
+  // RFC 5322: quote display name when it contains characters like commas,
+  // colons, semicolons, etc. Stripping these is simplest.
+  const safe = name.replace(/["<>]/g, "").trim();
+  return safe ? `${safe} <${email}>` : email;
+}
+
+function extractEmail(s: string): string | null {
+  const m = s.match(/<([^>]+)>/);
+  return m ? m[1] : null;
 }
 
 function getString(fd: FormData, key: string): string | null {
