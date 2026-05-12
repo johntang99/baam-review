@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, ExternalLink, QrCode, Code, Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
+import { InContentLocationPicker } from "@/components/locations/in-content-location-picker";
 import { SettingsForm } from "./settings-form";
 
 export const metadata = {
@@ -30,11 +31,15 @@ export default async function LocationSettingsPage({
 
   if (!profile?.account_id) redirect("/app/locations");
 
-  const { data: location } = await supabase
-    .from("locations")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  // Fetch the active location + the full list (for the in-content picker)
+  // in parallel.
+  const [{ data: location }, { data: locations }] = await Promise.all([
+    supabase.from("locations").select("*").eq("id", id).maybeSingle(),
+    supabase
+      .from("locations")
+      .select("id, display_name, brand_color, logo_url")
+      .order("created_at", { ascending: false }),
+  ]);
 
   if (!location) notFound();
 
@@ -43,15 +48,23 @@ export default async function LocationSettingsPage({
 
   return (
     <main className="px-10 py-10">
-      <div className="max-w-4xl space-y-8">
-        <div>
+      <div className="max-w-4xl space-y-6">
+        <div className="space-y-3">
           <Link
             href="/app/locations"
-            className="inline-flex items-center gap-1.5 text-[12.5px] text-text-soft hover:text-text mb-3"
+            className="inline-flex items-center gap-1.5 text-[12.5px] text-text-soft hover:text-text"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             All locations
           </Link>
+
+          <InContentLocationPicker
+            locations={locations ?? []}
+            currentId={location.id}
+          />
+        </div>
+
+        <div>
           <PageHeader
             eyebrow="Location settings"
             title={location.display_name}
