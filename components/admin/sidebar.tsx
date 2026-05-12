@@ -9,6 +9,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { UserCard } from "./user-card";
+import { NavItem } from "./nav-item";
 import {
   LocationSwitcher,
   type LocationSwitcherLocation,
@@ -85,13 +86,11 @@ function NavSection({
           const Icon = item.icon;
           return (
             <li key={item.href}>
-              <Link
+              <NavItem
                 href={item.href}
-                className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13.5px] text-cream/80 hover:bg-cream/[0.06] hover:text-cream transition-colors"
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Link>
+                label={item.label}
+                icon={<Icon className="h-4 w-4" />}
+              />
             </li>
           );
         })}
