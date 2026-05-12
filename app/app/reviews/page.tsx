@@ -8,7 +8,11 @@ import {
   PLATFORM_LABEL,
   LANGUAGE_LABEL,
 } from "@/lib/analytics/aggregate";
-import { markFeedbackRead, markFeedbackUnread } from "./actions";
+import {
+  markFeedbackRead,
+  markFeedbackUnread,
+  focusLocationInReviews,
+} from "./actions";
 
 export const metadata = {
   title: "Reviews — BAAM Review",
@@ -129,6 +133,7 @@ export default async function ReviewsPage({
             items={googleReviews ?? []}
             locName={locName}
             emptyMessage="No Google reviews synced yet. Open a location and click Sync now."
+            currentTab={tab}
           />
         ) : tab === "completed" ? (
           <CompletedList
@@ -155,6 +160,7 @@ export default async function ReviewsPage({
             completed={completed ?? []}
             googleReviews={googleReviews ?? []}
             locName={locName}
+            currentTab={tab}
           />
         )}
       </div>
@@ -203,16 +209,23 @@ function GoogleReviewsList({
   items,
   locName,
   emptyMessage,
+  currentTab,
 }: {
   items: GoogleReviewRow[];
   locName: Map<string, string>;
   emptyMessage: string;
+  currentTab: string;
 }) {
   if (items.length === 0) return <EmptyState message={emptyMessage} />;
   return (
     <ul className="space-y-3">
       {items.map((r) => (
-        <GoogleReviewCard key={r.id} r={r} locName={locName} />
+        <GoogleReviewCard
+          key={r.id}
+          r={r}
+          locName={locName}
+          currentTab={currentTab}
+        />
       ))}
     </ul>
   );
@@ -221,9 +234,11 @@ function GoogleReviewsList({
 function GoogleReviewCard({
   r,
   locName,
+  currentTab,
 }: {
   r: GoogleReviewRow;
   locName: Map<string, string>;
+  currentTab: string;
 }) {
   const low = r.rating <= 2;
   return (
@@ -293,12 +308,23 @@ function GoogleReviewCard({
         </div>
       )}
 
-      <div className="mt-3 flex justify-end">
+      <div className="mt-3 flex items-center justify-end gap-3">
+        <form
+          action={focusLocationInReviews.bind(null, r.location_id, currentTab)}
+        >
+          <button
+            type="submit"
+            className="text-[12px] text-forest hover:underline"
+            title="Filter this Reviews page to only this location"
+          >
+            Focus on {locName.get(r.location_id) ?? "this location"} →
+          </button>
+        </form>
         <Link
           href={`/app/locations/${r.location_id}/reviews`}
-          className="text-[12px] text-forest hover:underline"
+          className="text-[12px] text-text-soft hover:text-ink"
         >
-          Open in location →
+          Open settings
         </Link>
       </div>
     </li>
@@ -481,11 +507,13 @@ function UnifiedList({
   completed,
   googleReviews,
   locName,
+  currentTab,
 }: {
   feedback: FeedbackRow[];
   completed: CompletedRow[];
   googleReviews: GoogleReviewRow[];
   locName: Map<string, string>;
+  currentTab: string;
 }) {
   type Item =
     | { kind: "google"; at: string; data: GoogleReviewRow }
@@ -522,7 +550,12 @@ function UnifiedList({
     <ul className="space-y-3">
       {items.map((it) =>
         it.kind === "google" ? (
-          <GoogleReviewCard key={`g-${it.data.id}`} r={it.data} locName={locName} />
+          <GoogleReviewCard
+            key={`g-${it.data.id}`}
+            r={it.data}
+            locName={locName}
+            currentTab={currentTab}
+          />
         ) : it.kind === "feedback" ? (
           <FeedbackCard key={`f-${it.data.id}`} f={it.data} locName={locName} />
         ) : (
