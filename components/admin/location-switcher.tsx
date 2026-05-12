@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { ChevronDown, Check, Plus, LayoutGrid, Globe } from "lucide-react";
+import { ChevronDown, Check, Plus, LayoutGrid } from "lucide-react";
 
 export interface LocationSwitcherLocation {
   id: string;
@@ -68,9 +68,15 @@ export function LocationSwitcher({
     });
     setOpen(false);
 
+    // "Manage all locations" → always navigate to the management hub.
+    if (value === null) {
+      router.push("/app/locations");
+      return;
+    }
+
     if (onManagementPage) {
-      // Picking from the sidebar implies "go to workspace" — leave the
-      // management area and land where the selection actually has effect.
+      // Picking a specific location while on a management page → go to
+      // workspace dashboard for it.
       router.push("/app");
       return;
     }
@@ -88,12 +94,12 @@ export function LocationSwitcher({
           <LocationBadge loc={selected} />
         ) : (
           <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-cream/10 text-cream/70">
-            <Globe className="h-4 w-4" />
+            <LayoutGrid className="h-4 w-4" />
           </span>
         )}
         <span className="min-w-0 flex-1">
           <span className="block text-[13px] font-medium text-cream truncate">
-            {selected ? selected.display_name : "All locations"}
+            {selected ? selected.display_name : "Manage all locations"}
           </span>
           <span className="block text-[11px] text-cream/55 truncate">
             {selected
@@ -111,24 +117,6 @@ export function LocationSwitcher({
           role="menu"
           className="absolute left-0 right-0 z-40 mt-1.5 max-h-[60vh] overflow-y-auto rounded-xl border border-cream/10 bg-ink/95 backdrop-blur p-1 shadow-2xl"
         >
-          <button
-            type="button"
-            onClick={() => pick(null)}
-            className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[13px] text-cream/85 hover:bg-cream/[0.06] hover:text-cream"
-          >
-            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-cream/10 text-cream/70">
-              <Globe className="h-3.5 w-3.5" />
-            </span>
-            <span className="flex-1">All locations</span>
-            {displayedId === null && (
-              <Check className="h-3.5 w-3.5 text-gold" />
-            )}
-          </button>
-
-          {locations.length > 0 && (
-            <div className="my-1 h-px bg-cream/10" />
-          )}
-
           {locations.map((loc) => (
             <button
               key={loc.id}
@@ -151,7 +139,9 @@ export function LocationSwitcher({
             </button>
           ))}
 
-          <div className="my-1 h-px bg-cream/10" />
+          {locations.length > 0 && (
+            <div className="my-1 h-px bg-cream/10" />
+          )}
 
           <Link
             href="/api/auth/google/start"
@@ -164,16 +154,19 @@ export function LocationSwitcher({
             <span className="flex-1">Connect a new location</span>
           </Link>
 
-          <Link
-            href="/app/locations"
-            onClick={() => setOpen(false)}
+          <button
+            type="button"
+            onClick={() => pick(null)}
             className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[13px] text-cream/85 hover:bg-cream/[0.06] hover:text-cream"
           >
             <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-cream/10 text-cream/70">
               <LayoutGrid className="h-3.5 w-3.5" />
             </span>
             <span className="flex-1">Manage all locations</span>
-          </Link>
+            {displayedId === null && (
+              <Check className="h-3.5 w-3.5 text-gold flex-shrink-0" />
+            )}
+          </button>
         </div>
       )}
     </div>
