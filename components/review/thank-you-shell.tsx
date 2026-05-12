@@ -1,15 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   Calendar,
   Check,
   Copy,
   MessageSquare,
   Share2,
-  Users,
-  X,
 } from "lucide-react";
+
+// Lucide dropped brand logos for trademark reasons; the Facebook "f" mark
+// is small enough to inline.
+function FacebookGlyph({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.25-1.5 1.55-1.5H16.7V4.65A22.5 22.5 0 0 0 14.3 4.5c-2.35 0-4 1.45-4 4.1V10.9H7.6V14h2.7v8h3.2z" />
+    </svg>
+  );
+}
 import type { Language, SocialHandles } from "@/lib/database.types";
 import { STRINGS } from "@/lib/i18n/review";
 import { logPostReviewAction } from "@/app/r/[slug]/thank-you/actions";
@@ -57,7 +71,6 @@ export function ThankYouShell(props: ThankYouShellProps) {
   } = props;
   const s = STRINGS[lang];
 
-  const [shareOpen, setShareOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<number | null>(null);
   const loggedView = useRef(false);
@@ -102,21 +115,7 @@ export function ThankYouShell(props: ThankYouShellProps) {
     window.open(location.bookingUrl, "_blank", "noopener,noreferrer");
   }
 
-  function handleReferToggle() {
-    const next = !shareOpen;
-    setShareOpen(next);
-    if (next) {
-      void logPostReviewAction({
-        locationId: location.id,
-        requestId,
-        actionType: "refer_click",
-        shareToken,
-        language: lang,
-      });
-    }
-  }
-
-  async function handleShare(destination: "wechat" | "sms" | "copy" | "more") {
+  async function handleShare(destination: "fb" | "sms" | "copy" | "more") {
     void logPostReviewAction({
       locationId: location.id,
       requestId,
@@ -131,7 +130,24 @@ export function ThankYouShell(props: ThankYouShellProps) {
       return;
     }
 
-    if (destination === "more" && typeof navigator !== "undefined" && navigator.share) {
+    if (destination === "fb") {
+      const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+      window.open(fbUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    if (destination === "sms") {
+      window.location.href = `sms:?&body=${encodeURIComponent(
+        `${shareablePreviewQuote} ${shareUrl}`,
+      )}`;
+      return;
+    }
+
+    if (
+      destination === "more" &&
+      typeof navigator !== "undefined" &&
+      typeof navigator.share === "function"
+    ) {
       try {
         await navigator.share({
           title: location.displayName,
@@ -144,14 +160,6 @@ export function ThankYouShell(props: ThankYouShellProps) {
       }
     }
 
-    if (destination === "sms") {
-      window.location.href = `sms:?&body=${encodeURIComponent(
-        `${shareablePreviewQuote} ${shareUrl}`,
-      )}`;
-      return;
-    }
-
-    // copy + wechat both copy to clipboard; WeChat users paste into their chat
     try {
       await navigator.clipboard.writeText(shareUrl);
       showToast(s.toast_copied);
@@ -198,8 +206,6 @@ export function ThankYouShell(props: ThankYouShellProps) {
     (v) => typeof v === "string" && v.length > 0,
   );
   const showShareCard = consentDisplay && !!shareUrl;
-  const canRefer = showShareCard;
-  const hasNextSteps = !!location.bookingUrl || canRefer;
 
   return (
     <div
@@ -282,8 +288,9 @@ export function ThankYouShell(props: ThankYouShellProps) {
         </div>
       </section>
 
-      {/* Next steps */}
-      {hasNextSteps && (
+      {/* Next steps — only renders when there's an external CTA to surface
+          (booking_url). The share card lives in its own section below. */}
+      {location.bookingUrl && (
         <section className="overflow-hidden rounded-3xl border border-border-base bg-paper shadow-sm">
           <div className="border-b border-border-soft px-7 pb-[18px] pt-[26px]">
             <p className="mb-2 text-[11.5px] font-medium uppercase tracking-[0.14em] text-text-muted">
@@ -299,56 +306,35 @@ export function ThankYouShell(props: ThankYouShellProps) {
           </div>
 
           <div className="flex flex-col gap-2.5 px-[18px] py-[14px] pb-[22px]">
-            {location.bookingUrl && (
-              <ActionButton
-                primary
-                accent={accent}
-                icon={<Calendar className="h-5 w-5" />}
-                title={s.book_title}
-                desc={s.book_desc}
-                onClick={handleBook}
-              />
-            )}
-            {canRefer && (
-              <ActionButton
-                accent={accent}
-                icon={<Users className="h-5 w-5" />}
-                title={s.refer_title}
-                desc={s.refer_desc}
-                onClick={handleReferToggle}
-              />
-            )}
+            <ActionButton
+              primary
+              accent={accent}
+              icon={<Calendar className="h-5 w-5" />}
+              title={s.book_title}
+              desc={s.book_desc}
+              onClick={handleBook}
+            />
           </div>
         </section>
       )}
 
-      {/* Share card reveal */}
-      {showShareCard && shareOpen && (
-        <section className="overflow-hidden rounded-3xl border border-border-base bg-paper shadow-sm animate-[slideDown_0.35s_cubic-bezier(0.16,1,0.3,1)_backwards]">
-          <header className="flex items-start justify-between gap-3.5 px-7 pt-[22px]">
-            <div className="flex-1">
-              <p className="mb-2 inline-flex items-center gap-1.5 text-[11.5px] font-medium uppercase tracking-[0.14em] text-gold">
-                <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-                {s.share_eyebrow}
-              </p>
-              <h3 className="mb-1 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.015em] text-ink">
-                {s.share_title.replace(s.share_title_em, "")}
-                <em className="not-italic italic" style={{ color: accent }}>
-                  {s.share_title_em}
-                </em>
-              </h3>
-              <p className="font-display text-[14.5px] italic leading-snug text-text-soft">
-                {s.share_sub}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShareOpen(false)}
-              className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full border border-border-base bg-cream-deep text-text-muted transition-colors hover:bg-paper hover:text-ink"
-              aria-label="Close share card"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
+      {/* Share card — always visible when consent allows it. */}
+      {showShareCard && (
+        <section className="overflow-hidden rounded-3xl border border-border-base bg-paper shadow-sm">
+          <header className="px-7 pt-[22px]">
+            <p className="mb-2 inline-flex items-center gap-1.5 text-[11.5px] font-medium uppercase tracking-[0.14em] text-gold">
+              <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+              {s.share_eyebrow}
+            </p>
+            <h3 className="mb-1 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.015em] text-ink">
+              {s.share_title.replace(s.share_title_em, "")}
+              <em className="not-italic italic" style={{ color: accent }}>
+                {s.share_title_em}
+              </em>
+            </h3>
+            <p className="font-display text-[14.5px] italic leading-snug text-text-soft">
+              {s.share_sub}
+            </p>
           </header>
 
           <SharePreview
@@ -364,13 +350,14 @@ export function ThankYouShell(props: ThankYouShellProps) {
             )}
             mark={s.share_preview_mark}
             shareImageUrl={shareImageUrl}
+            businessHref={shareUrl ?? `/r/${location.slug}`}
           />
 
           <div className="grid grid-cols-4 gap-2.5 p-[22px]">
             <ShareDest
-              variant="wechat"
-              label={s.dest_wechat}
-              onClick={() => handleShare("wechat")}
+              variant="fb"
+              label={s.dest_fb}
+              onClick={() => handleShare("fb")}
             />
             <ShareDest
               variant="sms"
@@ -507,10 +494,6 @@ export function ThankYouShell(props: ThankYouShellProps) {
           0% { transform: scale(0.3); opacity: 0; }
           100% { transform: scale(1); opacity: 1; }
         }
-        @keyframes slideDown {
-          0% { opacity: 0; transform: translateY(-12px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
       `}</style>
     </div>
   );
@@ -596,6 +579,7 @@ function SharePreview({
   attribution,
   mark,
   shareImageUrl,
+  businessHref,
 }: {
   accent: string;
   initial: string;
@@ -606,6 +590,7 @@ function SharePreview({
   attribution: string;
   mark: string;
   shareImageUrl: string | null;
+  businessHref: string;
 }) {
   return (
     <div
@@ -635,17 +620,24 @@ function SharePreview({
       )}
 
       <div className="relative flex items-center justify-between border-t border-white/[0.18] pt-[18px]">
-        <div className="flex items-center gap-2.5">
+        <Link
+          href={businessHref}
+          className="-m-1 flex items-center gap-2.5 rounded-md p-1 transition-opacity hover:opacity-90 focus:opacity-90"
+        >
           <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-white font-display text-[18px] font-semibold" style={{ color: accent }}>
             {initial}
           </span>
-          <div>
-            <p className="text-[12.5px] font-semibold">{displayName}</p>
+          <span className="block">
+            <span className="block text-[12.5px] font-semibold">
+              {displayName}
+            </span>
             {address && (
-              <p className="mt-0.5 text-[10.5px] text-white/70">{address}</p>
+              <span className="block text-[10.5px] text-white/70">
+                {address}
+              </span>
             )}
-          </div>
-        </div>
+          </span>
+        </Link>
         {shareImageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -666,22 +658,25 @@ function ShareDest({
   icon,
   onClick,
 }: {
-  variant: "wechat" | "sms" | "copy" | "more";
+  variant: "fb" | "sms" | "copy" | "more";
   label: string;
   accent?: string;
   icon?: React.ReactNode;
   onClick: () => void;
 }) {
   const bg =
-    variant === "wechat"
-      ? "#07C160"
+    variant === "fb"
+      ? "#1877F2"
       : variant === "sms"
         ? accent ?? "#1F4D3F"
         : variant === "copy"
           ? "#0F1F1A"
           : "#5A6660";
   const renderedIcon =
-    icon ?? (variant === "sms" ? (
+    icon ??
+    (variant === "fb" ? (
+      <FacebookGlyph className="h-[18px] w-[18px]" />
+    ) : variant === "sms" ? (
       <MessageSquare className="h-[18px] w-[18px]" />
     ) : (
       <Share2 className="h-[18px] w-[18px]" />

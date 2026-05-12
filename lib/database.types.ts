@@ -44,7 +44,8 @@ export type ShareDestination =
   | "copy"
   | "more"
   | "whatsapp"
-  | "email";
+  | "email"
+  | "fb";
 
 export interface SocialHandles {
   xhs?: string;

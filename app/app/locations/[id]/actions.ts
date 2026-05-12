@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Database, Json } from "@/lib/database.types";
+import type { Database, Json, SocialHandles } from "@/lib/database.types";
 
 type LocationUpdate = Database["public"]["Tables"]["locations"]["Update"];
 
@@ -77,6 +77,8 @@ export async function updateLocation(locationId: string, formData: FormData) {
     resetSenderVerification = true;
   }
 
+  const socialHandles = collectSocialHandles(formData);
+
   const update: LocationUpdate = {
     display_name: getString(formData, "display_name") ?? "Untitled",
     address: getString(formData, "address"),
@@ -92,6 +94,8 @@ export async function updateLocation(locationId: string, formData: FormData) {
     custom_url_label: getJsonbPerLang(formData, "custom_url_label", supported),
     sender_email: senderEmail,
     sender_name: senderName,
+    booking_url: getString(formData, "booking_url"),
+    social_handles: socialHandles,
     ...(resetSenderVerification ? { sender_verified_at: null } : {}),
   };
 
@@ -124,6 +128,17 @@ function collectChipsByLang(
     if (items.length > 0) result[lang] = items;
   }
   return result;
+}
+
+const SOCIAL_KEYS = ["fb", "ig", "xhs", "wechat_mp", "tiktok"] as const;
+
+function collectSocialHandles(fd: FormData): SocialHandles {
+  const out: SocialHandles = {};
+  for (const key of SOCIAL_KEYS) {
+    const v = getString(fd, `social_${key}`);
+    if (v) out[key] = v;
+  }
+  return out;
 }
 
 function buildPromptQuestions(

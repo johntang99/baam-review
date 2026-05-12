@@ -82,9 +82,12 @@ export default async function ThankYouPage({
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     "https://review.baamplatform.com";
   const shareToken = requestId ?? null;
+  // Share link points at the dedicated share-card landing /s/<token>, not the
+  // review-collection /r/<slug> page — friends should see the recommendation
+  // first, then choose to book / open in maps / leave their own review.
   const shareUrl =
-    consentDisplay && !isPrivate
-      ? `${baseUrl}/r/${location.slug}${shareToken ? `?ref=${shareToken}` : ""}`
+    consentDisplay && !isPrivate && shareToken
+      ? `${baseUrl}/s/${shareToken}?lang=${lang}`
       : null;
   const shareImageUrl =
     consentDisplay && !isPrivate && shareToken

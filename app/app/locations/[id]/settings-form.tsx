@@ -48,6 +48,7 @@ export function SettingsForm({
 
   const welcomeInitial = (location.welcome_message ?? {}) as Record<string, string>;
   const customLabelInitial = (location.custom_url_label ?? {}) as Record<string, string>;
+  const socialInitial = (location.social_handles ?? {}) as Record<string, string>;
 
   const promptOverride = parsePromptQuestions(location.prompt_questions);
   const serviceChipsInitial = chipMapToTextMap(promptOverride?.service_chips);
@@ -182,6 +183,71 @@ export function SettingsForm({
         </Field>
 
         <CustomLabelField initialLabels={customLabelInitial} location={location} />
+      </Section>
+
+      <Section
+        title="Post-review actions"
+        description="Drives the “While you're here” card on the thank-you page after a customer is sent to Google. Leave blank to hide the matching CTA."
+      >
+        <Field
+          label="Booking URL"
+          htmlFor="booking_url"
+          hint="Where the “Book your next visit” button opens. Vagaro, Calendly, Square, your own scheduler — anything."
+        >
+          <Input
+            id="booking_url"
+            name="booking_url"
+            type="url"
+            placeholder="https://book.example.com/..."
+            defaultValue={location.booking_url ?? ""}
+          />
+        </Field>
+      </Section>
+
+      <Section
+        title="Social handles"
+        description="Used on the post-review “Follow us” strip. Leave blank to hide the row."
+      >
+        <Field label="Facebook" htmlFor="social_fb" hint="Just the page slug, e.g. drhuangacupuncture">
+          <Input
+            id="social_fb"
+            name="social_fb"
+            placeholder="drhuangacupuncture"
+            defaultValue={socialInitial.fb ?? ""}
+          />
+        </Field>
+        <Field label="Instagram" htmlFor="social_ig" hint="Username without the @">
+          <Input
+            id="social_ig"
+            name="social_ig"
+            placeholder="drhuangacu"
+            defaultValue={socialInitial.ig ?? ""}
+          />
+        </Field>
+        <Field label="Xiaohongshu (小红书)" htmlFor="social_xhs" hint="User ID from the share-profile URL">
+          <Input
+            id="social_xhs"
+            name="social_xhs"
+            placeholder="drhuangtcm"
+            defaultValue={socialInitial.xhs ?? ""}
+          />
+        </Field>
+        <Field label="WeChat Official Account" htmlFor="social_wechat_mp" hint="WeChat ID for the official account">
+          <Input
+            id="social_wechat_mp"
+            name="social_wechat_mp"
+            placeholder="drhuangtcm"
+            defaultValue={socialInitial.wechat_mp ?? ""}
+          />
+        </Field>
+        <Field label="TikTok" htmlFor="social_tiktok" hint="Username without the @">
+          <Input
+            id="social_tiktok"
+            name="social_tiktok"
+            placeholder="drhuang"
+            defaultValue={socialInitial.tiktok ?? ""}
+          />
+        </Field>
       </Section>
 
       <Section

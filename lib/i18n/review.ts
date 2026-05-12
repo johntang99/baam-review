@@ -80,11 +80,11 @@ export const STRINGS = {
     thanks_title: "Thank you.",
     thanks_google: "Your review helps other people find us.",
     thanks_private: "We received your message and will reach out if you left a way to contact you.",
-    thanks_eyebrow: "Review submitted to Google",
+    thanks_eyebrow: "Off to Google",
     thanks_title_named: "Thank you,\n{name}.",
     thanks_sub:
       "Your feedback helps more local families find trusted care. We're grateful you took the time.",
-    thanks_meta_just_now: "Submitted just now",
+    thanks_meta_just_now: "Just a moment ago",
 
     // Next steps
     next_eyebrow: "A few things you might want to do next",
@@ -108,6 +108,7 @@ export const STRINGS = {
       "They'll see your review, the business's contact info, and a way to book.",
     share_preview_mark: "★ Recommended by a customer",
     share_preview_attribution: "— {name}, satisfied customer",
+    dest_fb: "Facebook",
     dest_wechat: "WeChat",
     dest_sms: "SMS",
     dest_copy: "Copy link",
@@ -212,10 +213,10 @@ export const STRINGS = {
     thanks_title: "谢谢您。",
     thanks_google: "您的评价能帮助更多人找到我们。",
     thanks_private: "我们已收到您的消息。如您留下联系方式，我们将与您联系。",
-    thanks_eyebrow: "评论已提交至 Google",
+    thanks_eyebrow: "正在前往 Google",
     thanks_title_named: "感谢您，\n{name}。",
     thanks_sub: "您的反馈帮助更多本地家庭找到值得信赖的服务。感谢您抽出宝贵时间。",
-    thanks_meta_just_now: "刚刚提交",
+    thanks_meta_just_now: "刚刚",
 
     next_eyebrow: "您可能还想做的几件事",
     next_title: "趁您还在这里。",
@@ -234,6 +235,7 @@ export const STRINGS = {
     share_sub: "他们会看到您的评论、商家的联系方式和预约方式。",
     share_preview_mark: "★ 顾客推荐",
     share_preview_attribution: "—— {name}，就诊顾客",
+    dest_fb: "Facebook",
     dest_wechat: "微信",
     dest_sms: "短信",
     dest_copy: "复制链接",
@@ -333,11 +335,11 @@ export const STRINGS = {
     thanks_google: "Su reseña ayuda a otras personas a encontrarnos.",
     thanks_private:
       "Recibimos su mensaje. Le contactaremos si nos dejó una forma de comunicarnos.",
-    thanks_eyebrow: "Reseña enviada a Google",
+    thanks_eyebrow: "Yendo a Google",
     thanks_title_named: "Gracias,\n{name}.",
     thanks_sub:
       "Su opinión ayuda a más familias locales a encontrar atención confiable. Le agradecemos su tiempo.",
-    thanks_meta_just_now: "Enviado hace un momento",
+    thanks_meta_just_now: "Hace un momento",
 
     next_eyebrow: "Algunas cosas que podría querer hacer ahora",
     next_title: "Mientras está aquí.",
@@ -357,6 +359,7 @@ export const STRINGS = {
       "Verán su reseña, la información de contacto del negocio y una forma de reservar.",
     share_preview_mark: "★ Recomendado por un cliente",
     share_preview_attribution: "— {name}, cliente satisfecho",
+    dest_fb: "Facebook",
     dest_wechat: "WeChat",
     dest_sms: "SMS",
     dest_copy: "Copiar enlace",
