@@ -55,7 +55,11 @@ export function ReviewFlow({
   const [service, setService] = useState<string | null>(null);
   const [rating, setRating] = useState<number>(5);
   const [descriptor, setDescriptor] = useState<string | null>(null);
-  const [consentDisplay, setConsentDisplay] = useState<boolean>(false);
+  // Default to opted-in (Option A): most customers skip the checkbox when it
+  // defaults off, killing the share moment. They can still uncheck to opt out;
+  // a per-request consent_display=true row is recorded on Google handoff so we
+  // retain the legal artifact for the Phase B1 display widget.
+  const [consentDisplay, setConsentDisplay] = useState<boolean>(true);
 
   const [phase, setPhase] = useState<Phase>("input");
   const [drafts, setDrafts] = useState<Draft[]>([]);
