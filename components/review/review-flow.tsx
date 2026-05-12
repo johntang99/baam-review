@@ -13,6 +13,7 @@ import type { Language } from "@/lib/i18n/review";
 import { STRINGS } from "@/lib/i18n/review";
 import { ChipGroup } from "./chip-group";
 import { StarRating } from "./star-rating";
+import { ConsentCheckbox } from "./consent-checkbox";
 import { track, type TrackContext } from "./track";
 import { DraftPicker, type Draft } from "./draft-picker";
 import { buttonVariants } from "@/components/ui/button";
@@ -29,6 +30,8 @@ interface ReviewFlowProps {
   customUrl: string | null;
   customUrlLabel: string | null;
   privateFeedbackHref: string;
+  consentDisplayEnabled: boolean;
+  trackingToken: string | null;
 }
 
 type Phase = "input" | "loading" | "drafts" | "error";
@@ -44,12 +47,15 @@ export function ReviewFlow({
   customUrl,
   customUrlLabel,
   privateFeedbackHref,
+  consentDisplayEnabled,
+  trackingToken,
 }: ReviewFlowProps) {
   const s = STRINGS[lang];
 
   const [service, setService] = useState<string | null>(null);
   const [rating, setRating] = useState<number>(5);
   const [descriptor, setDescriptor] = useState<string | null>(null);
+  const [consentDisplay, setConsentDisplay] = useState<boolean>(false);
 
   const [phase, setPhase] = useState<Phase>("input");
   const [drafts, setDrafts] = useState<Draft[]>([]);
@@ -102,9 +108,14 @@ export function ReviewFlow({
       rating,
       descriptor,
       skipped_drafts: true,
+      // Consent only meaningful for the Google path; harmless on others.
+      consent_display: platform === "google" ? consentDisplay : undefined,
     });
     window.open(href, "_blank", "noopener,noreferrer");
-    window.location.href = `/r/${slug}/thank-you?via=${platform}&lang=${lang}`;
+    const consentParam =
+      platform === "google" && consentDisplay ? "&consent=1" : "";
+    const tokenParam = trackingToken ? `&t=${trackingToken}` : "";
+    window.location.href = `/r/${slug}/thank-you?via=${platform}&lang=${lang}${consentParam}${tokenParam}`;
   }
 
   if (phase === "drafts") {
@@ -119,6 +130,10 @@ export function ReviewFlow({
         onBack={() => setPhase("input")}
         onRegenerate={() => fetchDrafts({ regenerate: true })}
         isRegenerating={false}
+        consentDisplayEnabled={consentDisplayEnabled}
+        consentDisplay={consentDisplay}
+        onConsentDisplayChange={setConsentDisplay}
+        trackingToken={trackingToken}
       />
     );
   }
@@ -168,6 +183,15 @@ export function ReviewFlow({
       </Section>
 
       <div className="space-y-3 pt-2">
+        {consentDisplayEnabled && googleReviewUrl ? (
+          <ConsentCheckbox
+            checked={consentDisplay}
+            onChange={setConsentDisplay}
+            label={s.consent_display_label}
+            help={s.consent_display_help}
+          />
+        ) : null}
+
         {googleReviewUrl ? (
           <button
             type="button"

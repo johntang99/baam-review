@@ -70,10 +70,64 @@ export const STRINGS = {
     private_submit: "Send",
     private_submitting: "Sending…",
 
+    // Consent (shown before Google handoff)
+    consent_display_label:
+      "I'm happy for this review to appear on the business's website.",
+    consent_display_help:
+      "Optional. You can still post on Google either way — this just lets the business feature your review on their site.",
+
     // Thank you
     thanks_title: "Thank you.",
     thanks_google: "Your review helps other people find us.",
     thanks_private: "We received your message and will reach out if you left a way to contact you.",
+    thanks_eyebrow: "Review submitted to Google",
+    thanks_title_named: "Thank you,\n{name}.",
+    thanks_sub:
+      "Your feedback helps more local families find trusted care. We're grateful you took the time.",
+    thanks_meta_just_now: "Submitted just now",
+
+    // Next steps
+    next_eyebrow: "A few things you might want to do next",
+    next_title: "While you're here.",
+    next_title_em: "here.",
+    next_sub: "No pressure — close the tab whenever you want.",
+
+    // Book CTA
+    book_title: "Book your next visit",
+    book_desc: "Open slots this week — 30 seconds to reserve.",
+
+    // Refer CTA
+    refer_title: "Share with a friend",
+    refer_desc: "A beautiful share card with a tracked link.",
+
+    // Share card
+    share_eyebrow: "Your share card",
+    share_title: "Send this to a friend.",
+    share_title_em: "friend.",
+    share_sub:
+      "They'll see your review, the business's contact info, and a way to book.",
+    share_preview_mark: "★ Recommended by a customer",
+    share_preview_attribution: "— {name}, satisfied customer",
+    dest_wechat: "WeChat",
+    dest_sms: "SMS",
+    dest_copy: "Copy link",
+    dest_more: "More",
+
+    // Follow strip
+    follow_title: "Follow us",
+    follow_sub: "Customer stories, seasonal tips, and clinic news.",
+    follow_xhs: "Xiaohongshu",
+    follow_ig: "Instagram",
+    follow_wechat: "WeChat",
+    follow_tiktok: "TikTok",
+    follow_fb: "Facebook",
+
+    // Done
+    done_btn: "All done — close this page",
+
+    // Toasts
+    toast_copied: "Share link copied to clipboard",
+    toast_book_opening: "Opening booking page in new tab…",
 
     // WeChat
     wechat_title: "Open this page in your browser to leave a Google review",
@@ -151,9 +205,52 @@ export const STRINGS = {
     private_submit: "发送",
     private_submitting: "正在发送…",
 
+    consent_display_label: "我同意此评论显示在商家的网站上。",
+    consent_display_help:
+      "可选。无论是否勾选，您仍可在 Google 上发布评价 —— 这只是允许商家在其网站上展示您的评论。",
+
     thanks_title: "谢谢您。",
     thanks_google: "您的评价能帮助更多人找到我们。",
     thanks_private: "我们已收到您的消息。如您留下联系方式，我们将与您联系。",
+    thanks_eyebrow: "评论已提交至 Google",
+    thanks_title_named: "感谢您，\n{name}。",
+    thanks_sub: "您的反馈帮助更多本地家庭找到值得信赖的服务。感谢您抽出宝贵时间。",
+    thanks_meta_just_now: "刚刚提交",
+
+    next_eyebrow: "您可能还想做的几件事",
+    next_title: "趁您还在这里。",
+    next_title_em: "在这里。",
+    next_sub: "不勉强 —— 随时可以关闭此页面。",
+
+    book_title: "预约下次就诊",
+    book_desc: "本周有空档 —— 30 秒即可预约。",
+
+    refer_title: "分享给朋友",
+    refer_desc: "一张精美的分享卡，附带可追踪的链接。",
+
+    share_eyebrow: "您的分享卡",
+    share_title: "把这张卡发给朋友。",
+    share_title_em: "朋友。",
+    share_sub: "他们会看到您的评论、商家的联系方式和预约方式。",
+    share_preview_mark: "★ 顾客推荐",
+    share_preview_attribution: "—— {name}，就诊顾客",
+    dest_wechat: "微信",
+    dest_sms: "短信",
+    dest_copy: "复制链接",
+    dest_more: "更多",
+
+    follow_title: "关注我们",
+    follow_sub: "顾客故事、季节贴士与商家动态。",
+    follow_xhs: "小红书",
+    follow_ig: "Instagram",
+    follow_wechat: "微信公众号",
+    follow_tiktok: "抖音",
+    follow_fb: "Facebook",
+
+    done_btn: "完成 —— 关闭此页面",
+
+    toast_copied: "分享链接已复制到剪贴板",
+    toast_book_opening: "正在新标签页中打开预约页面…",
 
     wechat_title: "请在浏览器中打开此页面以留 Google 评价",
     wechat_body:
@@ -227,10 +324,57 @@ export const STRINGS = {
     private_submit: "Enviar",
     private_submitting: "Enviando…",
 
+    consent_display_label:
+      "Acepto que esta reseña aparezca en el sitio web del negocio.",
+    consent_display_help:
+      "Opcional. Igual puede publicar en Google — esto solo permite al negocio destacar su reseña en su sitio.",
+
     thanks_title: "Gracias.",
     thanks_google: "Su reseña ayuda a otras personas a encontrarnos.",
     thanks_private:
       "Recibimos su mensaje. Le contactaremos si nos dejó una forma de comunicarnos.",
+    thanks_eyebrow: "Reseña enviada a Google",
+    thanks_title_named: "Gracias,\n{name}.",
+    thanks_sub:
+      "Su opinión ayuda a más familias locales a encontrar atención confiable. Le agradecemos su tiempo.",
+    thanks_meta_just_now: "Enviado hace un momento",
+
+    next_eyebrow: "Algunas cosas que podría querer hacer ahora",
+    next_title: "Mientras está aquí.",
+    next_title_em: "aquí.",
+    next_sub: "Sin presión — cierre la pestaña cuando quiera.",
+
+    book_title: "Reserve su próxima visita",
+    book_desc: "Horarios disponibles esta semana — 30 segundos para reservar.",
+
+    refer_title: "Compartir con un amigo",
+    refer_desc: "Una tarjeta hermosa con un enlace rastreable.",
+
+    share_eyebrow: "Su tarjeta de compartir",
+    share_title: "Envíe esto a un amigo.",
+    share_title_em: "amigo.",
+    share_sub:
+      "Verán su reseña, la información de contacto del negocio y una forma de reservar.",
+    share_preview_mark: "★ Recomendado por un cliente",
+    share_preview_attribution: "— {name}, cliente satisfecho",
+    dest_wechat: "WeChat",
+    dest_sms: "SMS",
+    dest_copy: "Copiar enlace",
+    dest_more: "Más",
+
+    follow_title: "Síganos",
+    follow_sub:
+      "Historias de clientes, consejos de temporada y noticias del negocio.",
+    follow_xhs: "Xiaohongshu",
+    follow_ig: "Instagram",
+    follow_wechat: "WeChat",
+    follow_tiktok: "TikTok",
+    follow_fb: "Facebook",
+
+    done_btn: "Listo — cerrar esta página",
+
+    toast_copied: "Enlace copiado al portapapeles",
+    toast_book_opening: "Abriendo página de reservas en nueva pestaña…",
 
     wechat_title: "Abra esta página en su navegador para dejar una reseña en Google",
     wechat_body:

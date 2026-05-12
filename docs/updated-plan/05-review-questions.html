@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share your visit — Dr. Huang Acupuncture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --clinic-primary: #962D22;
+  --clinic-primary-dark: #6F1F18;
+  --clinic-soft: #F8E5E1;
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 30px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+a { color: inherit; text-decoration: none; }
+
+.shell { width: 100%; max-width: 480px; position: relative; z-index: 1; }
+
+/* TOP BAR */
+.top-bar { display: flex; justify-content: flex-end; align-items: center; padding: 12px 4px; margin-bottom: 12px; }
+.lang-switcher { display: flex; background: var(--paper); border: 1px solid var(--border); border-radius: 999px; padding: 3px; gap: 2px; }
+.lang-btn {
+  padding: 5px 12px;
+  background: transparent;
+  border: none;
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all 0.15s;
+}
+.lang-btn:hover { color: var(--text); }
+.lang-btn.active { background: var(--ink); color: var(--cream); }
+
+/* CARD */
+.card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* HEADER */
+.card-header { padding: 32px 30px 24px; border-bottom: 1px solid var(--border-soft); }
+.clinic-row { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.clinic-logo {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--clinic-primary), var(--clinic-primary-dark));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 26px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(150, 45, 34, 0.18);
+}
+.clinic-info-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.clinic-info-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.greeting {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.greeting em { font-style: italic; color: var(--clinic-primary); }
+.greeting-sub {
+  font-family: 'Newsreader', serif;
+  font-size: 16.5px;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+/* PROGRESS */
+.progress { padding: 18px 30px 0; display: flex; align-items: center; gap: 12px; }
+.progress-text {
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.progress-track { flex: 1; height: 3px; background: var(--border-soft); border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; width: 33%; background: var(--clinic-primary); border-radius: 999px; transition: width 0.4s ease; }
+
+/* QUESTION */
+.question-area { padding: 28px 30px 26px; }
+.question {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.question-hint {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 22px;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 24px; }
+.chip {
+  padding: 11px 18px;
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.chip:hover { border-color: var(--clinic-primary); color: var(--clinic-primary); transform: translateY(-1px); }
+.chip.selected { background: var(--clinic-primary); border-color: var(--clinic-primary); color: white; }
+.chip.selected:hover { background: var(--clinic-primary-dark); transform: translateY(-1px); }
+.chip.other { background: transparent; border-style: dashed; color: var(--text-muted); }
+.chip.other:hover { background: var(--cream); }
+
+/* OTHER INPUT */
+.other-input-wrap { display: none; margin-bottom: 24px; animation: slideDown 0.25s ease; }
+.other-input-wrap.show { display: block; }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.other-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--cream);
+  border: 1.5px solid var(--clinic-primary);
+  border-radius: 12px;
+  font-family: 'Onest', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+}
+.other-input:focus { outline: none; background: var(--paper); box-shadow: 0 0 0 3px rgba(150, 45, 34, 0.1); }
+
+/* ============ CONSENT CHECKBOX ============ */
+.consent-row {
+  margin-bottom: 22px;
+  padding: 14px 16px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.consent-row:hover { border-color: var(--text-muted); }
+.consent-row.checked {
+  background: rgba(150, 45, 34, 0.05);
+  border-color: var(--clinic-primary);
+}
+.consent-checkbox {
+  width: 20px; height: 20px;
+  border: 1.5px solid var(--text-muted);
+  border-radius: 5px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  background: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.consent-row.checked .consent-checkbox {
+  background: var(--clinic-primary);
+  border-color: var(--clinic-primary);
+}
+.consent-checkbox svg {
+  width: 12px; height: 12px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.consent-row.checked .consent-checkbox svg { opacity: 1; }
+.consent-text {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.45;
+}
+.consent-text strong { font-weight: 500; color: var(--ink); }
+.consent-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* CONTINUE BUTTON */
+.btn-row { display: flex; gap: 12px; }
+.btn {
+  flex: 1;
+  padding: 16px 22px;
+  font-family: 'Onest', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary { background: var(--ink); color: var(--cream); }
+.btn-primary:hover { background: #20332C; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-secondary { background: transparent; color: var(--text-soft); flex: 0; padding: 16px 18px; }
+.btn-secondary:hover { background: var(--cream-deep); color: var(--text); }
+
+/* PRIVATE FEEDBACK LINK */
+.private-link-row {
+  margin-top: 20px;
+  padding: 18px 24px;
+  background: var(--cream-deep);
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.private-link-text { font-size: 13.5px; color: var(--text-soft); flex: 1; }
+.private-link-text strong { color: var(--ink); font-weight: 500; }
+.private-link-btn {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.private-link-btn:hover { background: var(--paper); border-color: var(--ink); }
+
+/* FOOTER */
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 0 16px;
+}
+.footer a { color: var(--text-soft); font-weight: 500; }
+.footer-baam {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.footer-baam-mark {
+  width: 14px; height: 14px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+body.lang-zh { font-family: 'Noto Sans SC', 'Onest', sans-serif; }
+body.lang-zh .greeting,
+body.lang-zh .question,
+body.lang-zh .clinic-info-name {
+  font-family: 'Fraunces', 'Noto Sans SC', serif;
+}
+
+@media (max-width: 480px) {
+  body { padding: 8px; }
+  .card-header { padding: 24px 22px 20px; }
+  .question-area { padding: 22px 22px 22px; }
+  .progress { padding: 14px 22px 0; }
+  .greeting { font-size: 26px; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <div class="top-bar">
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="zh">中文</button>
+      <button class="lang-btn" data-lang="es">ES</button>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <div class="clinic-row">
+        <div class="clinic-logo">黄</div>
+        <div>
+          <div class="clinic-info-name">Dr. Huang Acupuncture</div>
+          <div class="clinic-info-sub">Flushing, NY · Verified</div>
+        </div>
+      </div>
+      <h1 class="greeting" id="greeting">Thanks for visiting,<br><em>Sarah.</em></h1>
+      <p class="greeting-sub" id="greeting-sub">A few quick taps and we'll have a review draft you can edit. About 60 seconds.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress">
+      <div class="progress-text" id="progress-text">Question 1 of 3</div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
+    </div>
+
+    <!-- Question + chips -->
+    <div class="question-area">
+      <h2 class="question" id="question">What did we help you with today?</h2>
+      <p class="question-hint" id="question-hint">Pick whichever fits best — you can add more later.</p>
+
+      <div class="chips" id="chips">
+        <div class="chip" data-value="back-pain">Back pain</div>
+        <div class="chip selected" data-value="migraines">Migraines</div>
+        <div class="chip" data-value="stress">Stress &amp; anxiety</div>
+        <div class="chip" data-value="insomnia">Insomnia</div>
+        <div class="chip" data-value="allergies">Allergies</div>
+        <div class="chip" data-value="digestion">Digestion</div>
+        <div class="chip" data-value="fertility">Fertility support</div>
+        <div class="chip other" id="other-chip">Something else…</div>
+      </div>
+
+      <div class="other-input-wrap" id="other-wrap">
+        <input type="text" class="other-input" id="other-input" placeholder="Tell us in your own words…">
+      </div>
+
+      <!-- CONSENT CHECKBOX (v2.0 master plan compliance layer) -->
+      <div class="consent-row checked" id="consent-row">
+        <div class="consent-checkbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div>
+          <div class="consent-text" id="consent-text">
+            <strong>I'm comfortable with Dr. Huang Acupuncture displaying my review on their website and marketing.</strong>
+          </div>
+          <div class="consent-sub" id="consent-sub">You can change your mind later — we'll send you a one-click link.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary">← Back</button>
+        <button class="btn btn-primary" id="continue-btn">
+          Continue
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <div class="private-link-row">
+        <div class="private-link-text">
+          <strong id="private-strong">Rather not write a public review?</strong><br>
+          <span id="private-sub">Share your feedback privately with the clinic instead.</span>
+        </div>
+        <button class="private-link-btn" id="private-btn">Private feedback →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span id="footer-text">© 2026 Dr. Huang Acupuncture</span>
+    <br>
+    <a href="#" class="footer-baam">
+      <span class="footer-baam-mark">B</span>
+      <span id="footer-baam-text">Powered by BAAM Review</span>
+    </a>
+  </div>
+
+</div>
+
+<script>
+  const T = {
+    en: {
+      greeting: 'Thanks for visiting,<br><em>Sarah.</em>',
+      greetingSub: "A few quick taps and we'll have a review draft you can edit. About 60 seconds.",
+      progress: 'Question 1 of 3',
+      question: 'What did we help you with today?',
+      hint: 'Pick whichever fits best — you can add more later.',
+      chips: ['Back pain', 'Migraines', 'Stress & anxiety', 'Insomnia', 'Allergies', 'Digestion', 'Fertility support', 'Something else…'],
+      placeholder: 'Tell us in your own words…',
+      consent: "I'm comfortable with Dr. Huang Acupuncture displaying my review on their website and marketing.",
+      consentSub: "You can change your mind later — we'll send you a one-click link.",
+      continue: 'Continue',
+      back: '← Back',
+      privateStrong: 'Rather not write a public review?',
+      privateSub: 'Share your feedback privately with the clinic instead.',
+      privateBtn: 'Private feedback →',
+      footer: '© 2026 Dr. Huang Acupuncture',
+      poweredBy: 'Powered by BAAM Review'
+    },
+    zh: {
+      greeting: '感谢您今天的来访，<br><em>Sarah。</em>',
+      greetingSub: '只需几下点击，我们就能为您生成一份可编辑的评论草稿。约 60 秒。',
+      progress: '问题 1 / 3',
+      question: '我们今天帮您处理了什么？',
+      hint: '选最符合的就好——稍后还可以补充。',
+      chips: ['背痛', '偏头痛', '压力与焦虑', '失眠', '过敏', '消化', '备孕调理', '其他…'],
+      placeholder: '请用您自己的话告诉我们…',
+      consent: '我同意黄医生中医诊所在其网站和宣传中展示我的评论。',
+      consentSub: '您随时可以改变主意 —— 我们会发送一键链接给您。',
+      continue: '继续',
+      back: '← 返回',
+      privateStrong: '不想公开发表评论？',
+      privateSub: '可以选择私下将反馈直接发给诊所。',
+      privateBtn: '私下反馈 →',
+      footer: '© 2026 黄医生中医诊所',
+      poweredBy: '由 BAAM Review 提供技术支持'
+    },
+    es: {
+      greeting: 'Gracias por su visita,<br><em>Sarah.</em>',
+      greetingSub: 'Unos toques rápidos y tendremos un borrador de reseña que puede editar. Alrededor de 60 segundos.',
+      progress: 'Pregunta 1 de 3',
+      question: '¿En qué le ayudamos hoy?',
+      hint: 'Elija la que mejor se ajuste — puede agregar más después.',
+      chips: ['Dolor de espalda', 'Migrañas', 'Estrés y ansiedad', 'Insomnio', 'Alergias', 'Digestión', 'Apoyo de fertilidad', 'Algo más…'],
+      placeholder: 'Cuéntenos en sus propias palabras…',
+      consent: 'Permito que Dr. Huang Acupuntura muestre mi reseña en su sitio web y materiales de marketing.',
+      consentSub: 'Puede cambiar de opinión más tarde — le enviaremos un enlace de un clic.',
+      continue: 'Continuar',
+      back: '← Atrás',
+      privateStrong: '¿Prefiere no escribir una reseña pública?',
+      privateSub: 'Comparta su opinión en privado con la clínica.',
+      privateBtn: 'Opinión privada →',
+      footer: '© 2026 Dr. Huang Acupuntura',
+      poweredBy: 'Con tecnología de BAAM Review'
+    }
+  };
+
+  function setLang(lang) {
+    const t = T[lang];
+    document.body.classList.remove('lang-en', 'lang-zh', 'lang-es');
+    document.body.classList.add('lang-' + lang);
+    document.documentElement.lang = lang;
+
+    document.getElementById('greeting').innerHTML = t.greeting;
+    document.getElementById('greeting-sub').textContent = t.greetingSub;
+    document.getElementById('progress-text').textContent = t.progress;
+    document.getElementById('question').textContent = t.question;
+    document.getElementById('question-hint').textContent = t.hint;
+    document.getElementById('other-input').placeholder = t.placeholder;
+    document.getElementById('consent-text').innerHTML = '<strong>' + t.consent + '</strong>';
+    document.getElementById('consent-sub').textContent = t.consentSub;
+
+    const chips = document.querySelectorAll('#chips .chip');
+    chips.forEach((c, i) => { if (t.chips[i]) c.textContent = t.chips[i]; });
+
+    document.querySelector('.btn-secondary').textContent = t.back;
+    document.getElementById('continue-btn').innerHTML = t.continue + ' <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
+    document.getElementById('private-strong').textContent = t.privateStrong;
+    document.getElementById('private-sub').textContent = t.privateSub;
+    document.getElementById('private-btn').textContent = t.privateBtn;
+    document.getElementById('footer-text').textContent = t.footer;
+    document.getElementById('footer-baam-text').textContent = t.poweredBy;
+
+    bindChips();
+  }
+
+  function bindChips() {
+    document.querySelectorAll('#chips .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (chip.id === 'other-chip') {
+          chip.classList.toggle('selected');
+          document.getElementById('other-wrap').classList.toggle('show', chip.classList.contains('selected'));
+        } else {
+          document.querySelectorAll('#chips .chip:not(#other-chip)').forEach(c => c.classList.remove('selected'));
+          chip.classList.add('selected');
+        }
+      });
+    });
+  }
+
+  // Consent checkbox toggle
+  document.getElementById('consent-row').addEventListener('click', (e) => {
+    e.currentTarget.classList.toggle('checked');
+  });
+
+  // Lang switcher
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setLang(btn.dataset.lang);
+    });
+  });
+
+  bindChips();
+</script>
+
+</body>
+</html>

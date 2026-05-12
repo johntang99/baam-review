@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --forest-light: #2A6B57;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88847;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --hover: #F5F1E8;
+  --success: #2D7A5F;
+  --alert: #B5443A;
+  --alert-soft: #FCE8E5;
+  --warn: #D4924A;
+  --warn-soft: #FBEAD3;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 28px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Onest', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream);
+  font-size: 14.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ============ LAYOUT ============ */
+.app {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  min-height: 100vh;
+}
+
+/* ============ SIDEBAR ============ */
+aside {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 24px;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+.brand-mark {
+  width: 28px; height: 28px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.location-switcher {
+  background: rgba(250, 247, 242, 0.06);
+  border: 1px solid rgba(250, 247, 242, 0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.location-switcher:hover { background: rgba(250, 247, 242, 0.1); }
+.location-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #C0392B, #962D22);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.location-text { flex: 1; min-width: 0; }
+.location-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.location-sub { font-size: 11.5px; color: rgba(250, 247, 242, 0.55); }
+.location-chevron { color: rgba(250, 247, 242, 0.4); }
+
+.nav-label {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(250, 247, 242, 0.4);
+  padding: 0 8px 8px;
+  margin-top: 8px;
+  font-weight: 500;
+}
+.nav-list { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.nav-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: rgba(250, 247, 242, 0.7);
+  transition: background 0.15s, color 0.15s;
+}
+.nav-list a:hover { background: rgba(250, 247, 242, 0.06); color: var(--cream); }
+.nav-list a.active { background: rgba(201, 169, 97, 0.12); color: var(--gold); }
+.nav-list a svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-list a .badges {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+.nav-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+.nav-badge.alert { background: var(--alert); color: var(--cream); }
+.nav-badge.warn { background: var(--gold); color: var(--ink); }
+.nav-badge.new {
+  background: rgba(45, 122, 95, 0.85);
+  color: var(--cream);
+  font-family: 'Onest', sans-serif;
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+}
+
+.user-card {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.user-card:hover { background: rgba(250, 247, 242, 0.06); }
+.user-avatar {
+  width: 32px; height: 32px;
+  background: var(--sage);
+  color: var(--ink);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+.user-text { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+.user-tier { font-size: 11px; color: rgba(250, 247, 242, 0.5); }
+
+/* ============ MAIN ============ */
+main {
+  padding: 28px 36px 60px;
+  background: var(--cream);
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 28px;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.page-title-block .page-eyebrow {
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 40px;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  line-height: 1;
+}
+.page-title em { font-style: italic; color: var(--forest); }
+.top-bar-actions { display: flex; gap: 10px; align-items: center; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  font-family: 'Onest', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--forest); color: var(--cream); }
+.btn-primary:hover { background: var(--forest-dark); }
+.btn-secondary { background: var(--paper); color: var(--text); border-color: var(--border); }
+.btn-secondary:hover { background: var(--cream-deep); }
+.btn-gold { background: var(--gold); color: var(--ink); }
+.btn-gold:hover { background: var(--gold-dark); color: var(--cream); }
+.btn-icon { padding: 9px; }
+.btn svg { width: 15px; height: 15px; }
+
+/* ============ REVENUE STRIP ============ */
+.revenue-strip {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.rev-stat {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  position: relative;
+  transition: all 0.2s;
+}
+.rev-stat:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.rev-stat.hero {
+  background: linear-gradient(135deg, var(--ink) 0%, #1B2E27 100%);
+  color: var(--cream);
+  border-color: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+.rev-stat.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 90% 20%, rgba(201, 169, 97, 0.18), transparent 50%);
+}
+.rev-stat.hero > * { position: relative; z-index: 1; }
+.rev-stat-label {
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+}
+.rev-stat.hero .rev-stat-label { color: var(--gold); }
+.rev-stat-label .info {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--cream-deep);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  margin-left: 2px;
+}
+.rev-stat.hero .rev-stat-label .info { background: rgba(250, 247, 242, 0.15); color: var(--gold-soft); color: rgba(201, 169, 97, 0.7); }
+.rev-stat-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 38px;
+  color: var(--ink);
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.rev-stat.hero .rev-stat-value { color: var(--gold); font-weight: 400; font-size: 44px; }
+.rev-stat-value .unit { font-size: 18px; color: var(--text-muted); margin-left: 4px; }
+.rev-stat.hero .rev-stat-value .unit { color: rgba(201, 169, 97, 0.6); }
+.rev-stat-delta {
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 500;
+}
+.rev-stat-delta.up { color: var(--success); }
+.rev-stat.hero .rev-stat-delta.up { color: #6EBE9D; }
+.rev-stat-period { font-size: 11.5px; color: var(--text-muted); margin-left: 6px; font-weight: 400; }
+.rev-stat.hero .rev-stat-period { color: rgba(250, 247, 242, 0.5); }
+.rev-stat-tag {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 500;
+  background: rgba(201, 169, 97, 0.16);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.rev-stat.hero .rev-stat-tag { background: rgba(201, 169, 97, 0.2); }
+
+/* ============ SERVICE RECOVERY ALERT ============ */
+.alert-banner {
+  background: linear-gradient(135deg, #C0392B 0%, var(--alert) 100%);
+  color: var(--cream);
+  border-radius: 14px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.alert-icon {
+  width: 38px; height: 38px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cream);
+  flex-shrink: 0;
+}
+.alert-text { flex: 1; }
+.alert-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--cream);
+  letter-spacing: -0.01em;
+}
+.alert-sub {
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 2px;
+}
+.alert-btn {
+  background: var(--cream);
+  color: var(--alert);
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Onest', sans-serif;
+  white-space: nowrap;
+}
+.alert-btn:hover { background: var(--paper); color: var(--alert); }
+
+/* ============ MAIN CONTENT GRID ============ */
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 22px;
+}
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.card-header {
+  padding: 18px 24px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-soft);
+  gap: 12px;
+}
+.card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.card-title-row { display: flex; align-items: center; gap: 10px; }
+.card-badge {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+.card-badge.gold { background: rgba(201, 169, 97, 0.18); color: var(--gold-dark); }
+.card-badge.green { background: rgba(45, 122, 95, 0.15); color: var(--success); }
+.card-link {
+  font-size: 13px;
+  color: var(--forest);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============ REVENUE FUNNEL ============ */
+.funnel { padding: 22px 24px 24px; }
+.funnel-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 100px 60px;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.funnel-row:last-child { margin-bottom: 0; }
+.funnel-label {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+.funnel-bar {
+  height: 30px;
+  background: var(--cream-deep);
+  border-radius: 7px;
+  overflow: hidden;
+  position: relative;
+}
+.funnel-fill {
+  height: 100%;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--cream);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.funnel-fill.l1 { background: var(--ink); width: 100%; }
+.funnel-fill.l2 { background: var(--forest); width: 78%; }
+.funnel-fill.l3 { background: var(--forest-light); width: 64%; }
+.funnel-fill.l4 { background: var(--sage); width: 38%; color: var(--ink); }
+.funnel-fill.l5 {
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-dark) 100%);
+  width: 92%;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+}
+.funnel-fill.l5::before {
+  content: '$ ';
+  font-family: 'Onest', sans-serif;
+  font-weight: 600;
+  opacity: 0.8;
+  margin-right: 2px;
+}
+.funnel-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.funnel-pct {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+.funnel-divider {
+  height: 1px;
+  background: var(--border-soft);
+  margin: 20px 0 14px;
+}
+.funnel-stage-label {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 12px;
+  padding-left: 1px;
+}
+.funnel-summary {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.funnel-summary-text {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-soft);
+  flex: 1;
+}
+.funnel-summary-text strong {
+  font-style: normal;
+  color: var(--forest);
+  font-weight: 500;
+}
+
+/* ============ AI REPLY QUEUE ============ */
+.replies-queue { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.reply-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  align-items: center;
+  transition: all 0.15s;
+}
+.reply-card:hover {
+  background: var(--paper);
+  border-color: var(--forest);
+}
+.reply-avatar {
+  width: 36px; height: 36px;
+  background: var(--sage);
+  color: var(--ink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+.reply-content { min-width: 0; }
+.reply-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.reply-name { font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.reply-stars { color: var(--gold); font-size: 11px; letter-spacing: 1px; }
+.reply-snippet {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+.reply-action-btn {
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Onest', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.reply-action-btn:hover { background: var(--forest-dark); }
+.reply-action-btn svg { width: 11px; height: 11px; }
+
+/* ============ ACTIVITY ============ */
+.activity-list { padding: 0; }
+.activity-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 100px 110px 70px;
+  gap: 14px;
+  padding: 14px 24px;
+  align-items: center;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 13.5px;
+  transition: background 0.12s;
+}
+.activity-row:last-child { border-bottom: none; }
+.activity-row:hover { background: var(--cream-deep); }
+.activity-status {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+.activity-status.completed { background: var(--success); }
+.activity-status.clicked { background: var(--gold); }
+.activity-status.sent { background: var(--sage); }
+.activity-status.private { background: var(--warn); }
+.activity-status.referred {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+}
+
+.activity-name { font-weight: 500; color: var(--ink); }
+.activity-meta { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+.activity-channel { color: var(--text-soft); font-size: 12.5px; }
+.activity-time { color: var(--text-muted); font-size: 12.5px; font-family: 'JetBrains Mono', monospace; }
+.tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.tag.lang-en { background: #E5EDDF; color: var(--forest); }
+.tag.lang-zh { background: #F8E5E1; color: #8B3A2A; }
+.tag.lang-es { background: #FBEAD3; color: #A06820; }
+
+/* ============ REFERRAL ATTRIBUTION ============ */
+.referral-card { padding: 22px 24px 24px; }
+.referral-headline {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.referral-headline-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--gold);
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+.referral-headline-text {
+  font-family: 'Newsreader', serif;
+  font-size: 15px;
+  color: var(--text-soft);
+  font-style: italic;
+  line-height: 1.4;
+  flex: 1;
+}
+.referral-headline-text strong { color: var(--ink); font-style: normal; font-weight: 500; }
+
+.referral-pipeline {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.pipeline-step {
+  text-align: center;
+  padding: 14px 8px;
+  background: var(--cream-deep);
+  border-radius: 10px;
+  position: relative;
+}
+.pipeline-step::after {
+  content: '→';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  z-index: 1;
+}
+.pipeline-step:last-child::after { display: none; }
+.pipeline-step.last { background: rgba(201, 169, 97, 0.15); }
+.pipeline-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 24px;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.pipeline-step.last .pipeline-num { color: var(--gold-dark); }
+.pipeline-label {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.top-referrers-label {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.top-referrer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-soft);
+}
+.top-referrer:last-child { border-bottom: 1px solid var(--border-soft); }
+.top-referrer-avatar {
+  width: 28px; height: 28px;
+  background: var(--sage);
+  color: var(--ink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+.top-referrer-name { font-size: 13px; font-weight: 500; color: var(--ink); flex: 1; }
+.top-referrer-stat {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.top-referrer-stat strong { color: var(--gold-dark); font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; }
+
+/* ============ ADVOCATES STRIP ============ */
+.advocates-card { padding: 22px 24px 24px; }
+.advocates-tier-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.advocates-tier-badge {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 500;
+  font-family: 'Onest', sans-serif;
+}
+.tier-future { background: var(--cream-deep); color: var(--text-muted); border: 1px dashed var(--border); }
+.advocate-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-soft);
+}
+.advocate-row:first-of-type { border-top: none; padding-top: 0; }
+.advocate-avatar {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: var(--cream);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.advocate-text { flex: 1; min-width: 0; }
+.advocate-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.advocate-flags {
+  display: flex;
+  gap: 4px;
+  margin-left: 4px;
+}
+.flag-pill {
+  font-size: 9.5px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--cream-deep);
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.advocate-stats {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ============ QUICK ACTIONS ============ */
+.quick-actions { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+.action-btn:hover {
+  background: var(--paper);
+  border-color: var(--forest);
+  transform: translateX(2px);
+}
+.action-btn .icon-wrap {
+  width: 34px; height: 34px;
+  background: var(--paper);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--forest);
+  flex-shrink: 0;
+}
+.action-btn .icon-wrap svg { width: 16px; height: 16px; }
+.action-btn .action-text { flex: 1; }
+.action-btn .action-title { font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.action-btn .action-desc { font-size: 11.5px; color: var(--text-soft); margin-top: 2px; }
+.action-btn .action-arrow { color: var(--text-muted); }
+.action-btn:hover .action-arrow { color: var(--forest); }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1280px) {
+  .revenue-strip { grid-template-columns: 1.2fr 1fr 1fr 1fr; }
+}
+@media (max-width: 1100px) {
+  .content-grid { grid-template-columns: 1fr; }
+  .revenue-strip { grid-template-columns: repeat(2, 1fr); }
+  .rev-stat.hero { grid-column: span 2; }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  aside { display: none; }
+  main { padding: 20px 18px; }
+  .revenue-strip { grid-template-columns: 1fr; }
+  .rev-stat.hero { grid-column: span 1; }
+  .activity-row { grid-template-columns: 1fr; gap: 4px; }
+  .funnel-row { grid-template-columns: 1fr; gap: 6px; }
+  .referral-pipeline { grid-template-columns: repeat(2, 1fr); }
+  .pipeline-step::after { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside>
+    <div class="brand">
+      <span class="brand-mark">B</span>
+      BAAM Review
+    </div>
+
+    <div class="location-switcher">
+      <div class="location-icon">黄</div>
+      <div class="location-text">
+        <div class="location-name">Dr. Huang Acupuncture</div>
+        <div class="location-sub">Flushing, NY · Growth</div>
+      </div>
+      <span class="location-chevron">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </span>
+    </div>
+
+    <div class="nav-label">Workspace</div>
+    <ul class="nav-list">
+      <li><a href="#" class="active">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a></li>
+      <li><a href="04-admin-send-request.html">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        Send request
+      </a></li>
+      <li><a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+        Reviews
+        <span class="badges">
+          <span class="nav-badge warn">7</span>
+          <span class="nav-badge alert">3</span>
+        </span>
+      </a></li>
+      <li><a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        AI Replies
+        <span class="badges"><span class="nav-badge warn">7</span></span>
+      </a></li>
+      <li><a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        Referrals
+        <span class="badges"><span class="nav-badge new">NEW</span></span>
+      </a></li>
+      <li><a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+        Distribute
+        <span class="badges"><span class="nav-badge new">NEW</span></span>
+      </a></li>
+      <li><a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Analytics
+      </a></li>
+      <li><a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Embed & QR
+      </a></li>
+    </ul>
+
+    <div class="nav-label">Account</div>
+    <ul class="nav-list">
+      <li><a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Settings
+      </a></li>
+      <li><a href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        Billing
+      </a></li>
+    </ul>
+
+    <div class="user-card">
+      <div class="user-avatar">JC</div>
+      <div class="user-text">
+        <div class="user-name">John Chen</div>
+        <div class="user-tier">Growth · Founding member</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="page-title-block">
+        <div class="page-eyebrow">Tuesday, May 12 · Last 30 days</div>
+        <h1 class="page-title">Good morning, <em>John.</em></h1>
+      </div>
+      <div class="top-bar-actions">
+        <button class="btn btn-secondary">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Last 30 days
+        </button>
+        <button class="btn btn-primary">
+          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>
+          Send request
+        </button>
+      </div>
+    </div>
+
+    <!-- ============ SERVICE RECOVERY ALERT ============ -->
+    <div class="alert-banner">
+      <div class="alert-icon">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      </div>
+      <div class="alert-text">
+        <div class="alert-title">3 reviews need your attention</div>
+        <div class="alert-sub">2 private feedback (1 unread) and 1 new Google review at 3★ — AI has drafted suggested responses.</div>
+      </div>
+      <button class="alert-btn">Review now →</button>
+    </div>
+
+    <!-- ============ REVENUE STRIP ============ -->
+    <div class="revenue-strip">
+      <div class="rev-stat hero">
+        <span class="rev-stat-tag">Growth tier</span>
+        <div class="rev-stat-label">
+          Estimated revenue impact
+          <span class="info">i</span>
+        </div>
+        <div class="rev-stat-value">$<span>3,840</span></div>
+        <span class="rev-stat-delta up">▲ 28%</span>
+        <span class="rev-stat-period">vs. previous 30d</span>
+      </div>
+      <div class="rev-stat">
+        <div class="rev-stat-label">New Google reviews</div>
+        <div class="rev-stat-value">54</div>
+        <span class="rev-stat-delta up">▲ 18</span>
+        <span class="rev-stat-period">this month</span>
+      </div>
+      <div class="rev-stat">
+        <div class="rev-stat-label">Referral clicks</div>
+        <div class="rev-stat-value">23</div>
+        <span class="rev-stat-delta up">▲ 23</span>
+        <span class="rev-stat-period">since launch</span>
+      </div>
+      <div class="rev-stat">
+        <div class="rev-stat-label">Website widget views</div>
+        <div class="rev-stat-value">1,247</div>
+        <span class="rev-stat-delta up">▲ 41%</span>
+        <span class="rev-stat-period">vs. previous 30d</span>
+      </div>
+    </div>
+
+    <!-- ============ CONTENT GRID ============ -->
+    <div class="content-grid">
+
+      <!-- LEFT COLUMN -->
+      <div style="display: flex; flex-direction: column; gap: 22px;">
+
+        <!-- FUNNEL TO REVENUE -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <div class="card-title">From request sent to revenue</div>
+            </div>
+            <a href="#" class="card-link">Full analytics →</a>
+          </div>
+          <div class="funnel">
+            <div class="funnel-stage-label">Collection funnel</div>
+            <div class="funnel-row">
+              <div class="funnel-label">Sent</div>
+              <div class="funnel-bar"><div class="funnel-fill l1">142</div></div>
+              <div class="funnel-num">142</div>
+              <div class="funnel-pct">100%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">Delivered</div>
+              <div class="funnel-bar"><div class="funnel-fill l2">111</div></div>
+              <div class="funnel-num">111</div>
+              <div class="funnel-pct">78%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">Clicked</div>
+              <div class="funnel-bar"><div class="funnel-fill l3">91</div></div>
+              <div class="funnel-num">91</div>
+              <div class="funnel-pct">64%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">Completed</div>
+              <div class="funnel-bar"><div class="funnel-fill l4">54</div></div>
+              <div class="funnel-num">54</div>
+              <div class="funnel-pct">38%</div>
+            </div>
+
+            <div class="funnel-divider"></div>
+            <div class="funnel-stage-label">Revenue attribution</div>
+            <div class="funnel-row">
+              <div class="funnel-label">Est. impact</div>
+              <div class="funnel-bar"><div class="funnel-fill l5">3,840</div></div>
+              <div class="funnel-num" style="color: var(--gold-dark);">$3.8K</div>
+              <div class="funnel-pct">est.</div>
+            </div>
+
+            <div class="funnel-summary">
+              <div class="funnel-summary-text">
+                Outperforming the industry by <strong>3.4×</strong> on completion. Revenue attribution assumes <strong>$300/customer</strong> with <strong>5% lift</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI REPLY QUEUE -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <div class="card-title">AI Reply queue</div>
+              <span class="card-badge gold">7 pending</span>
+            </div>
+            <a href="#" class="card-link">Review all →</a>
+          </div>
+          <div class="replies-queue">
+            <div class="reply-card">
+              <div class="reply-avatar">SL</div>
+              <div class="reply-content">
+                <div class="reply-header-row">
+                  <span class="reply-name">Sarah Liu</span>
+                  <span class="reply-stars">★★★★★</span>
+                  <span class="tag lang-zh" style="font-size: 10px; padding: 1px 6px;">中文</span>
+                </div>
+                <div class="reply-snippet">"因为偏头痛来的，三次治疗后晚上终于能睡整觉了。黄医生很耐心..."</div>
+              </div>
+              <button class="reply-action-btn">
+                Review draft
+                <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            <div class="reply-card">
+              <div class="reply-avatar">MD</div>
+              <div class="reply-content">
+                <div class="reply-header-row">
+                  <span class="reply-name">Marcus Davis</span>
+                  <span class="reply-stars">★★★★★</span>
+                  <span class="tag lang-en" style="font-size: 10px; padding: 1px 6px;">EN</span>
+                </div>
+                <div class="reply-snippet">"Excellent care, knowledgeable practitioner, calming environment — exactly what I needed for stress management."</div>
+              </div>
+              <button class="reply-action-btn">
+                Review draft
+                <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            <div class="reply-card">
+              <div class="reply-avatar">ER</div>
+              <div class="reply-content">
+                <div class="reply-header-row">
+                  <span class="reply-name">Elena Ramírez</span>
+                  <span class="reply-stars">★★★★★</span>
+                  <span class="tag lang-es" style="font-size: 10px; padding: 1px 6px;">ES</span>
+                </div>
+                <div class="reply-snippet">"La Dra. Huang es excelente. Mi dolor de espalda mejoró notablemente después de cuatro sesiones..."</div>
+              </div>
+              <button class="reply-action-btn">
+                Review draft
+                <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVITY -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <div class="card-title">Recent activity</div>
+            </div>
+            <a href="#" class="card-link">View all →</a>
+          </div>
+          <div class="activity-list">
+            <div class="activity-row">
+              <div class="activity-status referred"></div>
+              <div>
+                <div class="activity-name">Wei Zhang via Sarah Liu's referral</div>
+                <div class="activity-meta">Booked appointment · $300 attributed</div>
+              </div>
+              <div class="activity-channel">Referral</div>
+              <div><span class="tag lang-zh">中文</span></div>
+              <div class="activity-time">12m ago</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-status completed"></div>
+              <div>
+                <div class="activity-name">Sarah Liu</div>
+                <div class="activity-meta">Posted to Google · 5⭐ · Consented to testimonial</div>
+              </div>
+              <div class="activity-channel">SMS</div>
+              <div><span class="tag lang-zh">中文</span></div>
+              <div class="activity-time">22m ago</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-status completed"></div>
+              <div>
+                <div class="activity-name">Marcus Davis</div>
+                <div class="activity-meta">Posted to Google · 5⭐ · Tapped "Refer a friend"</div>
+              </div>
+              <div class="activity-channel">SMS</div>
+              <div><span class="tag lang-en">EN</span></div>
+              <div class="activity-time">38m ago</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-status completed"></div>
+              <div>
+                <div class="activity-name">Elena Ramírez</div>
+                <div class="activity-meta">Posted to Google · 5⭐ · Booked next visit</div>
+              </div>
+              <div class="activity-channel">Email</div>
+              <div><span class="tag lang-es">ES</span></div>
+              <div class="activity-time">1h ago</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-status private"></div>
+              <div>
+                <div class="activity-name">Anonymous</div>
+                <div class="activity-meta">Private feedback · 3⭐ · Service recovery suggested</div>
+              </div>
+              <div class="activity-channel">QR scan</div>
+              <div><span class="tag lang-en">EN</span></div>
+              <div class="activity-time">2h ago</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-status sent"></div>
+              <div>
+                <div class="activity-name">David Park</div>
+                <div class="activity-meta">Sent · awaiting click</div>
+              </div>
+              <div class="activity-channel">SMS</div>
+              <div><span class="tag lang-en">EN</span></div>
+              <div class="activity-time">3h ago</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display: flex; flex-direction: column; gap: 22px;">
+
+        <!-- REFERRAL ATTRIBUTION -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <div class="card-title">Referrals</div>
+            </div>
+            <a href="#" class="card-link">Details →</a>
+          </div>
+          <div class="referral-card">
+            <div class="referral-headline">
+              <div class="referral-headline-num">3</div>
+              <div class="referral-headline-text">new customers attributable to <strong>reviewer-driven referrals</strong> this month.</div>
+            </div>
+
+            <div class="referral-pipeline">
+              <div class="pipeline-step">
+                <div class="pipeline-num">54</div>
+                <div class="pipeline-label">Reviewers</div>
+              </div>
+              <div class="pipeline-step">
+                <div class="pipeline-num">31</div>
+                <div class="pipeline-label">Shared</div>
+              </div>
+              <div class="pipeline-step">
+                <div class="pipeline-num">23</div>
+                <div class="pipeline-label">Clicked</div>
+              </div>
+              <div class="pipeline-step last">
+                <div class="pipeline-num">3</div>
+                <div class="pipeline-label">Booked</div>
+              </div>
+            </div>
+
+            <div class="top-referrers-label">Top referrers this month</div>
+            <div class="top-referrer">
+              <div class="top-referrer-avatar">SL</div>
+              <div class="top-referrer-name">Sarah Liu</div>
+              <div class="top-referrer-stat"><strong>2</strong> bookings</div>
+            </div>
+            <div class="top-referrer">
+              <div class="top-referrer-avatar">MD</div>
+              <div class="top-referrer-name">Marcus Davis</div>
+              <div class="top-referrer-stat"><strong>1</strong> booking</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BEST ADVOCATES PREVIEW -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <div class="card-title">Best advocates</div>
+              <span class="card-badge gold">Top 5</span>
+            </div>
+            <a href="#" class="card-link">All advocates →</a>
+          </div>
+          <div class="advocates-card">
+            <div class="advocate-row">
+              <div class="advocate-avatar">SL</div>
+              <div class="advocate-text">
+                <div class="advocate-name">
+                  Sarah Liu
+                  <span class="advocate-flags">
+                    <span class="flag-pill">5★</span>
+                    <span class="flag-pill">×2 ref</span>
+                    <span class="flag-pill">share</span>
+                  </span>
+                </div>
+                <div class="advocate-stats">Score 94 · 2 visits · referred 2 new customers</div>
+              </div>
+            </div>
+            <div class="advocate-row">
+              <div class="advocate-avatar">MD</div>
+              <div class="advocate-text">
+                <div class="advocate-name">
+                  Marcus Davis
+                  <span class="advocate-flags">
+                    <span class="flag-pill">5★</span>
+                    <span class="flag-pill">×1 ref</span>
+                  </span>
+                </div>
+                <div class="advocate-stats">Score 81 · 4 visits · referred 1 new customer</div>
+              </div>
+            </div>
+            <div class="advocate-row">
+              <div class="advocate-avatar">ER</div>
+              <div class="advocate-text">
+                <div class="advocate-name">
+                  Elena Ramírez
+                  <span class="advocate-flags">
+                    <span class="flag-pill">5★</span>
+                    <span class="flag-pill">rebook</span>
+                  </span>
+                </div>
+                <div class="advocate-stats">Score 76 · 3 visits · rebooked next month</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <div class="card-title">Quick actions</div>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <button class="action-btn">
+              <div class="icon-wrap">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="action-text">
+                <div class="action-title">Send a review request</div>
+                <div class="action-desc">SMS or email, 30 seconds</div>
+              </div>
+              <span class="action-arrow">→</span>
+            </button>
+            <button class="action-btn">
+              <div class="icon-wrap">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5z"/></svg>
+              </div>
+              <div class="action-text">
+                <div class="action-title">Generate social graphic</div>
+                <div class="action-desc">Top reviews → Xiaohongshu cards</div>
+              </div>
+              <span class="action-arrow">→</span>
+            </button>
+            <button class="action-btn">
+              <div class="icon-wrap">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+              </div>
+              <div class="action-text">
+                <div class="action-title">Copy widget embed</div>
+                <div class="action-desc">Add reviews to your website</div>
+              </div>
+              <span class="action-arrow">→</span>
+            </button>
+            <button class="action-btn">
+              <div class="icon-wrap">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="action-text">
+                <div class="action-title">Open Staff Mode</div>
+                <div class="action-desc">Mobile front-desk app</div>
+              </div>
+              <span class="action-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+</div>
+
+</body>
+</html>

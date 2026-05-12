@@ -14,6 +14,7 @@ import { STRINGS, type Language } from "@/lib/i18n/review";
 import { buttonVariants, Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { ConsentCheckbox } from "./consent-checkbox";
 import { track, type TrackContext } from "./track";
 
 export interface Draft {
@@ -35,6 +36,10 @@ interface DraftPickerProps {
   onRegenerate: () => Promise<void>;
   onBack: () => void;
   isRegenerating: boolean;
+  consentDisplayEnabled: boolean;
+  consentDisplay: boolean;
+  onConsentDisplayChange: (next: boolean) => void;
+  trackingToken: string | null;
 }
 
 const TONE_LABEL_KEYS: Record<string, "drafts_tone_warm" | "drafts_tone_specific" | "drafts_tone_brief"> = {
@@ -53,6 +58,10 @@ export function DraftPicker({
   onRegenerate,
   onBack,
   isRegenerating,
+  consentDisplayEnabled,
+  consentDisplay,
+  onConsentDisplayChange,
+  trackingToken,
 }: DraftPickerProps) {
   const s = STRINGS[lang];
 
@@ -120,10 +129,13 @@ export function DraftPicker({
       descriptor: inputsSummary.descriptor,
       tone: drafts[selectedIndex]?.tone,
       edited: editedText !== drafts[selectedIndex]?.text,
+      consent_display: consentDisplay,
     });
 
     window.open(googleReviewUrl, "_blank", "noopener,noreferrer");
-    window.location.href = `/r/${slug}/thank-you?via=google&lang=${lang}`;
+    const consentParam = consentDisplay ? "&consent=1" : "";
+    const tokenParam = trackingToken ? `&t=${trackingToken}` : "";
+    window.location.href = `/r/${slug}/thank-you?via=google&lang=${lang}${consentParam}${tokenParam}`;
   }
 
   return (
@@ -236,6 +248,15 @@ export function DraftPicker({
       </p>
 
       <div className="space-y-2">
+        {consentDisplayEnabled && googleReviewUrl && (
+          <ConsentCheckbox
+            checked={consentDisplay}
+            onChange={onConsentDisplayChange}
+            label={s.consent_display_label}
+            help={s.consent_display_help}
+          />
+        )}
+
         {googleReviewUrl && (
           <button
             type="button"

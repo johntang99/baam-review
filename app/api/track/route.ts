@@ -54,6 +54,8 @@ export async function POST(request: NextRequest) {
 
   // Side-effect: when a customer clicks a public CTA, mark the
   // review_request as completed so the dashboard funnel reflects it.
+  // Also captures display-consent (Phase A / Session A1) on the same call so
+  // the public widget can know whether this review's text is republishable.
   if (
     event_type === "platform_clicked" &&
     body.request_id &&
@@ -66,12 +68,17 @@ export async function POST(request: NextRequest) {
       platform === "custom" ||
       platform === "private_feedback"
     ) {
+      const consentRaw = body.metadata?.consent_display;
+      const update: Database["public"]["Tables"]["review_requests"]["Update"] = {
+        completed_platform: platform,
+        completed_at: new Date().toISOString(),
+      };
+      if (typeof consentRaw === "boolean") {
+        update.consent_display = consentRaw;
+      }
       await supabase
         .from("review_requests")
-        .update({
-          completed_platform: platform,
-          completed_at: new Date().toISOString(),
-        })
+        .update(update)
         .eq("id", body.request_id)
         .is("completed_at", null);
     }

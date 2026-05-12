@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Mode — Dr. Huang Acupuncture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --forest-light: #2A6B57;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88847;
+  --gold-soft: #E8D9B5;
+  --clinic-primary: #962D22;
+  --clinic-primary-dark: #6F1F18;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --success: #2D7A5F;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 30px rgba(15, 31, 26, 0.08);
+  --shadow-xl: 0 24px 48px rgba(15, 31, 26, 0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+a { color: inherit; text-decoration: none; }
+
+.shell { width: 100%; max-width: 460px; position: relative; z-index: 1; padding-bottom: 80px; }
+
+/* ============ TOP BAR ============ */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px 18px;
+}
+.staff-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 13px 6px 9px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.staff-badge-icon {
+  width: 20px; height: 20px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 11px;
+}
+.brand-mini {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+.brand-mini-mark {
+  width: 20px; height: 20px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Onest', sans-serif;
+}
+
+/* ============ HEADER CARD ============ */
+.header-card {
+  background: linear-gradient(135deg, var(--ink) 0%, #1B2E27 100%);
+  color: var(--cream);
+  border-radius: 22px;
+  padding: 26px 26px 22px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.header-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 25%, rgba(201, 169, 97, 0.15), transparent 50%);
+}
+.header-card > * { position: relative; z-index: 1; }
+
+.greeting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.greeting-avatar {
+  width: 44px; height: 44px;
+  background: var(--sage);
+  color: var(--ink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.greeting-text { flex: 1; }
+.greeting-hi {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  color: var(--cream);
+}
+.greeting-hi em { font-style: italic; color: var(--gold); }
+.greeting-date {
+  font-size: 12px;
+  color: rgba(250, 247, 242, 0.6);
+  margin-top: 3px;
+}
+
+/* TODAY STATS */
+.today-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(250, 247, 242, 0.12);
+}
+.today-stat {
+  text-align: left;
+}
+.today-stat-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 28px;
+  color: var(--cream);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.today-stat-num.gold { color: var(--gold); }
+.today-stat-label {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(250, 247, 242, 0.55);
+  font-weight: 500;
+}
+
+/* ============ ACTION CARDS ============ */
+.section-label {
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin: 22px 4px 12px;
+}
+
+.action-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  box-shadow: var(--shadow-sm);
+}
+.action-card:hover, .action-card:active {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--clinic-primary);
+}
+.action-card.primary {
+  background: var(--clinic-primary);
+  color: white;
+  border-color: var(--clinic-primary);
+  padding: 26px 22px;
+}
+.action-card.primary:hover, .action-card.primary:active {
+  background: var(--clinic-primary-dark);
+  border-color: var(--clinic-primary-dark);
+}
+.action-card.primary .action-icon-wrap {
+  background: rgba(255, 255, 255, 0.16);
+  color: white;
+  width: 52px; height: 52px;
+}
+.action-card.primary .action-title { color: white; font-size: 18px; }
+.action-card.primary .action-desc { color: rgba(255, 255, 255, 0.8); }
+.action-card.primary .action-arrow { color: rgba(255, 255, 255, 0.8); }
+
+.action-icon-wrap {
+  width: 48px; height: 48px;
+  background: var(--cream-deep);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clinic-primary);
+  flex-shrink: 0;
+}
+.action-icon-wrap svg { width: 22px; height: 22px; }
+.action-text { flex: 1; min-width: 0; }
+.action-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.action-desc {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+.action-arrow {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+/* ============ QR FULLSCREEN MODAL ============ */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 31, 26, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.25s ease;
+}
+.modal-backdrop.show { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.qr-modal {
+  background: var(--paper);
+  border-radius: 28px;
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  text-align: center;
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes scaleIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.qr-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px; height: 36px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+}
+.qr-modal-header {
+  margin-bottom: 22px;
+}
+.qr-modal-eyebrow {
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--clinic-primary);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.qr-modal-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 24px;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+}
+.qr-modal-title em { font-style: italic; color: var(--clinic-primary); }
+.qr-modal-sub {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-soft);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.qr-canvas-wrap {
+  background: linear-gradient(160deg, var(--clinic-primary) 0%, var(--clinic-primary-dark) 100%);
+  border-radius: 22px;
+  padding: 26px;
+  margin-bottom: 22px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(150, 45, 34, 0.3);
+}
+.qr-canvas-wrap::before {
+  content: '';
+  position: absolute;
+  top: -30%; right: -20%;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 70%);
+  pointer-events: none;
+}
+.qr-clinic-name {
+  font-family: 'Fraunces', serif;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  position: relative;
+  letter-spacing: -0.005em;
+}
+.qr-clinic-prompt {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  margin-bottom: 18px;
+  position: relative;
+}
+.qr-box {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 0 auto;
+  width: 220px;
+  height: 220px;
+  position: relative;
+}
+.qr-box svg { width: 100%; height: 100%; }
+.qr-url-strip {
+  margin-top: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+  position: relative;
+}
+
+.qr-modal-footer {
+  display: flex;
+  gap: 10px;
+}
+.qr-mod-btn {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid var(--border);
+  background: var(--cream-deep);
+  border-radius: 12px;
+  font-family: 'Onest', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.qr-mod-btn:hover { background: var(--paper); border-color: var(--ink); }
+.qr-mod-btn svg { width: 14px; height: 14px; }
+
+/* ============ SEND SHEET ============ */
+.send-sheet {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(15, 31, 26, 0.5);
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.send-sheet.show { display: flex; }
+.send-sheet-card {
+  background: var(--paper);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 460px;
+  padding: 14px 24px 32px;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.send-sheet-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 999px;
+  margin: 0 auto 18px;
+}
+.send-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+.send-sheet-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+}
+.send-sheet-title em { font-style: italic; color: var(--clinic-primary); }
+.send-close {
+  width: 32px; height: 32px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.field-mobile { margin-bottom: 18px; }
+.field-mobile label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.input-mobile {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: 'Onest', sans-serif;
+  font-size: 16px;
+  color: var(--text);
+}
+.input-mobile:focus {
+  outline: none;
+  border-color: var(--clinic-primary);
+  background: var(--paper);
+}
+
+.channel-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.channel-btn {
+  padding: 12px;
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.channel-btn.active {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+.channel-btn svg { width: 14px; height: 14px; }
+
+.lang-row { display: flex; gap: 6px; }
+.lang-pill-mobile {
+  flex: 1;
+  padding: 11px;
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Onest', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.lang-pill-mobile.selected {
+  background: var(--clinic-primary);
+  color: white;
+  border-color: var(--clinic-primary);
+}
+
+.send-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--clinic-primary);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Onest', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.send-btn:hover { background: var(--clinic-primary-dark); }
+
+/* ============ TODAY'S SHIFT ACTIVITY ============ */
+.shift-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  margin-top: 14px;
+}
+.shift-header {
+  padding: 18px 22px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-soft);
+}
+.shift-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.shift-count {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.shift-list { padding: 4px 0; }
+.shift-row {
+  padding: 12px 22px;
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--border-soft);
+}
+.shift-row:last-child { border-bottom: none; }
+.shift-status {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.shift-status.completed { background: var(--success); }
+.shift-status.clicked { background: var(--gold); }
+.shift-status.sent { background: var(--sage); }
+
+.shift-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+.shift-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.shift-time { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+/* ============ SCRIPTS HELPER ============ */
+.script-card {
+  background: var(--cream-deep);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-top: 18px;
+}
+.script-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.script-quote {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text);
+}
+.script-meta {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.script-meta-text {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.script-next {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--clinic-primary);
+}
+
+/* ============ BOTTOM SAFE AREA ============ */
+.bottom-safe {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: linear-gradient(to top, var(--cream), transparent);
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ============ TOAST ============ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink);
+  color: var(--cream);
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 300;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-check {
+  width: 16px; height: 16px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <div class="top-bar">
+    <div class="staff-badge">
+      <span class="staff-badge-icon">M</span>
+      Maria · Staff
+    </div>
+    <div class="brand-mini">
+      <span class="brand-mini-mark">B</span>
+      Staff Mode
+    </div>
+  </div>
+
+  <!-- ============ HEADER CARD ============ -->
+  <div class="header-card">
+    <div class="greeting-row">
+      <div class="greeting-avatar">MR</div>
+      <div class="greeting-text">
+        <div class="greeting-hi">Good afternoon, <em>Maria.</em></div>
+        <div class="greeting-date">Dr. Huang Acupuncture · Tuesday, May 12</div>
+      </div>
+    </div>
+    <div class="today-row">
+      <div class="today-stat">
+        <div class="today-stat-num">8</div>
+        <div class="today-stat-label">Sent today</div>
+      </div>
+      <div class="today-stat">
+        <div class="today-stat-num gold">5</div>
+        <div class="today-stat-label">Completed</div>
+      </div>
+      <div class="today-stat">
+        <div class="today-stat-num">63<span style="font-size: 16px; color: rgba(250,247,242,0.55);">%</span></div>
+        <div class="today-stat-label">Completion</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN ACTIONS ============ -->
+  <div class="section-label">Right now</div>
+
+  <button class="action-card primary" id="send-action">
+    <div class="action-icon-wrap">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+    </div>
+    <div class="action-text">
+      <div class="action-title">Send a review request</div>
+      <div class="action-desc">Customer just finished — text or email in 20 seconds</div>
+    </div>
+    <span class="action-arrow">→</span>
+  </button>
+
+  <button class="action-card" id="qr-action">
+    <div class="action-icon-wrap">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z"/></svg>
+    </div>
+    <div class="action-text">
+      <div class="action-title">Show QR code</div>
+      <div class="action-desc">Hold up the screen — customer scans in 2 seconds</div>
+    </div>
+    <span class="action-arrow">→</span>
+  </button>
+
+  <button class="action-card">
+    <div class="action-icon-wrap">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+    </div>
+    <div class="action-text">
+      <div class="action-title">Send referral link</div>
+      <div class="action-desc">For a happy customer to share with a friend</div>
+    </div>
+    <span class="action-arrow">→</span>
+  </button>
+
+  <button class="action-card">
+    <div class="action-icon-wrap">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    </div>
+    <div class="action-text">
+      <div class="action-title">Book next visit</div>
+      <div class="action-desc">Send the booking link via SMS</div>
+    </div>
+    <span class="action-arrow">→</span>
+  </button>
+
+  <!-- ============ SCRIPT HELPER ============ -->
+  <div class="script-card">
+    <div class="script-eyebrow">
+      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 8h10M7 12h6m-6 4h10M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Suggested script · After a good visit
+    </div>
+    <p class="script-quote">"We're so glad you had a good experience today. Would you mind sharing a quick review? It takes about a minute — I'll text you the link right now."</p>
+    <div class="script-meta">
+      <span class="script-meta-text">EN · ZH · ES versions available</span>
+      <a href="#" class="script-next">More scripts →</a>
+    </div>
+  </div>
+
+  <!-- ============ TODAY'S SHIFT ============ -->
+  <div class="section-label">Today's shift</div>
+  <div class="shift-card">
+    <div class="shift-header">
+      <div class="shift-title">Recent activity</div>
+      <span class="shift-count">8 requests</span>
+    </div>
+    <div class="shift-list">
+      <div class="shift-row">
+        <div class="shift-status completed"></div>
+        <div>
+          <div class="shift-name">Wei Zhang</div>
+          <div class="shift-meta">Posted 5★ to Google · 中文</div>
+        </div>
+        <div class="shift-time">2:14 PM</div>
+      </div>
+      <div class="shift-row">
+        <div class="shift-status clicked"></div>
+        <div>
+          <div class="shift-name">James Park</div>
+          <div class="shift-meta">Tapped link · writing now</div>
+        </div>
+        <div class="shift-time">2:08 PM</div>
+      </div>
+      <div class="shift-row">
+        <div class="shift-status completed"></div>
+        <div>
+          <div class="shift-name">Maria Castillo</div>
+          <div class="shift-meta">Posted 5★ to Google · Español</div>
+        </div>
+        <div class="shift-time">1:52 PM</div>
+      </div>
+      <div class="shift-row">
+        <div class="shift-status sent"></div>
+        <div>
+          <div class="shift-name">Lin Cheng</div>
+          <div class="shift-meta">Sent · awaiting click</div>
+        </div>
+        <div class="shift-time">1:30 PM</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ QR FULLSCREEN MODAL ============ -->
+<div class="modal-backdrop" id="qr-modal">
+  <div class="qr-modal">
+    <button class="qr-close" id="qr-close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <div class="qr-modal-header">
+      <div class="qr-modal-eyebrow">Show to customer</div>
+      <h3 class="qr-modal-title">Scan to leave a <em>review.</em></h3>
+      <p class="qr-modal-sub">Phone camera → tap notification. 60 seconds, three languages.</p>
+    </div>
+
+    <div class="qr-canvas-wrap">
+      <div class="qr-clinic-name">Dr. Huang Acupuncture</div>
+      <div class="qr-clinic-prompt">Thanks for visiting — please share your experience</div>
+      <div class="qr-box">
+        <svg viewBox="0 0 33 33" xmlns="http://www.w3.org/2000/svg">
+          <rect width="33" height="33" fill="white"/>
+          <g fill="#962D22">
+            <rect x="0" y="0" width="7" height="7"/>
+            <rect x="1" y="1" width="5" height="5" fill="white"/>
+            <rect x="2" y="2" width="3" height="3"/>
+            <rect x="26" y="0" width="7" height="7"/>
+            <rect x="27" y="1" width="5" height="5" fill="white"/>
+            <rect x="28" y="2" width="3" height="3"/>
+            <rect x="0" y="26" width="7" height="7"/>
+            <rect x="1" y="27" width="5" height="5" fill="white"/>
+            <rect x="2" y="28" width="3" height="3"/>
+            <rect x="9" y="0" width="1" height="1"/><rect x="11" y="0" width="1" height="1"/><rect x="14" y="0" width="2" height="1"/><rect x="18" y="0" width="1" height="1"/><rect x="20" y="0" width="2" height="1"/><rect x="23" y="0" width="1" height="1"/>
+            <rect x="8" y="2" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/><rect x="12" y="2" width="2" height="1"/><rect x="15" y="2" width="1" height="1"/><rect x="17" y="2" width="2" height="1"/><rect x="20" y="2" width="1" height="1"/><rect x="22" y="2" width="2" height="1"/>
+            <rect x="9" y="4" width="2" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="14" y="4" width="1" height="1"/><rect x="16" y="4" width="2" height="1"/><rect x="19" y="4" width="1" height="1"/><rect x="21" y="4" width="2" height="1"/>
+            <rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="2" height="1"/><rect x="13" y="6" width="1" height="1"/><rect x="15" y="6" width="2" height="1"/><rect x="18" y="6" width="1" height="1"/><rect x="20" y="6" width="1" height="1"/><rect x="22" y="6" width="2" height="1"/><rect x="25" y="6" width="1" height="1"/>
+            <rect x="0" y="9" width="2" height="1"/><rect x="3" y="9" width="1" height="1"/><rect x="5" y="9" width="2" height="1"/><rect x="9" y="9" width="1" height="1"/><rect x="11" y="9" width="2" height="1"/><rect x="14" y="9" width="1" height="1"/><rect x="16" y="9" width="2" height="1"/><rect x="19" y="9" width="1" height="1"/><rect x="21" y="9" width="2" height="1"/><rect x="25" y="9" width="1" height="1"/><rect x="27" y="9" width="2" height="1"/><rect x="30" y="9" width="1" height="1"/><rect x="32" y="9" width="1" height="1"/>
+            <rect x="1" y="11" width="1" height="1"/><rect x="4" y="11" width="2" height="1"/><rect x="8" y="11" width="2" height="1"/><rect x="12" y="11" width="1" height="1"/><rect x="15" y="11" width="2" height="1"/><rect x="19" y="11" width="2" height="1"/><rect x="23" y="11" width="1" height="1"/><rect x="25" y="11" width="2" height="1"/><rect x="29" y="11" width="1" height="1"/><rect x="31" y="11" width="2" height="1"/>
+            <rect x="0" y="13" width="1" height="1"/><rect x="3" y="13" width="2" height="1"/><rect x="6" y="13" width="1" height="1"/><rect x="9" y="13" width="2" height="1"/><rect x="13" y="13" width="1" height="1"/><rect x="15" y="13" width="2" height="1"/><rect x="19" y="13" width="2" height="1"/><rect x="23" y="13" width="2" height="1"/><rect x="27" y="13" width="1" height="1"/><rect x="30" y="13" width="2" height="1"/>
+            <rect x="2" y="15" width="2" height="1"/><rect x="5" y="15" width="1" height="1"/><rect x="7" y="15" width="2" height="1"/><rect x="11" y="15" width="2" height="1"/><rect x="14" y="15" width="2" height="1"/><rect x="17" y="15" width="1" height="1"/><rect x="20" y="15" width="2" height="1"/><rect x="24" y="15" width="1" height="1"/><rect x="26" y="15" width="2" height="1"/><rect x="29" y="15" width="1" height="1"/><rect x="31" y="15" width="2" height="1"/>
+            <rect x="0" y="17" width="1" height="1"/><rect x="2" y="17" width="2" height="1"/><rect x="6" y="17" width="2" height="1"/><rect x="9" y="17" width="1" height="1"/><rect x="11" y="17" width="2" height="1"/><rect x="15" y="17" width="1" height="1"/><rect x="17" y="17" width="2" height="1"/><rect x="21" y="17" width="2" height="1"/><rect x="25" y="17" width="1" height="1"/><rect x="27" y="17" width="2" height="1"/><rect x="30" y="17" width="2" height="1"/>
+            <rect x="1" y="19" width="2" height="1"/><rect x="5" y="19" width="1" height="1"/><rect x="7" y="19" width="2" height="1"/><rect x="10" y="19" width="2" height="1"/><rect x="13" y="19" width="2" height="1"/><rect x="16" y="19" width="1" height="1"/><rect x="18" y="19" width="2" height="1"/><rect x="22" y="19" width="1" height="1"/><rect x="24" y="19" width="2" height="1"/><rect x="28" y="19" width="1" height="1"/><rect x="30" y="19" width="2" height="1"/>
+            <rect x="0" y="21" width="1" height="1"/><rect x="3" y="21" width="2" height="1"/><rect x="7" y="21" width="1" height="1"/><rect x="9" y="21" width="2" height="1"/><rect x="13" y="21" width="1" height="1"/><rect x="15" y="21" width="2" height="1"/><rect x="19" y="21" width="2" height="1"/><rect x="23" y="21" width="1" height="1"/><rect x="25" y="21" width="2" height="1"/><rect x="29" y="21" width="1" height="1"/><rect x="31" y="21" width="2" height="1"/>
+            <rect x="9" y="24" width="2" height="1"/><rect x="13" y="24" width="2" height="1"/><rect x="16" y="24" width="1" height="1"/><rect x="18" y="24" width="2" height="1"/><rect x="22" y="24" width="2" height="1"/><rect x="26" y="24" width="1" height="1"/><rect x="28" y="24" width="2" height="1"/><rect x="32" y="24" width="1" height="1"/>
+            <rect x="8" y="26" width="2" height="1"/><rect x="11" y="26" width="1" height="1"/><rect x="13" y="26" width="2" height="1"/><rect x="17" y="26" width="2" height="1"/><rect x="20" y="26" width="1" height="1"/><rect x="22" y="26" width="2" height="1"/><rect x="25" y="26" width="1" height="1"/><rect x="27" y="26" width="2" height="1"/><rect x="30" y="26" width="2" height="1"/>
+            <rect x="9" y="28" width="1" height="1"/><rect x="11" y="28" width="2" height="1"/><rect x="14" y="28" width="2" height="1"/><rect x="18" y="28" width="1" height="1"/><rect x="20" y="28" width="2" height="1"/><rect x="23" y="28" width="2" height="1"/><rect x="27" y="28" width="1" height="1"/><rect x="29" y="28" width="2" height="1"/><rect x="32" y="28" width="1" height="1"/>
+            <rect x="8" y="30" width="1" height="1"/><rect x="10" y="30" width="2" height="1"/><rect x="13" y="30" width="1" height="1"/><rect x="15" y="30" width="2" height="1"/><rect x="19" y="30" width="1" height="1"/><rect x="21" y="30" width="2" height="1"/><rect x="25" y="30" width="1" height="1"/><rect x="28" y="30" width="2" height="1"/><rect x="31" y="30" width="2" height="1"/>
+            <rect x="9" y="32" width="2" height="1"/><rect x="12" y="32" width="1" height="1"/><rect x="14" y="32" width="2" height="1"/><rect x="17" y="32" width="1" height="1"/><rect x="19" y="32" width="2" height="1"/><rect x="23" y="32" width="2" height="1"/><rect x="26" y="32" width="1" height="1"/><rect x="28" y="32" width="2" height="1"/><rect x="31" y="32" width="2" height="1"/>
+          </g>
+        </svg>
+      </div>
+      <div class="qr-url-strip">review.baamplatform.com/r/dr-huang</div>
+    </div>
+
+    <div class="qr-modal-footer">
+      <button class="qr-mod-btn" id="qr-print">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        Print PDF
+      </button>
+      <button class="qr-mod-btn" id="qr-copy">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy link
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SEND SHEET ============ -->
+<div class="send-sheet" id="send-sheet">
+  <div class="send-sheet-card">
+    <div class="send-sheet-handle"></div>
+    <div class="send-sheet-header">
+      <div>
+        <div class="send-sheet-title">New review <em>request.</em></div>
+      </div>
+      <button class="send-close" id="send-close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="field-mobile">
+      <label>Customer name</label>
+      <input type="text" class="input-mobile" placeholder="First name is enough">
+    </div>
+
+    <div class="field-mobile">
+      <label>Channel</label>
+      <div class="channel-row">
+        <button class="channel-btn active" id="sm-sms">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          SMS
+        </button>
+        <button class="channel-btn" id="sm-email">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Email
+        </button>
+      </div>
+    </div>
+
+    <div class="field-mobile">
+      <label>Phone number</label>
+      <input type="tel" class="input-mobile" placeholder="+1 ___ ___ ____">
+    </div>
+
+    <div class="field-mobile">
+      <label>Language</label>
+      <div class="lang-row">
+        <div class="lang-pill-mobile">EN</div>
+        <div class="lang-pill-mobile selected">中文</div>
+        <div class="lang-pill-mobile">ES</div>
+      </div>
+    </div>
+
+    <button class="send-btn" id="send-confirm">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+      Send to customer
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span id="toast-msg">Sent</span>
+</div>
+
+<div class="bottom-safe"></div>
+
+<script>
+  // QR modal
+  const qrModal = document.getElementById('qr-modal');
+  document.getElementById('qr-action').addEventListener('click', () => qrModal.classList.add('show'));
+  document.getElementById('qr-close').addEventListener('click', () => qrModal.classList.remove('show'));
+  qrModal.addEventListener('click', (e) => { if (e.target === qrModal) qrModal.classList.remove('show'); });
+
+  // Send sheet
+  const sendSheet = document.getElementById('send-sheet');
+  document.getElementById('send-action').addEventListener('click', () => sendSheet.classList.add('show'));
+  document.getElementById('send-close').addEventListener('click', () => sendSheet.classList.remove('show'));
+  sendSheet.addEventListener('click', (e) => { if (e.target === sendSheet) sendSheet.classList.remove('show'); });
+
+  // Send sheet — channel toggle
+  document.getElementById('sm-sms').addEventListener('click', function() {
+    this.classList.add('active');
+    document.getElementById('sm-email').classList.remove('active');
+  });
+  document.getElementById('sm-email').addEventListener('click', function() {
+    this.classList.add('active');
+    document.getElementById('sm-sms').classList.remove('active');
+  });
+
+  // Send sheet — language toggle
+  document.querySelectorAll('.lang-pill-mobile').forEach(p => {
+    p.addEventListener('click', function() {
+      document.querySelectorAll('.lang-pill-mobile').forEach(x => x.classList.remove('selected'));
+      this.classList.add('selected');
+    });
+  });
+
+  // Toast
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toast-msg');
+  function showToast(msg) {
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  document.getElementById('send-confirm').addEventListener('click', () => {
+    sendSheet.classList.remove('show');
+    showToast('Sent — customer will receive in a few seconds');
+  });
+  document.getElementById('qr-copy').addEventListener('click', () => showToast('Link copied to clipboard'));
+  document.getElementById('qr-print').addEventListener('click', () => showToast('Opening print preview…'));
+</script>
+
+</body>
+</html>

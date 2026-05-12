@@ -35,6 +35,7 @@ type Loc = {
   yelp_url: string | null;
   custom_url: string | null;
   custom_url_label: Record<string, string> | null;
+  consent_display_enabled: boolean;
 };
 
 export async function generateMetadata({
@@ -71,7 +72,7 @@ export default async function ReviewLandingPage({
   const { data: location } = await supabase
     .from("locations")
     .select(
-      "id, account_id, slug, display_name, brand_color, logo_url, business_type, default_language, supported_languages, welcome_message, prompt_questions, google_review_url, yelp_url, custom_url, custom_url_label",
+      "id, account_id, slug, display_name, brand_color, logo_url, business_type, default_language, supported_languages, welcome_message, prompt_questions, google_review_url, yelp_url, custom_url, custom_url_label, consent_display_enabled",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -167,6 +168,8 @@ export default async function ReviewLandingPage({
             customUrl={loc.custom_url}
             customUrlLabel={customLabel}
             privateFeedbackHref={privateFeedbackHref}
+            consentDisplayEnabled={loc.consent_display_enabled}
+            trackingToken={token ?? null}
           />
         </div>
 

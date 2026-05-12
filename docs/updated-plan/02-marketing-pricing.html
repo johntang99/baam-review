@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing — BAAM Review</title>
+<meta name="description" content="Self-serve pricing for BAAM Review. Free, Starter $49/mo, Growth $99/mo, Agency $499/mo. 14-day trial, no credit card, no sales calls.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --forest-light: #2A6B57;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-soft: #E8D9B5;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 16px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 24px 48px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Onest', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+a { color: inherit; text-decoration: none; }
+.container { max-width: 1240px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+/* ============ NAV ============ */
+nav {
+  padding: 24px 0;
+  position: sticky;
+  top: 0;
+  background: rgba(250, 247, 242, 0.85);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  z-index: 100;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+nav.scrolled { border-color: var(--border); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; }
+.logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--forest);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cream);
+  font-weight: 600;
+  font-size: 14px;
+}
+.nav-links { display: flex; gap: 36px; align-items: center; }
+.nav-links a {
+  font-size: 14.5px;
+  color: var(--text-soft);
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-links a.active { color: var(--ink); font-weight: 500; }
+.nav-cta { display: flex; gap: 12px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14.5px;
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--forest); color: var(--cream); }
+.btn-primary:hover { background: var(--forest-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-ghost { background: transparent; color: var(--text); }
+.btn-ghost:hover { background: var(--cream-deep); }
+.btn-outline { background: transparent; color: var(--forest); border-color: var(--forest); }
+.btn-outline:hover { background: var(--forest); color: var(--cream); }
+.btn-dark { background: var(--ink); color: var(--cream); }
+.btn-dark:hover { background: #1B2E27; }
+.btn-gold { background: var(--gold); color: var(--ink); }
+.btn-gold:hover { background: #B8985A; }
+.btn-large { padding: 16px 30px; font-size: 15.5px; }
+.btn-xl { padding: 18px 36px; font-size: 16.5px; }
+
+/* ============ PAGE HEADER ============ */
+.page-header { padding: 72px 0 40px; text-align: center; }
+.eyebrow {
+  font-size: 12.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--forest); font-weight: 500; margin-bottom: 18px;
+}
+.page-header h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(46px, 6vw, 76px);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 22px;
+}
+.page-header h1 em { font-style: italic; color: var(--forest); }
+.page-header p {
+  font-family: 'Newsreader', serif;
+  font-size: 20px;
+  color: var(--text-soft);
+  max-width: 620px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* BILLING TOGGLE */
+.billing-toggle-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 36px;
+}
+.billing-toggle {
+  display: inline-flex;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: var(--shadow-sm);
+}
+.billing-toggle button {
+  padding: 10px 22px;
+  background: transparent;
+  border: none;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all 0.2s;
+}
+.billing-toggle button.active {
+  background: var(--ink);
+  color: var(--cream);
+}
+.savings-badge {
+  display: inline-block;
+  font-size: 11px;
+  background: var(--gold);
+  color: var(--ink);
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-left: 8px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* ============ FOUNDING BANNER ============ */
+.founding-banner {
+  max-width: 920px;
+  margin: 36px auto 0;
+  background: linear-gradient(135deg, var(--ink) 0%, #1B2E27 100%);
+  color: var(--cream);
+  border-radius: 20px;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.founding-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 90% 30%, rgba(201, 169, 97, 0.16), transparent 50%);
+}
+.founding-banner > * { position: relative; z-index: 1; }
+.founding-icon {
+  width: 44px; height: 44px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.founding-text { flex: 1; }
+.founding-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--cream);
+  margin-bottom: 3px;
+}
+.founding-title em { font-style: italic; color: var(--gold); }
+.founding-sub {
+  font-size: 13.5px;
+  color: rgba(250, 247, 242, 0.75);
+  line-height: 1.5;
+}
+.founding-counter {
+  font-family: 'JetBrains Mono', monospace;
+  text-align: center;
+  padding: 10px 16px;
+  background: rgba(201, 169, 97, 0.15);
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.founding-counter-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 28px;
+  color: var(--gold);
+  line-height: 1;
+}
+.founding-counter-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(201, 169, 97, 0.85);
+  margin-top: 4px;
+  font-family: 'Onest', sans-serif;
+}
+
+/* ============ PRICING GRID ============ */
+.pricing-section { padding: 60px 0 80px; }
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+.tier {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 36px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.tier:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.tier.featured {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+  transform: scale(1.025);
+  box-shadow: var(--shadow-lg);
+}
+.tier.featured:hover { transform: scale(1.025) translateY(-3px); }
+.tier.featured .tier-name,
+.tier.featured .tier-price-num,
+.tier.featured .tier-narrative { color: var(--cream); }
+.tier.featured .tier-desc,
+.tier.featured .tier-price-period,
+.tier.featured .tier-price-yearly { color: rgba(250, 247, 242, 0.7); }
+.tier.featured .feature-item { color: rgba(250, 247, 242, 0.85); }
+.tier.featured .feature-check { color: var(--gold); }
+.tier.featured .tier-divider { border-color: rgba(250, 247, 242, 0.15); }
+.tier.featured .feature-section-label { color: var(--gold); }
+
+.tier-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: var(--ink);
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tier-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.tier-narrative {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 15.5px;
+  color: var(--forest);
+  margin-bottom: 24px;
+  line-height: 1.3;
+  min-height: 40px;
+}
+.tier.featured .tier-narrative { color: var(--gold-soft); }
+.tier-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.tier-price-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 54px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.tier-price-num .currency {
+  font-size: 28px;
+  vertical-align: super;
+  letter-spacing: 0;
+}
+.tier-price-period {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.tier-price-yearly {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 22px;
+  font-style: italic;
+  min-height: 18px;
+}
+.tier .btn { width: 100%; margin-bottom: 22px; }
+.tier-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.feature-section-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--forest);
+  font-weight: 500;
+  margin-bottom: 12px;
+  margin-top: 18px;
+}
+.feature-section-label:first-child { margin-top: 0; }
+.feature-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  flex: 1;
+}
+.feature-item {
+  font-size: 13.5px;
+  color: var(--text);
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  line-height: 1.45;
+}
+.feature-item.bold { font-weight: 500; }
+.feature-check {
+  flex-shrink: 0;
+  color: var(--forest);
+  margin-top: 3px;
+}
+.feature-check svg { display: block; }
+
+/* ============ COMPARE TABLE ============ */
+.compare-section {
+  background: var(--paper);
+  padding: 90px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.compare-section .eyebrow { text-align: center; }
+.compare-section h2 {
+  text-align: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(34px, 4.5vw, 52px);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: 18px;
+  line-height: 1.05;
+}
+.compare-section h2 em { font-style: italic; color: var(--forest); }
+.compare-section .sub {
+  text-align: center;
+  font-family: 'Newsreader', serif;
+  font-size: 18px;
+  color: var(--text-soft);
+  max-width: 620px;
+  margin: 0 auto 50px;
+  line-height: 1.5;
+}
+.compare-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: 'Onest', sans-serif;
+}
+.compare-table th, .compare-table td {
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-soft);
+}
+.compare-table thead th {
+  border-bottom: 2px solid var(--border);
+  font-weight: 500;
+  color: var(--text);
+  font-size: 14px;
+  padding: 14px 20px 18px;
+}
+.compare-table thead th.us {
+  background: var(--cream-deep);
+  color: var(--forest);
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 17px;
+  border-radius: 12px 12px 0 0;
+  border-bottom-color: var(--gold);
+}
+.compare-table tbody td.us {
+  background: var(--cream-deep);
+  font-weight: 500;
+  color: var(--text);
+}
+.compare-table tbody tr:last-child td { border-bottom: none; }
+.compare-table tbody tr:last-child td.us { border-radius: 0 0 12px 12px; }
+.compare-table .feat-name {
+  font-size: 14.5px;
+  color: var(--text);
+}
+.compare-yes { color: var(--forest); }
+.compare-no { color: var(--text-muted); }
+.compare-table tbody tr:hover td:not(.us) { background: rgba(232, 226, 213, 0.3); }
+
+/* ============ ROI MINI ============ */
+.roi-mini-section {
+  background: linear-gradient(135deg, #FCF8EE 0%, var(--cream) 100%);
+  padding: 100px 0;
+}
+.roi-mini-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 80px;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.roi-mini-narrative .eyebrow { color: #836A30; }
+.roi-mini-narrative h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(34px, 4vw, 46px);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+.roi-mini-narrative h2 em { font-style: italic; color: var(--forest); }
+.roi-mini-narrative p {
+  font-family: 'Newsreader', serif;
+  font-size: 18px;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.roi-calc {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 36px;
+  box-shadow: var(--shadow-md);
+}
+.roi-calc-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.roi-calc-sub {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+.roi-input-group { margin-bottom: 22px; }
+.roi-input-group:last-of-type { margin-bottom: 28px; }
+.roi-input-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.roi-input-label span:first-child {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+.roi-input-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--forest);
+  font-weight: 500;
+}
+.roi-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--border-soft);
+  border-radius: 999px;
+  outline: none;
+}
+.roi-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px; height: 22px;
+  background: var(--forest);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 4px solid var(--paper);
+  box-shadow: 0 2px 6px rgba(31, 77, 63, 0.3);
+}
+.roi-slider::-moz-range-thumb {
+  width: 22px; height: 22px;
+  background: var(--forest);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 4px solid var(--paper);
+  box-shadow: 0 2px 6px rgba(31, 77, 63, 0.3);
+}
+.roi-result {
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 16px;
+  padding: 24px 28px;
+  text-align: center;
+}
+.roi-result-label {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(250, 247, 242, 0.55);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.roi-result-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 48px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.roi-result-period { font-size: 13.5px; color: rgba(250, 247, 242, 0.7); font-style: italic; }
+.roi-result-detail {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(250, 247, 242, 0.12);
+  font-size: 13px;
+  color: rgba(250, 247, 242, 0.65);
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  line-height: 1.5;
+}
+.roi-result-detail strong { color: var(--cream); font-style: normal; font-weight: 500; }
+.roi-disclaimer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-style: italic;
+  font-family: 'Newsreader', serif;
+}
+
+/* ============ FAQ ============ */
+.faq-section { padding: 100px 0; }
+.faq-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; align-items: start; }
+.faq-grid h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(40px, 5vw, 56px);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  line-height: 1.05;
+}
+.faq-grid h2 em { font-style: italic; color: var(--forest); }
+.faq-grid p {
+  font-family: 'Newsreader', serif;
+  font-size: 18px;
+  color: var(--text-soft);
+  margin-top: 16px;
+  line-height: 1.5;
+}
+.faq-list { display: flex; flex-direction: column; }
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  padding: 22px 0;
+  cursor: pointer;
+}
+.faq-item:first-child { border-top: 1px solid var(--border); }
+.faq-q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 19px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.faq-toggle {
+  font-family: 'Onest', sans-serif;
+  font-size: 24px;
+  color: var(--text-muted);
+  transition: transform 0.25s;
+  font-weight: 300;
+  margin-left: 16px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.faq-item.open .faq-toggle { transform: rotate(45deg); color: var(--forest); }
+.faq-a {
+  font-family: 'Newsreader', serif;
+  font-size: 17px;
+  color: var(--text-soft);
+  line-height: 1.55;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, margin-top 0.3s ease;
+}
+.faq-item.open .faq-a {
+  max-height: 400px;
+  margin-top: 14px;
+}
+
+/* ============ CTA ============ */
+.cta-section {
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 32px;
+  margin: 0 32px 80px;
+  padding: 90px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(201, 169, 97, 0.15), transparent 50%);
+}
+.cta-section > * { position: relative; z-index: 1; }
+.cta-section h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(36px, 5vw, 56px);
+  letter-spacing: -0.025em;
+  color: var(--cream);
+  margin-bottom: 20px;
+  line-height: 1.05;
+}
+.cta-section h2 em { font-style: italic; color: var(--gold); }
+.cta-section p {
+  font-family: 'Newsreader', serif;
+  font-size: 19px;
+  color: rgba(250, 247, 242, 0.75);
+  max-width: 540px;
+  margin: 0 auto 36px;
+}
+.cta-section .btn { background: var(--gold); color: var(--ink); }
+.cta-section .btn:hover { background: var(--cream); }
+
+/* ============ FOOTER ============ */
+footer { padding: 60px 0 40px; border-top: 1px solid var(--border); }
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.footer-bottom .logo { font-size: 18px; }
+.footer-bottom .logo-mark { width: 26px; height: 26px; font-size: 12px; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1180px) {
+  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+  .tier.featured { transform: none; }
+  .tier.featured:hover { transform: translateY(-3px); }
+}
+@media (max-width: 900px) {
+  .roi-mini-grid { grid-template-columns: 1fr; gap: 40px; }
+  .faq-grid { grid-template-columns: 1fr; gap: 40px; }
+  .founding-banner { flex-direction: column; text-align: center; padding: 22px 20px; gap: 16px; }
+}
+@media (max-width: 760px) {
+  .pricing-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .container { padding: 0 20px; }
+  .compare-section { padding: 60px 0; }
+  .compare-section table { font-size: 13px; }
+  .compare-table th, .compare-table td { padding: 12px 10px; }
+  .cta-section { margin: 0 16px 60px; padding: 60px 32px; }
+  .roi-calc { padding: 28px 24px; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="container nav-inner">
+    <a href="01-marketing-home.html" class="logo">
+      <span class="logo-mark">B</span>
+      BAAM Review
+    </a>
+    <div class="nav-links">
+      <a href="01-marketing-home.html#loop">How it works</a>
+      <a href="#" class="active">Pricing</a>
+      <a href="#roi">ROI calculator</a>
+      <a href="01-marketing-home.html#languages">Languages</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-ghost">Log in</a>
+      <a href="#" class="btn btn-primary">Start free trial</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ PAGE HEADER ============ -->
+<section class="page-header">
+  <div class="container">
+    <div class="eyebrow">Pricing</div>
+    <h1>Self-serve. Transparent.<br><em>No sales calls.</em></h1>
+    <p>Start free. Upgrade when reviews start working for you. Cancel anytime in one click. Save 20% with annual billing.</p>
+    <div class="billing-toggle-row">
+      <div class="billing-toggle">
+        <button class="active" id="monthly-btn">Monthly</button>
+        <button id="yearly-btn">Yearly <span class="savings-badge">Save 20%</span></button>
+      </div>
+    </div>
+
+    <div class="founding-banner">
+      <div class="founding-icon">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.32.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .32-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg>
+      </div>
+      <div class="founding-text">
+        <div class="founding-title">First 50 <em>founding customers</em> — lock in launch pricing forever</div>
+        <div class="founding-sub">$39 Starter / $89 Growth / $249 Agency monthly, locked as long as your subscription stays active. Once we hit 50 founders, list prices apply.</div>
+      </div>
+      <div class="founding-counter">
+        <div class="founding-counter-num">23</div>
+        <div class="founding-counter-label">Spots left</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING GRID ============ -->
+<section class="pricing-section">
+  <div class="container">
+    <div class="pricing-grid">
+
+      <!-- FREE -->
+      <div class="tier">
+        <div class="tier-name">Free</div>
+        <div class="tier-narrative">Try the wedge. See what your customers actually do.</div>
+        <div class="tier-price">
+          <div class="tier-price-num"><span class="currency">$</span>0</div>
+          <div class="tier-price-period">/forever</div>
+        </div>
+        <div class="tier-price-yearly">No card required</div>
+        <a href="#" class="btn btn-outline">Start for free</a>
+        <hr class="tier-divider">
+
+        <div class="feature-section-label">Stage 1 · Collect</div>
+        <ul class="feature-list">
+          <li class="feature-item bold">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            5 review requests / month
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            1 location
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            AI-assisted writing
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            EN / 中文 / Español
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            QR code generator
+          </li>
+          <li class="feature-item" style="color: var(--text-muted);">
+            <span class="feature-check" style="color: var(--text-muted);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            "Powered by BAAM Review" branding
+          </li>
+        </ul>
+      </div>
+
+      <!-- STARTER -->
+      <div class="tier">
+        <div class="tier-name">Starter</div>
+        <div class="tier-narrative">Get more Google reviews.</div>
+        <div class="tier-price">
+          <div class="tier-price-num"><span class="currency">$</span><span class="price-amount" data-monthly="49" data-yearly="39">49</span></div>
+          <div class="tier-price-period">/mo</div>
+        </div>
+        <div class="tier-price-yearly"><span class="yearly-note" style="display:none;">$470 billed annually</span><span class="monthly-note">14-day free trial</span></div>
+        <a href="#" class="btn btn-dark">Start free trial</a>
+        <hr class="tier-divider">
+
+        <div class="feature-section-label">Stages 1–2 · Collect + Publish</div>
+        <ul class="feature-list">
+          <li class="feature-item bold">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            150 review requests / month
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            1 location, custom branding
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            SMS + email sending
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            "Leave a Review" embed script
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Private feedback inbox
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Post-review thank-you with Book/Refer/Follow
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Funnel analytics
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Email support
+          </li>
+        </ul>
+      </div>
+
+      <!-- GROWTH (FEATURED) -->
+      <div class="tier featured">
+        <div class="tier-badge">Most popular</div>
+        <div class="tier-name">Growth</div>
+        <div class="tier-narrative">Turn reviews into revenue.</div>
+        <div class="tier-price">
+          <div class="tier-price-num"><span class="currency">$</span><span class="price-amount" data-monthly="99" data-yearly="79">99</span></div>
+          <div class="tier-price-period">/mo</div>
+        </div>
+        <div class="tier-price-yearly"><span class="yearly-note" style="display:none;">$950 billed annually</span><span class="monthly-note">14-day free trial</span></div>
+        <a href="#" class="btn btn-gold">Start free trial</a>
+        <hr class="tier-divider">
+
+        <div class="feature-section-label">Stages 1–2 · Everything in Starter</div>
+        <ul class="feature-list">
+          <li class="feature-item bold">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Unlimited review requests
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Up to 5 locations
+          </li>
+        </ul>
+
+        <div class="feature-section-label">Stages 3–4 · Display + Distribute</div>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Website review widgets (schema markup)
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            First-party testimonials
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            AI Reply Assistant
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Xiaohongshu + Instagram + FB graphics
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            GBP post generator
+          </li>
+        </ul>
+
+        <div class="feature-section-label">Stages 5–6 · Convert + Refer</div>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Share-with-a-Friend referral links
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Service recovery for low-rating feedback
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Staff Mode (mobile front-desk app)
+          </li>
+          <li class="feature-item bold">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Revenue attribution dashboard
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Priority support
+          </li>
+        </ul>
+      </div>
+
+      <!-- AGENCY -->
+      <div class="tier">
+        <div class="tier-name">Agency</div>
+        <div class="tier-narrative">Reputation and referrals at scale.</div>
+        <div class="tier-price">
+          <div class="tier-price-num"><span class="currency">$</span><span class="price-amount" data-monthly="499" data-yearly="399">499</span></div>
+          <div class="tier-price-period">/mo</div>
+        </div>
+        <div class="tier-price-yearly"><span class="yearly-note" style="display:none;">$4,790 billed annually</span><span class="monthly-note">14-day free trial</span></div>
+        <a href="#" class="btn btn-outline">Start free trial</a>
+        <hr class="tier-divider">
+
+        <div class="feature-section-label">Everything in Growth, plus</div>
+        <ul class="feature-list">
+          <li class="feature-item bold">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Up to 25 locations
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            White-label (your brand)
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Agency dashboard across clients
+          </li>
+        </ul>
+
+        <div class="feature-section-label">Stage 7 · Compound</div>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Review theme mining across portfolio
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Auto-published testimonial SEO pages
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Ad-copy generator from reviews
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            B2B partner referral tracking
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Best Advocates CRM
+          </li>
+          <li class="feature-item">
+            <span class="feature-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Dedicated account manager
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPARE ============ -->
+<section class="compare-section">
+  <div class="container">
+    <div class="eyebrow">Honest comparison</div>
+    <h2>$99 buys you <em>the whole loop.</em></h2>
+    <p class="sub">Most review tools price like Birdeye ($299+ with sales calls) or stop at collection like NiceJob. BAAM Review at $99 includes everything below — at sub-$100 with no sales call.</p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="us">BAAM Review Growth</th>
+          <th>Birdeye</th>
+          <th>Podium</th>
+          <th>NiceJob Pro</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feat-name">Starting price</td>
+          <td class="us">$49 / month</td>
+          <td>$299–$599 / mo</td>
+          <td>$399+ / mo</td>
+          <td>$125 / mo</td>
+        </tr>
+        <tr>
+          <td class="feat-name">Setup fees</td>
+          <td class="us"><span class="compare-yes">●</span> None</td>
+          <td>$500–$1,500</td>
+          <td>$500+</td>
+          <td><span class="compare-yes">●</span> None</td>
+        </tr>
+        <tr>
+          <td class="feat-name">Self-serve signup, no sales call</td>
+          <td class="us"><span class="compare-yes">●</span> Yes</td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-yes">●</span> Yes</td>
+        </tr>
+        <tr>
+          <td class="feat-name">AI-assisted writing for the customer</td>
+          <td class="us"><span class="compare-yes">●</span> Yes</td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">English / Chinese / Spanish first-class</td>
+          <td class="us"><span class="compare-yes">●</span> All three</td>
+          <td>EN only</td>
+          <td>EN + basic ES</td>
+          <td>EN only</td>
+        </tr>
+        <tr>
+          <td class="feat-name">Website review widget with schema markup</td>
+          <td class="us"><span class="compare-yes">●</span> Yes</td>
+          <td>Basic widget</td>
+          <td>Basic widget</td>
+          <td>Basic widget</td>
+        </tr>
+        <tr>
+          <td class="feat-name">AI Reply Assistant (multilingual)</td>
+          <td class="us"><span class="compare-yes">●</span> Yes</td>
+          <td>EN only</td>
+          <td>EN only</td>
+          <td><span class="compare-no">—</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">Xiaohongshu auto-distribution</td>
+          <td class="us"><span class="compare-yes">●</span> Yes</td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">Share-with-a-Friend referral links</td>
+          <td class="us"><span class="compare-yes">●</span> Yes</td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">Revenue attribution dashboard</td>
+          <td class="us"><span class="compare-yes">●</span> Yes</td>
+          <td>Custom</td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">Staff Mode (front-desk mobile app)</td>
+          <td class="us"><span class="compare-yes">●</span> Yes</td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+          <td><span class="compare-no">—</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">Compliance-safe (no review gating)</td>
+          <td class="us"><span class="compare-yes">●</span> Yes</td>
+          <td>Configurable</td>
+          <td>Configurable</td>
+          <td><span class="compare-yes">●</span> Yes</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ ROI CALCULATOR ============ -->
+<section class="roi-mini-section" id="roi">
+  <div class="container">
+    <div class="roi-mini-grid">
+      <div class="roi-mini-narrative">
+        <div class="eyebrow">Does the $99 pay back?</div>
+        <h2>Reviews are <em>worth</em> something. Let's calculate.</h2>
+        <p>A Google review is worth $50–200 in lifetime customer value for most local businesses. More reviews mean better SEO, better trust, more bookings. Adjust the sliders and see what your number actually looks like.</p>
+        <p style="margin-top: 18px; font-size: 16px;">The math assumes a conservative 5% lift in monthly customers from going from 3 reviews/month to 15 reviews/month — well below what most BAAM Review customers see in practice.</p>
+      </div>
+      <div class="roi-calc">
+        <div class="roi-calc-title">Quick ROI estimate</div>
+        <div class="roi-calc-sub">No signup required. Just slide.</div>
+
+        <div class="roi-input-group">
+          <div class="roi-input-label">
+            <span>Average customer value</span>
+            <span class="roi-input-value">$<span id="roi-cv-val">300</span></span>
+          </div>
+          <input type="range" class="roi-slider" id="roi-cv" min="50" max="2000" step="50" value="300">
+        </div>
+
+        <div class="roi-input-group">
+          <div class="roi-input-label">
+            <span>Monthly customers today</span>
+            <span class="roi-input-value"><span id="roi-cm-val">80</span></span>
+          </div>
+          <input type="range" class="roi-slider" id="roi-cm" min="10" max="500" step="5" value="80">
+        </div>
+
+        <div class="roi-input-group">
+          <div class="roi-input-label">
+            <span>Conversion lift from better reviews</span>
+            <span class="roi-input-value"><span id="roi-lift-val">5</span>%</span>
+          </div>
+          <input type="range" class="roi-slider" id="roi-lift" min="2" max="20" step="1" value="5">
+        </div>
+
+        <div class="roi-result">
+          <div class="roi-result-label">Estimated monthly revenue impact</div>
+          <div class="roi-result-num">$<span id="roi-out">1,200</span></div>
+          <div class="roi-result-period">per month, conservatively</div>
+          <div class="roi-result-detail">
+            That's roughly <strong><span id="roi-extra-customers">4</span> additional customers per month</strong> — and a <strong><span id="roi-multiple">12×</span> return on the $99 Growth plan</strong>.
+          </div>
+        </div>
+
+        <p class="roi-disclaimer">Estimates only. Actual results vary by industry, location, current ranking, and execution.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq-section">
+  <div class="container">
+    <div class="faq-grid">
+      <div>
+        <div class="eyebrow">FAQ</div>
+        <h2>Questions, <em>answered.</em></h2>
+        <p>Most of what people ask before signing up. If your question isn't here, email us — we answer the same day.</p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item open">
+          <div class="faq-q">Will the AI-generated drafts get flagged by Google? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">No. The drafts are generated from your customer's specific inputs — what they were treated for, how it went, what they thought of you. The customer reviews and edits before posting, and they are the author of record. We disclose this clearly on the page. This is fundamentally different from fabricated reviews.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What's the actual difference between Starter and Growth? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">Starter ($49) gets you stages 1–2 of the Review-to-Revenue Loop: collecting Google reviews with the AI-assisted flow, plus the embedded "Leave a Review" button and basic analytics. Growth ($99) adds stages 3–6: the website Display Widget that puts those reviews to work as conversion-driving social proof with schema markup, the AI Reply Assistant for responding to incoming reviews in multiple languages, automatic social graphics for Xiaohongshu/Instagram/Facebook, share-with-a-friend referral links, the Staff Mode mobile app for your front desk, and the revenue attribution dashboard. Growth is for businesses that want reviews to actually drive bookings, not just sit there.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What does "Turn reviews into revenue" actually mean? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">Three concrete things. First, your reviews appear on your website with "Book Now" and "Call" buttons attached — every review becomes a conversion asset, not just a trust signal. Second, your top reviews get auto-generated as branded social cards for Xiaohongshu, Instagram, and Facebook, reaching new customers your competitors aren't reaching. Third, after every successful review, your customer gets an optional "Share with a Friend" button with a tracked referral link — every new customer attributable to a specific reviewer. The dashboard shows you exactly what's happening, in dollars.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Do I need a Google Business Profile? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">Yes. We connect to your Google Business Profile during onboarding to verify your location and create the deep link to your review form. If you don't have one set up yet, we'll walk you through creating one — it's free and takes about ten minutes.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Does the AI Reply Assistant work in Chinese and Spanish? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">Yes — and this is one of the places where the multilingual story really matters. If a Chinese-speaking patient leaves you a Google review in 中文, the Reply Assistant drafts your response in 中文 with natural-sounding tone. Same for Spanish. None of the major US competitors handle non-English reply drafting well — and for businesses serving immigrant communities, replying in the customer's language matters.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What's the founding customer program? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">First 50 paid signups get to lock in launch pricing forever: Starter $39 (instead of $49), Growth $89 (instead of $99), Agency $249 (instead of $499). As long as your subscription stays active, you keep those prices. Once we hit 50 founders, list prices apply universally.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What happens if I cancel? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">You keep access until the end of your billing period, then your account moves to read-only. We never delete your data; you can come back and reactivate anytime. Cancellation is one click in your account settings — no email required, no retention pitch.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Can I switch tiers later? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">Anytime. Upgrades take effect immediately and prorate. Downgrades take effect at your next billing cycle. No fees either way.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What about SMS deliverability? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">SMS in the US requires carrier registration (A2P 10DLC). We handle this for you in the background — your account ships with SMS enabled but during the registration window (typically 2–4 weeks) volume is throttled. Email-based requests work immediately at signup with no throttling.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Is this only for BAAM Studio clients? <span class="faq-toggle">+</span></div>
+          <div class="faq-a">No. BAAM Review works on any website — WordPress, Squarespace, Wix, Webflow, custom-built, or just a Google Business Profile with no website at all. We're built by BAAM Studio, but we're an independent product. If you are a BAAM Studio client, the schema markup loops back into your existing BAAM site automatically.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<div class="cta-section">
+  <h2>Start free.<br><em>See if it fits.</em></h2>
+  <p>Fourteen days. No credit card. The full Starter feature set. If BAAM Review doesn't earn its place in your week, you walk away with nothing lost.</p>
+  <a href="#" class="btn btn-large">Start free trial →</a>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-bottom">
+      <span>© 2026 BAAM Studio</span>
+      <a href="01-marketing-home.html" class="logo">
+        <span class="logo-mark">B</span> BAAM Review
+      </a>
+      <span>Built in New York</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+
+  // Billing toggle
+  const monthlyBtn = document.getElementById('monthly-btn');
+  const yearlyBtn = document.getElementById('yearly-btn');
+  const priceAmounts = document.querySelectorAll('.price-amount');
+  const yearlyNotes = document.querySelectorAll('.yearly-note');
+  const monthlyNotes = document.querySelectorAll('.monthly-note');
+
+  monthlyBtn.addEventListener('click', () => {
+    monthlyBtn.classList.add('active');
+    yearlyBtn.classList.remove('active');
+    priceAmounts.forEach(el => el.textContent = el.dataset.monthly);
+    yearlyNotes.forEach(el => el.style.display = 'none');
+    monthlyNotes.forEach(el => el.style.display = 'inline');
+  });
+  yearlyBtn.addEventListener('click', () => {
+    yearlyBtn.classList.add('active');
+    monthlyBtn.classList.remove('active');
+    priceAmounts.forEach(el => el.textContent = el.dataset.yearly);
+    yearlyNotes.forEach(el => el.style.display = 'inline');
+    monthlyNotes.forEach(el => el.style.display = 'none');
+  });
+
+  // FAQ toggle
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.addEventListener('click', () => item.classList.toggle('open'));
+  });
+
+  // ROI calculator
+  const cvSlider = document.getElementById('roi-cv');
+  const cmSlider = document.getElementById('roi-cm');
+  const liftSlider = document.getElementById('roi-lift');
+  const cvVal = document.getElementById('roi-cv-val');
+  const cmVal = document.getElementById('roi-cm-val');
+  const liftVal = document.getElementById('roi-lift-val');
+  const out = document.getElementById('roi-out');
+  const extraCustomersEl = document.getElementById('roi-extra-customers');
+  const multipleEl = document.getElementById('roi-multiple');
+
+  function fmt(n) { return n.toLocaleString('en-US', { maximumFractionDigits: 0 }); }
+
+  function recalc() {
+    const cv = parseInt(cvSlider.value);
+    const cm = parseInt(cmSlider.value);
+    const lift = parseInt(liftSlider.value);
+    cvVal.textContent = fmt(cv);
+    cmVal.textContent = fmt(cm);
+    liftVal.textContent = lift;
+
+    const extraCustomers = Math.round(cm * (lift / 100));
+    const monthlyImpact = extraCustomers * cv;
+    out.textContent = fmt(monthlyImpact);
+    extraCustomersEl.textContent = extraCustomers;
+
+    const multiple = Math.round(monthlyImpact / 99);
+    multipleEl.textContent = (multiple >= 1 ? multiple : 1) + '×';
+  }
+
+  cvSlider.addEventListener('input', recalc);
+  cmSlider.addEventListener('input', recalc);
+  liftSlider.addEventListener('input', recalc);
+  recalc();
+</script>
+
+</body>
+</html>

@@ -30,6 +30,31 @@ export type LandingEventType =
   | "platform_clicked"
   | "private_feedback_submitted";
 
+export type PostReviewActionType =
+  | "view"
+  | "book_click"
+  | "refer_click"
+  | "share_click"
+  | "follow_click"
+  | "done_click";
+
+export type ShareDestination =
+  | "wechat"
+  | "sms"
+  | "copy"
+  | "more"
+  | "whatsapp"
+  | "email";
+
+export interface SocialHandles {
+  xhs?: string;
+  ig?: string;
+  wechat_mp?: string;
+  tiktok?: string;
+  fb?: string;
+  [key: string]: string | undefined;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -105,6 +130,10 @@ export interface Database {
           sender_verified_at: string | null;
           google_resource_name: string | null;
           reviews_synced_at: string | null;
+          avg_customer_value_cents: number | null;
+          booking_url: string | null;
+          social_handles: SocialHandles;
+          consent_display_enabled: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -131,6 +160,10 @@ export interface Database {
           sender_verified_at?: string | null;
           google_resource_name?: string | null;
           reviews_synced_at?: string | null;
+          avg_customer_value_cents?: number | null;
+          booking_url?: string | null;
+          social_handles?: SocialHandles;
+          consent_display_enabled?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -158,6 +191,7 @@ export interface Database {
           completed_at: string | null;
           flagged_at: string | null;
           flag_reason: string | null;
+          consent_display: boolean;
           created_by: string | null;
           created_at: string;
         };
@@ -181,6 +215,7 @@ export interface Database {
           completed_at?: string | null;
           flagged_at?: string | null;
           flag_reason?: string | null;
+          consent_display?: boolean;
           created_by?: string | null;
           created_at?: string;
         };
@@ -309,6 +344,32 @@ export interface Database {
           fetched_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["google_reviews"]["Insert"]>;
+        Relationships: [];
+      };
+      post_review_actions: {
+        Row: {
+          id: string;
+          location_id: string;
+          request_id: string | null;
+          action_type: PostReviewActionType;
+          share_destination: ShareDestination | null;
+          share_token: string | null;
+          language: Language | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          request_id?: string | null;
+          action_type: PostReviewActionType;
+          share_destination?: ShareDestination | null;
+          share_token?: string | null;
+          language?: Language | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["post_review_actions"]["Insert"]>;
         Relationships: [];
       };
       google_oauth_tokens: {
