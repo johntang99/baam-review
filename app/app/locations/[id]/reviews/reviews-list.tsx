@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   RefreshCw,
   AlertTriangle,
   CheckCircle2,
+  Share2,
   Sparkles,
   Send,
   Trash2,
@@ -155,7 +157,7 @@ export function ReviewsList({
       ) : (
         <ul className="space-y-3">
           {reviews.map((r) => (
-            <ReviewCard key={r.id} r={r} />
+            <ReviewCard key={r.id} r={r} locationId={locationId} />
           ))}
         </ul>
       )}
@@ -163,7 +165,7 @@ export function ReviewsList({
   );
 }
 
-function ReviewCard({ r }: { r: Review }) {
+function ReviewCard({ r, locationId }: { r: Review; locationId: string }) {
   const low = r.rating <= 2;
   return (
     <li
@@ -189,9 +191,19 @@ function ReviewCard({ r }: { r: Review }) {
             <p className="text-[13.5px] text-ink truncate font-medium">
               {r.reviewer_display_name ?? "Anonymous"}
             </p>
-            <span className="text-[11.5px] text-text-muted whitespace-nowrap">
-              {relativeTime(r.review_create_time)}
-            </span>
+            <div className="flex items-center gap-3 whitespace-nowrap text-[11.5px] text-text-muted">
+              {r.rating >= 4 && r.comment && (
+                <Link
+                  href={`/app/locations/${locationId}/reviews/${r.id}/share`}
+                  className="inline-flex items-center gap-1 text-forest hover:underline"
+                  title="Generate a share card for this review"
+                >
+                  <Share2 className="h-3 w-3" />
+                  Share
+                </Link>
+              )}
+              <span>{relativeTime(r.review_create_time)}</span>
+            </div>
           </div>
           <p className="text-gold text-[14px]">
             {"★".repeat(r.rating)}

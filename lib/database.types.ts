@@ -56,6 +56,24 @@ export interface SocialHandles {
   [key: string]: string | undefined;
 }
 
+export type WidgetLayout = "cards" | "compact";
+
+export interface WidgetConfig {
+  layout?: WidgetLayout;
+  min_rating?: 4 | 5;
+  max_count?: number;
+  accent_color?: string | null;
+  show_aggregate?: boolean;
+  show_leave_own?: boolean;
+  show_reply?: boolean;
+}
+
+export type WidgetEventType =
+  | "view"
+  | "review_click"
+  | "leave_own_click"
+  | "cta_click";
+
 export interface Database {
   public: {
     Tables: {
@@ -135,6 +153,8 @@ export interface Database {
           booking_url: string | null;
           social_handles: SocialHandles;
           consent_display_enabled: boolean;
+          widget_config: WidgetConfig;
+          default_share_theme: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -165,6 +185,8 @@ export interface Database {
           booking_url?: string | null;
           social_handles?: SocialHandles;
           consent_display_enabled?: boolean;
+          widget_config?: WidgetConfig;
+          default_share_theme?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -345,6 +367,90 @@ export interface Database {
           fetched_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["google_reviews"]["Insert"]>;
+        Relationships: [];
+      };
+      referrals: {
+        Row: {
+          id: string;
+          location_id: string;
+          advocate_request_id: string | null;
+          event_type:
+            | "share_view"
+            | "booking_click"
+            | "open_in_maps_click"
+            | "leave_own_click"
+            | "review_started"
+            | "review_submitted";
+          conversion_request_id: string | null;
+          referrer_host: string | null;
+          user_agent: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          advocate_request_id?: string | null;
+          event_type:
+            | "share_view"
+            | "booking_click"
+            | "open_in_maps_click"
+            | "leave_own_click"
+            | "review_started"
+            | "review_submitted";
+          conversion_request_id?: string | null;
+          referrer_host?: string | null;
+          user_agent?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["referrals"]["Insert"]>;
+        Relationships: [];
+      };
+      social_graphics: {
+        Row: {
+          id: string;
+          location_id: string;
+          google_review_id: string | null;
+          size: "og" | "square" | "story";
+          theme: string;
+          action: "view" | "copy_url" | "download" | "open";
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          google_review_id?: string | null;
+          size: "og" | "square" | "story";
+          theme: string;
+          action: "view" | "copy_url" | "download" | "open";
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["social_graphics"]["Insert"]>;
+        Relationships: [];
+      };
+      widget_events: {
+        Row: {
+          id: string;
+          location_id: string;
+          event_type: WidgetEventType;
+          google_review_id: string | null;
+          origin: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          event_type: WidgetEventType;
+          google_review_id?: string | null;
+          origin?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["widget_events"]["Insert"]>;
         Relationships: [];
       };
       post_review_actions: {

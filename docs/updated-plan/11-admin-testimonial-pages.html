@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landing Pages — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88847;
+  --clinic-primary: #962D22;
+  --clinic-primary-dark: #6F1F18;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --success: #2D7A5F;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 28px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif; color: var(--text); background: var(--cream); font-size: 14.5px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+aside { background: var(--ink); color: var(--cream); padding: 24px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 24px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; }
+.brand-mark { width: 28px; height: 28px; background: var(--gold); color: var(--ink); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+.location-switcher { background: rgba(250, 247, 242, 0.06); border: 1px solid rgba(250, 247, 242, 0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+.location-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #C0392B, #962D22); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.location-name { font-size: 13.5px; font-weight: 500; color: var(--cream); }
+.location-sub { font-size: 11.5px; color: rgba(250, 247, 242, 0.55); }
+.nav-label { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250, 247, 242, 0.4); padding: 0 8px 8px; margin-top: 8px; font-weight: 500; }
+.nav-list { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.nav-list a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; color: rgba(250, 247, 242, 0.7); transition: all 0.15s; }
+.nav-list a:hover { background: rgba(250, 247, 242, 0.06); color: var(--cream); }
+.nav-list a.active { background: rgba(201, 169, 97, 0.12); color: var(--gold); }
+.nav-list a svg { width: 16px; height: 16px; flex-shrink: 0; }
+.user-card { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; }
+.user-avatar { width: 32px; height: 32px; background: var(--sage); color: var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+.user-tier { font-size: 11px; color: rgba(250, 247, 242, 0.5); }
+
+main { padding: 32px 40px 60px; max-width: 1280px; }
+.page-header { margin-bottom: 32px; }
+.page-eyebrow { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+.page-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 48px; letter-spacing: -0.025em; color: var(--ink); line-height: 1.05; margin-bottom: 12px; }
+.page-title em { font-style: italic; color: var(--forest); }
+.page-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 18px; color: var(--text-soft); max-width: 720px; line-height: 1.5; }
+
+/* CADENCE STRIP */
+.cadence-strip { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; background: linear-gradient(135deg, var(--ink) 0%, #1B2E27 100%); color: var(--cream); border-radius: 14px; margin-bottom: 32px; position: relative; overflow: hidden; }
+.cadence-strip::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 85% 20%, rgba(201, 169, 97, 0.18), transparent 50%); }
+.cadence-strip > * { position: relative; z-index: 1; }
+.cadence-left { display: flex; align-items: center; gap: 16px; }
+.cadence-icon { width: 38px; height: 38px; background: var(--gold); color: var(--ink); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cadence-text-h { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; color: var(--cream); letter-spacing: -0.01em; }
+.cadence-text-sub { font-size: 13px; color: rgba(250, 247, 242, 0.75); margin-top: 2px; }
+.cadence-text-sub em { color: var(--gold); font-style: normal; font-weight: 500; }
+.cadence-right { display: flex; align-items: center; gap: 12px; }
+.cadence-pill { padding: 6px 12px; background: rgba(250, 247, 242, 0.1); border-radius: 999px; font-size: 12px; color: var(--cream); }
+.cadence-pill strong { color: var(--gold); font-family: 'JetBrains Mono', monospace; }
+
+/* TABS */
+.tabs-row { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+.tab { padding: 12px 18px; background: transparent; border: none; font-family: 'Onest', sans-serif; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; position: relative; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--ink); }
+.tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--forest); }
+.tab .count { display: inline-block; margin-left: 6px; padding: 1px 7px; background: var(--cream-deep); color: var(--text); border-radius: 999px; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+.tab.active .count { background: var(--gold); color: var(--ink); }
+
+/* PAGES LIST + PREVIEW */
+.layout { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
+
+.pages-list { display: flex; flex-direction: column; gap: 8px; }
+.page-list-item { background: var(--paper); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; }
+.page-list-item:hover { border-color: var(--forest); transform: translateX(2px); }
+.page-list-item.active { border-color: var(--forest); background: var(--cream-deep); }
+.page-list-status { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.page-list-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--ink); line-height: 1.25; letter-spacing: -0.01em; }
+.status-pill { font-size: 10px; padding: 2px 7px; border-radius: 999px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+.status-pill.draft { background: rgba(201, 169, 97, 0.18); color: var(--gold-dark); }
+.status-pill.published { background: rgba(45, 122, 95, 0.15); color: var(--success); }
+.page-list-meta { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
+.page-list-mentions { font-family: 'JetBrains Mono', monospace; }
+
+/* PREVIEW PANEL */
+.preview-panel { background: var(--paper); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.preview-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; background: var(--cream-deep); border-bottom: 1px solid var(--border); gap: 16px; }
+.preview-url { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.preview-url-icon { width: 24px; height: 24px; background: var(--paper); border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--success); flex-shrink: 0; }
+.preview-url-icon svg { width: 12px; height: 12px; }
+.preview-url-text { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.preview-url-text strong { color: var(--ink); font-weight: 500; }
+.preview-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; font-family: 'Onest', sans-serif; font-size: 12.5px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border); background: var(--paper); color: var(--text); cursor: pointer; }
+.btn:hover { background: var(--cream); }
+.btn-primary { background: var(--forest); color: var(--cream); border-color: var(--forest); }
+.btn-primary:hover { background: var(--forest-dark); color: var(--cream); }
+.btn svg { width: 13px; height: 13px; }
+
+/* RENDERED PAGE PREVIEW (the testimonial page itself) */
+.rendered-page { background: var(--paper); }
+.rp-nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 1px solid var(--border-soft); }
+.rp-clinic { display: flex; align-items: center; gap: 12px; }
+.rp-clinic-logo { width: 38px; height: 38px; background: linear-gradient(135deg, var(--clinic-primary), var(--clinic-primary-dark)); color: white; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; }
+.rp-clinic-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--ink); letter-spacing: -0.01em; }
+.rp-clinic-loc { font-size: 11.5px; color: var(--text-muted); }
+.rp-nav-links { display: flex; gap: 22px; font-size: 13px; color: var(--text-soft); }
+.rp-nav-cta { padding: 7px 14px; background: var(--clinic-primary); color: white; border-radius: 999px; font-size: 12px; font-weight: 500; }
+
+/* PAGE HERO */
+.rp-hero { padding: 50px 60px 36px; background: var(--cream); border-bottom: 1px solid var(--border-soft); }
+.rp-breadcrumb { font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px; letter-spacing: 0.03em; }
+.rp-breadcrumb a { color: var(--text-soft); }
+.rp-hero-eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clinic-primary); font-weight: 500; margin-bottom: 12px; }
+.rp-hero-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 44px; line-height: 1.05; letter-spacing: -0.025em; color: var(--ink); max-width: 700px; margin-bottom: 18px; }
+.rp-hero-title em { font-style: italic; color: var(--clinic-primary); }
+.rp-hero-lead { font-family: 'Newsreader', serif; font-size: 17px; line-height: 1.6; color: var(--text-soft); max-width: 660px; }
+.rp-hero-lead strong { color: var(--ink); font-weight: 500; font-style: italic; }
+
+.rp-aggregate-row { display: flex; align-items: center; gap: 28px; margin-top: 28px; padding: 18px 22px; background: var(--paper); border: 1px solid var(--border); border-radius: 14px; }
+.rp-agg-item { flex: 1; }
+.rp-agg-num { font-family: 'Fraunces', serif; font-weight: 400; font-size: 28px; color: var(--ink); letter-spacing: -0.02em; line-height: 1; }
+.rp-agg-num.gold { color: var(--gold-dark); }
+.rp-agg-num .stars { font-size: 18px; color: var(--gold); letter-spacing: 1.5px; }
+.rp-agg-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+.rp-agg-divider { width: 1px; background: var(--border); align-self: stretch; }
+
+/* REVIEW CARDS GRID */
+.rp-reviews-section { padding: 50px 60px; }
+.rp-section-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 26px; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.015em; }
+.rp-section-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: var(--text-soft); margin-bottom: 32px; }
+.rp-reviews-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.rp-review-card { background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; }
+.rp-review-card:nth-child(odd) { background: var(--cream-deep); }
+.rp-review-stars { color: var(--gold); font-size: 14px; letter-spacing: 2px; margin-bottom: 10px; }
+.rp-review-text { font-family: 'Newsreader', serif; font-size: 15.5px; line-height: 1.55; color: var(--text); margin-bottom: 14px; font-style: italic; }
+.rp-review-meta { display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border-soft); }
+.rp-review-avatar { width: 32px; height: 32px; background: var(--sage); color: var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.rp-review-author { font-size: 13px; font-weight: 500; color: var(--ink); }
+.rp-review-source { font-size: 11.5px; color: var(--text-muted); }
+.rp-review-source svg { width: 11px; height: 11px; display: inline; vertical-align: -1px; }
+.rp-lang-tag { margin-left: auto; padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 500; }
+.rp-lang-tag.en { background: #E5EDDF; color: var(--forest); }
+.rp-lang-tag.zh { background: #F8E5E1; color: #8B3A2A; }
+.rp-lang-tag.es { background: #FBEAD3; color: #A06820; }
+
+/* CTA PANEL */
+.rp-cta-section { padding: 50px 60px; background: var(--cream); border-top: 1px solid var(--border-soft); }
+.rp-cta-card { background: linear-gradient(135deg, var(--clinic-primary), var(--clinic-primary-dark)); color: white; border-radius: 20px; padding: 40px 44px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; position: relative; overflow: hidden; }
+.rp-cta-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 90% 20%, rgba(255, 255, 255, 0.12), transparent 50%); }
+.rp-cta-card > * { position: relative; z-index: 1; }
+.rp-cta-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; color: white; margin-bottom: 12px; }
+.rp-cta-title em { font-style: italic; color: var(--gold-soft); color: #F5E5BA; }
+.rp-cta-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: rgba(255, 255, 255, 0.85); margin-bottom: 24px; }
+.rp-cta-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; background: white; color: var(--clinic-primary); border-radius: 999px; font-family: 'Onest', sans-serif; font-size: 14.5px; font-weight: 500; }
+.rp-cta-meta { font-size: 12.5px; color: rgba(255, 255, 255, 0.75); margin-top: 12px; }
+.rp-cta-meta strong { color: white; font-weight: 500; }
+.rp-cta-right { display: flex; flex-direction: column; gap: 10px; }
+.rp-cta-info-item { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: white; padding: 12px 14px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+.rp-cta-info-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--gold-soft); }
+
+/* FAQ */
+.rp-faq-section { padding: 50px 60px; }
+.rp-faq-list { display: flex; flex-direction: column; gap: 4px; max-width: 760px; }
+.rp-faq-item { border-bottom: 1px solid var(--border-soft); padding: 18px 4px; cursor: pointer; }
+.rp-faq-q { display: flex; justify-content: space-between; align-items: center; font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; color: var(--ink); letter-spacing: -0.01em; }
+.rp-faq-toggle { color: var(--text-muted); font-size: 24px; font-weight: 300; line-height: 1; }
+.rp-faq-a { font-family: 'Newsreader', serif; font-size: 15.5px; color: var(--text-soft); line-height: 1.6; margin-top: 12px; padding-right: 40px; }
+
+/* SCHEMA INDICATOR */
+.schema-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(45, 122, 95, 0.1); color: var(--success); border-radius: 999px; font-size: 11.5px; font-weight: 500; }
+.schema-badge svg { width: 11px; height: 11px; }
+
+/* EMBED MODAL TRIGGER */
+.embed-card { margin-top: 24px; padding: 20px 24px; background: var(--paper); border: 1px dashed var(--border); border-radius: 14px; }
+.embed-card-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; color: var(--ink); margin-bottom: 4px; letter-spacing: -0.01em; }
+.embed-card-sub { font-size: 12.5px; color: var(--text-soft); margin-bottom: 14px; line-height: 1.45; }
+.embed-snippet { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--ink); color: var(--gold); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; overflow-x: auto; }
+.embed-snippet code { flex: 1; white-space: nowrap; }
+.embed-copy { background: rgba(201, 169, 97, 0.18); border: 1px solid var(--gold); color: var(--gold); padding: 4px 10px; border-radius: 6px; font-family: 'Onest', sans-serif; font-size: 11px; cursor: pointer; flex-shrink: 0; }
+
+@media (max-width: 1200px) {
+  .layout { grid-template-columns: 1fr; }
+  .rp-hero { padding: 36px 30px 28px; }
+  .rp-hero-title { font-size: 32px; }
+  .rp-reviews-grid { grid-template-columns: 1fr; }
+  .rp-cta-card { grid-template-columns: 1fr; gap: 24px; padding: 32px; }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  aside { display: none; }
+  main { padding: 20px 18px; }
+  .page-title { font-size: 36px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside>
+    <div class="brand"><span class="brand-mark">B</span> BAAM Review</div>
+    <div class="location-switcher">
+      <div class="location-icon">黄</div>
+      <div>
+        <div class="location-name">Dr. Huang Acupuncture</div>
+        <div class="location-sub">Flushing, NY · Growth</div>
+      </div>
+    </div>
+    <div class="nav-label">Workspace</div>
+    <ul class="nav-list">
+      <li><a href="03-admin-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12l2-2"/></svg> Dashboard</a></li>
+      <li><a href="04-admin-send-request.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 5l7 7"/></svg> Send request</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2"/></svg> Reviews</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2"/></svg> AI Replies</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 20h5"/></svg> Referrals</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1"/></svg> Distribute</a></li>
+    </ul>
+    <div class="nav-label">Compound</div>
+    <ul class="nav-list">
+      <li><a href="09-admin-themes-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75"/></svg> Themes</a></li>
+      <li><a href="10-admin-ad-copy-generator.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2"/></svg> Ad Copy</a></li>
+      <li><a href="#" class="active"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Landing Pages</a></li>
+      <li><a href="12-admin-review-studio.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276"/></svg> Review Studio</a></li>
+    </ul>
+    <div class="user-card">
+      <div class="user-avatar">JC</div>
+      <div>
+        <div class="user-name">John Chen</div>
+        <div class="user-tier">Growth · Founding member</div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="page-header">
+      <div class="page-eyebrow">Stage 7 · Compound · Landing Pages</div>
+      <h1 class="page-title">Reviews become <em>SEO pages.</em></h1>
+      <p class="page-sub">Every 60 days, BAAM Review generates new landing pages from your top themes. Each one's a long-tail SEO asset written from real customer language, ready to publish to your site.</p>
+    </div>
+
+    <!-- CADENCE STRIP -->
+    <div class="cadence-strip">
+      <div class="cadence-left">
+        <div class="cadence-icon">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <div>
+          <div class="cadence-text-h">3 new pages generated this cycle</div>
+          <div class="cadence-text-sub">Next auto-generation in <em>17 days</em> · Cadence: <em>every 60 days</em></div>
+        </div>
+      </div>
+      <div class="cadence-right">
+        <span class="cadence-pill"><strong>5</strong> published</span>
+        <span class="cadence-pill"><strong>3</strong> awaiting review</span>
+        <button class="btn btn-primary">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066"/></svg>
+          Cadence settings
+        </button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-row">
+      <button class="tab active">Drafts <span class="count">3</span></button>
+      <button class="tab">Published <span class="count">5</span></button>
+      <button class="tab">Archived <span class="count">2</span></button>
+    </div>
+
+    <!-- LAYOUT: LIST + PREVIEW -->
+    <div class="layout">
+
+      <!-- LEFT: PAGE LIST -->
+      <div class="pages-list">
+        <div class="page-list-item active">
+          <div class="page-list-status">
+            <span class="status-pill draft">Draft</span>
+            <span class="schema-badge">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Schema ready
+            </span>
+          </div>
+          <div class="page-list-title">What patients say about migraine treatment</div>
+          <div class="page-list-meta">
+            <span>Generated 2h ago</span>
+            <span class="page-list-mentions">38 mentions</span>
+          </div>
+        </div>
+
+        <div class="page-list-item">
+          <div class="page-list-status">
+            <span class="status-pill draft">Draft</span>
+          </div>
+          <div class="page-list-title">Patients on Dr. Huang's bedside manner</div>
+          <div class="page-list-meta">
+            <span>Generated 2h ago</span>
+            <span class="page-list-mentions">47 mentions</span>
+          </div>
+        </div>
+
+        <div class="page-list-item">
+          <div class="page-list-status">
+            <span class="status-pill draft">Draft</span>
+          </div>
+          <div class="page-list-title">Acupuncture for stress relief in Flushing</div>
+          <div class="page-list-meta">
+            <span>Generated 2h ago</span>
+            <span class="page-list-mentions">19 mentions</span>
+          </div>
+        </div>
+
+        <div class="page-list-item">
+          <div class="page-list-status">
+            <span class="status-pill published">Live</span>
+          </div>
+          <div class="page-list-title">Worth the trip — patients across NYC</div>
+          <div class="page-list-meta">
+            <span>Published Mar 12</span>
+            <span class="page-list-mentions">21 mentions</span>
+          </div>
+        </div>
+
+        <div class="page-list-item">
+          <div class="page-list-status">
+            <span class="status-pill published">Live</span>
+          </div>
+          <div class="page-list-title">Chinese-speaking acupuncturist NY metro</div>
+          <div class="page-list-meta">
+            <span>Published Feb 28</span>
+            <span class="page-list-mentions">34 mentions</span>
+          </div>
+        </div>
+
+        <div class="page-list-item">
+          <div class="page-list-status">
+            <span class="status-pill published">Live</span>
+          </div>
+          <div class="page-list-title">Insomnia &amp; sleep — patient stories</div>
+          <div class="page-list-meta">
+            <span>Published Feb 14</span>
+            <span class="page-list-mentions">15 mentions</span>
+          </div>
+        </div>
+
+        <!-- EMBED CARD -->
+        <div class="embed-card">
+          <div class="embed-card-title">Embed on your site</div>
+          <div class="embed-card-sub">Add one line of code to your website. The page renders at <strong>drhuang.com/testimonials/migraines</strong> — SEO juice flows to your domain, not ours.</div>
+          <div class="embed-snippet">
+            <code>&lt;script src="https://baamreview.com/page/dr-huang/migraines.js"&gt;&lt;/script&gt;</code>
+            <button class="embed-copy">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: PREVIEW PANEL -->
+      <div class="preview-panel">
+        <div class="preview-toolbar">
+          <div class="preview-url">
+            <div class="preview-url-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div class="preview-url-text">drhuang.com/testimonials/<strong>migraines</strong></div>
+          </div>
+          <div class="preview-actions">
+            <button class="btn">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+              Edit
+            </button>
+            <button class="btn">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9"/></svg>
+              Regenerate
+            </button>
+            <button class="btn btn-primary">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+              Publish
+            </button>
+          </div>
+        </div>
+
+        <!-- THE RENDERED PAGE PREVIEW -->
+        <div class="rendered-page">
+          <!-- Page nav -->
+          <div class="rp-nav">
+            <div class="rp-clinic">
+              <div class="rp-clinic-logo">黄</div>
+              <div>
+                <div class="rp-clinic-name">Dr. Huang Acupuncture</div>
+                <div class="rp-clinic-loc">Flushing, NY · Bilingual TCM</div>
+              </div>
+            </div>
+            <div class="rp-nav-links">
+              <span>Services</span>
+              <span>About</span>
+              <span>Reviews</span>
+              <span class="rp-nav-cta">Book now →</span>
+            </div>
+          </div>
+
+          <!-- Hero -->
+          <div class="rp-hero">
+            <div class="rp-breadcrumb">
+              <a>Home</a> / <a>Testimonials</a> / Migraine treatment
+            </div>
+            <div class="rp-hero-eyebrow">What patients say about</div>
+            <h1 class="rp-hero-title">Migraine treatment at <em>Dr. Huang Acupuncture</em>.</h1>
+            <p class="rp-hero-lead">Patients across the New York metro have come to Dr. Huang Acupuncture for chronic migraines and walked out sleeping through the night again. <strong>The pattern is consistent</strong>: thorough consultations, individualized treatment plans, and patients reporting meaningful relief within three to five sessions. Below are real reviews from real patients, in their own words.</p>
+
+            <div class="rp-aggregate-row">
+              <div class="rp-agg-item">
+                <div class="rp-agg-num"><span class="stars">★★★★★</span> 4.9</div>
+                <div class="rp-agg-label">Average rating</div>
+              </div>
+              <div class="rp-agg-divider"></div>
+              <div class="rp-agg-item">
+                <div class="rp-agg-num gold">38</div>
+                <div class="rp-agg-label">Patients mentioned migraines</div>
+              </div>
+              <div class="rp-agg-divider"></div>
+              <div class="rp-agg-item">
+                <div class="rp-agg-num">3–5</div>
+                <div class="rp-agg-label">Sessions to relief (typical)</div>
+              </div>
+              <div class="rp-agg-divider"></div>
+              <div class="rp-agg-item">
+                <div class="rp-agg-num">187</div>
+                <div class="rp-agg-label">Verified Google reviews</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews grid -->
+          <div class="rp-reviews-section">
+            <h2 class="rp-section-title">Patient stories</h2>
+            <p class="rp-section-sub">Eight real reviews from patients who mentioned migraines, displayed in their original language.</p>
+
+            <div class="rp-reviews-grid">
+              <div class="rp-review-card">
+                <div class="rp-review-stars">★★★★★</div>
+                <p class="rp-review-text">"Came in for chronic migraines that nothing else had helped. After three sessions with Dr. Huang, I'm sleeping through the night again. She takes her time and explains everything."</p>
+                <div class="rp-review-meta">
+                  <div class="rp-review-avatar">MD</div>
+                  <div>
+                    <div class="rp-review-author">Marcus D.</div>
+                    <div class="rp-review-source">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.35 11.1H12v3.8h5.35c-.55 2.4-2.65 4.1-5.35 4.1-3.25 0-5.9-2.65-5.9-5.9s2.65-5.9 5.9-5.9c1.6 0 3.05.6 4.1 1.6L18.7 6c-1.8-1.65-4.1-2.7-6.7-2.7C7 3.3 3 7.3 3 12.3s4 9 9 9c5.2 0 8.65-3.65 8.65-8.8 0-.6-.05-1.05-.15-1.45z"/></svg>
+                      Google · Mar 12
+                    </div>
+                  </div>
+                  <span class="rp-lang-tag en">EN</span>
+                </div>
+              </div>
+
+              <div class="rp-review-card">
+                <div class="rp-review-stars">★★★★★</div>
+                <p class="rp-review-text">"因为长期偏头痛来的，之前试过的方法都没什么用。在黄医生这里做了三次治疗，晚上终于能睡整觉了。她很有耐心。"</p>
+                <div class="rp-review-meta">
+                  <div class="rp-review-avatar">SL</div>
+                  <div>
+                    <div class="rp-review-author">Sarah L.</div>
+                    <div class="rp-review-source">Google · Apr 8</div>
+                  </div>
+                  <span class="rp-lang-tag zh">中文</span>
+                </div>
+              </div>
+
+              <div class="rp-review-card">
+                <div class="rp-review-stars">★★★★★</div>
+                <p class="rp-review-text">"Después de cinco sesiones, mis migrañas crónicas casi desaparecieron. La Dra. Huang se toma el tiempo para entender lo que pasa antes de tratar."</p>
+                <div class="rp-review-meta">
+                  <div class="rp-review-avatar">ER</div>
+                  <div>
+                    <div class="rp-review-author">Elena R.</div>
+                    <div class="rp-review-source">Google · Mar 22</div>
+                  </div>
+                  <span class="rp-lang-tag es">ES</span>
+                </div>
+              </div>
+
+              <div class="rp-review-card">
+                <div class="rp-review-stars">★★★★★</div>
+                <p class="rp-review-text">"I had been dealing with hormonal migraines for years. Within four sessions I noticed a real difference. Dr. Huang is methodical and thorough."</p>
+                <div class="rp-review-meta">
+                  <div class="rp-review-avatar">PR</div>
+                  <div>
+                    <div class="rp-review-author">Priya R.</div>
+                    <div class="rp-review-source">Google · Feb 14</div>
+                  </div>
+                  <span class="rp-lang-tag en">EN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTA -->
+          <div class="rp-cta-section">
+            <div class="rp-cta-card">
+              <div>
+                <h2 class="rp-cta-title">Ready to <em>schedule</em> a migraine consultation?</h2>
+                <div class="rp-cta-sub">First-time patients get a full intake plus treatment, about 75 minutes. Both English and 中文 are welcome.</div>
+                <a class="rp-cta-btn">
+                  Book online →
+                </a>
+                <div class="rp-cta-meta"><strong>187 verified reviews</strong> · 4.9 average · most-trusted bilingual TCM in Flushing</div>
+              </div>
+              <div class="rp-cta-right">
+                <div class="rp-cta-info-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                  136-21 Roosevelt Ave, Flushing NY
+                </div>
+                <div class="rp-cta-info-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493"/></svg>
+                  (929) 555-2891
+                </div>
+                <div class="rp-cta-info-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  Mon–Sat · 9am–7pm
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FAQ -->
+          <div class="rp-faq-section">
+            <h2 class="rp-section-title">Common questions</h2>
+            <p class="rp-section-sub">Pulled from what patients have actually asked, in their own reviews and consultations.</p>
+
+            <div class="rp-faq-list">
+              <div class="rp-faq-item">
+                <div class="rp-faq-q">
+                  How many sessions before patients see migraine relief?
+                  <span class="rp-faq-toggle">−</span>
+                </div>
+                <div class="rp-faq-a">Most patients in these reviews mention noticeable relief within 3–5 sessions. Individual results vary based on chronicity, triggers, and overall health. Dr. Huang will discuss expected timelines during your first consultation.</div>
+              </div>
+              <div class="rp-faq-item">
+                <div class="rp-faq-q">
+                  Are consultations available in Chinese?
+                  <span class="rp-faq-toggle">+</span>
+                </div>
+              </div>
+              <div class="rp-faq-item">
+                <div class="rp-faq-q">
+                  Does Dr. Huang accept insurance?
+                  <span class="rp-faq-toggle">+</span>
+                </div>
+              </div>
+              <div class="rp-faq-item">
+                <div class="rp-faq-q">
+                  What should I expect at a first visit?
+                  <span class="rp-faq-toggle">+</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

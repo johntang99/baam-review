@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Studio — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88847;
+  --gold-soft: #E8D9B5;
+  --clinic-primary: #962D22;
+  --clinic-primary-dark: #6F1F18;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --success: #2D7A5F;
+  --youtube: #FF0000;
+  --tiktok: #000000;
+  --xhs: #FF2741;
+  --gbp: #4285F4;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 28px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif; color: var(--text); background: var(--cream); font-size: 14.5px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+aside { background: var(--ink); color: var(--cream); padding: 24px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 24px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; }
+.brand-mark { width: 28px; height: 28px; background: var(--gold); color: var(--ink); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+.location-switcher { background: rgba(250, 247, 242, 0.06); border: 1px solid rgba(250, 247, 242, 0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+.location-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #C0392B, #962D22); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.location-name { font-size: 13.5px; font-weight: 500; color: var(--cream); }
+.location-sub { font-size: 11.5px; color: rgba(250, 247, 242, 0.55); }
+.nav-label { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250, 247, 242, 0.4); padding: 0 8px 8px; margin-top: 8px; font-weight: 500; }
+.nav-list { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.nav-list a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; color: rgba(250, 247, 242, 0.7); transition: all 0.15s; }
+.nav-list a:hover { background: rgba(250, 247, 242, 0.06); color: var(--cream); }
+.nav-list a.active { background: rgba(201, 169, 97, 0.12); color: var(--gold); }
+.nav-list a svg { width: 16px; height: 16px; flex-shrink: 0; }
+.user-card { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; }
+.user-avatar { width: 32px; height: 32px; background: var(--sage); color: var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+.user-tier { font-size: 11px; color: rgba(250, 247, 242, 0.5); }
+
+/* MAIN */
+main { padding: 32px 40px 60px; max-width: 1400px; }
+.page-header { margin-bottom: 32px; }
+.page-eyebrow { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+.page-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 52px; letter-spacing: -0.025em; color: var(--ink); line-height: 1.02; margin-bottom: 14px; }
+.page-title em { font-style: italic; color: var(--forest); }
+.page-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 19px; color: var(--text-soft); max-width: 760px; line-height: 1.5; }
+
+/* HERO STRIP */
+.hero-strip { display: grid; grid-template-columns: 1fr auto; gap: 40px; padding: 32px 36px; background: linear-gradient(135deg, var(--ink) 0%, #1B2E27 100%); color: var(--cream); border-radius: 22px; margin-bottom: 36px; align-items: center; position: relative; overflow: hidden; }
+.hero-strip::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 85% 30%, rgba(201, 169, 97, 0.16), transparent 50%); }
+.hero-strip > * { position: relative; z-index: 1; }
+.hero-left h2 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 30px; line-height: 1.15; letter-spacing: -0.02em; color: var(--cream); margin-bottom: 8px; }
+.hero-left h2 em { font-style: italic; color: var(--gold); }
+.hero-left p { font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: rgba(250, 247, 242, 0.78); max-width: 460px; line-height: 1.5; }
+.hero-platforms-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+.platform-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; background: rgba(250, 247, 242, 0.1); border: 1px solid rgba(250, 247, 242, 0.15); border-radius: 999px; font-size: 12px; color: var(--cream); font-weight: 500; }
+.platform-mark { width: 18px; height: 18px; background: white; color: var(--ink); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; }
+.hero-right { text-align: center; padding-left: 36px; border-left: 1px solid rgba(250, 247, 242, 0.15); }
+.hero-stat-num { font-family: 'Fraunces', serif; font-weight: 400; font-size: 60px; letter-spacing: -0.03em; color: var(--gold); line-height: 1; }
+.hero-stat-label { font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(250, 247, 242, 0.7); margin-top: 8px; font-weight: 500; }
+.hero-stat-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 13px; color: rgba(250, 247, 242, 0.55); margin-top: 8px; max-width: 180px; }
+
+/* TWO-COLUMN: SET LIST + PREVIEW */
+.studio-layout { display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: start; }
+
+/* LEFT — VIDEO SETS LIST */
+.sets-col { display: flex; flex-direction: column; gap: 12px; }
+.sets-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.sets-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; color: var(--ink); letter-spacing: -0.01em; }
+.sets-count { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+.set-card { background: var(--paper); border: 1px solid var(--border); border-radius: 14px; padding: 16px; cursor: pointer; transition: all 0.18s; position: relative; }
+.set-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--forest); }
+.set-card.active { border-color: var(--forest); background: var(--cream-deep); box-shadow: var(--shadow-md); }
+.set-card.active::before { content: ''; position: absolute; left: -1px; top: 12px; bottom: 12px; width: 3px; background: var(--gold); border-radius: 0 3px 3px 0; }
+
+.set-thumb { position: relative; width: 100%; aspect-ratio: 16 / 9; background: linear-gradient(135deg, var(--clinic-primary), var(--clinic-primary-dark)); border-radius: 9px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Fraunces', serif; font-style: italic; font-size: 13px; text-align: center; padding: 14px; line-height: 1.3; overflow: hidden; }
+.set-thumb-2 { background: linear-gradient(135deg, #2A6B57, #163A30); }
+.set-thumb-3 { background: linear-gradient(135deg, #A88847, #8B6F39); }
+.set-thumb::before { content: ''; position: absolute; top: -30%; right: -20%; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 65%); }
+.set-thumb-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.25); opacity: 0; transition: opacity 0.2s; }
+.set-card:hover .set-thumb-play { opacity: 1; }
+.set-thumb-play-btn { width: 44px; height: 44px; background: rgba(255, 255, 255, 0.92); color: var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.set-thumb-play-btn svg { width: 20px; height: 20px; margin-left: 2px; }
+
+.set-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.set-stars { color: var(--gold); font-size: 12px; letter-spacing: 1.5px; }
+.set-status { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+.set-status.ready { background: rgba(201, 169, 97, 0.2); color: var(--gold-dark); }
+.set-status.partial { background: rgba(135, 168, 153, 0.25); color: var(--forest); }
+.set-author { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+.set-quote { font-family: 'Newsreader', serif; font-style: italic; font-size: 12.5px; color: var(--text-soft); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px; }
+
+.set-formats { display: flex; gap: 4px; align-items: center; }
+.set-format-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); opacity: 0.85; }
+.set-format-dot.posted { background: var(--success); opacity: 1; }
+.set-format-dot.pending { background: var(--border); opacity: 1; }
+.set-format-label { font-size: 11px; color: var(--text-muted); margin-left: 6px; }
+
+/* RIGHT — PREVIEW DETAIL */
+.preview-detail { background: var(--paper); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+
+.detail-header { padding: 22px 28px 18px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.detail-source { display: flex; align-items: center; gap: 14px; }
+.detail-source-avatar { width: 44px; height: 44px; background: var(--sage); color: var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.detail-source-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; color: var(--ink); letter-spacing: -0.01em; }
+.detail-source-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
+.detail-source-meta span { margin: 0 4px; }
+.detail-actions { display: flex; gap: 8px; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; font-family: 'Onest', sans-serif; font-size: 13px; font-weight: 500; border-radius: 9px; border: 1px solid var(--border); background: var(--paper); color: var(--text); cursor: pointer; transition: all 0.15s; }
+.btn:hover { background: var(--cream-deep); }
+.btn-primary { background: var(--forest); color: var(--cream); border-color: var(--forest); }
+.btn-primary:hover { background: var(--forest-dark); color: var(--cream); }
+.btn svg { width: 14px; height: 14px; }
+
+/* FORMAT TABS */
+.format-tabs { padding: 16px 28px 0; display: flex; gap: 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.fmt-tab { display: flex; align-items: center; gap: 8px; padding: 11px 14px; background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: 'Onest', sans-serif; font-size: 12.5px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: color 0.15s; white-space: nowrap; }
+.fmt-tab:hover { color: var(--text); }
+.fmt-tab.active { color: var(--ink); border-bottom-color: var(--forest); }
+.fmt-tab .fmt-icon { display: inline-flex; border: 1.5px solid currentColor; border-radius: 2px; flex-shrink: 0; }
+.fmt-icon-vertical { width: 8px; height: 14px; }
+.fmt-icon-vertical-tall { width: 9px; height: 16px; }
+.fmt-icon-landscape { width: 16px; height: 9px; }
+.fmt-icon-landscape-short { width: 18px; height: 7px; }
+.fmt-icon-square { width: 12px; height: 12px; }
+.fmt-icon-square-small { width: 9px; height: 9px; }
+.fmt-tab .fmt-spec { font-family: 'JetBrains Mono', monospace; font-size: 10px; opacity: 0.55; }
+
+/* PREVIEW CONTENT */
+.preview-content { padding: 28px; display: grid; grid-template-columns: minmax(260px, 1fr) minmax(380px, 1.4fr); gap: 32px; align-items: start; }
+
+/* VIDEO PLAYER */
+.video-stage { background: var(--cream-deep); border-radius: 16px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; }
+.video-frame-meta { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 18px; font-weight: 500; text-align: center; }
+.video-frame-meta strong { color: var(--ink); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+.video-frame { width: 240px; aspect-ratio: 9 / 16; background: linear-gradient(160deg, var(--clinic-primary) 0%, var(--clinic-primary-dark) 100%); border-radius: 18px; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(150, 45, 34, 0.3), 0 10px 24px rgba(15, 31, 26, 0.15); }
+.video-frame::before { content: ''; position: absolute; top: -30%; right: -30%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 65%); }
+.video-clinic-tag { position: absolute; top: 18px; left: 16px; display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(8px); border-radius: 999px; font-size: 9.5px; color: white; font-weight: 500; letter-spacing: 0.06em; }
+.video-clinic-tag-mark { width: 14px; height: 14px; background: white; color: var(--clinic-primary); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 600; font-size: 10px; }
+
+.video-quote { position: absolute; top: 50%; left: 24px; right: 24px; transform: translateY(-50%); font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: 17px; color: white; line-height: 1.3; text-align: center; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+.video-quote-stars { color: var(--gold-soft); font-size: 13px; letter-spacing: 2px; margin-bottom: 14px; display: block; }
+.video-quote-attribution { font-family: 'Onest', sans-serif; font-style: normal; font-size: 10.5px; font-weight: 500; color: rgba(255, 255, 255, 0.85); margin-top: 14px; letter-spacing: 0.04em; }
+
+.video-cta-area { position: absolute; bottom: 18px; left: 16px; right: 16px; text-align: center; }
+.video-cta-clinic { font-family: 'Fraunces', serif; font-weight: 500; font-size: 13px; color: white; margin-bottom: 4px; }
+.video-cta-action { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; background: white; color: var(--clinic-primary); border-radius: 999px; font-size: 10px; font-weight: 600; margin-top: 6px; }
+
+.video-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255, 255, 255, 0.2); }
+.video-progress-bar { height: 100%; width: 32%; background: var(--gold); }
+
+.video-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; width: 100%; font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.video-control-btns { display: flex; gap: 6px; }
+.vc-btn { width: 30px; height: 30px; background: var(--paper); border: 1px solid var(--border); border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-soft); cursor: pointer; }
+.vc-btn:hover { color: var(--ink); border-color: var(--ink); }
+.vc-btn svg { width: 13px; height: 13px; }
+
+/* CAPTION SECTION */
+.caption-section h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 6px; }
+.caption-section .section-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 13.5px; color: var(--text-soft); margin-bottom: 20px; }
+
+.caption-platform-strip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: var(--cream-deep); border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 16px; }
+.platform-icon-pill { width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.platform-icon-pill.yt { background: var(--youtube); }
+.platform-icon-pill.tt { background: var(--tiktok); }
+.platform-icon-pill.ig { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); }
+.platform-icon-pill.xhs { background: var(--xhs); }
+.platform-icon-pill.gbp { background: var(--gbp); }
+.platform-icon-pill.dl { background: var(--ink); }
+
+.caption-box { background: var(--cream); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+.caption-text { font-size: 14px; color: var(--text); line-height: 1.6; white-space: pre-wrap; margin-bottom: 14px; }
+.caption-text strong { font-weight: 600; }
+.caption-hashtags { display: flex; flex-wrap: wrap; gap: 6px; }
+.caption-hashtag { font-size: 12px; color: var(--forest); font-weight: 500; }
+.caption-meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-soft); font-size: 11.5px; color: var(--text-muted); }
+.caption-char-count { font-family: 'JetBrains Mono', monospace; }
+.caption-char-count strong { color: var(--ink); font-weight: 500; }
+.caption-edit { color: var(--forest); font-weight: 500; font-size: 12px; cursor: pointer; }
+
+/* DISTRIBUTION */
+.distribute-section { margin-top: 22px; }
+.distribute-label { font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-bottom: 12px; }
+.distribute-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dist-btn { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--paper); border: 1px solid var(--border); border-radius: 10px; font-family: 'Onest', sans-serif; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.15s; text-align: left; }
+.dist-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--forest); }
+.dist-btn.posted { background: rgba(45, 122, 95, 0.06); border-color: rgba(45, 122, 95, 0.25); }
+.dist-btn.native { background: rgba(66, 133, 244, 0.04); border-color: rgba(66, 133, 244, 0.25); }
+.dist-btn-text { flex: 1; min-width: 0; line-height: 1.2; }
+.dist-btn-name { font-weight: 500; color: var(--ink); }
+.dist-btn-status { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.dist-btn.posted .dist-btn-status { color: var(--success); font-weight: 500; }
+.dist-btn.native .dist-btn-status { color: var(--gbp); font-weight: 500; }
+.dist-btn-arrow { color: var(--text-muted); flex-shrink: 0; }
+.dist-btn.posted .dist-btn-arrow { color: var(--success); }
+.dist-btn-arrow svg { width: 12px; height: 12px; }
+.native-badge { display: inline-block; font-size: 9px; padding: 1px 5px; background: var(--gbp); color: white; border-radius: 4px; letter-spacing: 0.04em; font-weight: 600; margin-left: 4px; vertical-align: 1px; }
+
+/* RENDER COST FOOTER */
+.render-footer { margin: 0 28px 28px; padding: 14px 18px; background: var(--cream-deep); border-radius: 10px; font-size: 12px; color: var(--text-soft); display: flex; justify-content: space-between; align-items: center; }
+.render-footer-left { display: flex; gap: 24px; }
+.render-footer-item { display: flex; align-items: center; gap: 6px; }
+.render-footer-item svg { width: 13px; height: 13px; color: var(--text-muted); }
+.render-footer strong { color: var(--ink); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+.render-credits { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--paper); border: 1px solid var(--border); border-radius: 999px; font-size: 11.5px; color: var(--text); }
+.render-credits strong { color: var(--gold-dark); }
+
+@media (max-width: 1280px) {
+  .preview-content { grid-template-columns: 1fr; }
+}
+@media (max-width: 1100px) {
+  .studio-layout { grid-template-columns: 1fr; }
+  .hero-strip { grid-template-columns: 1fr; gap: 24px; }
+  .hero-right { padding-left: 0; border-left: none; padding-top: 20px; border-top: 1px solid rgba(250,247,242,0.15); }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  aside { display: none; }
+  main { padding: 20px 18px; }
+  .page-title { font-size: 36px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside>
+    <div class="brand"><span class="brand-mark">B</span> BAAM Review</div>
+    <div class="location-switcher">
+      <div class="location-icon">黄</div>
+      <div>
+        <div class="location-name">Dr. Huang Acupuncture</div>
+        <div class="location-sub">Flushing, NY · Growth</div>
+      </div>
+    </div>
+    <div class="nav-label">Workspace</div>
+    <ul class="nav-list">
+      <li><a href="03-admin-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3"/></svg> Dashboard</a></li>
+      <li><a href="04-admin-send-request.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg> Send request</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28"/></svg> Reviews</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> AI Replies</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857"/></svg> Referrals</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1h14"/></svg> Distribute</a></li>
+    </ul>
+    <div class="nav-label">Compound</div>
+    <ul class="nav-list">
+      <li><a href="09-admin-themes-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846"/></svg> Themes</a></li>
+      <li><a href="10-admin-ad-copy-generator.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14"/></svg> Ad Copy</a></li>
+      <li><a href="11-admin-testimonial-pages.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4"/></svg> Landing Pages</a></li>
+      <li><a href="#" class="active"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Review Studio</a></li>
+    </ul>
+    <div class="user-card">
+      <div class="user-avatar">JC</div>
+      <div>
+        <div class="user-name">John Chen</div>
+        <div class="user-tier">Growth · Founding member</div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="page-header">
+      <div class="page-eyebrow">Stage 7 · Compound · Review Studio</div>
+      <h1 class="page-title">One review. <em>Six formats.</em><br>Six places to post.</h1>
+      <p class="page-sub">Every video set renders in six platform-native formats simultaneously — YouTube Shorts, TikTok, Instagram Reels, Xiaohongshu, GBP video posts, and your website. Same review. Same brand. Six places.</p>
+    </div>
+
+    <!-- HERO STRIP -->
+    <div class="hero-strip">
+      <div class="hero-left">
+        <h2>One source review becomes <em>six pieces of content.</em></h2>
+        <p>Each platform gets the format, length, and caption convention it expects. You review once, download once, post six times.</p>
+        <div class="hero-platforms-row">
+          <span class="platform-chip"><span class="platform-mark" style="background: #FF0000; color: white;">YT</span>YouTube Shorts</span>
+          <span class="platform-chip"><span class="platform-mark" style="background: #FF0000; color: white;">YT</span>YouTube long-form</span>
+          <span class="platform-chip"><span class="platform-mark" style="background: black; color: white;">TT</span>TikTok</span>
+          <span class="platform-chip"><span class="platform-mark" style="background: linear-gradient(135deg, #833AB4, #FD1D1D); color: white;">IG</span>Instagram</span>
+          <span class="platform-chip"><span class="platform-mark" style="background: #FF2741; color: white;">小</span>Xiaohongshu</span>
+          <span class="platform-chip"><span class="platform-mark" style="background: #4285F4; color: white;">G</span>GBP Post</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-stat-num">6</div>
+        <div class="hero-stat-label">Platforms covered</div>
+        <div class="hero-stat-sub">from one source review</div>
+      </div>
+    </div>
+
+    <!-- STUDIO LAYOUT -->
+    <div class="studio-layout">
+
+      <!-- LEFT: VIDEO SETS LIST -->
+      <div class="sets-col">
+        <div class="sets-header">
+          <h3 class="sets-title">Ready for review</h3>
+          <span class="sets-count">3 sets</span>
+        </div>
+
+        <!-- Set 1 - ACTIVE -->
+        <div class="set-card active">
+          <div class="set-thumb">
+            <div>Came in for chronic migraines and after three sessions...</div>
+            <div class="set-thumb-play"><div class="set-thumb-play-btn"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+          </div>
+          <div class="set-meta-row">
+            <span class="set-stars">★★★★★</span>
+            <span class="set-status ready">Ready</span>
+          </div>
+          <div class="set-author">Marcus Davis · EN</div>
+          <div class="set-quote">"Came in for chronic migraines and after three sessions I'm sleeping through the night again."</div>
+          <div class="set-formats">
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-label">6 formats ready</span>
+          </div>
+        </div>
+
+        <!-- Set 2 -->
+        <div class="set-card">
+          <div class="set-thumb set-thumb-2">
+            <div>因为偏头痛来的，三次治疗后晚上终于能睡整觉了</div>
+            <div class="set-thumb-play"><div class="set-thumb-play-btn"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+          </div>
+          <div class="set-meta-row">
+            <span class="set-stars">★★★★★</span>
+            <span class="set-status ready">Ready</span>
+          </div>
+          <div class="set-author">Sarah Liu · 中文</div>
+          <div class="set-quote">"因为偏头痛来的，三次治疗后晚上终于能睡整觉了。黄医生很有耐心。"</div>
+          <div class="set-formats">
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-dot"></span>
+            <span class="set-format-label">6 formats ready</span>
+          </div>
+        </div>
+
+        <!-- Set 3 -->
+        <div class="set-card">
+          <div class="set-thumb set-thumb-3">
+            <div>Después de cinco sesiones mis migrañas crónicas...</div>
+            <div class="set-thumb-play"><div class="set-thumb-play-btn"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+          </div>
+          <div class="set-meta-row">
+            <span class="set-stars">★★★★★</span>
+            <span class="set-status partial">3 / 6 posted</span>
+          </div>
+          <div class="set-author">Elena Ramírez · ES</div>
+          <div class="set-quote">"Después de cinco sesiones, mis migrañas crónicas casi desaparecieron."</div>
+          <div class="set-formats">
+            <span class="set-format-dot posted"></span>
+            <span class="set-format-dot posted"></span>
+            <span class="set-format-dot posted"></span>
+            <span class="set-format-dot pending"></span>
+            <span class="set-format-dot pending"></span>
+            <span class="set-format-dot pending"></span>
+            <span class="set-format-label">3 posted · 3 pending</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: DETAIL PREVIEW -->
+      <div class="preview-detail">
+
+        <!-- DETAIL HEADER -->
+        <div class="detail-header">
+          <div class="detail-source">
+            <div class="detail-source-avatar">MD</div>
+            <div>
+              <div class="detail-source-name">Marcus Davis · 5★</div>
+              <div class="detail-source-meta">
+                <span>Posted Mar 12</span>·
+                <span>Theme: Migraine relief</span>·
+                <span>Style: Editorial Quote</span>·
+                <span>EN</span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Re-render
+            </button>
+            <button class="btn btn-primary">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+              Approve all 6
+            </button>
+          </div>
+        </div>
+
+        <!-- FORMAT TABS -->
+        <div class="format-tabs">
+          <button class="fmt-tab active">
+            <span class="fmt-icon fmt-icon-vertical"></span>
+            Vertical Short
+            <span class="fmt-spec">9:16 · 15s</span>
+          </button>
+          <button class="fmt-tab">
+            <span class="fmt-icon fmt-icon-vertical-tall"></span>
+            Vertical Long
+            <span class="fmt-spec">9:16 · 45s</span>
+          </button>
+          <button class="fmt-tab">
+            <span class="fmt-icon fmt-icon-landscape"></span>
+            Landscape Hero
+            <span class="fmt-spec">16:9 · 75s</span>
+          </button>
+          <button class="fmt-tab">
+            <span class="fmt-icon fmt-icon-landscape-short"></span>
+            Landscape Loop
+            <span class="fmt-spec">16:9 · 10s</span>
+          </button>
+          <button class="fmt-tab">
+            <span class="fmt-icon fmt-icon-square"></span>
+            Square GBP
+            <span class="fmt-spec">1:1 · 30s</span>
+          </button>
+          <button class="fmt-tab">
+            <span class="fmt-icon fmt-icon-square-small"></span>
+            Square Mini
+            <span class="fmt-spec">1:1 · 7s</span>
+          </button>
+        </div>
+
+        <!-- PREVIEW CONTENT -->
+        <div class="preview-content">
+
+          <!-- LEFT: Video preview -->
+          <div class="video-stage">
+            <div class="video-frame-meta">
+              <strong>1080 × 1920</strong> · 15 seconds · MP4
+            </div>
+            <div class="video-frame">
+              <div class="video-clinic-tag">
+                <span class="video-clinic-tag-mark">黄</span>
+                <span>Dr. Huang · Flushing</span>
+              </div>
+              <div class="video-quote">
+                <span class="video-quote-stars">★★★★★</span>
+                "Sleeping through the night again."
+                <div class="video-quote-attribution">— MARCUS D., MIGRAINE PATIENT</div>
+              </div>
+              <div class="video-cta-area">
+                <div class="video-cta-clinic">Dr. Huang Acupuncture</div>
+                <div class="video-cta-action">
+                  <svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  Book online
+                </div>
+              </div>
+              <div class="video-progress"><div class="video-progress-bar"></div></div>
+            </div>
+            <div class="video-controls">
+              <span>00:04 / 00:15</span>
+              <div class="video-control-btns">
+                <button class="vc-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg></button>
+                <button class="vc-btn"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zM10 6h2v12h-2z"/></svg></button>
+                <button class="vc-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg></button>
+              </div>
+              <span>1080×1920</span>
+            </div>
+          </div>
+
+          <!-- RIGHT: Caption + distribution -->
+          <div class="caption-section">
+            <h3>Caption for this format</h3>
+            <div class="section-sub">Each platform gets its own caption — same story, different vibe.</div>
+
+            <div class="caption-platform-strip">
+              <span class="platform-icon-pill tt">TT</span>
+              <span>TikTok · 15-second vertical format</span>
+            </div>
+
+            <div class="caption-box">
+              <div class="caption-text">POV: chronic migraines, you've tried everything, then you find <strong>Dr. Huang</strong>.
+
+3 sessions in and I'm sleeping through the night again 🌙
+The patience and care here is unreal.</div>
+              <div class="caption-hashtags">
+                <span class="caption-hashtag">#migrainerelief</span>
+                <span class="caption-hashtag">#tcm</span>
+                <span class="caption-hashtag">#acupuncture</span>
+                <span class="caption-hashtag">#flushingny</span>
+                <span class="caption-hashtag">#nycwellness</span>
+              </div>
+              <div class="caption-meta-row">
+                <span class="caption-char-count"><strong>146</strong> / 150 chars</span>
+                <a class="caption-edit">Edit caption →</a>
+              </div>
+            </div>
+
+            <!-- DISTRIBUTION -->
+            <div class="distribute-section">
+              <div class="distribute-label">Distribute this format</div>
+              <div class="distribute-grid">
+
+                <button class="dist-btn">
+                  <span class="platform-icon-pill tt">TT</span>
+                  <div class="dist-btn-text">
+                    <div class="dist-btn-name">Post to TikTok</div>
+                    <div class="dist-btn-status">Opens composer</div>
+                  </div>
+                  <span class="dist-btn-arrow"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></span>
+                </button>
+
+                <button class="dist-btn posted">
+                  <span class="platform-icon-pill yt">YT</span>
+                  <div class="dist-btn-text">
+                    <div class="dist-btn-name">YouTube Shorts</div>
+                    <div class="dist-btn-status">✓ Posted Apr 8</div>
+                  </div>
+                  <span class="dist-btn-arrow"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></span>
+                </button>
+
+                <button class="dist-btn">
+                  <span class="platform-icon-pill ig">IG</span>
+                  <div class="dist-btn-text">
+                    <div class="dist-btn-name">Instagram Reels</div>
+                    <div class="dist-btn-status">Share via app</div>
+                  </div>
+                  <span class="dist-btn-arrow"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></span>
+                </button>
+
+                <button class="dist-btn">
+                  <span class="platform-icon-pill xhs">小</span>
+                  <div class="dist-btn-text">
+                    <div class="dist-btn-name">Xiaohongshu</div>
+                    <div class="dist-btn-status">Opens composer</div>
+                  </div>
+                  <span class="dist-btn-arrow"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></span>
+                </button>
+
+                <button class="dist-btn native">
+                  <span class="platform-icon-pill gbp">G</span>
+                  <div class="dist-btn-text">
+                    <div class="dist-btn-name">GBP Post <span class="native-badge">NATIVE</span></div>
+                    <div class="dist-btn-status">One-click via Google API</div>
+                  </div>
+                  <span class="dist-btn-arrow"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+                </button>
+
+                <button class="dist-btn">
+                  <span class="platform-icon-pill dl">↓</span>
+                  <div class="dist-btn-text">
+                    <div class="dist-btn-name">Download MP4</div>
+                    <div class="dist-btn-status">12.4 MB · 1080×1920</div>
+                  </div>
+                  <span class="dist-btn-arrow"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg></span>
+                </button>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RENDER FOOTER -->
+        <div class="render-footer">
+          <div class="render-footer-left">
+            <div class="render-footer-item">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Rendered in <strong>2m 14s</strong>
+            </div>
+            <div class="render-footer-item">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              Cost <strong>$0.40</strong>
+            </div>
+            <div class="render-footer-item">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-3 3.5 3 3.5-3 3.5 3z"/></svg>
+              Style <strong>Editorial Quote</strong>
+            </div>
+          </div>
+          <span class="render-credits">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+            <strong>1</strong> video set this month · 1 included in Growth
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

@@ -24,7 +24,9 @@
   --color-warn: #D4924A;
 
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
   --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 html,

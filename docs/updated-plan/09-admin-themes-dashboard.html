@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Themes — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --forest-light: #2A6B57;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88847;
+  --gold-soft: #E8D9B5;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --success: #2D7A5F;
+  --alert: #B5443A;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 28px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream);
+  font-size: 14.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+/* SIDEBAR (matches dashboard v2.0) */
+aside { background: var(--ink); color: var(--cream); padding: 24px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 24px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; letter-spacing: -0.01em; }
+.brand-mark { width: 28px; height: 28px; background: var(--gold); color: var(--ink); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+.location-switcher { background: rgba(250, 247, 242, 0.06); border: 1px solid rgba(250, 247, 242, 0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.location-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #C0392B, #962D22); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.location-text { flex: 1; min-width: 0; }
+.location-name { font-size: 13.5px; font-weight: 500; color: var(--cream); }
+.location-sub { font-size: 11.5px; color: rgba(250, 247, 242, 0.55); }
+.nav-label { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250, 247, 242, 0.4); padding: 0 8px 8px; margin-top: 8px; font-weight: 500; }
+.nav-list { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.nav-list a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; color: rgba(250, 247, 242, 0.7); transition: all 0.15s; }
+.nav-list a:hover { background: rgba(250, 247, 242, 0.06); color: var(--cream); }
+.nav-list a.active { background: rgba(201, 169, 97, 0.12); color: var(--gold); }
+.nav-list a svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-list a .badges { margin-left: auto; display: flex; gap: 4px; }
+.nav-badge { font-size: 10px; padding: 1px 6px; border-radius: 999px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.nav-badge.warn { background: var(--gold); color: var(--ink); }
+.nav-badge.new { background: rgba(45, 122, 95, 0.85); color: var(--cream); font-family: 'Onest', sans-serif; font-size: 9.5px; letter-spacing: 0.05em; }
+.user-card { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; }
+.user-avatar { width: 32px; height: 32px; background: var(--sage); color: var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+.user-tier { font-size: 11px; color: rgba(250, 247, 242, 0.5); }
+
+/* MAIN */
+main { padding: 32px 40px 60px; max-width: 1280px; }
+
+.page-header { margin-bottom: 40px; }
+.page-eyebrow { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 48px;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  line-height: 1.05;
+  margin-bottom: 12px;
+}
+.page-title em { font-style: italic; color: var(--forest); }
+.page-sub {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--text-soft);
+  max-width: 640px;
+  line-height: 1.5;
+}
+.page-sub .update-time { color: var(--ink); font-style: normal; font-weight: 500; }
+
+/* SORT PILLS */
+.sort-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.sort-label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.sort-pills { display: flex; gap: 8px; }
+.sort-pill {
+  padding: 7px 14px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sort-pill:hover { border-color: var(--forest); }
+.sort-pill.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+.stats-strip {
+  display: flex;
+  gap: 32px;
+  padding: 20px 28px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 32px;
+}
+.stat-mini { flex: 1; }
+.stat-mini-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-mini-num .delta { font-size: 13px; color: var(--success); margin-left: 6px; font-family: 'Onest', sans-serif; font-weight: 500; }
+.stat-mini-num.gold { color: var(--gold); }
+.stat-mini-label {
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.stat-mini-divider { width: 1px; background: var(--border); margin: 0; }
+
+/* THEMES GRID */
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 50px;
+}
+.theme-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 26px 28px 22px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+.theme-card:nth-child(2n) {
+  background: var(--cream-deep);
+}
+.theme-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--forest);
+}
+
+.theme-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+.theme-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(45, 122, 95, 0.1);
+  color: var(--success);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Onest', sans-serif;
+  flex-shrink: 0;
+}
+.theme-trend.down { background: rgba(181, 68, 58, 0.1); color: var(--alert); }
+.theme-trend.flat { background: var(--cream-deep); color: var(--text-muted); }
+.theme-trend svg { width: 11px; height: 11px; }
+.theme-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  line-height: 1.15;
+}
+.theme-context {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.theme-context strong { color: var(--ink); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+.theme-quotes {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 18px;
+  background: var(--cream);
+  border-radius: 12px;
+}
+.theme-card:nth-child(2n) .theme-quotes { background: var(--paper); }
+.theme-quote { display: flex; gap: 12px; }
+.theme-quote-mark {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 36px;
+  color: var(--gold);
+  line-height: 0.7;
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+.theme-quote-body { flex: 1; }
+.theme-quote-text {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.theme-quote-meta {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.theme-quote-stars { color: var(--gold); letter-spacing: 1.5px; font-size: 10.5px; }
+.lang-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.lang-tag.en { background: #E5EDDF; color: var(--forest); }
+.lang-tag.zh { background: #F8E5E1; color: #8B3A2A; }
+.lang-tag.es { background: #FBEAD3; color: #A06820; }
+
+.theme-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.theme-action {
+  padding: 10px 8px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Onest', sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  text-align: center;
+  line-height: 1.2;
+}
+.theme-card:nth-child(2n) .theme-action { background: var(--paper); }
+.theme-action:hover { border-color: var(--forest); color: var(--forest); }
+.theme-action svg { width: 12px; height: 12px; flex-shrink: 0; }
+.theme-action.primary { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.theme-action.primary:hover { background: var(--forest-dark); border-color: var(--forest-dark); color: var(--cream); }
+
+/* TREND CHART CARD */
+.chart-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 30px 32px;
+}
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+.chart-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.chart-sub {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--text-soft);
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+}
+.legend-item { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+.legend-label { color: var(--text); }
+
+.chart-container { width: 100%; height: 280px; position: relative; }
+.chart-svg { width: 100%; height: 100%; overflow: visible; }
+
+/* TOP BAR */
+.top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
+  font-family: 'Onest', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  color: var(--text);
+  cursor: pointer;
+}
+.btn:hover { background: var(--cream-deep); }
+.btn svg { width: 14px; height: 14px; }
+
+@media (max-width: 1100px) {
+  .themes-grid { grid-template-columns: 1fr; }
+  .stats-strip { flex-direction: column; gap: 16px; }
+  .stat-mini-divider { display: none; }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  aside { display: none; }
+  main { padding: 20px 18px; }
+  .page-title { font-size: 36px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR (Themes nav item active) -->
+  <aside>
+    <div class="brand"><span class="brand-mark">B</span> BAAM Review</div>
+    <div class="location-switcher">
+      <div class="location-icon">黄</div>
+      <div class="location-text">
+        <div class="location-name">Dr. Huang Acupuncture</div>
+        <div class="location-sub">Flushing, NY · Growth</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Workspace</div>
+    <ul class="nav-list">
+      <li><a href="03-admin-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> Dashboard</a></li>
+      <li><a href="04-admin-send-request.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg> Send request</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg> Reviews <span class="badges"><span class="nav-badge warn">7</span></span></a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> AI Replies</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg> Referrals</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg> Distribute</a></li>
+    </ul>
+
+    <div class="nav-label">Compound</div>
+    <ul class="nav-list">
+      <li><a href="#" class="active"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg> Themes <span class="badges"><span class="nav-badge new">NEW</span></span></a></li>
+      <li><a href="10-admin-ad-copy-generator.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Ad Copy</a></li>
+      <li><a href="11-admin-testimonial-pages.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Landing Pages</a></li>
+      <li><a href="12-admin-review-studio.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Review Studio</a></li>
+    </ul>
+
+    <div class="user-card">
+      <div class="user-avatar">JC</div>
+      <div>
+        <div class="user-name">John Chen</div>
+        <div class="user-tier">Growth · Founding member</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div></div>
+      <button class="btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Last 90 days
+      </button>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-eyebrow">Stage 7 · Compound</div>
+      <h1 class="page-title">What your customers are <em>saying.</em></h1>
+      <p class="page-sub">Themes mined nightly across all your reviews — Chinese, English, and Spanish clustered into one signal. <span class="update-time">Last updated 6 hours ago.</span></p>
+    </div>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip">
+      <div class="stat-mini">
+        <div class="stat-mini-num">12 <span class="delta">▲ 3</span></div>
+        <div class="stat-mini-label">Active themes</div>
+      </div>
+      <div class="stat-mini-divider"></div>
+      <div class="stat-mini">
+        <div class="stat-mini-num gold">187</div>
+        <div class="stat-mini-label">Reviews mined</div>
+      </div>
+      <div class="stat-mini-divider"></div>
+      <div class="stat-mini">
+        <div class="stat-mini-num">3</div>
+        <div class="stat-mini-label">Languages clustered</div>
+      </div>
+      <div class="stat-mini-divider"></div>
+      <div class="stat-mini">
+        <div class="stat-mini-num">47</div>
+        <div class="stat-mini-label">Top theme mentions</div>
+      </div>
+    </div>
+
+    <!-- SORT PILLS -->
+    <div class="sort-row">
+      <span class="sort-label">Sort by</span>
+      <div class="sort-pills">
+        <div class="sort-pill active">Most mentioned</div>
+        <div class="sort-pill">Fastest growing</div>
+        <div class="sort-pill">Highest rated</div>
+        <div class="sort-pill">By language</div>
+      </div>
+    </div>
+
+    <!-- THEMES GRID -->
+    <div class="themes-grid">
+
+      <!-- Theme 1 -->
+      <div class="theme-card">
+        <div class="theme-header">
+          <div>
+            <h3 class="theme-name">Patient explanations</h3>
+          </div>
+          <span class="theme-trend">
+            <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            32%
+          </span>
+        </div>
+        <div class="theme-context">Mentioned <strong>47</strong> times in the last 90 days · trending up</div>
+        <div class="theme-quotes">
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">She takes her time, explains every step, and never makes you feel rushed.</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Marcus D.</span>
+                <span class="lang-tag en">EN</span>
+              </div>
+            </div>
+          </div>
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">黄医生很有耐心，每一步都解释得很清楚，从来不让人觉得被催促。</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Sarah L.</span>
+                <span class="lang-tag zh">中文</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="theme-actions">
+          <button class="theme-action primary">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/></svg>
+            Ads
+          </button>
+          <button class="theme-action">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6"/></svg>
+            Page
+          </button>
+          <button class="theme-action">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14"/></svg>
+            Video
+          </button>
+          <button class="theme-action">
+            All 47 →
+          </button>
+        </div>
+      </div>
+
+      <!-- Theme 2 -->
+      <div class="theme-card">
+        <div class="theme-header">
+          <div>
+            <h3 class="theme-name">Migraine relief</h3>
+          </div>
+          <span class="theme-trend">
+            <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            18%
+          </span>
+        </div>
+        <div class="theme-context">Mentioned <strong>38</strong> times in the last 90 days · trending up</div>
+        <div class="theme-quotes">
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">Came in for chronic migraines. After three sessions I'm sleeping through the night again.</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Marcus D.</span>
+                <span class="lang-tag en">EN</span>
+              </div>
+            </div>
+          </div>
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">Después de cinco sesiones, mis migrañas crónicas casi desaparecieron. La Dra. Huang es excelente.</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Elena R.</span>
+                <span class="lang-tag es">ES</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="theme-actions">
+          <button class="theme-action primary"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14"/></svg>Ads</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4"/></svg>Page</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276"/></svg>Video</button>
+          <button class="theme-action">All 38 →</button>
+        </div>
+      </div>
+
+      <!-- Theme 3 -->
+      <div class="theme-card">
+        <div class="theme-header">
+          <div>
+            <h3 class="theme-name">Calm atmosphere</h3>
+          </div>
+          <span class="theme-trend flat">
+            <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="5 12 19 12"/></svg>
+            flat
+          </span>
+        </div>
+        <div class="theme-context">Mentioned <strong>29</strong> times in the last 90 days · stable</div>
+        <div class="theme-quotes">
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">The clinic itself is calm and clean — the kind of place you actually want to come back to.</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>James K.</span>
+                <span class="lang-tag en">EN</span>
+              </div>
+            </div>
+          </div>
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">诊所环境安静干净，让人放松。一进门就感觉踏实。</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Wei Z.</span>
+                <span class="lang-tag zh">中文</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="theme-actions">
+          <button class="theme-action primary"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14"/></svg>Ads</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4"/></svg>Page</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276"/></svg>Video</button>
+          <button class="theme-action">All 29 →</button>
+        </div>
+      </div>
+
+      <!-- Theme 4 -->
+      <div class="theme-card">
+        <div class="theme-header">
+          <div>
+            <h3 class="theme-name">Worth the trip</h3>
+          </div>
+          <span class="theme-trend">
+            <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            64%
+          </span>
+        </div>
+        <div class="theme-context">Mentioned <strong>21</strong> times in the last 90 days · trending up</div>
+        <div class="theme-quotes">
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">Honestly worth the trip from Manhattan. Better than anyone I've seen closer to home.</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Priya R.</span>
+                <span class="lang-tag en">EN</span>
+              </div>
+            </div>
+          </div>
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">从曼哈顿过来值得，技术比我之前去过的几家都好。</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Lin C.</span>
+                <span class="lang-tag zh">中文</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="theme-actions">
+          <button class="theme-action primary"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14"/></svg>Ads</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4"/></svg>Page</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276"/></svg>Video</button>
+          <button class="theme-action">All 21 →</button>
+        </div>
+      </div>
+
+      <!-- Theme 5 -->
+      <div class="theme-card">
+        <div class="theme-header">
+          <div>
+            <h3 class="theme-name">Stress relief</h3>
+          </div>
+          <span class="theme-trend">
+            <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            22%
+          </span>
+        </div>
+        <div class="theme-context">Mentioned <strong>19</strong> times in the last 90 days · trending up</div>
+        <div class="theme-quotes">
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">I came in completely burnt out. Left feeling like I'd been reset. Exactly what I needed.</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>David P.</span>
+                <span class="lang-tag en">EN</span>
+              </div>
+            </div>
+          </div>
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">工作压力大睡不好。来了几次之后整个人都松弛下来了。</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Mei H.</span>
+                <span class="lang-tag zh">中文</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="theme-actions">
+          <button class="theme-action primary"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14"/></svg>Ads</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4"/></svg>Page</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276"/></svg>Video</button>
+          <button class="theme-action">All 19 →</button>
+        </div>
+      </div>
+
+      <!-- Theme 6 -->
+      <div class="theme-card">
+        <div class="theme-header">
+          <div>
+            <h3 class="theme-name">Listens carefully</h3>
+          </div>
+          <span class="theme-trend">
+            <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            15%
+          </span>
+        </div>
+        <div class="theme-context">Mentioned <strong>17</strong> times in the last 90 days · trending up</div>
+        <div class="theme-quotes">
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">She really listens. Asked questions I hadn't been asked at any other doctor's office.</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Maria C.</span>
+                <span class="lang-tag es">ES</span>
+              </div>
+            </div>
+          </div>
+          <div class="theme-quote">
+            <span class="theme-quote-mark">"</span>
+            <div class="theme-quote-body">
+              <div class="theme-quote-text">问诊非常仔细，问了一些我从来没被问过的问题。这才是真正的中医。</div>
+              <div class="theme-quote-meta">
+                <span class="theme-quote-stars">★★★★★</span>
+                <span>Hong W.</span>
+                <span class="lang-tag zh">中文</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="theme-actions">
+          <button class="theme-action primary"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14"/></svg>Ads</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4"/></svg>Page</button>
+          <button class="theme-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276"/></svg>Video</button>
+          <button class="theme-action">All 17 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TREND CHART -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Themes over time</div>
+          <div class="chart-sub">The top 5 themes by mention frequency, trailing 12 months.</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><span class="legend-dot" style="background: var(--forest);"></span><span class="legend-label">Patient explanations</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background: var(--gold);"></span><span class="legend-label">Migraine relief</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background: #962D22;"></span><span class="legend-label">Calm atmosphere</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background: var(--sage);"></span><span class="legend-label">Worth the trip</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background: #E67E22;"></span><span class="legend-label">Stress relief</span></div>
+        </div>
+      </div>
+      <div class="chart-container">
+        <svg class="chart-svg" viewBox="0 0 1000 280" preserveAspectRatio="none">
+          <!-- Grid lines -->
+          <g stroke="#E8E2D5" stroke-width="1" stroke-dasharray="2 4" opacity="0.6">
+            <line x1="0" y1="56" x2="1000" y2="56"/>
+            <line x1="0" y1="112" x2="1000" y2="112"/>
+            <line x1="0" y1="168" x2="1000" y2="168"/>
+            <line x1="0" y1="224" x2="1000" y2="224"/>
+          </g>
+          <!-- Y-axis labels -->
+          <g font-family="JetBrains Mono" font-size="10" fill="#8A938E">
+            <text x="2" y="60">50</text>
+            <text x="2" y="116">40</text>
+            <text x="2" y="172">30</text>
+            <text x="2" y="228">20</text>
+          </g>
+          <!-- X-axis labels (months) -->
+          <g font-family="Onest" font-size="10" fill="#8A938E" font-weight="500">
+            <text x="40" y="270">Jun</text>
+            <text x="125" y="270">Jul</text>
+            <text x="210" y="270">Aug</text>
+            <text x="295" y="270">Sep</text>
+            <text x="380" y="270">Oct</text>
+            <text x="465" y="270">Nov</text>
+            <text x="550" y="270">Dec</text>
+            <text x="635" y="270">Jan</text>
+            <text x="720" y="270">Feb</text>
+            <text x="805" y="270">Mar</text>
+            <text x="890" y="270">Apr</text>
+            <text x="960" y="270">May</text>
+          </g>
+          <!-- Patient explanations line (forest) - trending up -->
+          <polyline fill="none" stroke="#1F4D3F" stroke-width="2.5" stroke-linecap="round"
+            points="50,190 130,180 210,165 295,155 380,145 465,130 550,115 635,100 720,90 805,72 890,55 950,45"/>
+          <!-- Migraine relief (gold) - trending up -->
+          <polyline fill="none" stroke="#C9A961" stroke-width="2.5" stroke-linecap="round"
+            points="50,200 130,195 210,180 295,170 380,160 465,150 550,140 635,125 720,115 805,100 890,90 950,82"/>
+          <!-- Calm atmosphere (clinic red) - flat -->
+          <polyline fill="none" stroke="#962D22" stroke-width="2.5" stroke-linecap="round"
+            points="50,150 130,155 210,148 295,152 380,150 465,148 550,150 635,148 720,152 805,150 890,148 950,150"/>
+          <!-- Worth the trip (sage) - trending up fast -->
+          <polyline fill="none" stroke="#87A899" stroke-width="2.5" stroke-linecap="round"
+            points="50,225 130,222 210,218 295,215 380,210 465,200 550,190 635,175 720,160 805,140 890,118 950,100"/>
+          <!-- Stress relief (orange) - up -->
+          <polyline fill="none" stroke="#E67E22" stroke-width="2.5" stroke-linecap="round"
+            points="50,215 130,208 210,202 295,195 380,188 465,180 550,170 635,158 720,148 805,135 890,125 950,118"/>
+
+          <!-- Last point dots -->
+          <circle cx="950" cy="45" r="4" fill="#1F4D3F"/>
+          <circle cx="950" cy="82" r="4" fill="#C9A961"/>
+          <circle cx="950" cy="150" r="4" fill="#962D22"/>
+          <circle cx="950" cy="100" r="4" fill="#87A899"/>
+          <circle cx="950" cy="118" r="4" fill="#E67E22"/>
+        </svg>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

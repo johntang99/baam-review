@@ -3,19 +3,26 @@ import { type NextRequest } from "next/server";
 export const runtime = "edge";
 
 /**
- * Serves the public embed snippet. Customer pastes:
+ * Serves the public embed snippet. Two modes:
  *
- *   <script src="https://review.baamplatform.com/api/embed.js"
- *           data-slug="<their-slug>"
- *           data-color="#1F4D3F"
- *           data-label="Leave a review"></script>
+ *   Button (data-mode="button" or unset) — renders a single CTA button.
  *
- * The IIFE below reads data-attributes from `document.currentScript`,
- * fires a fire-and-forget load tracking ping, and renders a styled
- * button — inline at the script tag's position, or fixed bottom-right
- * if data-position="fixed".
+ *     <script src="https://review.baamplatform.com/api/embed.js"
+ *             data-slug="<their-slug>"
+ *             data-color="#1F4D3F"
+ *             data-label="Leave a review"></script>
  *
- * All styles inlined so customer CSS resets don't break the button.
+ *   Widget (data-mode="widget") — injects an iframe pointing at
+ *   /widget/<slug> that shows the curated review carousel + JSON-LD.
+ *   The iframe auto-resizes via postMessage from the widget tracker.
+ *
+ *     <script src="https://review.baamplatform.com/api/embed.js"
+ *             data-slug="<their-slug>"
+ *             data-mode="widget"
+ *             data-color="#1F4D3F"></script>
+ *
+ * The IIFE below reads data-attributes from `document.currentScript`.
+ * All styles inlined so customer CSS resets don't break us.
  */
 export async function GET(request: NextRequest) {
   const base =
@@ -37,7 +44,7 @@ function buildEmbedJs(base: string): string {
   // The BASE_URL placeholder is replaced at build time; everything inside
   // the IIFE is plain ES5-compatible JS to maximize old-browser reach
   // (the embed runs on customer sites we don't control).
-  return `/*! BAAM Review embed — v1 */
+  return `/*! BAAM Review embed — v2 */
 (function(){
   var BASE = ${JSON.stringify(base)};
   var script = document.currentScript;
@@ -45,8 +52,8 @@ function buildEmbedJs(base: string): string {
 
   var slug = script.getAttribute('data-slug');
   if (!slug) return;
+  var mode = script.getAttribute('data-mode') || 'button';
   var color = script.getAttribute('data-color') || '#1F4D3F';
-  var label = script.getAttribute('data-label') || 'Leave a review';
   var lang = script.getAttribute('data-lang') || '';
   var position = script.getAttribute('data-position') || 'inline';
 
@@ -59,52 +66,91 @@ function buildEmbedJs(base: string): string {
     );
   } catch (e) {}
 
-  var url = BASE + '/r/' + encodeURIComponent(slug) + '?source=embed' + (lang ? '&lang=' + encodeURIComponent(lang) : '');
-
-  var btn = document.createElement('a');
-  btn.href = url;
-  btn.target = '_blank';
-  btn.rel = 'noopener noreferrer';
-  btn.setAttribute('aria-label', label);
-  btn.textContent = label;
-
-  // Inline styles so the customer's CSS reset doesn't break us.
-  var s = btn.style;
-  s.display = 'inline-flex';
-  s.alignItems = 'center';
-  s.justifyContent = 'center';
-  s.padding = '10px 18px';
-  s.background = color;
-  s.color = '#FAF7F2';
-  s.border = '0';
-  s.borderRadius = '10px';
-  s.fontSize = '14px';
-  s.fontWeight = '500';
-  s.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  s.textDecoration = 'none';
-  s.cursor = 'pointer';
-  s.lineHeight = '1';
-  s.transition = 'transform .15s ease, box-shadow .15s ease';
-  s.WebkitTapHighlightColor = 'transparent';
-
-  if (position === 'fixed') {
-    s.position = 'fixed';
-    s.bottom = '24px';
-    s.right = '24px';
-    s.zIndex = '2147483646';
-    s.boxShadow = '0 6px 18px rgba(15, 31, 26, 0.18)';
+  if (mode === 'widget') {
+    renderWidget();
   } else {
-    s.boxShadow = '0 1px 2px rgba(15, 31, 26, 0.06)';
+    renderButton();
   }
 
-  btn.addEventListener('mouseenter', function(){ s.transform = 'translateY(-1px)'; });
-  btn.addEventListener('mouseleave', function(){ s.transform = 'translateY(0)'; });
+  function renderButton() {
+    var label = script.getAttribute('data-label') || 'Leave a review';
+    var url = BASE + '/r/' + encodeURIComponent(slug) + '?source=embed' + (lang ? '&lang=' + encodeURIComponent(lang) : '');
 
-  if (position === 'fixed') {
-    if (document.body) document.body.appendChild(btn);
-    else document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(btn); });
-  } else if (script.parentNode) {
-    script.parentNode.insertBefore(btn, script.nextSibling);
+    var btn = document.createElement('a');
+    btn.href = url;
+    btn.target = '_blank';
+    btn.rel = 'noopener noreferrer';
+    btn.setAttribute('aria-label', label);
+    btn.textContent = label;
+
+    var s = btn.style;
+    s.display = 'inline-flex';
+    s.alignItems = 'center';
+    s.justifyContent = 'center';
+    s.padding = '10px 18px';
+    s.background = color;
+    s.color = '#FAF7F2';
+    s.border = '0';
+    s.borderRadius = '10px';
+    s.fontSize = '14px';
+    s.fontWeight = '500';
+    s.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    s.textDecoration = 'none';
+    s.cursor = 'pointer';
+    s.lineHeight = '1';
+    s.transition = 'transform .15s ease, box-shadow .15s ease';
+    s.WebkitTapHighlightColor = 'transparent';
+
+    if (position === 'fixed') {
+      s.position = 'fixed';
+      s.bottom = '24px';
+      s.right = '24px';
+      s.zIndex = '2147483646';
+      s.boxShadow = '0 6px 18px rgba(15, 31, 26, 0.18)';
+    } else {
+      s.boxShadow = '0 1px 2px rgba(15, 31, 26, 0.06)';
+    }
+
+    btn.addEventListener('mouseenter', function(){ s.transform = 'translateY(-1px)'; });
+    btn.addEventListener('mouseleave', function(){ s.transform = 'translateY(0)'; });
+
+    if (position === 'fixed') {
+      if (document.body) document.body.appendChild(btn);
+      else document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(btn); });
+    } else if (script.parentNode) {
+      script.parentNode.insertBefore(btn, script.nextSibling);
+    }
+  }
+
+  function renderWidget() {
+    var iframe = document.createElement('iframe');
+    var src = BASE + '/widget/' + encodeURIComponent(slug);
+    if (lang) src += '?lang=' + encodeURIComponent(lang);
+    iframe.src = src;
+    iframe.title = 'Customer reviews';
+    iframe.setAttribute('loading', 'lazy');
+    iframe.setAttribute('frameborder', '0');
+    iframe.setAttribute('scrolling', 'no');
+    iframe.setAttribute('allowtransparency', 'true');
+
+    var s = iframe.style;
+    s.display = 'block';
+    s.width = '100%';
+    s.border = '0';
+    s.background = 'transparent';
+    s.colorScheme = 'normal';
+    s.minHeight = '320px';
+
+    // Listen for height messages from /widget/[slug]'s WidgetTracker.
+    window.addEventListener('message', function(e){
+      if (!e || !e.data || e.data.type !== 'baam-widget-resize') return;
+      var h = parseInt(e.data.height, 10);
+      if (!isNaN(h) && h > 0) iframe.style.height = h + 'px';
+    });
+
+    if (script.parentNode) {
+      script.parentNode.insertBefore(iframe, script.nextSibling);
+    }
   }
 })();`;
 }

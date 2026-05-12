@@ -62,10 +62,20 @@ export default async function ReviewLandingPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ t?: string; lang?: string; source?: string }>;
+  searchParams: Promise<{
+    t?: string;
+    lang?: string;
+    source?: string;
+    ref?: string;
+  }>;
 }) {
   const { slug } = await params;
-  const { t: token, lang: langOverride, source } = await searchParams;
+  const {
+    t: token,
+    lang: langOverride,
+    source,
+    ref: refParam,
+  } = await searchParams;
 
   const supabase = createServiceClient();
 
@@ -124,11 +134,38 @@ export default async function ReviewLandingPage({
       ? source.slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, "")
       : null;
 
+  // Referral attribution: ?ref=<advocate_request_id> carried over from
+  // /s/<token> or a share-card click. Validate it points at a real request
+  // for this location before threading it through to the client.
+  let referredBy: string | null = null;
+  if (refParam && /^[0-9a-fA-F-]{32,36}$/.test(refParam)) {
+    const { data: advocate } = await supabase
+      .from("review_requests")
+      .select("id, location_id")
+      .eq("id", refParam)
+      .maybeSingle();
+    if (advocate && advocate.location_id === loc.id) {
+      referredBy = advocate.id;
+      // Server-side review_started event so the referral leaderboard has
+      // signal even if the visitor closes the tab before posting.
+      await supabase.from("referrals").insert({
+        location_id: loc.id,
+        advocate_request_id: advocate.id,
+        event_type: "review_started",
+        referrer_host: headersList.get("referer")
+          ? safeHost(headersList.get("referer"))
+          : null,
+        user_agent: userAgent?.slice(0, 500) ?? null,
+      });
+    }
+  }
+
   const ctx = {
     locationId: loc.id,
     requestId: request?.id ?? null,
     language: lang,
     source: sanitizedSource,
+    referredBy,
   };
 
   const initialLetter = loc.display_name.charAt(0).toUpperCase();
@@ -216,4 +253,13 @@ function Brand({
       </div>
     </div>
   );
+}
+
+function safeHost(referer: string | null): string | null {
+  if (!referer) return null;
+  try {
+    return new URL(referer).hostname.slice(0, 200);
+  } catch {
+    return null;
+  }
 }

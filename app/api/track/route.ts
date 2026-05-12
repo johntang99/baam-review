@@ -81,6 +81,22 @@ export async function POST(request: NextRequest) {
         .update(update)
         .eq("id", body.request_id)
         .is("completed_at", null);
+
+      // Attribute the conversion back to the reviewer who referred this
+      // customer (Phase B4). The /s/<advocate> page → /r/<slug>?ref=<advocate>
+      // flow puts advocate_request_id on every track event as metadata.
+      if (platform === "google") {
+        const referredBy = body.metadata?.referred_by;
+        if (typeof referredBy === "string" && referredBy) {
+          await supabase.from("referrals").insert({
+            location_id: body.location_id,
+            advocate_request_id: referredBy,
+            event_type: "review_submitted",
+            conversion_request_id: body.request_id,
+            user_agent: userAgent?.slice(0, 500) ?? null,
+          });
+        }
+      }
     }
   }
 

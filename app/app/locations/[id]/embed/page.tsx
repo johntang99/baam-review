@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import type { WidgetConfig } from "@/lib/database.types";
 import { PageHeader } from "@/components/admin/page-header";
 import { InContentLocationPicker } from "@/components/locations/in-content-location-picker";
-import { EmbedBuilder } from "./embed-builder";
+import { EmbedTabs } from "./embed-tabs";
 
 export const metadata = {
   title: "Embed — BAAM Review",
@@ -27,7 +28,7 @@ export default async function EmbedPage({
     supabase
       .from("locations")
       .select(
-        "id, slug, display_name, brand_color, default_language, supported_languages",
+        "id, slug, display_name, brand_color, default_language, supported_languages, widget_config",
       )
       .eq("id", id)
       .maybeSingle(),
@@ -60,17 +61,19 @@ export default async function EmbedPage({
         <div>
           <PageHeader
             eyebrow="Embed"
-            title="Website embed snippet"
-            description="Paste this one-line script anywhere on your website to render a Leave-a-Review button. Works on WordPress, Squarespace, Webflow, Wix, and any plain HTML page."
+            title="Website embed"
+            description="Two ways to put BAAM on your website: a single Leave-a-Review button, or the full review display widget with schema markup."
           />
         </div>
 
-        <EmbedBuilder
+        <EmbedTabs
+          locationId={location.id}
           slug={location.slug}
           appUrl={appUrl}
           brandColor={location.brand_color ?? "#1F4D3F"}
           supportedLanguages={location.supported_languages}
           defaultLanguage={location.default_language}
+          widgetConfig={(location.widget_config ?? {}) as WidgetConfig}
         />
       </div>
     </main>

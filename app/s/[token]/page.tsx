@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { Calendar, ExternalLink, MapPin } from "lucide-react";
 import { createServiceClient } from "@/lib/supabase/service";
@@ -7,6 +8,7 @@ import {
   isLanguage,
   type Language,
 } from "@/lib/i18n/review";
+import { ShareReferralTracker } from "./share-referral-tracker";
 
 export const dynamic = "force-dynamic";
 
@@ -160,7 +162,23 @@ export default async function SharePage({
         `${location.display_name} ${location.address}`,
       )}`
     : null;
-  const reviewPageUrl = `/r/${location.slug}?lang=${lang}`;
+  const reviewPageUrl = `/r/${location.slug}?lang=${lang}&ref=${req.id}`;
+  const bookingUrl = location.booking_url
+    ? appendRefParam(location.booking_url, req.id)
+    : null;
+
+  // Log the share_view referral. We skip when the request originator is
+  // viewing their own share page (rare in prod; protects analytics in dev).
+  const hdrs = await headers();
+  const refererHost = parseHost(hdrs.get("referer"));
+  const userAgent = hdrs.get("user-agent")?.slice(0, 500) ?? null;
+  await supabase.from("referrals").insert({
+    location_id: location.id,
+    advocate_request_id: req.id,
+    event_type: "share_view",
+    referrer_host: refererHost,
+    user_agent: userAgent,
+  });
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-cream px-4 pb-10 sm:px-6">
@@ -229,11 +247,12 @@ export default async function SharePage({
 
         {/* Action buttons */}
         <section className="space-y-2.5">
-          {location.booking_url && (
+          {bookingUrl && (
             <a
-              href={location.booking_url}
+              href={bookingUrl}
               target="_blank"
               rel="noopener noreferrer"
+              data-referral-event="booking_click"
               className="flex w-full items-center gap-4 rounded-2xl p-[18px] text-left text-white shadow-sm transition-all hover:translate-x-0.5 hover:shadow-md"
               style={{ background: accent }}
             >
@@ -252,6 +271,7 @@ export default async function SharePage({
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
+              data-referral-event="open_in_maps_click"
               className="flex w-full items-center gap-4 rounded-2xl border border-border-base bg-paper p-[18px] text-left transition-all hover:translate-x-0.5 hover:bg-cream-deep"
             >
               <span
@@ -268,6 +288,7 @@ export default async function SharePage({
           )}
 
           <Link
+            data-referral-event="leave_own_click"
             href={reviewPageUrl}
             className="flex w-full items-center gap-4 rounded-2xl border border-border-base bg-paper p-[18px] text-left transition-all hover:translate-x-0.5 hover:bg-cream-deep"
           >
@@ -288,6 +309,11 @@ export default async function SharePage({
           {t.poweredBy}
         </p>
       </div>
+
+      <ShareReferralTracker
+        locationId={location.id}
+        advocateRequestId={req.id}
+      />
     </main>
   );
 }
@@ -299,4 +325,25 @@ function darken(hex: string, amount: number): string {
   const g = Math.max(0, Math.floor(((num >> 8) & 0xff) * (1 - amount)));
   const b = Math.max(0, Math.floor((num & 0xff) * (1 - amount)));
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
+function appendRefParam(url: string, advocateId: string): string {
+  try {
+    const u = new URL(url);
+    u.searchParams.set("ref", advocateId);
+    return u.toString();
+  } catch {
+    // Not a valid URL — fall back to a raw concatenation.
+    const sep = url.includes("?") ? "&" : "?";
+    return `${url}${sep}ref=${encodeURIComponent(advocateId)}`;
+  }
+}
+
+function parseHost(referer: string | null | undefined): string | null {
+  if (!referer) return null;
+  try {
+    return new URL(referer).hostname.slice(0, 200);
+  } catch {
+    return null;
+  }
 }

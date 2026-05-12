@@ -9,6 +9,7 @@ export interface TrackContext {
   requestId: string | null;
   language: string;
   source?: string | null;
+  referredBy?: string | null;
 }
 
 export function track(
@@ -16,11 +17,12 @@ export function track(
   event_type: EventType,
   metadata?: Record<string, unknown>,
 ) {
-  // Source travels on every event so the analytics dashboard can attribute
-  // funnels back to whichever printed surface the customer scanned.
-  const enrichedMetadata = ctx.source
-    ? { ...(metadata ?? {}), source: ctx.source }
-    : (metadata ?? {});
+  // Source + referral attribution travel on every event so the analytics
+  // dashboard can attribute funnels back to printed surfaces AND to the
+  // reviewer who shared the link.
+  const enrichedMetadata: Record<string, unknown> = { ...(metadata ?? {}) };
+  if (ctx.source) enrichedMetadata.source = ctx.source;
+  if (ctx.referredBy) enrichedMetadata.referred_by = ctx.referredBy;
 
   const body = JSON.stringify({
     location_id: ctx.locationId,

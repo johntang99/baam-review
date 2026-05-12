@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Copy — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88847;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --success: #2D7A5F;
+  --google-blue: #4285F4;
+  --meta-blue: #0866FF;
+  --xhs-red: #FF2741;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 28px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif; color: var(--text); background: var(--cream); font-size: 14.5px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+/* SIDEBAR */
+aside { background: var(--ink); color: var(--cream); padding: 24px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 24px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; }
+.brand-mark { width: 28px; height: 28px; background: var(--gold); color: var(--ink); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+.location-switcher { background: rgba(250, 247, 242, 0.06); border: 1px solid rgba(250, 247, 242, 0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+.location-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #C0392B, #962D22); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.location-name { font-size: 13.5px; font-weight: 500; color: var(--cream); }
+.location-sub { font-size: 11.5px; color: rgba(250, 247, 242, 0.55); }
+.nav-label { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250, 247, 242, 0.4); padding: 0 8px 8px; margin-top: 8px; font-weight: 500; }
+.nav-list { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.nav-list a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; color: rgba(250, 247, 242, 0.7); transition: all 0.15s; }
+.nav-list a:hover { background: rgba(250, 247, 242, 0.06); color: var(--cream); }
+.nav-list a.active { background: rgba(201, 169, 97, 0.12); color: var(--gold); }
+.nav-list a svg { width: 16px; height: 16px; flex-shrink: 0; }
+.user-card { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; }
+.user-avatar { width: 32px; height: 32px; background: var(--sage); color: var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+.user-tier { font-size: 11px; color: rgba(250, 247, 242, 0.5); }
+
+/* MAIN */
+main { padding: 32px 40px 60px; max-width: 1240px; }
+.page-header { margin-bottom: 32px; }
+.page-eyebrow { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+.page-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 48px; letter-spacing: -0.025em; color: var(--ink); line-height: 1.05; margin-bottom: 12px; }
+.page-title em { font-style: italic; color: var(--forest); }
+.page-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 18px; color: var(--text-soft); max-width: 680px; line-height: 1.5; }
+
+/* TWO-COL LAYOUT */
+.gen-layout { display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: start; }
+
+/* GENERATOR FORM */
+.gen-form { background: var(--paper); border: 1px solid var(--border); border-radius: 18px; padding: 28px; position: sticky; top: 24px; }
+.form-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; color: var(--ink); margin-bottom: 4px; }
+.form-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; }
+.field { margin-bottom: 18px; }
+.field-label { display: block; font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 8px; letter-spacing: 0.02em; }
+.field-input, .field-select {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+}
+.field-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'><path d='M1 1l4 4 4-4' stroke='%235A6660' stroke-width='1.5' stroke-linecap='round'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px; }
+.field-input:focus, .field-select:focus { outline: none; border-color: var(--forest); background: var(--paper); }
+
+/* PLATFORM PICKER */
+.platform-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.platform-btn { padding: 12px 8px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 9px; cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: 'Onest', sans-serif; font-size: 11.5px; font-weight: 500; color: var(--text-soft); }
+.platform-btn:hover { border-color: var(--text-muted); }
+.platform-btn.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.platform-btn .platform-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; }
+.platform-icon.google { background: var(--google-blue); }
+.platform-icon.meta { background: var(--meta-blue); }
+.platform-icon.xhs { background: var(--xhs-red); }
+.platform-btn.active .platform-icon { color: white; }
+
+/* LANG PILLS */
+.lang-pills { display: flex; gap: 6px; }
+.lang-pill { flex: 1; padding: 8px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 500; text-align: center; transition: all 0.15s; }
+.lang-pill.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+/* GENERATE BTN */
+.generate-btn { width: 100%; padding: 14px; background: var(--forest); color: var(--cream); border: none; border-radius: 10px; font-family: 'Onest', sans-serif; font-size: 14.5px; font-weight: 500; cursor: pointer; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.generate-btn:hover { background: var(--forest-dark); }
+.generate-btn svg { width: 15px; height: 15px; }
+
+.usage-strip { margin-top: 18px; padding: 12px 14px; background: var(--cream-deep); border-radius: 9px; font-size: 12px; color: var(--text-soft); }
+.usage-strip strong { color: var(--ink); font-weight: 500; }
+.usage-bar { margin-top: 6px; height: 4px; background: var(--border); border-radius: 999px; overflow: hidden; }
+.usage-fill { height: 100%; width: 28%; background: var(--gold); }
+
+/* RIGHT COL: GENERATED VARIANTS */
+.results-col { min-width: 0; }
+.results-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 22px; }
+.results-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 22px; color: var(--ink); letter-spacing: -0.01em; }
+.results-meta { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.results-actions { display: flex; gap: 8px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; font-family: 'Onest', sans-serif; font-size: 13px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border); background: var(--paper); color: var(--text); cursor: pointer; }
+.btn:hover { background: var(--cream-deep); }
+.btn svg { width: 13px; height: 13px; }
+.btn-gold { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.btn-gold:hover { background: var(--gold-dark); color: var(--cream); }
+
+/* VARIANT CARDS */
+.variant-card { background: var(--paper); border: 1px solid var(--border); border-radius: 16px; padding: 24px 26px; margin-bottom: 16px; }
+.variant-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border-soft); }
+.variant-num { font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: 14px; color: var(--gold); letter-spacing: 0.05em; }
+.variant-num strong { font-size: 22px; font-style: normal; color: var(--ink); font-weight: 500; }
+.variant-tools { display: flex; gap: 6px; align-items: center; }
+.tool-btn { width: 32px; height: 32px; background: var(--cream); border: 1px solid var(--border); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-soft); transition: all 0.15s; }
+.tool-btn:hover { background: var(--paper); border-color: var(--forest); color: var(--forest); }
+.tool-btn.starred { background: rgba(201, 169, 97, 0.18); border-color: var(--gold); color: var(--gold-dark); }
+.tool-btn svg { width: 14px; height: 14px; }
+
+/* GOOGLE AD PREVIEW */
+.google-ad-preview { background: var(--paper); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; margin-bottom: 18px; }
+.google-ad-tag { display: inline-block; padding: 0 4px; background: white; border: 1px solid #1a73e8; color: #1a73e8; font-size: 10px; font-weight: 600; border-radius: 3px; margin-bottom: 4px; font-family: 'Onest', sans-serif; }
+.google-ad-url { color: #006621; font-size: 13px; margin-bottom: 4px; }
+.google-ad-headline { color: #1a0dab; font-size: 18px; font-weight: 400; line-height: 1.3; margin-bottom: 4px; font-family: 'Onest', sans-serif; }
+.google-ad-headline span { color: var(--text-muted); }
+.google-ad-desc { color: #4d5156; font-size: 13.5px; line-height: 1.4; }
+.google-headline-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.google-headline-item { display: flex; gap: 8px; align-items: baseline; }
+.headline-num { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-weight: 500; min-width: 22px; }
+.headline-text { font-family: 'Onest', sans-serif; font-size: 14px; color: var(--text); }
+.char-count { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-left: auto; }
+.char-count.warn { color: var(--gold-dark); }
+
+/* META AD PREVIEW */
+.meta-ad-preview { background: white; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 18px; }
+.meta-ad-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+.meta-ad-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, #C0392B, #962D22); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 600; font-size: 16px; }
+.meta-ad-name { font-size: 13px; font-weight: 600; color: #050505; }
+.meta-ad-sponsored { font-size: 12px; color: #65676b; }
+.meta-ad-body { padding: 0 16px 12px; font-size: 14px; color: #050505; line-height: 1.4; }
+.meta-ad-img { height: 200px; background: linear-gradient(135deg, #962D22, #6F1F18); display: flex; align-items: center; justify-content: center; color: white; font-family: 'Fraunces', serif; font-style: italic; font-size: 24px; text-align: center; padding: 0 30px; line-height: 1.3; }
+.meta-ad-cta-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #f0f2f5; border-top: 1px solid #e4e6eb; }
+.meta-ad-link-text { font-size: 12px; color: #65676b; text-transform: uppercase; letter-spacing: 0.5px; }
+.meta-ad-headline { font-size: 14px; font-weight: 600; color: #050505; margin-top: 2px; }
+.meta-ad-cta-btn { background: #e4e6eb; color: #050505; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* XIAOHONGSHU PREVIEW */
+.xhs-preview { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 18px; }
+.xhs-img { height: 220px; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); display: flex; align-items: center; justify-content: center; color: var(--ink); font-family: 'Fraunces', serif; font-weight: 500; font-size: 26px; text-align: center; padding: 30px; line-height: 1.2; }
+.xhs-body { padding: 14px 16px; }
+.xhs-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 8px; line-height: 1.3; }
+.xhs-text { font-size: 13.5px; color: #555; line-height: 1.5; margin-bottom: 10px; }
+.xhs-hashtags { display: flex; flex-wrap: wrap; gap: 6px; }
+.xhs-hashtag { color: #6c8ddf; font-size: 12.5px; }
+.xhs-author { display: flex; align-items: center; gap: 8px; padding-top: 10px; margin-top: 10px; border-top: 1px solid #f5f5f5; }
+.xhs-author-img { width: 28px; height: 28px; background: linear-gradient(135deg, #C0392B, #962D22); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 600; font-size: 12px; }
+.xhs-author-name { font-size: 12.5px; font-weight: 500; color: #333; }
+.xhs-author-meta { font-size: 11.5px; color: #999; margin-left: auto; }
+
+/* SOURCE PANEL */
+.source-panel { background: var(--cream-deep); border-radius: 12px; padding: 16px 18px; }
+.source-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+.source-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--text-soft); letter-spacing: 0.04em; }
+.source-label svg { width: 13px; height: 13px; color: var(--success); }
+.source-label-text { color: var(--text); font-weight: 600; }
+.source-chevron { color: var(--text-muted); transition: transform 0.2s; }
+.source-toggle.open .source-chevron { transform: rotate(180deg); }
+.source-content { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+.source-review {
+  background: var(--paper);
+  border-radius: 9px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 11px;
+}
+.source-review-mark {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 22px;
+  color: var(--gold);
+  line-height: 0.7;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.source-review-body { flex: 1; }
+.source-review-text { font-family: 'Newsreader', serif; font-style: italic; font-size: 13.5px; line-height: 1.5; color: var(--text); margin-bottom: 5px; }
+.source-review-meta { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.lang-tag { display: inline-block; padding: 1px 6px; border-radius: 999px; font-size: 9.5px; font-weight: 500; }
+.lang-tag.en { background: #E5EDDF; color: var(--forest); }
+.lang-tag.zh { background: #F8E5E1; color: #8B3A2A; }
+.lang-tag.es { background: #FBEAD3; color: #A06820; }
+
+/* THEME PILL */
+.theme-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(31, 77, 63, 0.08);
+  color: var(--forest);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.theme-pill svg { width: 12px; height: 12px; }
+
+@media (max-width: 1100px) {
+  .gen-layout { grid-template-columns: 1fr; }
+  .gen-form { position: static; }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  aside { display: none; }
+  main { padding: 20px 18px; }
+  .page-title { font-size: 36px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside>
+    <div class="brand"><span class="brand-mark">B</span> BAAM Review</div>
+    <div class="location-switcher">
+      <div class="location-icon">黄</div>
+      <div>
+        <div class="location-name">Dr. Huang Acupuncture</div>
+        <div class="location-sub">Flushing, NY · Growth</div>
+      </div>
+    </div>
+    <div class="nav-label">Workspace</div>
+    <ul class="nav-list">
+      <li><a href="03-admin-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3"/></svg> Dashboard</a></li>
+      <li><a href="04-admin-send-request.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg> Send request</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493"/></svg> Reviews</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> AI Replies</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857"/></svg> Referrals</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2"/></svg> Distribute</a></li>
+    </ul>
+    <div class="nav-label">Compound</div>
+    <ul class="nav-list">
+      <li><a href="09-admin-themes-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846"/></svg> Themes</a></li>
+      <li><a href="#" class="active"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Ad Copy</a></li>
+      <li><a href="11-admin-testimonial-pages.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6"/></svg> Landing Pages</a></li>
+      <li><a href="12-admin-review-studio.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276"/></svg> Review Studio</a></li>
+    </ul>
+    <div class="user-card">
+      <div class="user-avatar">JC</div>
+      <div>
+        <div class="user-name">John Chen</div>
+        <div class="user-tier">Growth · Founding member</div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="page-header">
+      <div class="page-eyebrow">Stage 7 · Compound · Ad Copy</div>
+      <h1 class="page-title">Ad copy from <em>your customers' words.</em></h1>
+      <p class="page-sub">Every variant is grounded in real reviews. Expand "Source reviews" under any variant to see which patient testimonials the copy was built from.</p>
+    </div>
+
+    <div class="gen-layout">
+
+      <!-- LEFT: GENERATOR FORM -->
+      <div class="gen-form">
+        <div class="form-title">Generate new copy</div>
+        <div class="form-sub">3 variants per generation</div>
+
+        <div class="field">
+          <label class="field-label">Theme</label>
+          <select class="field-select">
+            <option>Patient explanations · 47 mentions</option>
+            <option>Migraine relief · 38 mentions</option>
+            <option>Calm atmosphere · 29 mentions</option>
+            <option>Worth the trip · 21 mentions</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Platform</label>
+          <div class="platform-grid">
+            <button class="platform-btn active">
+              <span class="platform-icon google">G</span>
+              Google Search
+            </button>
+            <button class="platform-btn">
+              <span class="platform-icon google">G</span>
+              Google Display
+            </button>
+            <button class="platform-btn">
+              <span class="platform-icon meta">f</span>
+              Meta Ads
+            </button>
+            <button class="platform-btn">
+              <span class="platform-icon xhs">小</span>
+              Xiaohongshu
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Goal</label>
+          <select class="field-select">
+            <option>New customer acquisition</option>
+            <option>Rebooking existing patients</option>
+            <option>Service awareness</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Language</label>
+          <div class="lang-pills">
+            <div class="lang-pill active">EN</div>
+            <div class="lang-pill">中文</div>
+            <div class="lang-pill">ES</div>
+          </div>
+        </div>
+
+        <button class="generate-btn">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+          Generate 3 variants
+        </button>
+
+        <div class="usage-strip">
+          <strong>14 / 50</strong> generations used this month
+          <div class="usage-bar"><div class="usage-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: GENERATED VARIANTS -->
+      <div class="results-col">
+        <div class="results-header">
+          <div>
+            <div class="results-title">3 Google Search variants</div>
+            <div class="results-meta">Grounded in <strong>"Patient explanations"</strong> theme · 47 source reviews · generated just now</div>
+          </div>
+          <div class="results-actions">
+            <button class="btn">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              Export CSV
+            </button>
+            <button class="btn btn-gold">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Regenerate
+            </button>
+          </div>
+        </div>
+
+        <!-- VARIANT 1 -->
+        <div class="variant-card">
+          <div class="variant-header">
+            <div class="variant-num">Variant <strong>1</strong> · Editorial tone</div>
+            <div class="variant-tools">
+              <button class="tool-btn starred"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg></button>
+              <button class="tool-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+              <button class="tool-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9"/></svg></button>
+            </div>
+          </div>
+
+          <div class="theme-pill">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846"/></svg>
+            Patient explanations
+          </div>
+
+          <!-- Google Ad Preview -->
+          <div class="google-ad-preview">
+            <span class="google-ad-tag">Ad</span>
+            <div class="google-ad-url">www.drhuang.com</div>
+            <div class="google-ad-headline">Acupuncture That Actually Listens <span>| Flushing, NY</span></div>
+            <div class="google-ad-desc">Patients say Dr. Huang takes her time, explains every step, and never rushes. Book a thorough consultation today.</div>
+          </div>
+
+          <div class="google-headline-list">
+            <div class="google-headline-item">
+              <span class="headline-num">H1</span>
+              <span class="headline-text">Acupuncture That Actually Listens</span>
+              <span class="char-count">31 / 30</span>
+            </div>
+            <div class="google-headline-item">
+              <span class="headline-num">H2</span>
+              <span class="headline-text">Flushing's Most Patient TCM Clinic</span>
+              <span class="char-count">28 / 30</span>
+            </div>
+            <div class="google-headline-item">
+              <span class="headline-num">H3</span>
+              <span class="headline-text">Take Your Time. We Take Ours.</span>
+              <span class="char-count">29 / 30</span>
+            </div>
+            <div class="google-headline-item" style="margin-top: 8px;">
+              <span class="headline-num">D1</span>
+              <span class="headline-text">Patients say Dr. Huang takes her time, explains every step, and never rushes.</span>
+              <span class="char-count">79 / 90</span>
+            </div>
+            <div class="google-headline-item">
+              <span class="headline-num">D2</span>
+              <span class="headline-text">Personalized TCM care in English &amp; 中文. Book a thorough consultation today.</span>
+              <span class="char-count">78 / 90</span>
+            </div>
+          </div>
+
+          <!-- Source panel -->
+          <div class="source-panel">
+            <div class="source-toggle open">
+              <div class="source-label">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Source reviews:</span>
+                <span class="source-label-text">grounded in 3 real testimonials</span>
+              </div>
+              <span class="source-chevron"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </div>
+            <div class="source-content">
+              <div class="source-review">
+                <span class="source-review-mark">"</span>
+                <div class="source-review-body">
+                  <div class="source-review-text">She takes her time, explains every step, and never makes you feel rushed.</div>
+                  <div class="source-review-meta">
+                    <span>Marcus D.</span> · <span>★★★★★</span> · <span class="lang-tag en">EN</span> · <span>Mar 2026</span>
+                  </div>
+                </div>
+              </div>
+              <div class="source-review">
+                <span class="source-review-mark">"</span>
+                <div class="source-review-body">
+                  <div class="source-review-text">Every question I had got a real answer. Nothing felt brushed off.</div>
+                  <div class="source-review-meta">
+                    <span>Priya R.</span> · <span>★★★★★</span> · <span class="lang-tag en">EN</span> · <span>Feb 2026</span>
+                  </div>
+                </div>
+              </div>
+              <div class="source-review">
+                <span class="source-review-mark">"</span>
+                <div class="source-review-body">
+                  <div class="source-review-text">黄医生很有耐心，每一步都解释得很清楚。</div>
+                  <div class="source-review-meta">
+                    <span>Sarah L.</span> · <span>★★★★★</span> · <span class="lang-tag zh">中文</span> · <span>Apr 2026</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VARIANT 2 -->
+        <div class="variant-card">
+          <div class="variant-header">
+            <div class="variant-num">Variant <strong>2</strong> · Direct &amp; specific</div>
+            <div class="variant-tools">
+              <button class="tool-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg></button>
+              <button class="tool-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+              <button class="tool-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9"/></svg></button>
+            </div>
+          </div>
+
+          <div class="theme-pill">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846"/></svg>
+            Patient explanations
+          </div>
+
+          <div class="google-ad-preview">
+            <span class="google-ad-tag">Ad</span>
+            <div class="google-ad-url">www.drhuang.com/consultation</div>
+            <div class="google-ad-headline">Real Consultations. Real Answers. <span>| TCM Flushing</span></div>
+            <div class="google-ad-desc">Bilingual acupuncture clinic where every question gets a thoughtful answer. EN &amp; 中文. Book online.</div>
+          </div>
+
+          <div class="google-headline-list">
+            <div class="google-headline-item">
+              <span class="headline-num">H1</span>
+              <span class="headline-text">Real Consultations. Real Answers.</span>
+              <span class="char-count">31 / 30</span>
+            </div>
+            <div class="google-headline-item">
+              <span class="headline-num">H2</span>
+              <span class="headline-text">Bilingual TCM · Flushing</span>
+              <span class="char-count">22 / 30</span>
+            </div>
+            <div class="google-headline-item">
+              <span class="headline-num">H3</span>
+              <span class="headline-text">Every Question Answered</span>
+              <span class="char-count">23 / 30</span>
+            </div>
+            <div class="google-headline-item" style="margin-top: 8px;">
+              <span class="headline-num">D1</span>
+              <span class="headline-text">Where every question gets a thoughtful answer, not a brush-off. EN &amp; 中文.</span>
+              <span class="char-count">75 / 90</span>
+            </div>
+            <div class="google-headline-item">
+              <span class="headline-num">D2</span>
+              <span class="headline-text">Patients drive in from Manhattan because Dr. Huang takes the time most clinics don't.</span>
+              <span class="char-count">85 / 90</span>
+            </div>
+          </div>
+
+          <div class="source-panel">
+            <div class="source-toggle">
+              <div class="source-label">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Source reviews:</span>
+                <span class="source-label-text">grounded in 4 real testimonials</span>
+              </div>
+              <span class="source-chevron"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- VARIANT 3 -->
+        <div class="variant-card">
+          <div class="variant-header">
+            <div class="variant-num">Variant <strong>3</strong> · Trust-led</div>
+            <div class="variant-tools">
+              <button class="tool-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg></button>
+              <button class="tool-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+              <button class="tool-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9"/></svg></button>
+            </div>
+          </div>
+
+          <div class="theme-pill">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846"/></svg>
+            Patient explanations
+          </div>
+
+          <div class="google-ad-preview">
+            <span class="google-ad-tag">Ad</span>
+            <div class="google-ad-url">www.drhuang.com</div>
+            <div class="google-ad-headline">47 Patients Said: "She Listens." <span>| TCM Clinic</span></div>
+            <div class="google-ad-desc">Dr. Huang Acupuncture · Flushing's most-recommended bilingual TCM clinic. Read 187 verified reviews.</div>
+          </div>
+
+          <div class="google-headline-list">
+            <div class="google-headline-item">
+              <span class="headline-num">H1</span>
+              <span class="headline-text">47 Patients Said: "She Listens."</span>
+              <span class="char-count">30 / 30</span>
+            </div>
+            <div class="google-headline-item">
+              <span class="headline-num">H2</span>
+              <span class="headline-text">Dr. Huang Acupuncture · Flushing</span>
+              <span class="char-count">29 / 30</span>
+            </div>
+            <div class="google-headline-item">
+              <span class="headline-num">H3</span>
+              <span class="headline-text">187 Verified 5-Star Reviews</span>
+              <span class="char-count">26 / 30</span>
+            </div>
+          </div>
+
+          <div class="source-panel">
+            <div class="source-toggle">
+              <div class="source-label">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Source reviews:</span>
+                <span class="source-label-text">grounded in 5 real testimonials</span>
+              </div>
+              <span class="source-chevron"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
