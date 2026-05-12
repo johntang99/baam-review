@@ -68,18 +68,23 @@ export function LocationSwitcher({
     });
     setOpen(false);
 
-    // "Manage all locations" → always navigate to the management hub.
+    // The sidebar lives in /app/layout.tsx. Next.js's shared-layout
+    // optimization keeps the layout cached when navigating within /app/*,
+    // so router.push doesn't pick up the new cookie. Use a full reload
+    // (window.location) for cross-page navigation, which guarantees the
+    // layout re-runs server-side and shows the new selection.
     if (value === null) {
-      router.push("/app/locations");
+      window.location.assign("/app/locations");
       return;
     }
 
     if (onManagementPage) {
-      // Picking a specific location while on a management page → go to
-      // workspace dashboard for it.
-      router.push("/app");
+      window.location.assign("/app");
       return;
     }
+
+    // Same-page case — router.refresh() correctly re-fetches the layout +
+    // page since the URL hasn't changed (no shared-layout caching applies).
     router.refresh();
   }
 
