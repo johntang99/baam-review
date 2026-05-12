@@ -2,10 +2,19 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { RefreshCw, AlertTriangle, CheckCircle2 } from "lucide-react";
+import {
+  RefreshCw,
+  AlertTriangle,
+  CheckCircle2,
+  Sparkles,
+  Send,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { relativeTime } from "@/lib/analytics/aggregate";
 import { syncReviews, type SyncResult } from "./actions";
+import { postReply, removeReply } from "./post-reply";
 
 interface Review {
   id: string;
@@ -197,23 +206,207 @@ function ReviewCard({ r }: { r: Review }) {
         </p>
       )}
 
-      {r.reply_comment ? (
-        <div className="rounded-lg bg-cream-deep/40 p-3 text-[13px] text-text-soft space-y-1">
+      <ReplySection r={r} />
+    </li>
+  );
+}
+
+function ReplySection({ r }: { r: Review }) {
+  // Three states:
+  //   "viewing"  — existing reply already posted; show with Edit/Delete
+  //   "editing"  — textarea open for first-time draft OR re-edit
+  //   "posting"  — server action in flight
+  const [mode, setMode] = useState<"viewing" | "editing">(
+    r.reply_comment ? "viewing" : "viewing",
+  );
+  const [text, setText] = useState<string>(r.reply_comment ?? "");
+  const [drafting, startDrafting] = useTransition();
+  const [posting, startPosting] = useTransition();
+  const [deleting, startDeleting] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  async function draftWithAI() {
+    setError(null);
+    startDrafting(async () => {
+      try {
+        const res = await fetch("/api/reply-draft", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ review_id: r.id }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = (await res.json()) as { reply: string };
+        setText(json.reply);
+        setMode("editing");
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Couldn't generate a draft");
+      }
+    });
+  }
+
+  function startEditing() {
+    setError(null);
+    setText(r.reply_comment ?? "");
+    setMode("editing");
+  }
+
+  function cancelEdit() {
+    setText(r.reply_comment ?? "");
+    setMode("viewing");
+    setError(null);
+  }
+
+  function onPost() {
+    setError(null);
+    startPosting(async () => {
+      const result = await postReply({ reviewId: r.id, comment: text });
+      if (!result.ok) {
+        setError(result.error ?? "Couldn't post the reply.");
+        return;
+      }
+      setMode("viewing");
+    });
+  }
+
+  function onDelete() {
+    if (
+      !confirm(
+        "Remove this reply from Google? The reviewer will no longer see your response.",
+      )
+    )
+      return;
+    setError(null);
+    startDeleting(async () => {
+      const result = await removeReply(r.id);
+      if (!result.ok) {
+        setError(result.error ?? "Couldn't remove the reply.");
+        return;
+      }
+      setText("");
+      setMode("viewing");
+    });
+  }
+
+  const hasExisting = !!r.reply_comment && mode === "viewing";
+  const editing = mode === "editing";
+
+  // No reply yet, not editing → invitation row.
+  if (!hasExisting && !editing) {
+    return (
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        <Button
+          type="button"
+          size="sm"
+          variant="primary"
+          onClick={draftWithAI}
+          disabled={drafting}
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          {drafting ? "Drafting…" : "Draft a reply with AI"}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={() => {
+            setText("");
+            setMode("editing");
+          }}
+        >
+          Write manually
+        </Button>
+        {error && (
+          <p className="text-[12.5px] text-alert" role="alert">
+            {error}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // Existing reply, viewing mode → show it with edit / delete.
+  if (hasExisting) {
+    return (
+      <div className="rounded-lg bg-cream-deep/40 p-3 text-[13px] text-text-soft space-y-2">
+        <div className="flex items-center justify-between gap-3">
           <p className="text-[11px] uppercase tracking-[0.14em] text-text-muted">
-            Your reply{" "}
+            Your reply
             {r.reply_update_time && (
-              <span className="text-text-muted">
-                · {relativeTime(r.reply_update_time)}
-              </span>
+              <span> · {relativeTime(r.reply_update_time)}</span>
             )}
           </p>
-          <p className="whitespace-pre-wrap">{r.reply_comment}</p>
+          <div className="flex items-center gap-2.5 text-[11.5px]">
+            <button
+              type="button"
+              onClick={startEditing}
+              className="text-forest hover:underline"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={deleting}
+              className="inline-flex items-center gap-1 text-text-soft hover:text-alert disabled:opacity-50"
+            >
+              <Trash2 className="h-3 w-3" />
+              {deleting ? "Removing…" : "Remove"}
+            </button>
+          </div>
         </div>
-      ) : (
-        <p className="text-[12.5px] text-text-muted italic">
-          No reply yet. (AI-drafted replies coming in Session R2.)
+        <p className="whitespace-pre-wrap text-text">{r.reply_comment}</p>
+        {error && (
+          <p className="text-[12.5px] text-alert" role="alert">
+            {error}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // Editing mode — textarea + post / cancel + optional AI re-draft.
+  return (
+    <div className="space-y-2">
+      <Textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={5}
+        placeholder="Thank the reviewer, take ownership if needed, keep it short…"
+        className="text-[13.5px] leading-relaxed"
+      />
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant="primary"
+          onClick={onPost}
+          disabled={posting || !text.trim()}
+        >
+          <Send className="h-3.5 w-3.5" />
+          {posting ? "Posting…" : "Post to Google"}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={draftWithAI}
+          disabled={drafting}
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          {drafting ? "Drafting…" : r.reply_comment ? "Re-draft with AI" : "Draft with AI"}
+        </Button>
+        <Button type="button" size="sm" variant="ghost" onClick={cancelEdit}>
+          Cancel
+        </Button>
+        <p className="text-[11.5px] text-text-muted ml-auto">
+          {text.length} chars · public reply
+        </p>
+      </div>
+      {error && (
+        <p className="text-[12.5px] text-alert" role="alert">
+          {error}
         </p>
       )}
-    </li>
+    </div>
   );
 }
