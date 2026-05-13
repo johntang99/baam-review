@@ -1,9 +1,11 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase/service";
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import type { Database } from "@/lib/database.types";
+import { SHARE_THEMES, type ShareThemeKey } from "@/lib/share/themes";
 
 type Action = Database["public"]["Tables"]["social_graphics"]["Insert"]["action"];
 type Size = Database["public"]["Tables"]["social_graphics"]["Insert"]["size"];
@@ -37,4 +39,36 @@ export async function logShareEvent(input: {
     theme: input.theme,
     action: input.action as Action,
   });
+}
+
+/**
+ * Save the picked theme as the location's default — every future share-page
+ * opens with this theme pre-selected. RLS-scoped via the authenticated client.
+ */
+export async function setDefaultShareTheme(
+  locationId: string,
+  theme: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  if (!(theme in SHARE_THEMES)) {
+    return { ok: false, error: "Unknown theme" };
+  }
+
+  const { error } = await supabase
+    .from("locations")
+    .update({ default_share_theme: theme as ShareThemeKey })
+    .eq("id", locationId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(
+    `/app/locations/${locationId}/reviews/[reviewId]/share`,
+    "page",
+  );
+  return { ok: true };
 }
