@@ -31,6 +31,8 @@ interface Draft {
   show_reply: boolean;
   max_width: number | null;
   comment_lang_pref: WidgetCommentLangPref;
+  title: string;
+  subtitle: string;
 }
 
 export function WidgetBuilder({
@@ -53,6 +55,8 @@ export function WidgetBuilder({
         ? initialConfig.max_width
         : null,
     comment_lang_pref: initialConfig.comment_lang_pref ?? "auto",
+    title: initialConfig.title ?? "",
+    subtitle: initialConfig.subtitle ?? "",
   });
 
   const [copied, setCopied] = useState(false);
@@ -91,6 +95,10 @@ export function WidgetBuilder({
     u.searchParams.set("reply", draft.show_reply ? "1" : "0");
     if (draft.max_width) u.searchParams.set("max_width", String(draft.max_width));
     u.searchParams.set("comment_lang", draft.comment_lang_pref);
+    // Always set title/subtitle (even empty) so the page treats blank as
+    // "suppress" rather than falling back to saved value during preview.
+    u.searchParams.set("title", draft.title);
+    u.searchParams.set("subtitle", draft.subtitle);
     return u.toString();
   }, [previewOrigin, slug, draft]);
 
@@ -123,6 +131,12 @@ export function WidgetBuilder({
     ];
     if (draft.max_width) {
       attrs.push(`data-max-width="${draft.max_width}"`);
+    }
+    if (draft.title.trim()) {
+      attrs.push(`data-title="${escapeAttr(draft.title.trim())}"`);
+    }
+    if (draft.subtitle.trim()) {
+      attrs.push(`data-subtitle="${escapeAttr(draft.subtitle.trim())}"`);
     }
     return `<script ${attrs.join(" ")} async></script>`;
   }, [appUrl, draft, slug]);
@@ -157,6 +171,40 @@ export function WidgetBuilder({
   return (
     <div className="grid gap-8 lg:grid-cols-[340px_1fr]">
       <div className="space-y-5">
+        <Field
+          label="Section title"
+          htmlFor="widget_title"
+          hint="Shown above the reviews. Leave blank to hide. e.g. “What our customers say”."
+        >
+          <Input
+            id="widget_title"
+            value={draft.title}
+            onChange={(e) =>
+              setDraft({ ...draft, title: e.target.value.slice(0, 120) })
+            }
+            maxLength={120}
+            placeholder="What our customers say"
+          />
+        </Field>
+
+        <Field
+          label="Section subtitle"
+          htmlFor="widget_subtitle"
+          hint="One supporting line under the title. Optional."
+        >
+          <textarea
+            id="widget_subtitle"
+            value={draft.subtitle}
+            onChange={(e) =>
+              setDraft({ ...draft, subtitle: e.target.value.slice(0, 240) })
+            }
+            maxLength={240}
+            rows={2}
+            placeholder="Real reviews, fetched from our Google Business Profile."
+            className="w-full rounded-md border border-border-base bg-paper px-3 py-2 text-[14px] text-text shadow-sm transition-colors focus:border-forest focus:outline-none"
+          />
+        </Field>
+
         <Field label="Layout">
           <div className="grid grid-cols-2 gap-1.5">
             <LayoutPill
@@ -424,6 +472,14 @@ export function WidgetBuilder({
       </aside>
     </div>
   );
+}
+
+function escapeAttr(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 function LayoutPill({

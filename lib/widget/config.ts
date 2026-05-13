@@ -14,7 +14,12 @@ export interface ResolvedWidgetConfig {
   showReply: boolean;
   maxWidth: number | null;
   commentLangPref: WidgetCommentLangPref;
+  title: string | null;
+  subtitle: string | null;
 }
+
+const TITLE_MAX = 120;
+const SUBTITLE_MAX = 240;
 
 export function resolveWidgetConfig(
   raw: WidgetConfig | null | undefined,
@@ -36,5 +41,17 @@ export function resolveWidgetConfig(
     showReply: c.show_reply ?? false,
     maxWidth,
     commentLangPref: c.comment_lang_pref ?? "auto",
+    title: cleanHeaderString(c.title, TITLE_MAX),
+    subtitle: cleanHeaderString(c.subtitle, SUBTITLE_MAX),
   };
+}
+
+function cleanHeaderString(
+  raw: string | null | undefined,
+  max: number,
+): string | null {
+  if (typeof raw !== "string") return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  return trimmed.slice(0, max);
 }

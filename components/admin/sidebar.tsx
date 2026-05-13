@@ -27,7 +27,7 @@ const workspaceItems = [
   { href: "/app/send", label: "Send request", icon: Send },
   { href: "/app/reviews", label: "Reviews", icon: Star },
   { href: "/app/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/app/share", label: "Embed & QR", icon: Share2 },
+  { href: "/app/share", label: "Widget & QR poster", icon: Share2 },
 ];
 
 const accountItems = [

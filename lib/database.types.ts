@@ -70,6 +70,8 @@ export interface WidgetConfig {
   show_reply?: boolean;
   max_width?: number | null;
   comment_lang_pref?: WidgetCommentLangPref;
+  title?: string | null;
+  subtitle?: string | null;
 }
 
 export type WidgetEventType =

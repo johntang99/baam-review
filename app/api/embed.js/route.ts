@@ -135,7 +135,9 @@ function buildEmbedJs(base: string): string {
       { attr: 'data-leave-own',    qs: 'leave_own' },
       { attr: 'data-reply',        qs: 'reply' },
       { attr: 'data-max-width',    qs: 'max_width' },
-      { attr: 'data-comment-lang', qs: 'comment_lang' }
+      { attr: 'data-comment-lang', qs: 'comment_lang' },
+      { attr: 'data-title',        qs: 'title' },
+      { attr: 'data-subtitle',     qs: 'subtitle' }
     ];
 
     var qs = [];

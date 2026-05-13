@@ -109,7 +109,7 @@ export async function GET(
               gap: 8,
             }}
           >
-            <span style={{ color: accent }}>★</span>
+            <StarSvg size={fonts.mark} color={accent} />
             Recommended by a customer
           </div>
         </div>
@@ -117,12 +117,17 @@ export async function GET(
         <div
           style={{
             display: "flex",
-            color: accent,
-            fontSize: fonts.stars,
-            letterSpacing: 8,
+            alignItems: "center",
+            gap: Math.max(6, Math.floor(fonts.stars / 8)),
           }}
         >
-          {"★".repeat(Math.max(1, Math.min(5, review.rating)))}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <StarSvg
+              key={i}
+              size={fonts.stars}
+              color={i < Math.max(1, Math.min(5, review.rating)) ? accent : "rgba(255,255,255,0.2)"}
+            />
+          ))}
         </div>
 
         <div
@@ -235,5 +240,27 @@ export async function GET(
           "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
       },
     },
+  );
+}
+
+/**
+ * Inline star glyph. next/og's default font doesn't include the Black Star
+ * Unicode codepoint (U+2605), so emitting "★" as text renders as a tofu box
+ * on the server. SVG renders identically regardless of font availability.
+ */
+function StarSvg({ size, color }: { size: number; color: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ display: "block" }}
+    >
+      <path
+        d="M12 2.5 14.95 8.48 21.55 9.44 16.78 14.09 17.9 20.66 12 17.56 6.1 20.66 7.22 14.09 2.45 9.44 9.05 8.48Z"
+        fill={color}
+      />
+    </svg>
   );
 }

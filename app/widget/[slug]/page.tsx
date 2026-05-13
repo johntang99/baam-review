@@ -83,6 +83,8 @@ export default async function WidgetPage({
     lang?: string;
     max_width?: string;
     comment_lang?: string;
+    title?: string;
+    subtitle?: string;
   }>;
 }) {
   const { slug } = await params;
@@ -157,6 +159,8 @@ export default async function WidgetPage({
     showReply: sp.reply === "1" ? true : sp.reply === "0" ? false : cfg.showReply,
     maxWidth: maxWidthOverride,
     commentLangPref: commentLangOverride,
+    title: pickHeaderOverride(sp.title, cfg.title, 120),
+    subtitle: pickHeaderOverride(sp.subtitle, cfg.subtitle, 240),
   };
 
   const { data: reviews } = await supabase
@@ -224,6 +228,21 @@ export default async function WidgetPage({
           } as React.CSSProperties
         }
       >
+        {(cfg.title || cfg.subtitle) && (
+          <div className="mb-6 text-center">
+            {cfg.title && (
+              <h2 className="font-display text-[26px] font-medium leading-tight tracking-[-0.015em] text-ink sm:text-[32px]">
+                {cfg.title}
+              </h2>
+            )}
+            {cfg.subtitle && (
+              <p className="mx-auto mt-2 max-w-[640px] text-[14.5px] leading-relaxed text-text-soft sm:text-[16px]">
+                {cfg.subtitle}
+              </p>
+            )}
+          </div>
+        )}
+
         {cfg.showAggregate && aggregate.count > 0 && (
           <header className="mb-6 flex flex-col items-center gap-1.5 rounded-2xl border border-border-base bg-paper px-5 py-5 text-center shadow-sm sm:flex-row sm:justify-center sm:gap-4 sm:text-left">
             <div className="flex items-baseline gap-2.5">
@@ -409,6 +428,22 @@ function WidgetMissing({ slug, lang }: { slug: string; lang: "en" | "zh" | "es" 
       </p>
     </div>
   );
+}
+
+/**
+ * URL-param overrides for header text. An explicit empty string suppresses
+ * the saved value (so a clinic React wrapper can hide BAAM's internal
+ * header). Anything absent falls back to the saved cfg value.
+ */
+function pickHeaderOverride(
+  raw: string | undefined,
+  saved: string | null,
+  max: number,
+): string | null {
+  if (raw === undefined) return saved;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  return trimmed.slice(0, max);
 }
 
 function computeAggregate(ratings: number[]): {

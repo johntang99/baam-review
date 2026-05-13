@@ -1,47 +1,56 @@
 import Link from "next/link";
-import { QrCode, Code } from "lucide-react";
+import { Code, LayoutGrid, QrCode } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import type { WidgetConfig } from "@/lib/database.types";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import { PageHeader } from "@/components/admin/page-header";
 import { QrBuilder } from "../locations/[id]/qr/qr-builder";
 import { EmbedBuilder } from "../locations/[id]/embed/embed-builder";
+import { WidgetBuilder } from "../locations/[id]/embed/widget-builder";
 
 export const metadata = {
-  title: "Embed & QR — BAAM Review",
+  title: "Widget & embed — BAAM Review",
 };
 
 export const dynamic = "force-dynamic";
 
-type Tab = "qr" | "embed";
+type Tab = "widget" | "button" | "qr";
 
-export default async function ShareePage({
+const TAB_DESC: Record<Tab, string> = {
+  widget:
+    "Review widget your customers paste on their site. Carousel / single / grid / compact. Schema markup baked in.",
+  button:
+    "A single “Leave a review” button. Pastes anywhere on the site.",
+  qr: "Printable letter-size poster. Each variant tracks where it was scanned from.",
+};
+
+export default async function SharePage({
   searchParams,
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
   const { tab: tabRaw } = await searchParams;
-  const tab: Tab = tabRaw === "embed" ? "embed" : "qr";
+  const tab: Tab =
+    tabRaw === "button" ? "button" : tabRaw === "qr" ? "qr" : "widget";
 
   const supabase = await createClient();
-
   const selectedId = await getSelectedLocationId();
 
   let { data: location } = selectedId
     ? await supabase
         .from("locations")
         .select(
-          "id, slug, display_name, default_language, supported_languages, brand_color",
+          "id, slug, display_name, default_language, supported_languages, brand_color, widget_config",
         )
         .eq("id", selectedId)
         .maybeSingle()
     : { data: null };
 
-  // Fallback: if no location selected (or stale cookie), pick the first.
   if (!location) {
     const { data: first } = await supabase
       .from("locations")
       .select(
-        "id, slug, display_name, default_language, supported_languages, brand_color",
+        "id, slug, display_name, default_language, supported_languages, brand_color, widget_config",
       )
       .order("created_at", { ascending: false })
       .limit(1)
@@ -57,13 +66,13 @@ export default async function ShareePage({
       <main className="px-10 py-10 space-y-6">
         <PageHeader
           eyebrow="Share"
-          title="Embed & QR"
+          title="Widget & embed"
           description="Pick a location to generate share assets."
         />
         <div className="rounded-2xl border border-dashed border-border-base bg-paper/60 p-10 text-center max-w-2xl">
           <p className="text-[14px] text-text-soft">
-            Connect a Google Business Profile first to generate QR posters and
-            embed snippets.
+            Connect a Google Business Profile first to generate the widget,
+            embed snippet, or QR poster.
           </p>
           <Link
             href="/app/locations"
@@ -81,43 +90,53 @@ export default async function ShareePage({
       <PageHeader
         eyebrow="Share"
         title={location.display_name}
-        description={
-          tab === "qr"
-            ? "Printable letter-size poster. Each variant tracks where it was scanned from."
-            : "One-line script tag the customer pastes anywhere on their website."
-        }
+        description={TAB_DESC[tab]}
       />
 
       <nav className="flex gap-1 border-b border-border-base">
+        <TabLink
+          href="/app/share?tab=widget"
+          active={tab === "widget"}
+          icon={LayoutGrid}
+          label="Display widget"
+        />
+        <TabLink
+          href="/app/share?tab=button"
+          active={tab === "button"}
+          icon={Code}
+          label="Leave-a-review button"
+        />
         <TabLink
           href="/app/share?tab=qr"
           active={tab === "qr"}
           icon={QrCode}
           label="QR poster"
         />
-        <TabLink
-          href="/app/share?tab=embed"
-          active={tab === "embed"}
-          icon={Code}
-          label="Website embed"
-        />
       </nav>
 
       <div className="max-w-5xl">
-        {tab === "qr" ? (
-          <QrBuilder
+        {tab === "widget" ? (
+          <WidgetBuilder
+            locationId={location.id}
             slug={location.slug}
-            supportedLanguages={location.supported_languages}
-            defaultLanguage={location.default_language}
             appUrl={appUrl}
+            brandColor={location.brand_color ?? "#1F4D3F"}
+            initialConfig={(location.widget_config ?? {}) as WidgetConfig}
           />
-        ) : (
+        ) : tab === "button" ? (
           <EmbedBuilder
             slug={location.slug}
             appUrl={appUrl}
             brandColor={location.brand_color ?? "#1F4D3F"}
             supportedLanguages={location.supported_languages}
             defaultLanguage={location.default_language}
+          />
+        ) : (
+          <QrBuilder
+            slug={location.slug}
+            supportedLanguages={location.supported_languages}
+            defaultLanguage={location.default_language}
+            appUrl={appUrl}
           />
         )}
       </div>

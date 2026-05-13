@@ -56,6 +56,14 @@ export async function saveWidgetConfig(
   ) {
     clean.comment_lang_pref = config.comment_lang_pref;
   }
+  if (typeof config.title === "string") {
+    const t = config.title.trim().slice(0, 120);
+    clean.title = t || null;
+  }
+  if (typeof config.subtitle === "string") {
+    const s = config.subtitle.trim().slice(0, 240);
+    clean.subtitle = s || null;
+  }
 
   const { error } = await supabase
     .from("locations")
