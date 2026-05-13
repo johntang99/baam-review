@@ -224,10 +224,10 @@ function ReviewerAvatar({
       <img
         src={safePhoto}
         alt=""
-        width={28}
-        height={28}
+        width={56}
+        height={56}
         referrerPolicy="no-referrer"
-        className="h-7 w-7 flex-shrink-0 rounded-full bg-cream-deep object-cover"
+        className="h-14 w-14 flex-shrink-0 rounded-full bg-cream-deep object-cover"
         onError={(e) => {
           // Hide the broken-image icon; the initials disc isn't rendered as
           // a sibling, so use the parent's background-color via a fallback
@@ -243,7 +243,7 @@ function ReviewerAvatar({
   }
   return (
     <span
-      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[10.5px] font-semibold text-cream"
+      className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full text-[18px] font-semibold text-cream"
       style={{ background: accent }}
     >
       {initials || "?"}
