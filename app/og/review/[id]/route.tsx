@@ -71,28 +71,28 @@ export async function GET(
       : "en";
   const commentOne = pickComment(review.comment, preferLang, "translated") ?? "";
 
-  // Tighter character budget — needs to fit ~4 visible lines at the chosen
-  // font size given the card's padding and the bottom attribution + footer
-  // rows. CJK characters are wider; if the picked variant looks CJK, shrink
-  // further.
-  const isCJK = /[　-鿿぀-ヿ가-힯]/.test(commentOne);
-  const baseLen = size === "og" ? 220 : size === "square" ? 180 : 160;
-  const maxLen = isCJK ? Math.floor(baseLen * 0.45) : baseLen;
   const quote = commentOne.trim();
-  const trimmed = quote.length > maxLen ? quote.slice(0, maxLen - 1).trimEnd() + "…" : quote;
+  const isCJK = /[　-鿿぀-ヿ가-힯]/.test(quote);
+  // CJK chars are visually ~2× wider, so they consume more line-budget per
+  // character. We feed an "effective length" to the font-size picker.
+  const effectiveLen = isCJK ? quote.length * 2 : quote.length;
 
-  // Per-size font sizes. ImageResponse uses inline fontSizes since we don't
-  // ship a custom font (system serif fallback handles Fraunces well enough
-  // for raster output).
+  // Per-size font sizes (everything except quote which auto-scales below).
   const fonts = size === "og"
-    ? { mark: 18, stars: 56, quote: 50, attr: 22, name: 28, sub: 18, footer: 16 }
+    ? { mark: 18, stars: 56, attr: 22, name: 28, sub: 18, footer: 16 }
     : size === "square"
-      ? { mark: 18, stars: 60, quote: 56, attr: 22, name: 30, sub: 18, footer: 16 }
-      : { mark: 20, stars: 72, quote: 64, attr: 26, name: 32, sub: 20, footer: 18 };
+      ? { mark: 18, stars: 60, attr: 22, name: 30, sub: 18, footer: 16 }
+      : { mark: 20, stars: 72, attr: 26, name: 32, sub: 20, footer: 18 };
+
+  // Auto-scale the quote font so the full review fits. We keep the card at
+  // its target aspect ratio (Facebook/Instagram require fixed dims) and
+  // shrink type instead of truncating mid-sentence.
+  const quoteFontSize = pickQuoteFontSize(size, effectiveLen);
 
   const padding = size === "story" ? 80 : 64;
 
-  return new ImageResponse(
+  try {
+    return new ImageResponse(
     (
       <div
         style={{
@@ -148,19 +148,18 @@ export async function GET(
 
         <div
           style={{
-            display: "-webkit-box",
+            display: "flex",
             marginTop: 36,
-            fontSize: fonts.quote,
-            lineHeight: 1.15,
+            fontSize: quoteFontSize,
+            lineHeight: 1.18,
             fontStyle: "italic",
             fontWeight: 400,
             maxWidth: size === "story" ? 920 : 1000,
-            overflow: "hidden",
-            WebkitLineClamp: 4,
-            WebkitBoxOrient: "vertical",
+            // No truncation — the font shrinks via pickQuoteFontSize() until
+            // the entire review fits in the available vertical space.
           }}
         >
-          “{trimmed}”
+          “{quote}”
         </div>
 
         <div style={{ flex: 1 }} />
@@ -260,6 +259,87 @@ export async function GET(
       },
     },
   );
+  } catch (err) {
+    console.error("og/review render failed", {
+      googleReviewId: review.google_review_id,
+      size,
+      theme: themeUse.key,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    // Fall back to a minimal solid-color image so the share builder doesn't
+    // show a broken-image icon. Same dimensions as the requested size.
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: bg,
+            color: themeUse.fg,
+            fontSize: 40,
+            fontFamily: "system-ui, sans-serif",
+          }}
+        >
+          {loc.display_name}
+        </div>
+      ),
+      { width, height, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+}
+
+/**
+ * Pick a quote font size that fits the full review within the card's
+ * available vertical space. The buckets were calibrated empirically against
+ * each card aspect — short reviews stay large for impact; long reviews
+ * shrink so nothing gets clipped.
+ *
+ * effectiveLen treats CJK characters as 2× wide (already applied at call site).
+ */
+function pickQuoteFontSize(
+  size: "og" | "square" | "story",
+  effectiveLen: number,
+): number {
+  const buckets: Record<typeof size, { max: number; fs: number }[]> = {
+    // OG card 1200×630 — wide but short. Quote area is roughly 1072×320.
+    og: [
+      { max: 80, fs: 50 },
+      { max: 150, fs: 42 },
+      { max: 250, fs: 34 },
+      { max: 400, fs: 26 },
+      { max: 600, fs: 21 },
+      { max: 900, fs: 18 },
+      { max: Infinity, fs: 15 },
+    ],
+    // Square 1080×1080 — generous middle band, roughly 952×640 for quote.
+    square: [
+      { max: 100, fs: 60 },
+      { max: 200, fs: 50 },
+      { max: 350, fs: 40 },
+      { max: 550, fs: 32 },
+      { max: 800, fs: 25 },
+      { max: 1200, fs: 20 },
+      { max: Infinity, fs: 17 },
+    ],
+    // Story 1080×1920 — lots of vertical space, can stay bigger longer.
+    story: [
+      { max: 120, fs: 72 },
+      { max: 250, fs: 60 },
+      { max: 450, fs: 48 },
+      { max: 700, fs: 38 },
+      { max: 1100, fs: 30 },
+      { max: 1600, fs: 24 },
+      { max: Infinity, fs: 20 },
+    ],
+  };
+  const list = buckets[size];
+  for (const b of list) {
+    if (effectiveLen <= b.max) return b.fs;
+  }
+  return list[list.length - 1].fs;
 }
 
 /**
