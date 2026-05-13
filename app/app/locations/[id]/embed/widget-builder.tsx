@@ -52,14 +52,32 @@ export function WidgetBuilder({
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [iframeHeight, setIframeHeight] = useState(420);
 
-  // Live preview URL — bumps a key on changes so the iframe reloads with
-  // the latest preview config. preview=1 disables widget_events writes.
+  // Preview pulls from the current admin origin (localhost during dev,
+  // review.baamplatform.com in prod). This guarantees a fresh deploy is
+  // visible immediately rather than waiting for the production app's
+  // widget route to ship.
+  const [previewOrigin, setPreviewOrigin] = useState(appUrl);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setPreviewOrigin(window.location.origin);
+    }
+  }, []);
+
+  // Live preview URL — each draft field rides as a query param so the widget
+  // page can render the unsaved config without persisting anything. The page
+  // only honors these overrides when preview=1.
   const previewUrl = useMemo(() => {
-    const u = new URL(`${appUrl}/widget/${slug}`);
+    const u = new URL(`${previewOrigin}/widget/${slug}`);
     u.searchParams.set("preview", "1");
-    u.searchParams.set("v", `${draft.layout}-${draft.min_rating}-${draft.max_count}-${draft.show_aggregate}-${draft.show_leave_own}-${draft.show_reply}-${encodeURIComponent(draft.accent_color)}`);
+    u.searchParams.set("layout", draft.layout);
+    u.searchParams.set("accent", draft.accent_color);
+    u.searchParams.set("min_rating", String(draft.min_rating));
+    u.searchParams.set("max", String(draft.max_count));
+    u.searchParams.set("aggregate", draft.show_aggregate ? "1" : "0");
+    u.searchParams.set("leave_own", draft.show_leave_own ? "1" : "0");
+    u.searchParams.set("reply", draft.show_reply ? "1" : "0");
     return u.toString();
-  }, [appUrl, slug, draft]);
+  }, [previewOrigin, slug, draft]);
 
   useEffect(() => {
     function onMessage(e: MessageEvent) {
@@ -109,21 +127,37 @@ export function WidgetBuilder({
   const previewSrc = previewUrl;
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_440px]">
-      <div className="space-y-6">
+    <div className="grid gap-8 lg:grid-cols-[340px_1fr]">
+      <div className="space-y-5">
         <Field label="Layout">
-          <div className="grid grid-cols-2 gap-2">
-            <LayoutTile
+          <div className="grid grid-cols-2 gap-1.5">
+            <LayoutPill
               active={draft.layout === "cards"}
-              title="Card grid"
-              desc="Three-up grid on desktop, single column on mobile."
+              title="Grid"
+              hint="Three-up cards"
               onClick={() => setDraft({ ...draft, layout: "cards" })}
+              icon={<GridIcon />}
             />
-            <LayoutTile
+            <LayoutPill
+              active={draft.layout === "carousel"}
+              title="Carousel"
+              hint="Horizontal scroll"
+              onClick={() => setDraft({ ...draft, layout: "carousel" })}
+              icon={<CarouselIcon />}
+            />
+            <LayoutPill
+              active={draft.layout === "single"}
+              title="Single"
+              hint="One at a time"
+              onClick={() => setDraft({ ...draft, layout: "single" })}
+              icon={<SingleIcon />}
+            />
+            <LayoutPill
               active={draft.layout === "compact"}
-              title="Compact list"
-              desc="Single column. Great for sidebars and footers."
+              title="Compact"
+              hint="Short clips list"
               onClick={() => setDraft({ ...draft, layout: "compact" })}
+              icon={<CompactIcon />}
             />
           </div>
         </Field>
@@ -288,31 +322,92 @@ export function WidgetBuilder({
   );
 }
 
-function LayoutTile({
+function LayoutPill({
   active,
   title,
-  desc,
+  hint,
+  icon,
   onClick,
 }: {
   active: boolean;
   title: string;
-  desc: string;
+  hint: string;
+  icon: React.ReactNode;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      title={hint}
       className={cn(
-        "rounded-lg border p-3 text-left transition-colors",
+        "flex items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-colors",
         active
-          ? "border-forest bg-forest/[0.04]"
-          : "border-border-base bg-paper hover:bg-hover",
+          ? "border-forest bg-forest/[0.04] text-ink"
+          : "border-border-base bg-paper text-text-soft hover:bg-hover",
       )}
     >
-      <p className="text-[13.5px] font-medium text-ink">{title}</p>
-      <p className="text-[11.5px] text-text-soft mt-0.5">{desc}</p>
+      <span
+        className={cn(
+          "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md",
+          active
+            ? "bg-forest text-cream"
+            : "bg-cream-deep text-text-soft",
+        )}
+        aria-hidden="true"
+      >
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13px] font-medium leading-tight">
+          {title}
+        </span>
+        <span className="block truncate text-[11px] text-text-muted">
+          {hint}
+        </span>
+      </span>
     </button>
+  );
+}
+
+/* Inline SVG glyphs — small enough to keep inline. Each conveys the layout
+   shape at a glance. */
+function GridIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+      <rect x="0" y="0" width="6" height="6" rx="1" />
+      <rect x="8" y="0" width="6" height="6" rx="1" />
+      <rect x="0" y="8" width="6" height="6" rx="1" />
+      <rect x="8" y="8" width="6" height="6" rx="1" />
+    </svg>
+  );
+}
+function CarouselIcon() {
+  return (
+    <svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="3" y="2" width="10" height="10" rx="1.5" fill="currentColor" />
+      <rect x="0.5" y="3" width="2" height="8" rx="0.8" opacity="0.4" />
+      <rect x="13.5" y="3" width="2" height="8" rx="0.8" opacity="0.4" />
+    </svg>
+  );
+}
+function SingleIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+      <rect x="1" y="3" width="12" height="8" rx="1.5" />
+      <circle cx="5" cy="13.2" r="0.6" opacity="0.45" />
+      <circle cx="7" cy="13.2" r="0.6" />
+      <circle cx="9" cy="13.2" r="0.6" opacity="0.45" />
+    </svg>
+  );
+}
+function CompactIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+      <rect x="0" y="1" width="14" height="3" rx="1" />
+      <rect x="0" y="5.5" width="14" height="3" rx="1" />
+      <rect x="0" y="10" width="14" height="3" rx="1" />
+    </svg>
   );
 }
 

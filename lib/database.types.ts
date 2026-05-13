@@ -56,7 +56,7 @@ export interface SocialHandles {
   [key: string]: string | undefined;
 }
 
-export type WidgetLayout = "cards" | "compact";
+export type WidgetLayout = "cards" | "compact" | "carousel" | "single";
 
 export interface WidgetConfig {
   layout?: WidgetLayout;

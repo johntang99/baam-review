@@ -2,30 +2,39 @@ import { headers } from "next/headers";
 import { createServiceClient } from "@/lib/supabase/service";
 import { resolveWidgetConfig } from "@/lib/widget/config";
 import type { WidgetConfig } from "@/lib/database.types";
+import {
+  ReviewCard,
+  CompactRow,
+  Stars,
+  type WidgetReview,
+} from "@/components/widget/review-card";
+import { WidgetCarousel } from "@/components/widget/widget-carousel";
+import { WidgetSingle } from "@/components/widget/widget-single";
 import { WidgetTracker } from "./widget-tracker";
 
 export const dynamic = "force-dynamic";
 
-interface GoogleReview {
-  id: string;
-  google_review_id: string;
-  reviewer_display_name: string | null;
-  rating: number;
-  comment: string | null;
-  review_create_time: string;
-  reply_comment: string | null;
-}
+type GoogleReview = WidgetReview;
 
 export default async function WidgetPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ preview?: string }>;
+  searchParams: Promise<{
+    preview?: string;
+    layout?: string;
+    accent?: string;
+    min_rating?: string;
+    max?: string;
+    aggregate?: string;
+    leave_own?: string;
+    reply?: string;
+  }>;
 }) {
   const { slug } = await params;
-  const { preview } = await searchParams;
-  const isPreview = preview === "1";
+  const sp = await searchParams;
+  const isPreview = sp.preview === "1";
 
   const supabase = createServiceClient();
   const { data: location } = await supabase
@@ -39,10 +48,46 @@ export default async function WidgetPage({
     return <WidgetMissing slug={slug} />;
   }
 
-  const cfg = resolveWidgetConfig(
+  // Start from the saved config, then layer URL overrides on top. Any
+  // present override wins; absent fields fall back to the saved value.
+  // preview=1 only suppresses widget_events writes — it does NOT gate
+  // visual overrides, so a clinic site can configure its homepage widget
+  // via JSON without touching the BAAM admin.
+  let cfg = resolveWidgetConfig(
     location.widget_config as WidgetConfig | null,
     location.brand_color ?? "#1F4D3F",
   );
+  const accent =
+    sp.accent && /^#[0-9a-fA-F]{6}$/.test(sp.accent)
+      ? sp.accent
+      : cfg.accentColor;
+  const minRating =
+    sp.min_rating === "5" ? 5 : sp.min_rating === "4" ? 4 : cfg.minRating;
+  const max = sp.max
+    ? Math.max(3, Math.min(20, Number(sp.max) || cfg.maxCount))
+    : cfg.maxCount;
+  const layoutOverride: typeof cfg.layout | null =
+    sp.layout === "cards"
+      ? "cards"
+      : sp.layout === "compact"
+        ? "compact"
+        : sp.layout === "carousel"
+          ? "carousel"
+          : sp.layout === "single"
+            ? "single"
+            : null;
+  cfg = {
+    ...cfg,
+    layout: layoutOverride ?? cfg.layout,
+    accentColor: accent,
+    minRating,
+    maxCount: max,
+    showAggregate:
+      sp.aggregate === "1" ? true : sp.aggregate === "0" ? false : cfg.showAggregate,
+    showLeaveOwn:
+      sp.leave_own === "1" ? true : sp.leave_own === "0" ? false : cfg.showLeaveOwn,
+    showReply: sp.reply === "1" ? true : sp.reply === "0" ? false : cfg.showReply,
+  };
 
   const { data: reviews } = await supabase
     .from("google_reviews")
@@ -126,6 +171,18 @@ export default async function WidgetPage({
           <EmptyState locationName={location.display_name} />
         ) : cfg.layout === "compact" ? (
           <CompactList items={items} cfg={cfg} googleUrl={location.google_review_url} />
+        ) : cfg.layout === "carousel" ? (
+          <WidgetCarousel
+            items={items}
+            cfg={cfg}
+            googleUrl={location.google_review_url}
+          />
+        ) : cfg.layout === "single" ? (
+          <WidgetSingle
+            items={items}
+            cfg={cfg}
+            googleUrl={location.google_review_url}
+          />
         ) : (
           <CardGrid items={items} cfg={cfg} googleUrl={location.google_review_url} />
         )}
@@ -193,112 +250,10 @@ function CompactList({
     <ul className="space-y-2.5">
       {items.map((r) => (
         <li key={r.id}>
-          <a
-            href={googleUrl ?? "#"}
-            target="_top"
-            rel="noopener noreferrer"
-            data-action="review_click"
-            data-review-id={r.google_review_id}
-            className="block rounded-xl border border-border-base bg-paper px-4 py-3 shadow-sm transition-all hover:-translate-y-px hover:shadow-md"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="truncate text-[13.5px] font-medium text-ink">
-                {r.reviewer_display_name ?? "Verified customer"}
-              </p>
-              <Stars rating={r.rating} accent={cfg.accentColor} small />
-            </div>
-            <p className="mt-1.5 line-clamp-2 text-[13px] leading-snug text-text-soft">
-              {r.comment}
-            </p>
-          </a>
+          <CompactRow review={r} cfg={cfg} googleUrl={googleUrl} />
         </li>
       ))}
     </ul>
-  );
-}
-
-function ReviewCard({
-  review,
-  cfg,
-  googleUrl,
-}: {
-  review: GoogleReview;
-  cfg: ReturnType<typeof resolveWidgetConfig>;
-  googleUrl: string | null;
-}) {
-  const initials = (review.reviewer_display_name ?? "?")
-    .trim()
-    .split(/\s+/)
-    .map((p) => p.charAt(0).toUpperCase())
-    .slice(0, 2)
-    .join("");
-  return (
-    <a
-      href={googleUrl ?? "#"}
-      target="_top"
-      rel="noopener noreferrer"
-      data-action="review_click"
-      data-review-id={review.google_review_id}
-      className="flex h-full flex-col gap-3 rounded-2xl border border-border-base bg-paper p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
-    >
-      <div className="flex items-center justify-between gap-2">
-        <Stars rating={review.rating} accent={cfg.accentColor} />
-        <span className="text-[11px] uppercase tracking-[0.12em] text-text-muted">
-          {formatDate(review.review_create_time)}
-        </span>
-      </div>
-      <p className="line-clamp-5 flex-1 text-[14px] leading-relaxed text-text">
-        {review.comment}
-      </p>
-      <div className="mt-1 flex items-center gap-2.5 border-t border-border-soft pt-3">
-        <span
-          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[10.5px] font-semibold text-cream"
-          style={{ background: cfg.accentColor }}
-        >
-          {initials || "?"}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[12.5px] font-medium text-ink">
-            {review.reviewer_display_name ?? "Verified customer"}
-          </p>
-          <p className="text-[10.5px] text-text-muted">via Google</p>
-        </div>
-      </div>
-      {cfg.showReply && review.reply_comment && (
-        <div className="rounded-lg bg-cream-deep px-3 py-2">
-          <p className="mb-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-text-muted">
-            Owner response
-          </p>
-          <p className="line-clamp-3 text-[12px] leading-snug text-text-soft">
-            {review.reply_comment}
-          </p>
-        </div>
-      )}
-    </a>
-  );
-}
-
-function Stars({
-  rating,
-  accent,
-  small = false,
-}: {
-  rating: number;
-  accent: string;
-  small?: boolean;
-}) {
-  const filled = Math.round(rating);
-  return (
-    <span
-      className={
-        small ? "text-[13px] tracking-[1.5px]" : "text-[15px] tracking-[2px]"
-      }
-      style={{ color: accent }}
-      aria-label={`${rating} out of 5`}
-    >
-      {"★".repeat(filled)}
-      <span className="opacity-25">{"★".repeat(5 - filled)}</span>
-    </span>
   );
 }
 
@@ -326,22 +281,6 @@ function WidgetMissing({ slug }: { slug: string }) {
       </p>
     </div>
   );
-}
-
-function formatDate(iso: string): string {
-  try {
-    const d = new Date(iso);
-    const now = new Date();
-    const days = Math.floor(
-      (now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24),
-    );
-    if (days < 1) return "Today";
-    if (days < 30) return `${days}d ago`;
-    if (days < 365) return `${Math.floor(days / 30)}mo ago`;
-    return d.toLocaleDateString("en-US", { year: "numeric", month: "short" });
-  } catch {
-    return "";
-  }
 }
 
 function computeAggregate(ratings: number[]): {
