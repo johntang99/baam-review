@@ -9,6 +9,7 @@ interface WidgetCarouselProps {
   items: WidgetReview[];
   cfg: ResolvedWidgetConfig;
   googleUrl: string | null;
+  lang?: string;
 }
 
 /**
@@ -20,6 +21,7 @@ export function WidgetCarousel({
   items,
   cfg,
   googleUrl,
+  lang,
 }: WidgetCarouselProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [canPrev, setCanPrev] = useState(false);
@@ -71,7 +73,7 @@ export function WidgetCarousel({
             className="snap-start flex-shrink-0"
             style={{ width: "min(320px, 86%)" }}
           >
-            <ReviewCard review={r} cfg={cfg} googleUrl={googleUrl} />
+            <ReviewCard review={r} cfg={cfg} googleUrl={googleUrl} lang={lang} />
           </div>
         ))}
       </div>

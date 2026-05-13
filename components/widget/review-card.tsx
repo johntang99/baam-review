@@ -44,11 +44,13 @@ export function ReviewCard({
   review,
   cfg,
   googleUrl,
+  lang,
   fullHeight = true,
 }: {
   review: WidgetReview;
   cfg: ResolvedWidgetConfig;
   googleUrl: string | null;
+  lang?: string;
   /** When false, the card sizes to its content rather than stretching. */
   fullHeight?: boolean;
 }) {
@@ -58,6 +60,7 @@ export function ReviewCard({
     .map((p) => p.charAt(0).toUpperCase())
     .slice(0, 2)
     .join("");
+  const comment = pickComment(review.comment, lang);
   return (
     <a
       href={googleUrl ?? "#"}
@@ -77,7 +80,7 @@ export function ReviewCard({
         </span>
       </div>
       <p className="line-clamp-5 flex-1 text-[14px] leading-relaxed text-text">
-        {review.comment}
+        {comment}
       </p>
       <div className="mt-1 flex items-center gap-2.5 border-t border-border-soft pt-3">
         <span
@@ -111,11 +114,14 @@ export function CompactRow({
   review,
   cfg,
   googleUrl,
+  lang,
 }: {
   review: WidgetReview;
   cfg: ResolvedWidgetConfig;
   googleUrl: string | null;
+  lang?: string;
 }) {
+  const comment = pickComment(review.comment, lang);
   return (
     <a
       href={googleUrl ?? "#"}
@@ -132,10 +138,48 @@ export function CompactRow({
         <Stars rating={review.rating} accent={cfg.accentColor} small />
       </div>
       <p className="mt-1.5 line-clamp-2 text-[13px] leading-snug text-text-soft">
-        {review.comment}
+        {comment}
       </p>
     </a>
   );
+}
+
+/**
+ * Google's GBP API returns translated reviews in the format:
+ *   (Translated by Google) <english>\n\n(Original)\n<source>
+ * Parse it so we can show the original instead of the translation when the
+ * viewer's locale matches the source language.
+ */
+export function parseGoogleComment(
+  raw: string | null | undefined,
+): { translated: string | null; original: string | null } {
+  if (!raw) return { translated: null, original: null };
+  const TRANS = "(Translated by Google)";
+  const ORIG = "(Original)";
+  if (!raw.includes(TRANS)) return { translated: raw, original: null };
+  const afterTrans = raw.slice(raw.indexOf(TRANS) + TRANS.length).trim();
+  const origAt = afterTrans.indexOf(ORIG);
+  if (origAt < 0) return { translated: afterTrans, original: null };
+  return {
+    translated: afterTrans.slice(0, origAt).trim(),
+    original: afterTrans.slice(origAt + ORIG.length).trim(),
+  };
+}
+
+/**
+ * Pick the comment variant to show given the current locale. zh viewers get
+ * the original when it exists (overwhelmingly Chinese in this product's
+ * dataset); en / es viewers get Google's translation when one exists.
+ */
+export function pickComment(
+  raw: string | null | undefined,
+  lang: string | undefined,
+): string | null {
+  if (!raw) return null;
+  const { translated, original } = parseGoogleComment(raw);
+  if (!translated && !original) return raw;
+  if (lang === "zh") return original ?? translated ?? raw;
+  return translated ?? original ?? raw;
 }
 
 export function formatDate(iso: string): string {

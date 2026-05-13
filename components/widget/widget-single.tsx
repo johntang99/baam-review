@@ -9,6 +9,7 @@ interface WidgetSingleProps {
   items: WidgetReview[];
   cfg: ResolvedWidgetConfig;
   googleUrl: string | null;
+  lang?: string;
 }
 
 const ROTATE_MS = 7000;
@@ -18,7 +19,12 @@ const ROTATE_MS = 7000;
  * and when the reduced-motion media query is on. Prev/next arrows and dots
  * for manual control.
  */
-export function WidgetSingle({ items, cfg, googleUrl }: WidgetSingleProps) {
+export function WidgetSingle({
+  items,
+  cfg,
+  googleUrl,
+  lang,
+}: WidgetSingleProps) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<number | null>(null);
@@ -60,6 +66,7 @@ export function WidgetSingle({ items, cfg, googleUrl }: WidgetSingleProps) {
         review={review}
         cfg={cfg}
         googleUrl={googleUrl}
+        lang={lang}
         fullHeight={false}
       />
 
