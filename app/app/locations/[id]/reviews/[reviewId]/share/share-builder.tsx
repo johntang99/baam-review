@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, Copy, Download, ExternalLink } from "lucide-react";
 import {
   SHARE_SIZES,
@@ -41,12 +41,33 @@ export function ShareBuilder({
   );
   const [copied, setCopied] = useState(false);
 
+  // For the live preview, render from the current admin origin (so localhost
+  // dev sees its own freshly-edited /og/review route). The "Copy image URL"
+  // action still uses the canonical prod URL since that's what customers
+  // will share externally.
+  const [previewOrigin, setPreviewOrigin] = useState(appUrl);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setPreviewOrigin(window.location.origin);
+    }
+  }, []);
+
+  // Canonical (prod) URL — used by Copy + Download + Open actions.
   const imgUrl = useMemo(() => {
     const u = new URL(`${appUrl}/og/review/${review.googleReviewId}`);
     u.searchParams.set("size", size);
     u.searchParams.set("theme", theme);
     return u.toString();
   }, [appUrl, review.googleReviewId, size, theme]);
+
+  // Preview URL — same shape but origin-relative and cache-busted so a fresh
+  // deploy (or local code change) shows immediately.
+  const previewSrc = useMemo(() => {
+    const u = new URL(`${previewOrigin}/og/review/${review.googleReviewId}`);
+    u.searchParams.set("size", size);
+    u.searchParams.set("theme", theme);
+    return u.toString();
+  }, [previewOrigin, review.googleReviewId, size, theme]);
 
   function fileName(): string {
     const slugName = locationName
@@ -257,8 +278,8 @@ export function ShareBuilder({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              key={imgUrl}
-              src={imgUrl}
+              key={previewSrc}
+              src={previewSrc}
               alt="Share-card preview"
               className="h-full w-full object-cover"
               onLoad={() =>

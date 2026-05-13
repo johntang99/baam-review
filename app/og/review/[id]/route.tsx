@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { createServiceClient } from "@/lib/supabase/service";
+import { pickComment } from "@/components/widget/review-card";
 import {
   resolveSize,
   resolveTheme,
@@ -59,10 +60,25 @@ export async function GET(
   const accent = themeUse.accent(brand);
   const initial = loc.display_name.charAt(0).toUpperCase();
 
-  // Truncate quote so layout doesn't blow out. Story / square get a tighter
-  // budget than OG.
-  const maxLen = size === "og" ? 260 : size === "square" ? 220 : 200;
-  const quote = (review.comment ?? "").trim();
+  // Strip Google's "(Translated by Google) ... (Original) ..." wrapper so the
+  // card shows ONE version, not both concatenated. Default to the translated
+  // (English) variant for broadest social-share audience; ?lang=zh|es flips
+  // the preference per pickComment's rules.
+  const langParam = url.searchParams.get("lang");
+  const preferLang =
+    langParam === "zh" || langParam === "es" || langParam === "en"
+      ? langParam
+      : "en";
+  const commentOne = pickComment(review.comment, preferLang, "translated") ?? "";
+
+  // Tighter character budget — needs to fit ~4 visible lines at the chosen
+  // font size given the card's padding and the bottom attribution + footer
+  // rows. CJK characters are wider; if the picked variant looks CJK, shrink
+  // further.
+  const isCJK = /[　-鿿぀-ヿ가-힯]/.test(commentOne);
+  const baseLen = size === "og" ? 220 : size === "square" ? 180 : 160;
+  const maxLen = isCJK ? Math.floor(baseLen * 0.45) : baseLen;
+  const quote = commentOne.trim();
   const trimmed = quote.length > maxLen ? quote.slice(0, maxLen - 1).trimEnd() + "…" : quote;
 
   // Per-size font sizes. ImageResponse uses inline fontSizes since we don't
@@ -132,13 +148,16 @@ export async function GET(
 
         <div
           style={{
-            display: "flex",
+            display: "-webkit-box",
             marginTop: 36,
             fontSize: fonts.quote,
             lineHeight: 1.15,
             fontStyle: "italic",
             fontWeight: 400,
             maxWidth: size === "story" ? 920 : 1000,
+            overflow: "hidden",
+            WebkitLineClamp: 4,
+            WebkitBoxOrient: "vertical",
           }}
         >
           “{trimmed}”
