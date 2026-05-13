@@ -58,6 +58,8 @@ export interface SocialHandles {
 
 export type WidgetLayout = "cards" | "compact" | "carousel" | "single";
 
+export type WidgetCommentLangPref = "auto" | "translated" | "original";
+
 export interface WidgetConfig {
   layout?: WidgetLayout;
   min_rating?: 4 | 5;
@@ -66,6 +68,8 @@ export interface WidgetConfig {
   show_aggregate?: boolean;
   show_leave_own?: boolean;
   show_reply?: boolean;
+  max_width?: number | null;
+  comment_lang_pref?: WidgetCommentLangPref;
 }
 
 export type WidgetEventType =

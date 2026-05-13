@@ -1,4 +1,8 @@
-import type { WidgetConfig, WidgetLayout } from "@/lib/database.types";
+import type {
+  WidgetCommentLangPref,
+  WidgetConfig,
+  WidgetLayout,
+} from "@/lib/database.types";
 
 export interface ResolvedWidgetConfig {
   layout: WidgetLayout;
@@ -8,6 +12,8 @@ export interface ResolvedWidgetConfig {
   showAggregate: boolean;
   showLeaveOwn: boolean;
   showReply: boolean;
+  maxWidth: number | null;
+  commentLangPref: WidgetCommentLangPref;
 }
 
 export function resolveWidgetConfig(
@@ -16,6 +22,10 @@ export function resolveWidgetConfig(
 ): ResolvedWidgetConfig {
   const c = raw ?? {};
   const maxCount = c.max_count ?? 6;
+  const maxWidth =
+    typeof c.max_width === "number" && c.max_width > 0
+      ? Math.max(320, Math.min(1920, Math.floor(c.max_width)))
+      : null;
   return {
     layout: c.layout ?? "cards",
     minRating: c.min_rating ?? 4,
@@ -24,5 +34,7 @@ export function resolveWidgetConfig(
     showAggregate: c.show_aggregate ?? true,
     showLeaveOwn: c.show_leave_own ?? true,
     showReply: c.show_reply ?? false,
+    maxWidth,
+    commentLangPref: c.comment_lang_pref ?? "auto",
   };
 }

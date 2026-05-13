@@ -60,7 +60,7 @@ export function ReviewCard({
     .map((p) => p.charAt(0).toUpperCase())
     .slice(0, 2)
     .join("");
-  const comment = pickComment(review.comment, lang);
+  const comment = pickComment(review.comment, lang, cfg.commentLangPref);
   return (
     <a
       href={googleUrl ?? "#"}
@@ -121,7 +121,7 @@ export function CompactRow({
   googleUrl: string | null;
   lang?: string;
 }) {
-  const comment = pickComment(review.comment, lang);
+  const comment = pickComment(review.comment, lang, cfg.commentLangPref);
   return (
     <a
       href={googleUrl ?? "#"}
@@ -167,17 +167,21 @@ export function parseGoogleComment(
 }
 
 /**
- * Pick the comment variant to show given the current locale. zh viewers get
- * the original when it exists (overwhelmingly Chinese in this product's
- * dataset); en / es viewers get Google's translation when one exists.
+ * Pick which comment variant to show. The `pref` overrides locale logic:
+ *   - "translated" — always Google's English translation when available
+ *   - "original"   — always the source language (whatever the reviewer wrote)
+ *   - "auto"       — zh viewers get original, en / es viewers get translated
  */
 export function pickComment(
   raw: string | null | undefined,
   lang: string | undefined,
+  pref: "auto" | "translated" | "original" = "auto",
 ): string | null {
   if (!raw) return null;
   const { translated, original } = parseGoogleComment(raw);
   if (!translated && !original) return raw;
+  if (pref === "translated") return translated ?? original ?? raw;
+  if (pref === "original") return original ?? translated ?? raw;
   if (lang === "zh") return original ?? translated ?? raw;
   return translated ?? original ?? raw;
 }

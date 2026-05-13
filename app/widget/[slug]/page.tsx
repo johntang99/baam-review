@@ -81,6 +81,8 @@ export default async function WidgetPage({
     leave_own?: string;
     reply?: string;
     lang?: string;
+    max_width?: string;
+    comment_lang?: string;
   }>;
 }) {
   const { slug } = await params;
@@ -130,6 +132,18 @@ export default async function WidgetPage({
           : sp.layout === "single"
             ? "single"
             : null;
+  const maxWidthOverride =
+    sp.max_width && /^\d{2,5}$/.test(sp.max_width)
+      ? Math.max(320, Math.min(1920, Number(sp.max_width)))
+      : cfg.maxWidth;
+  const commentLangOverride: typeof cfg.commentLangPref =
+    sp.comment_lang === "translated"
+      ? "translated"
+      : sp.comment_lang === "original"
+        ? "original"
+        : sp.comment_lang === "auto"
+          ? "auto"
+          : cfg.commentLangPref;
   cfg = {
     ...cfg,
     layout: layoutOverride ?? cfg.layout,
@@ -141,6 +155,8 @@ export default async function WidgetPage({
     showLeaveOwn:
       sp.leave_own === "1" ? true : sp.leave_own === "0" ? false : cfg.showLeaveOwn,
     showReply: sp.reply === "1" ? true : sp.reply === "0" ? false : cfg.showReply,
+    maxWidth: maxWidthOverride,
+    commentLangPref: commentLangOverride,
   };
 
   const { data: reviews } = await supabase
@@ -200,8 +216,13 @@ export default async function WidgetPage({
       />
 
       <div
-        className="px-4 py-5 sm:px-5 sm:py-6"
-        style={{ "--accent": cfg.accentColor } as React.CSSProperties}
+        className="mx-auto px-4 py-5 sm:px-5 sm:py-6"
+        style={
+          {
+            "--accent": cfg.accentColor,
+            maxWidth: cfg.maxWidth ? `${cfg.maxWidth}px` : "100%",
+          } as React.CSSProperties
+        }
       >
         {cfg.showAggregate && aggregate.count > 0 && (
           <header className="mb-6 flex flex-col items-center gap-1.5 rounded-2xl border border-border-base bg-paper px-5 py-5 text-center shadow-sm sm:flex-row sm:justify-center sm:gap-4 sm:text-left">

@@ -48,20 +48,33 @@ export function WidgetTracker({
 
     document.addEventListener("click", onClick);
 
-    // Resize parent iframe to fit content.
+    // Resize parent iframe to fit content. We post on a few cadences to
+    // handle font/asset loading and layout settling. Without these extras
+    // the iframe sometimes locks in a height before the final paint and
+    // the bottom of the widget (CTA) gets clipped.
     function postSize() {
       if (window.parent === window) return;
-      const h = document.documentElement.scrollHeight;
+      const h = Math.max(
+        document.documentElement.scrollHeight,
+        document.body?.scrollHeight ?? 0,
+      );
       window.parent.postMessage(
         { type: "baam-widget-resize", height: h },
         "*",
       );
     }
     postSize();
+    const timeouts = [50, 200, 600, 1500].map((ms) =>
+      window.setTimeout(postSize, ms),
+    );
+    window.addEventListener("load", postSize);
     const ro = new ResizeObserver(postSize);
     ro.observe(document.documentElement);
+    if (document.body) ro.observe(document.body);
     return () => {
       document.removeEventListener("click", onClick);
+      window.removeEventListener("load", postSize);
+      timeouts.forEach((id) => window.clearTimeout(id));
       ro.disconnect();
     };
   }, [isPreview, locationId, origin]);

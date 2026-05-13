@@ -2,7 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Check, Copy, Save } from "lucide-react";
-import type { WidgetConfig, WidgetLayout } from "@/lib/database.types";
+import type {
+  WidgetCommentLangPref,
+  WidgetConfig,
+  WidgetLayout,
+} from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/section";
 import { Input } from "@/components/ui/input";
@@ -25,6 +29,8 @@ interface Draft {
   show_aggregate: boolean;
   show_leave_own: boolean;
   show_reply: boolean;
+  max_width: number | null;
+  comment_lang_pref: WidgetCommentLangPref;
 }
 
 export function WidgetBuilder({
@@ -42,6 +48,11 @@ export function WidgetBuilder({
     show_aggregate: initialConfig.show_aggregate ?? true,
     show_leave_own: initialConfig.show_leave_own ?? true,
     show_reply: initialConfig.show_reply ?? false,
+    max_width:
+      typeof initialConfig.max_width === "number"
+        ? initialConfig.max_width
+        : null,
+    comment_lang_pref: initialConfig.comment_lang_pref ?? "auto",
   });
 
   const [copied, setCopied] = useState(false);
@@ -50,7 +61,9 @@ export function WidgetBuilder({
   const [pending, startTransition] = useTransition();
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const [iframeHeight, setIframeHeight] = useState(420);
+  // Generous initial height so the CTA isn't clipped before the first
+  // postMessage from the widget tracker lands.
+  const [iframeHeight, setIframeHeight] = useState(640);
 
   // Preview pulls from the current admin origin (localhost during dev,
   // review.baamplatform.com in prod). This guarantees a fresh deploy is
@@ -76,6 +89,8 @@ export function WidgetBuilder({
     u.searchParams.set("aggregate", draft.show_aggregate ? "1" : "0");
     u.searchParams.set("leave_own", draft.show_leave_own ? "1" : "0");
     u.searchParams.set("reply", draft.show_reply ? "1" : "0");
+    if (draft.max_width) u.searchParams.set("max_width", String(draft.max_width));
+    u.searchParams.set("comment_lang", draft.comment_lang_pref);
     return u.toString();
   }, [previewOrigin, slug, draft]);
 
@@ -89,15 +104,28 @@ export function WidgetBuilder({
     return () => window.removeEventListener("message", onMessage);
   }, []);
 
+  // Self-contained snippet: every saved setting is on the script tag as a
+  // data-* attribute so the customer's site is the source of truth. They can
+  // tweak any attribute on their end without revisiting the BAAM admin.
   const snippet = useMemo(() => {
-    const attrs = [
+    const attrs: string[] = [
       `src="${appUrl}/api/embed.js"`,
       `data-slug="${slug}"`,
       `data-mode="widget"`,
+      `data-layout="${draft.layout}"`,
       `data-color="${draft.accent_color}"`,
+      `data-min-rating="${draft.min_rating}"`,
+      `data-max="${draft.max_count}"`,
+      `data-aggregate="${draft.show_aggregate ? 1 : 0}"`,
+      `data-leave-own="${draft.show_leave_own ? 1 : 0}"`,
+      `data-reply="${draft.show_reply ? 1 : 0}"`,
+      `data-comment-lang="${draft.comment_lang_pref}"`,
     ];
+    if (draft.max_width) {
+      attrs.push(`data-max-width="${draft.max_width}"`);
+    }
     return `<script ${attrs.join(" ")} async></script>`;
-  }, [appUrl, draft.accent_color, slug]);
+  }, [appUrl, draft, slug]);
 
   async function copy() {
     try {
@@ -225,6 +253,82 @@ export function WidgetBuilder({
               }
               className="w-28 font-mono uppercase"
             />
+          </div>
+        </Field>
+
+        <Field
+          label="Max width (px)"
+          htmlFor="max_width"
+          hint="Constrains the widget on wide pages. Leave blank to fill the container."
+        >
+          <Input
+            id="max_width"
+            type="number"
+            min={320}
+            max={1920}
+            placeholder="auto"
+            value={draft.max_width ?? ""}
+            onChange={(e) => {
+              const raw = e.target.value.trim();
+              if (!raw) {
+                setDraft({ ...draft, max_width: null });
+                return;
+              }
+              const n = Number(raw);
+              if (!Number.isFinite(n)) return;
+              setDraft({
+                ...draft,
+                max_width: Math.max(320, Math.min(1920, Math.floor(n))),
+              });
+            }}
+            className="w-32"
+          />
+        </Field>
+
+        <Field
+          label="Comment language"
+          hint="How the widget picks between Google’s translation and the original."
+        >
+          <div className="grid grid-cols-3 gap-1.5">
+            {(
+              [
+                {
+                  value: "auto" as const,
+                  label: "Auto",
+                  hint: "Match viewer locale",
+                },
+                {
+                  value: "translated" as const,
+                  label: "Translated",
+                  hint: "Always English",
+                },
+                {
+                  value: "original" as const,
+                  label: "Original",
+                  hint: "Reviewer’s language",
+                },
+              ]
+            ).map((opt) => {
+              const active = draft.comment_lang_pref === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() =>
+                    setDraft({ ...draft, comment_lang_pref: opt.value })
+                  }
+                  className={cn(
+                    "rounded-lg border px-3 py-2 text-left transition-colors",
+                    active
+                      ? "border-forest bg-forest/[0.04] text-ink"
+                      : "border-border-base bg-paper text-text-soft hover:bg-hover",
+                  )}
+                >
+                  <p className="text-[13px] font-medium">{opt.label}</p>
+                  <p className="text-[11px] text-text-muted">{opt.hint}</p>
+                </button>
+              );
+            })}
           </div>
         </Field>
 

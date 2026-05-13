@@ -123,9 +123,34 @@ function buildEmbedJs(base: string): string {
   }
 
   function renderWidget() {
-    var iframe = document.createElement('iframe');
+    // Read every supported data-* attribute and forward it to the widget URL.
+    // Anything absent here falls back to the location's saved widget_config.
+    var WIDGET_PARAMS = [
+      { attr: 'data-layout',       qs: 'layout' },
+      { attr: 'data-color',        qs: 'accent' },
+      { attr: 'data-accent',       qs: 'accent' },
+      { attr: 'data-min-rating',   qs: 'min_rating' },
+      { attr: 'data-max',          qs: 'max' },
+      { attr: 'data-aggregate',    qs: 'aggregate' },
+      { attr: 'data-leave-own',    qs: 'leave_own' },
+      { attr: 'data-reply',        qs: 'reply' },
+      { attr: 'data-max-width',    qs: 'max_width' },
+      { attr: 'data-comment-lang', qs: 'comment_lang' }
+    ];
+
+    var qs = [];
+    if (lang) qs.push('lang=' + encodeURIComponent(lang));
+    for (var i = 0; i < WIDGET_PARAMS.length; i++) {
+      var p = WIDGET_PARAMS[i];
+      var v = script.getAttribute(p.attr);
+      if (v !== null && v !== '') {
+        qs.push(p.qs + '=' + encodeURIComponent(v));
+      }
+    }
     var src = BASE + '/widget/' + encodeURIComponent(slug);
-    if (lang) src += '?lang=' + encodeURIComponent(lang);
+    if (qs.length) src += '?' + qs.join('&');
+
+    var iframe = document.createElement('iframe');
     iframe.src = src;
     iframe.title = 'Customer reviews';
     iframe.setAttribute('loading', 'lazy');
@@ -140,6 +165,14 @@ function buildEmbedJs(base: string): string {
     s.background = 'transparent';
     s.colorScheme = 'normal';
     s.minHeight = '320px';
+    // Respect data-max-width on the iframe too so the iframe element itself
+    // doesn't overflow its container on very wide pages.
+    var mw = script.getAttribute('data-max-width');
+    if (mw && /^\\d{2,5}$/.test(mw)) {
+      s.maxWidth = parseInt(mw, 10) + 'px';
+      s.marginLeft = 'auto';
+      s.marginRight = 'auto';
+    }
 
     // Listen for height messages from /widget/[slug]'s WidgetTracker.
     window.addEventListener('message', function(e){

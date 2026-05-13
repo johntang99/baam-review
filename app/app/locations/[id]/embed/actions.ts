@@ -41,6 +41,21 @@ export async function saveWidgetConfig(
   if (typeof config.show_reply === "boolean") {
     clean.show_reply = config.show_reply;
   }
+  if (config.max_width === null) {
+    clean.max_width = null;
+  } else if (typeof config.max_width === "number") {
+    clean.max_width = Math.max(
+      320,
+      Math.min(1920, Math.floor(config.max_width)),
+    );
+  }
+  if (
+    config.comment_lang_pref === "auto" ||
+    config.comment_lang_pref === "translated" ||
+    config.comment_lang_pref === "original"
+  ) {
+    clean.comment_lang_pref = config.comment_lang_pref;
+  }
 
   const { error } = await supabase
     .from("locations")
