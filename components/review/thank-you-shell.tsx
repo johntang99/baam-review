@@ -52,6 +52,17 @@ interface ThankYouShellProps {
   shareImageUrl: string | null;
   isPrivate: boolean;
   shareablePreviewQuote: string;
+  /** Active referral offer for this location, or null when none configured. */
+  offer: {
+    title: string;
+    subtitle: string | null;
+    code: string | null;
+    imageUrl: string | null;
+    imageAspect: "16:9" | "4:3" | "1:1" | "21:9" | "3:4";
+    accentColor: string;
+    expiresAt: string | null;
+    isExpired: boolean;
+  } | null;
 }
 
 export function ThankYouShell(props: ThankYouShellProps) {
@@ -68,6 +79,7 @@ export function ThankYouShell(props: ThankYouShellProps) {
     shareImageUrl,
     isPrivate,
     shareablePreviewQuote,
+    offer,
   } = props;
   const s = STRINGS[lang];
 
@@ -75,7 +87,10 @@ export function ThankYouShell(props: ThankYouShellProps) {
   const toastTimer = useRef<number | null>(null);
   const loggedView = useRef(false);
 
-  const accent = location.brandColor || "#1F4D3F";
+  // Active-offer accent overrides the location brand color so the share-card
+  // preview here visually matches the friend-side /s/<token> rendering.
+  const accent =
+    offer?.accentColor || location.brandColor || "#1F4D3F";
 
   // Per-location CSS var driving the prototype's --clinic-primary token.
   // Inline style keeps it scoped to this subtree.
@@ -326,15 +341,34 @@ export function ThankYouShell(props: ThankYouShellProps) {
               <span className="h-1.5 w-1.5 rounded-full bg-gold" />
               {s.share_eyebrow}
             </p>
-            <h3 className="mb-1 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.015em] text-ink">
-              {s.share_title.replace(s.share_title_em, "")}
-              <em className="not-italic italic" style={{ color: accent }}>
-                {s.share_title_em}
-              </em>
-            </h3>
-            <p className="font-display text-[14.5px] italic leading-snug text-text-soft">
-              {s.share_sub}
-            </p>
+            {offer ? (
+              <>
+                <h3 className="mb-1 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.015em] text-ink">
+                  Send this — they get{" "}
+                  <em className="not-italic italic" style={{ color: accent }}>
+                    {summarizeOffer(offer.title)}
+                  </em>
+                </h3>
+                <p className="font-display text-[14.5px] italic leading-snug text-text-soft">
+                  {offer.subtitle ?? s.share_sub}
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="mb-1 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.015em] text-ink">
+                  {s.share_title.replace(s.share_title_em, "")}
+                  <em
+                    className="not-italic italic"
+                    style={{ color: accent }}
+                  >
+                    {s.share_title_em}
+                  </em>
+                </h3>
+                <p className="font-display text-[14.5px] italic leading-snug text-text-soft">
+                  {s.share_sub}
+                </p>
+              </>
+            )}
           </header>
 
           <SharePreview
@@ -351,6 +385,7 @@ export function ThankYouShell(props: ThankYouShellProps) {
             mark={s.share_preview_mark}
             shareImageUrl={shareImageUrl}
             businessHref={shareUrl ?? `/r/${location.slug}`}
+            offer={offer}
           />
 
           <div className="grid grid-cols-4 gap-2.5 p-[22px]">
@@ -580,6 +615,7 @@ function SharePreview({
   mark,
   shareImageUrl,
   businessHref,
+  offer,
 }: {
   accent: string;
   initial: string;
@@ -591,6 +627,16 @@ function SharePreview({
   mark: string;
   shareImageUrl: string | null;
   businessHref: string;
+  offer: {
+    title: string;
+    subtitle: string | null;
+    code: string | null;
+    imageUrl: string | null;
+    imageAspect: "16:9" | "4:3" | "1:1" | "21:9" | "3:4";
+    accentColor: string;
+    expiresAt: string | null;
+    isExpired: boolean;
+  } | null;
 }) {
   return (
     <div
@@ -614,9 +660,49 @@ function SharePreview({
       </p>
 
       {attribution.trim().length > 2 && (
-        <p className="relative mb-[22px] text-[12px] text-white/75">
+        <p className="relative mb-[18px] text-[12px] text-white/75">
           {attribution}
         </p>
+      )}
+
+      {offer && (
+        <div className="relative mb-[18px] overflow-hidden rounded-[14px] bg-white p-4 text-ink shadow-sm">
+          {offer.imageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={offer.imageUrl}
+              alt=""
+              className="mb-3 w-full rounded-[10px] object-cover"
+              style={{
+                aspectRatio: offer.imageAspect.replace(":", " / "),
+              }}
+            />
+          )}
+          <span
+            className="mb-2 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-white"
+            style={{ background: offer.accentColor }}
+          >
+            {offer.isExpired ? "Offer expired" : "Limited offer"}
+          </span>
+          <p className="font-display text-[16px] font-medium leading-[1.2] text-ink">
+            {offer.title}
+          </p>
+          {offer.subtitle && (
+            <p className="mt-1 text-[12px] leading-snug text-text-soft">
+              {offer.subtitle}
+            </p>
+          )}
+          {offer.code && (
+            <p className="mt-3 inline-block rounded-md border border-dashed px-2.5 py-1 font-mono text-[12.5px] font-bold tracking-[0.04em]"
+               style={{
+                 color: offer.accentColor,
+                 borderColor: offer.accentColor,
+                 background: tintWhite(offer.accentColor, 0.9),
+               }}>
+              {offer.code}
+            </p>
+          )}
+        </div>
       )}
 
       <div className="relative flex items-center justify-between border-t border-white/[0.18] pt-[18px]">
@@ -725,4 +811,36 @@ function SocialButton({
       <span className="text-[10.5px] text-text-muted">{handle}</span>
     </button>
   );
+}
+
+/**
+ * Strip a leading "$20 off", "Free consultation", "10% off" etc. from the
+ * offer title so the share-card header can read "they get $20 off". Falls
+ * back to the full title if no leading benefit phrase is detected.
+ */
+function summarizeOffer(title: string): string {
+  const t = title.trim();
+  // Common patterns: "$N off X", "N% off X", "Free X". Just take the
+  // first 6 words to keep the header tight.
+  const words = t.split(/\s+/);
+  if (words.length <= 6) return t.toLowerCase().replace(/[.!]$/, "");
+  return words.slice(0, 6).join(" ").toLowerCase().replace(/[.!]$/, "") + "…";
+}
+
+function tintWhite(hex: string, amount: number): string {
+  if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return "#FFFFFF";
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.min(
+    255,
+    Math.floor(((n >> 16) & 0xff) + (255 - ((n >> 16) & 0xff)) * amount),
+  );
+  const g = Math.min(
+    255,
+    Math.floor(((n >> 8) & 0xff) + (255 - ((n >> 8) & 0xff)) * amount),
+  );
+  const b = Math.min(
+    255,
+    Math.floor((n & 0xff) + (255 - (n & 0xff)) * amount),
+  );
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }

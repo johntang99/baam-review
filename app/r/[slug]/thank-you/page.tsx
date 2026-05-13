@@ -4,7 +4,11 @@ import {
   isLanguage,
   type Language,
 } from "@/lib/i18n/review";
-import type { SocialHandles } from "@/lib/database.types";
+import type {
+  ReferralConfig,
+  SocialHandles,
+} from "@/lib/database.types";
+import { resolveReferralConfig } from "@/lib/referral/config";
 import { ThankYouShell } from "@/components/review/thank-you-shell";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +44,7 @@ export default async function ThankYouPage({
   const { data: location } = await supabase
     .from("locations")
     .select(
-      "id, slug, display_name, brand_color, logo_url, address, default_language, supported_languages, booking_url, social_handles, consent_display_enabled",
+      "id, slug, display_name, brand_color, logo_url, address, default_language, supported_languages, booking_url, social_handles, consent_display_enabled, referral_config",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -109,6 +113,12 @@ export default async function ThankYouPage({
           ? `${recipientName.split(" ")[0]} just recommended ${location.display_name}.`
           : `${location.display_name} just got a new ${rating}-star review.`;
 
+  const brandColor = location.brand_color ?? "#1F4D3F";
+  const offer = resolveReferralConfig(
+    location.referral_config as ReferralConfig | null,
+    brandColor,
+  );
+
   return (
     <main className="flex min-h-screen flex-col items-center bg-cream px-4 pb-10 sm:px-6">
       <ThankYouShell
@@ -118,7 +128,7 @@ export default async function ThankYouPage({
           id: location.id,
           slug: location.slug,
           displayName: location.display_name,
-          brandColor: location.brand_color ?? "#1F4D3F",
+          brandColor,
           logoUrl: location.logo_url,
           address: location.address,
           bookingUrl: location.booking_url,
@@ -133,6 +143,20 @@ export default async function ThankYouPage({
         shareImageUrl={shareImageUrl}
         isPrivate={isPrivate}
         shareablePreviewQuote={localizedQuote}
+        offer={
+          offer.hasOffer
+            ? {
+                title: offer.offerTitle!,
+                subtitle: offer.offerSubtitle,
+                code: offer.offerCode,
+                imageUrl: offer.offerImageUrl,
+                imageAspect: offer.offerImageAspect,
+                accentColor: offer.accentColor,
+                expiresAt: offer.expiresAt,
+                isExpired: offer.isExpired,
+              }
+            : null
+        }
       />
     </main>
   );
