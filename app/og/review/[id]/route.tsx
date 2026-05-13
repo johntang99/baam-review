@@ -303,36 +303,42 @@ function pickQuoteFontSize(
   size: "og" | "square" | "story",
   effectiveLen: number,
 ): number {
+  // Buckets calibrated against actual rendered output, not theoretical
+  // character widths. Goal: fill ~70–85% of the available quote area
+  // vertically, so short reviews are punchy and long reviews still feel
+  // like a deliberate composition rather than a wall of text.
   const buckets: Record<typeof size, { max: number; fs: number }[]> = {
-    // OG card 1200×630 — wide but short. Quote area is roughly 1072×320.
+    // OG card 1200×630 — wide but short. Quote area roughly 1072×320.
     og: [
       { max: 80, fs: 50 },
-      { max: 150, fs: 42 },
-      { max: 250, fs: 34 },
-      { max: 400, fs: 26 },
-      { max: 600, fs: 21 },
-      { max: 900, fs: 18 },
+      { max: 160, fs: 40 },
+      { max: 280, fs: 30 },
+      { max: 450, fs: 24 },
+      { max: 700, fs: 20 },
+      { max: 1000, fs: 17 },
       { max: Infinity, fs: 15 },
     ],
-    // Square 1080×1080 — generous middle band, roughly 952×640 for quote.
+    // Square 1080×1080 — generous middle band, roughly 952×650 for quote.
     square: [
-      { max: 100, fs: 60 },
-      { max: 200, fs: 50 },
-      { max: 350, fs: 40 },
-      { max: 550, fs: 32 },
-      { max: 800, fs: 25 },
-      { max: 1200, fs: 20 },
-      { max: Infinity, fs: 17 },
+      { max: 80, fs: 64 },
+      { max: 180, fs: 56 },
+      { max: 320, fs: 46 },
+      { max: 500, fs: 38 },
+      { max: 750, fs: 32 },
+      { max: 1100, fs: 27 },
+      { max: 1600, fs: 22 },
+      { max: Infinity, fs: 18 },
     ],
-    // Story 1080×1920 — lots of vertical space, can stay bigger longer.
+    // Story 1080×1920 — lots of vertical space, can stay bigger much longer.
     story: [
-      { max: 120, fs: 72 },
-      { max: 250, fs: 60 },
-      { max: 450, fs: 48 },
-      { max: 700, fs: 38 },
-      { max: 1100, fs: 30 },
-      { max: 1600, fs: 24 },
-      { max: Infinity, fs: 20 },
+      { max: 100, fs: 84 },
+      { max: 200, fs: 72 },
+      { max: 400, fs: 58 },
+      { max: 650, fs: 48 },
+      { max: 1000, fs: 40 },
+      { max: 1500, fs: 32 },
+      { max: 2200, fs: 26 },
+      { max: Infinity, fs: 22 },
     ],
   };
   const list = buckets[size];
