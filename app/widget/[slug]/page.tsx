@@ -150,18 +150,23 @@ export default async function WidgetPage({
         style={{ "--accent": cfg.accentColor } as React.CSSProperties}
       >
         {cfg.showAggregate && aggregate.count > 0 && (
-          <header className="mb-4 flex items-center gap-3 rounded-2xl border border-border-base bg-paper px-4 py-3 shadow-sm">
-            <Stars rating={aggregate.average} accent={cfg.accentColor} />
-            <div className="flex-1 leading-tight">
-              <p className="font-display text-[16.5px] font-medium tracking-[-0.01em] text-ink">
-                {aggregate.average.toFixed(1)}{" "}
-                <span className="text-[13px] text-text-muted">
-                  / 5 · {aggregate.count} review
+          <header className="mb-6 flex flex-col items-center gap-1.5 rounded-2xl border border-border-base bg-paper px-5 py-5 text-center shadow-sm sm:flex-row sm:justify-center sm:gap-4 sm:text-left">
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-display text-[32px] font-medium leading-none tracking-[-0.02em] text-ink">
+                {aggregate.average.toFixed(1)}
+              </span>
+              <Stars rating={aggregate.average} accent={cfg.accentColor} />
+            </div>
+            <div className="leading-tight">
+              <p className="text-[13.5px] text-text">
+                Based on{" "}
+                <span className="font-medium text-ink">
+                  {aggregate.count} Google review
                   {aggregate.count === 1 ? "" : "s"}
                 </span>
               </p>
               <p className="text-[11.5px] text-text-muted">
-                via Google · {location.display_name}
+                for {location.display_name}
               </p>
             </div>
           </header>
@@ -188,14 +193,28 @@ export default async function WidgetPage({
         )}
 
         {cfg.showLeaveOwn && (
-          <div className="mt-5 flex justify-center">
+          <div className="mt-7 flex justify-center">
             <a
-              href={`${baseUrl}/r/${location.slug}?source=widget`}
-              target="_top"
+              href={
+                location.google_review_url
+                  ? location.google_review_url
+                  : `${baseUrl}/r/${location.slug}?source=widget`
+              }
+              target="_blank"
+              rel="noopener noreferrer"
               data-action="leave_own"
-              className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-[13.5px] font-medium transition-all hover:-translate-y-px hover:shadow-md"
+              className="inline-flex items-center gap-2.5 rounded-full px-8 py-4 text-[15.5px] font-semibold shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
               style={{ background: cfg.accentColor, color: "#FAF7F2" }}
             >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
               Leave your own review
               <span aria-hidden>→</span>
             </a>

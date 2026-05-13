@@ -61,7 +61,7 @@ export function ReviewCard({
   return (
     <a
       href={googleUrl ?? "#"}
-      target="_top"
+      target="_blank"
       rel="noopener noreferrer"
       data-action="review_click"
       data-review-id={review.google_review_id}
@@ -119,7 +119,7 @@ export function CompactRow({
   return (
     <a
       href={googleUrl ?? "#"}
-      target="_top"
+      target="_blank"
       rel="noopener noreferrer"
       data-action="review_click"
       data-review-id={review.google_review_id}
