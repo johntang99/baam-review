@@ -51,6 +51,21 @@ export async function saveReferralConfig(
   } else if (config.offer_image_url === null) {
     clean.offer_image_url = null;
   }
+  if (
+    config.offer_image_aspect === "16:9" ||
+    config.offer_image_aspect === "4:3" ||
+    config.offer_image_aspect === "1:1" ||
+    config.offer_image_aspect === "21:9" ||
+    config.offer_image_aspect === "3:4"
+  ) {
+    clean.offer_image_aspect = config.offer_image_aspect;
+  }
+  if (typeof config.accent_color === "string") {
+    const t = config.accent_color.trim();
+    clean.accent_color = /^#[0-9a-fA-F]{6}$/.test(t) ? t : null;
+  } else if (config.accent_color === null) {
+    clean.accent_color = null;
+  }
   if (typeof config.cta_label === "string") {
     const t = config.cta_label.trim().slice(0, CTA_LABEL_MAX);
     clean.cta_label = t || null;

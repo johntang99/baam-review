@@ -1,4 +1,7 @@
-import type { ReferralConfig } from "@/lib/database.types";
+import type {
+  OfferImageAspect,
+  ReferralConfig,
+} from "@/lib/database.types";
 
 export interface ResolvedReferralConfig {
   enabled: boolean;
@@ -8,6 +11,10 @@ export interface ResolvedReferralConfig {
   offerSubtitle: string | null;
   offerCode: string | null;
   offerImageUrl: string | null;
+  /** Aspect ratio of the hero image. Width is fixed by the card; height = width / aspect. */
+  offerImageAspect: OfferImageAspect;
+  /** Resolved accent — referral_config.accent_color override, or location brand_color fallback. */
+  accentColor: string;
   ctaLabel: string;
   /** Falls back to the location's booking_url when null. */
   ctaUrl: string | null;
@@ -15,6 +22,18 @@ export interface ResolvedReferralConfig {
   expiresAt: string | null;
   /** True when expires_at is in the past (offer should still render but with an "expired" pill). */
   isExpired: boolean;
+}
+
+export const VALID_ASPECTS: OfferImageAspect[] = [
+  "16:9",
+  "4:3",
+  "1:1",
+  "21:9",
+  "3:4",
+];
+
+export function isValidAspect(x: unknown): x is OfferImageAspect {
+  return typeof x === "string" && (VALID_ASPECTS as string[]).includes(x);
 }
 
 const DEFAULT_CTA_LABEL = "Book with this offer";
@@ -27,9 +46,13 @@ const CTA_LABEL_MAX = 60;
  * Resolve the saved JSON config into a render-safe shape with sane defaults
  * and trimmed/clamped strings. Returns enabled=false (no offer block) when
  * the config is empty or explicitly disabled.
+ *
+ * Pass the location's brand_color as `fallbackAccent` — used when the
+ * referral config doesn't override accent.
  */
 export function resolveReferralConfig(
   raw: ReferralConfig | null | undefined,
+  fallbackAccent: string,
 ): ResolvedReferralConfig {
   const c = raw ?? {};
   const enabled = c.enabled !== false; // default true; explicit false hides
@@ -37,11 +60,20 @@ export function resolveReferralConfig(
   const offerSubtitle = cleanString(c.offer_subtitle, SUBTITLE_MAX);
   const offerCode = cleanCode(c.offer_code);
   const offerImageUrl = cleanUrl(c.offer_image_url);
+  const accentColor =
+    typeof c.accent_color === "string" &&
+    /^#[0-9a-fA-F]{6}$/.test(c.accent_color.trim())
+      ? c.accent_color.trim()
+      : fallbackAccent;
   const ctaLabel =
     cleanString(c.cta_label, CTA_LABEL_MAX) ?? DEFAULT_CTA_LABEL;
   const ctaUrl = cleanUrl(c.cta_url);
   const expiresAt = cleanIso(c.expires_at);
   const isExpired = expiresAt ? new Date(expiresAt).getTime() < Date.now() : false;
+
+  const offerImageAspect = isValidAspect(c.offer_image_aspect)
+    ? c.offer_image_aspect
+    : "16:9";
 
   return {
     enabled,
@@ -50,6 +82,8 @@ export function resolveReferralConfig(
     offerSubtitle,
     offerCode,
     offerImageUrl,
+    offerImageAspect,
+    accentColor,
     ctaLabel,
     ctaUrl,
     expiresAt,

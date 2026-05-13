@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Calendar, Check, Copy } from "lucide-react";
 import type { Language } from "@/lib/i18n/review";
+import type { OfferImageAspect } from "@/lib/database.types";
 
 const STRINGS: Record<
   Language,
@@ -47,11 +48,17 @@ interface OfferBlockProps {
   subtitle: string | null;
   code: string | null;
   imageUrl: string | null;
+  imageAspect: OfferImageAspect;
   ctaLabel: string;
   ctaUrl: string | null;
   expiresAt: string | null;
   isExpired: boolean;
   lang: Language;
+}
+
+function aspectToCss(aspect: OfferImageAspect): string {
+  // CSS aspect-ratio accepts "W / H" — convert from our colon syntax.
+  return aspect.replace(":", " / ");
 }
 
 export function OfferBlock({
@@ -60,6 +67,7 @@ export function OfferBlock({
   subtitle,
   code,
   imageUrl,
+  imageAspect,
   ctaLabel,
   ctaUrl,
   expiresAt,
@@ -130,7 +138,8 @@ export function OfferBlock({
           <img
             src={imageUrl}
             alt=""
-            className="mb-4 h-32 w-full rounded-xl object-cover"
+            className="mb-4 w-full rounded-xl object-cover"
+            style={{ aspectRatio: aspectToCss(imageAspect) }}
           />
         )}
 

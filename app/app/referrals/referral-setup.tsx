@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { Check, Save } from "lucide-react";
-import type { ReferralConfig } from "@/lib/database.types";
+import type {
+  OfferImageAspect,
+  ReferralConfig,
+} from "@/lib/database.types";
 import { Field } from "@/components/ui/section";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +16,9 @@ import { saveReferralConfig } from "./actions";
 
 interface ReferralSetupProps {
   locationId: string;
+  /** Account ID — used for the storage upload path so the RLS policy on the
+   * `logos` bucket (scoped to account_id prefix) allows the write. */
+  accountId: string;
   locationSlug: string;
   brandColor: string;
   bookingFallback: string | null;
@@ -26,10 +32,31 @@ interface Draft {
   offer_subtitle: string;
   offer_code: string;
   offer_image_url: string | null;
+  offer_image_aspect: OfferImageAspect;
+  accent_color: string;
   cta_label: string;
   cta_url: string;
   expires_at: string; // YYYY-MM-DD or ""
 }
+
+/** Curated palette mirrors the prototype's preset row. Owner can pick one
+ * or override with a custom hex via the color input. */
+const ACCENT_PRESETS: { value: string; label: string }[] = [
+  { value: "#962D22", label: "Clinic red" },
+  { value: "#1F4D3F", label: "BAAM forest" },
+  { value: "#0F4C81", label: "Sapphire" },
+  { value: "#7A4A1F", label: "Bronze" },
+  { value: "#5E3F76", label: "Aubergine" },
+  { value: "#2F5F4F", label: "Sage" },
+];
+
+const ASPECT_OPTIONS: { value: OfferImageAspect; label: string; hint: string }[] = [
+  { value: "16:9", label: "16:9", hint: "Wide landscape (default)" },
+  { value: "4:3", label: "4:3", hint: "Classic landscape" },
+  { value: "1:1", label: "1:1", hint: "Square" },
+  { value: "21:9", label: "21:9", hint: "Cinema strip" },
+  { value: "3:4", label: "3:4", hint: "Portrait" },
+];
 
 function toDateInput(iso: string | null | undefined): string {
   if (!iso) return "";
@@ -40,6 +67,7 @@ function toDateInput(iso: string | null | undefined): string {
 
 export function ReferralSetup({
   locationId,
+  accountId,
   locationSlug,
   brandColor,
   bookingFallback,
@@ -52,6 +80,8 @@ export function ReferralSetup({
     offer_subtitle: initialConfig.offer_subtitle ?? "",
     offer_code: initialConfig.offer_code ?? "",
     offer_image_url: initialConfig.offer_image_url ?? null,
+    offer_image_aspect: initialConfig.offer_image_aspect ?? "16:9",
+    accent_color: initialConfig.accent_color ?? brandColor,
     cta_label: initialConfig.cta_label ?? "Book with this offer",
     cta_url: initialConfig.cta_url ?? "",
     expires_at: toDateInput(initialConfig.expires_at),
@@ -100,6 +130,8 @@ export function ReferralSetup({
     u.searchParams.set("offer_code", draft.offer_code);
     if (draft.offer_image_url)
       u.searchParams.set("offer_image", draft.offer_image_url);
+    u.searchParams.set("offer_image_aspect", draft.offer_image_aspect);
+    u.searchParams.set("accent_color", draft.accent_color);
     u.searchParams.set("cta_label", draft.cta_label);
     u.searchParams.set("cta_url", draft.cta_url);
     u.searchParams.set("expires_at", draft.expires_at);
@@ -115,6 +147,11 @@ export function ReferralSetup({
         offer_subtitle: draft.offer_subtitle || null,
         offer_code: draft.offer_code || null,
         offer_image_url: draft.offer_image_url,
+        offer_image_aspect: draft.offer_image_aspect,
+        accent_color:
+          draft.accent_color && draft.accent_color !== brandColor
+            ? draft.accent_color
+            : null,
         cta_label: draft.cta_label || null,
         cta_url: draft.cta_url || null,
         expires_at: draft.expires_at || null,
@@ -242,12 +279,69 @@ export function ReferralSetup({
           <h3 className="font-display text-[17px] font-medium text-ink">
             Visual
           </h3>
+
+          <Field
+            label="Accent color"
+            hint="Drives the share-card gradient, code styling, and CTA button. Defaults to your location’s brand color."
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              {ACCENT_PRESETS.map((p) => {
+                const active =
+                  draft.accent_color.toLowerCase() === p.value.toLowerCase();
+                return (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() =>
+                      setDraft({ ...draft, accent_color: p.value })
+                    }
+                    title={p.label}
+                    aria-label={p.label}
+                    className={cn(
+                      "h-7 w-7 rounded-full border-2 transition-transform hover:scale-110",
+                      active ? "border-ink" : "border-transparent",
+                    )}
+                    style={{ background: p.value }}
+                  />
+                );
+              })}
+              <span className="mx-2 h-6 w-px bg-border-base" aria-hidden="true" />
+              <input
+                type="color"
+                aria-label="Custom accent color"
+                value={draft.accent_color}
+                onChange={(e) =>
+                  setDraft({ ...draft, accent_color: e.target.value })
+                }
+                className="h-9 w-12 cursor-pointer rounded-md border border-border-base bg-paper p-1"
+              />
+              <Input
+                value={draft.accent_color}
+                onChange={(e) =>
+                  setDraft({ ...draft, accent_color: e.target.value })
+                }
+                className="w-28 font-mono uppercase"
+              />
+              {draft.accent_color.toLowerCase() !== brandColor.toLowerCase() && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDraft({ ...draft, accent_color: brandColor })
+                  }
+                  className="text-[12px] text-text-soft hover:underline"
+                >
+                  Reset to brand color
+                </button>
+              )}
+            </div>
+          </Field>
+
           <Field
             label="Hero image"
             hint="Optional. Shown above the offer title — service photo, product shot, etc. 1200×630 recommended."
           >
             <LogoUploader
-              accountId={locationId}
+              accountId={accountId}
               initialUrl={draft.offer_image_url}
               brandColor={brandColor}
               fallbackInitial="📷"
@@ -256,6 +350,48 @@ export function ReferralSetup({
                 setDraft({ ...draft, offer_image_url: url })
               }
             />
+          </Field>
+
+          <Field
+            label="Image shape"
+            hint="Card width is fixed — the height adjusts to match this ratio. Image is centered and cropped to fill."
+          >
+            <div className="flex flex-wrap gap-1.5">
+              {ASPECT_OPTIONS.map((opt) => {
+                const active = draft.offer_image_aspect === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() =>
+                      setDraft({ ...draft, offer_image_aspect: opt.value })
+                    }
+                    title={opt.hint}
+                    className={cn(
+                      "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-[13px] transition-colors",
+                      active
+                        ? "border-forest bg-forest/[0.04] text-ink"
+                        : "border-border-base bg-paper text-text-soft hover:bg-hover",
+                    )}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "block flex-shrink-0 rounded-sm",
+                        active ? "bg-forest" : "bg-text-muted/40",
+                      )}
+                      style={{
+                        width: 26,
+                        aspectRatio: opt.value.replace(":", " / "),
+                      }}
+                    />
+                    <span className="font-mono text-[12px] font-medium">
+                      {opt.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </Field>
         </div>
 

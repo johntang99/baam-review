@@ -42,7 +42,7 @@ export default async function ReferralsPage({
     ? await supabase
         .from("locations")
         .select(
-          "id, slug, display_name, brand_color, booking_url, referral_config",
+          "id, account_id, slug, display_name, brand_color, booking_url, referral_config",
         )
         .eq("id", selectedId)
         .maybeSingle()
@@ -52,7 +52,7 @@ export default async function ReferralsPage({
     const { data: first } = await supabase
       .from("locations")
       .select(
-        "id, slug, display_name, brand_color, booking_url, referral_config",
+        "id, account_id, slug, display_name, brand_color, booking_url, referral_config",
       )
       .order("created_at", { ascending: false })
       .limit(1)
@@ -119,6 +119,7 @@ export default async function ReferralsPage({
       {tab === "setup" && (
         <ReferralSetup
           locationId={location.id}
+          accountId={location.account_id}
           locationSlug={location.slug}
           brandColor={location.brand_color ?? "#1F4D3F"}
           bookingFallback={location.booking_url ?? null}

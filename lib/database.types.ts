@@ -58,12 +58,17 @@ export interface SocialHandles {
 
 export type WidgetLayout = "cards" | "compact" | "carousel" | "single";
 
+export type OfferImageAspect = "16:9" | "4:3" | "1:1" | "21:9" | "3:4";
+
 export interface ReferralConfig {
   enabled?: boolean;
   offer_title?: string | null;
   offer_subtitle?: string | null;
   offer_code?: string | null;
   offer_image_url?: string | null;
+  offer_image_aspect?: OfferImageAspect | null;
+  /** Override accent color for the share landing card. Null falls back to locations.brand_color. */
+  accent_color?: string | null;
   cta_label?: string | null;
   cta_url?: string | null;
   expires_at?: string | null; // ISO timestamp

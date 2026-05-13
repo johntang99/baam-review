@@ -115,6 +115,8 @@ export default async function SharePage({
     offer_subtitle?: string;
     offer_code?: string;
     offer_image?: string;
+    offer_image_aspect?: string;
+    accent_color?: string;
     cta_label?: string;
     cta_url?: string;
     expires_at?: string;
@@ -154,7 +156,7 @@ export default async function SharePage({
   const s = STRINGS[lang];
   const t = SHARE_STRINGS[lang];
 
-  const accent = location.brand_color ?? "#1F4D3F";
+  const brandAccent = location.brand_color ?? "#1F4D3F";
   const consent = !!req.consent_display;
   const firstName = req.recipient_name?.trim().split(/\s+/)[0] ?? null;
   const initial = location.display_name.charAt(0).toUpperCase();
@@ -194,12 +196,26 @@ export default async function SharePage({
         offer_subtitle: sp.offer_subtitle ?? baseRefCfg?.offer_subtitle ?? null,
         offer_code: sp.offer_code ?? baseRefCfg?.offer_code ?? null,
         offer_image_url: sp.offer_image ?? baseRefCfg?.offer_image_url ?? null,
+        offer_image_aspect:
+          (sp.offer_image_aspect as
+            | "16:9"
+            | "4:3"
+            | "1:1"
+            | "21:9"
+            | "3:4"
+            | undefined) ??
+          baseRefCfg?.offer_image_aspect ??
+          null,
+        accent_color: sp.accent_color ?? baseRefCfg?.accent_color ?? null,
         cta_label: sp.cta_label ?? baseRefCfg?.cta_label ?? null,
         cta_url: sp.cta_url ?? baseRefCfg?.cta_url ?? null,
         expires_at: sp.expires_at ?? baseRefCfg?.expires_at ?? null,
       }
     : null;
-  const offer = resolveReferralConfig(previewRefCfg ?? baseRefCfg);
+  const offer = resolveReferralConfig(previewRefCfg ?? baseRefCfg, brandAccent);
+  // Resolved accent (referral override > location.brand_color) drives the
+  // whole share landing card.
+  const accent = offer.accentColor;
   const ctaOfferUrl = offer.hasOffer
     ? buildCtaUrl(offer, location.booking_url, req.id)
     : null;
@@ -296,6 +312,7 @@ export default async function SharePage({
             subtitle={offer.offerSubtitle}
             code={offer.offerCode}
             imageUrl={offer.offerImageUrl}
+            imageAspect={offer.offerImageAspect}
             ctaLabel={offer.ctaLabel}
             ctaUrl={ctaOfferUrl}
             expiresAt={offer.expiresAt}
