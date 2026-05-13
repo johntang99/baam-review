@@ -12,6 +12,8 @@ interface LogoUploaderProps {
   fallbackInitial: string;
   /** Hidden form field name carrying the URL on submit */
   fieldName: string;
+  /** Optional callback fired whenever the URL changes (upload or remove). */
+  onChange?: (url: string | null) => void;
 }
 
 export function LogoUploader({
@@ -20,10 +22,16 @@ export function LogoUploader({
   brandColor,
   fallbackInitial,
   fieldName,
+  onChange: onUrlChange,
 }: LogoUploaderProps) {
   const [url, setUrl] = useState<string | null>(initialUrl);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function commitUrl(next: string | null) {
+    setUrl(next);
+    onUrlChange?.(next);
+  }
 
   async function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -47,7 +55,7 @@ export function LogoUploader({
     }
 
     const { data } = supabase.storage.from("logos").getPublicUrl(path);
-    setUrl(data.publicUrl);
+    commitUrl(data.publicUrl);
     setPending(false);
   }
 
@@ -88,7 +96,7 @@ export function LogoUploader({
         {url && !pending && (
           <button
             type="button"
-            onClick={() => setUrl(null)}
+            onClick={() => commitUrl(null)}
             className="inline-flex items-center gap-1 text-[12px] text-text-soft hover:text-alert"
           >
             <X className="h-3 w-3" /> Remove

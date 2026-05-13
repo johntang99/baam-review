@@ -7,6 +7,7 @@ import {
   Settings,
   Share2,
   CreditCard,
+  Users,
 } from "lucide-react";
 import { UserCard } from "./user-card";
 import { NavItem } from "./nav-item";
@@ -28,6 +29,7 @@ const workspaceItems = [
   { href: "/app/reviews", label: "Reviews", icon: Star },
   { href: "/app/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/app/share", label: "Widget & QR poster", icon: Share2 },
+  { href: "/app/referrals", label: "Referrals", icon: Users },
 ];
 
 const accountItems = [

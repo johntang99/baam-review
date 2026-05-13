@@ -13,6 +13,9 @@ const VALID: EventType[] = [
   "leave_own_click",
   "review_started",
   "review_submitted",
+  "offer_view",
+  "offer_book_click",
+  "code_copied",
 ];
 
 interface Body {

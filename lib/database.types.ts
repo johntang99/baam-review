@@ -58,6 +58,17 @@ export interface SocialHandles {
 
 export type WidgetLayout = "cards" | "compact" | "carousel" | "single";
 
+export interface ReferralConfig {
+  enabled?: boolean;
+  offer_title?: string | null;
+  offer_subtitle?: string | null;
+  offer_code?: string | null;
+  offer_image_url?: string | null;
+  cta_label?: string | null;
+  cta_url?: string | null;
+  expires_at?: string | null; // ISO timestamp
+}
+
 export type WidgetCommentLangPref = "auto" | "translated" | "original";
 
 export interface WidgetConfig {
@@ -161,6 +172,7 @@ export interface Database {
           consent_display_enabled: boolean;
           widget_config: WidgetConfig;
           default_share_theme: string | null;
+          referral_config: ReferralConfig;
           created_at: string;
           updated_at: string;
         };
@@ -193,6 +205,7 @@ export interface Database {
           consent_display_enabled?: boolean;
           widget_config?: WidgetConfig;
           default_share_theme?: string | null;
+          referral_config?: ReferralConfig;
           created_at?: string;
           updated_at?: string;
         };
@@ -386,7 +399,10 @@ export interface Database {
             | "open_in_maps_click"
             | "leave_own_click"
             | "review_started"
-            | "review_submitted";
+            | "review_submitted"
+            | "offer_view"
+            | "offer_book_click"
+            | "code_copied";
           conversion_request_id: string | null;
           referrer_host: string | null;
           user_agent: string | null;
@@ -403,7 +419,10 @@ export interface Database {
             | "open_in_maps_click"
             | "leave_own_click"
             | "review_started"
-            | "review_submitted";
+            | "review_submitted"
+            | "offer_view"
+            | "offer_book_click"
+            | "code_copied";
           conversion_request_id?: string | null;
           referrer_host?: string | null;
           user_agent?: string | null;

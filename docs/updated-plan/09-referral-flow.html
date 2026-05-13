@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototype — Referral flow (thank-you + recommendation card)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ─── Brand tokens (adjustable via picker bar) ──────────────── */
+  --brand-primary: #962D22;        /* Dr. Huang red as default */
+  --brand-dark:    #6F1F18;        /* darker shade for gradients */
+  --brand-soft:    #F8E5E1;        /* very light tint for backgrounds */
+
+  /* ─── Fixed neutrals ────────────────────────────────────────── */
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-soft: #E8D9B5;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 30px rgba(15, 31, 26, 0.08);
+  --shadow-xl: 0 24px 48px rgba(15, 31, 26, 0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream-deep);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding: 0 0 80px;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ============ COLOR PICKER BAR ============ */
+.picker-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--paper);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 28px;
+  box-shadow: var(--shadow-sm);
+}
+.picker-bar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: center;
+}
+.picker-title {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.picker-title em {
+  font-style: italic;
+  color: var(--brand-primary);
+  font-weight: 400;
+}
+.picker-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.picker-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.picker-input {
+  width: 44px;
+  height: 32px;
+  padding: 2px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.picker-hex {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-soft);
+  text-transform: uppercase;
+}
+.picker-reset {
+  margin-left: auto;
+  padding: 8px 16px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.picker-reset:hover { background: var(--paper); }
+.picker-preset-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.picker-preset {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+.picker-preset:hover { transform: scale(1.1); }
+.picker-preset.active { border-color: var(--ink); }
+
+/* ============ PAGE SHELL ============ */
+.shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 48px 0 18px;
+}
+.section-label-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+.section-label-text {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.section-label-hint {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* ============ TWO-COLUMN GRID ============ */
+.flow-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+}
+@media (max-width: 980px) {
+  .flow-grid { grid-template-columns: 1fr; }
+}
+
+/* ============ PHONE FRAME ============ */
+.phone-frame {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 14px;
+  box-shadow: var(--shadow-xl);
+}
+.phone-screen {
+  background: var(--cream);
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  min-height: 760px;
+  padding: 16px;
+}
+.phone-label {
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+/* ============ CARD COMMON ============ */
+.card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 14px;
+}
+
+/* ─── CONFIRMATION BANNER ──────────────────────── */
+.confirm-banner {
+  background: linear-gradient(135deg, var(--forest) 0%, #163A30 100%);
+  color: var(--cream);
+  padding: 30px 24px 26px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.confirm-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 85% 20%, rgba(201, 169, 97, 0.16), transparent 50%),
+              radial-gradient(circle at 15% 80%, rgba(135, 168, 153, 0.14), transparent 50%);
+}
+.confirm-banner > * { position: relative; }
+.confirm-checkmark {
+  width: 46px; height: 46px;
+  background: rgba(201, 169, 97, 0.2);
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold);
+  margin: 0 auto 14px;
+}
+.confirm-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.confirm-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--cream);
+  margin-bottom: 10px;
+}
+.confirm-title em { font-style: italic; color: var(--gold); }
+.confirm-sub {
+  font-family: 'Newsreader', serif;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: rgba(250, 247, 242, 0.78);
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.clinic-row {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--cream-deep);
+  border-top: 1px solid var(--border-soft);
+}
+.clinic-logo {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-dark));
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 18px;
+}
+.clinic-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 14.5px;
+  color: var(--ink);
+}
+.clinic-meta {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.clinic-stars {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--gold);
+  letter-spacing: 1.5px;
+}
+
+/* ─── NEXT STEPS CARD ──────────────────────── */
+.next-card-head {
+  padding: 22px 22px 12px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.next-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.next-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  line-height: 1.18;
+  margin-bottom: 4px;
+}
+.next-title em { font-style: italic; color: var(--forest); }
+.next-sub {
+  font-family: 'Newsreader', serif;
+  font-size: 13.5px;
+  font-style: italic;
+  color: var(--text-soft);
+}
+
+.actions {
+  padding: 12px 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  font-family: 'Onest', sans-serif;
+}
+.action:hover {
+  background: var(--paper);
+  transform: translateX(2px);
+  box-shadow: var(--shadow-md);
+}
+.action-primary {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+.action-primary:hover { background: var(--brand-dark); border-color: var(--brand-dark); }
+.action-primary .action-icon { background: rgba(255, 255, 255, 0.18); color: white; }
+.action-primary .action-title, .action-primary .action-desc, .action-primary .action-arrow { color: white; }
+.action-primary .action-desc { color: rgba(255, 255, 255, 0.85); }
+.action-primary .action-arrow { color: rgba(255, 255, 255, 0.7); }
+
+.action-icon {
+  width: 38px; height: 38px;
+  background: var(--paper);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--brand-primary);
+  flex-shrink: 0;
+}
+.action-icon svg { width: 18px; height: 18px; }
+.action-text { flex: 1; min-width: 0; }
+.action-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 1px;
+}
+.action-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.3;
+}
+.action-arrow {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ============ RECOMMENDATION CARD ============ */
+/* The visual that gets shared. Used both on the customer's thank-you
+   page (preview) AND on the friend's /s/<token> landing. */
+.rec-card {
+  background: linear-gradient(160deg, var(--brand-primary) 0%, var(--brand-dark) 100%);
+  border-radius: 18px;
+  padding: 24px 22px 20px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 22px rgba(15, 31, 26, 0.15);
+}
+.rec-card::before {
+  content: '';
+  position: absolute;
+  top: -40%; right: -20%;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 70%);
+}
+.rec-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  font-weight: 500;
+  position: relative;
+}
+.rec-stars {
+  color: #FFD56A;
+  font-size: 18px;
+  letter-spacing: 3px;
+  margin-bottom: 11px;
+  position: relative;
+}
+.rec-quote {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4;
+  color: white;
+  margin-bottom: 14px;
+  position: relative;
+}
+.rec-attr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  position: relative;
+}
+.rec-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.rec-attr-name {
+  font-size: 13px;
+  font-weight: 500;
+}
+.rec-attr-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 1px;
+}
+
+/* ─── OFFER BLOCK (inside the rec card) ──────── */
+.rec-offer {
+  position: relative;
+  margin-top: 14px;
+  padding: 16px 16px 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 14px;
+  color: var(--ink);
+}
+.rec-offer-image {
+  width: 100%;
+  height: 96px;
+  object-fit: cover;
+  background: linear-gradient(45deg, var(--brand-soft), white);
+  border-radius: 10px;
+  margin-bottom: 11px;
+}
+.rec-offer-tag {
+  display: inline-block;
+  padding: 3px 9px;
+  background: var(--brand-primary);
+  color: white;
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.rec-offer-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  line-height: 1.15;
+  margin-bottom: 3px;
+}
+.rec-offer-sub {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  line-height: 1.35;
+  margin-bottom: 11px;
+}
+.rec-offer-code-row {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.rec-offer-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.04em;
+  color: var(--brand-primary);
+  background: var(--brand-soft);
+  padding: 6px 11px;
+  border-radius: 7px;
+  border: 1px dashed var(--brand-primary);
+}
+.rec-offer-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 0;
+  font-family: 'Onest', sans-serif;
+}
+.rec-offer-expiry {
+  margin-top: 9px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.rec-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+.rec-clinic {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.rec-clinic-mark {
+  width: 30px; height: 30px;
+  background: white;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--brand-primary);
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 15px;
+}
+.rec-clinic-name {
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.rec-clinic-loc {
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 1px;
+}
+.rec-qr {
+  width: 42px; height: 42px;
+  background: white;
+  border-radius: 7px;
+  padding: 4px;
+}
+
+/* ─── Share-destination tiles ──────── */
+.share-dests {
+  padding: 18px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.share-dest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 4px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Onest', sans-serif;
+  text-align: center;
+}
+.share-dest:hover {
+  background: var(--paper);
+  transform: translateY(-2px);
+}
+.share-dest-icon {
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+}
+.share-dest-icon svg { width: 15px; height: 15px; }
+.share-dest-icon.fb { background: #1877F2; }
+.share-dest-icon.x { background: #0F1419; }
+.share-dest-icon.sms { background: var(--brand-primary); }
+.share-dest-icon.copy { background: var(--ink); }
+.share-dest-label {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* ─── Done button ──────── */
+.done-row {
+  margin-top: 6px;
+  text-align: center;
+}
+.done-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+/* ─── Footer ──────── */
+.footer-tiny {
+  text-align: center;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+.footer-baam {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+.footer-baam-mark {
+  width: 12px; height: 12px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 3px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* ============ FRIEND LANDING (right column) ============ */
+.friend-card-stack > * + * { margin-top: 14px; }
+
+.friend-eyebrow {
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.friend-cta-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.friend-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  background: var(--brand-primary);
+  border-radius: 12px;
+  color: white;
+  text-decoration: none;
+  font-family: 'Onest', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 0;
+  width: 100%;
+}
+.friend-cta:hover { background: var(--brand-dark); transform: translateY(-1px); }
+.friend-cta-icon {
+  width: 32px; height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.friend-cta-icon svg { width: 16px; height: 16px; }
+.friend-cta-arrow { margin-left: auto; font-size: 16px; }
+
+.friend-cta-secondary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  background: var(--cream-deep);
+  border-radius: 12px;
+  color: var(--text);
+  margin-top: 8px;
+  text-decoration: none;
+  font-family: 'Onest', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  width: 100%;
+  cursor: pointer;
+}
+.friend-cta-secondary:hover { background: var(--paper); }
+.friend-cta-secondary .friend-cta-icon { background: var(--paper); color: var(--brand-primary); }
+
+/* ============ DETAIL CALLOUTS (annotations) ============ */
+.callouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+.callout {
+  background: var(--paper);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.callout-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  background: var(--brand-primary);
+  color: white;
+  border-radius: 50%;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.callout-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.callout-text {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+/* ============ STANDALONE CARDS (Section B) ============ */
+.standalone-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+@media (max-width: 980px) {
+  .standalone-row { grid-template-columns: 1fr; }
+}
+.standalone-label {
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============ PICKER BAR ============ -->
+<div class="picker-bar">
+  <div class="picker-bar-inner">
+    <div class="picker-title">Referral flow — <em>color-adjustable prototype</em></div>
+
+    <div class="picker-preset-row">
+      <button class="picker-preset active" data-c="#962D22" data-d="#6F1F18" data-s="#F8E5E1" style="background: #962D22" title="Clinic red (Dr. Huang)"></button>
+      <button class="picker-preset" data-c="#1F4D3F" data-d="#163A30" data-s="#E1ECE8" style="background: #1F4D3F" title="BAAM forest"></button>
+      <button class="picker-preset" data-c="#0F4C81" data-d="#0A3661" data-s="#DDE9F5" style="background: #0F4C81" title="Sapphire blue"></button>
+      <button class="picker-preset" data-c="#7A4A1F" data-d="#5A3614" data-s="#EFE3D4" style="background: #7A4A1F" title="Warm bronze"></button>
+      <button class="picker-preset" data-c="#5E3F76" data-d="#452E58" data-s="#ECE3F2" style="background: #5E3F76" title="Aubergine"></button>
+      <button class="picker-preset" data-c="#2F5F4F" data-d="#234738" data-s="#E1ECE7" style="background: #2F5F4F" title="Sage"></button>
+    </div>
+
+    <div class="picker-group">
+      <span class="picker-label">Custom</span>
+      <input type="color" class="picker-input" id="primary" value="#962D22">
+      <span class="picker-hex" id="primary-hex">#962D22</span>
+    </div>
+
+    <button class="picker-reset" id="reset">Reset</button>
+  </div>
+</div>
+
+<div class="shell">
+
+<!-- ============ SECTION A: THANK-YOU PAGE (CUSTOMER) ============ -->
+<div class="section-label">
+  <span class="section-label-num">A</span>
+  <span class="section-label-text">Thank-you page</span>
+  <span class="section-label-hint">— what the reviewer sees after posting to Google. The share card now carries the referral offer.</span>
+</div>
+
+<div class="flow-grid">
+
+  <!-- LEFT: phone preview of the thank-you page -->
+  <div class="phone-frame">
+    <div class="phone-label">Customer (on mobile)</div>
+    <div class="phone-screen">
+
+      <!-- Confirmation banner -->
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="confirm-banner">
+          <div class="confirm-checkmark">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="confirm-eyebrow">Off to Google</div>
+          <h1 class="confirm-title">Thank you,<br><em>Lili.</em></h1>
+          <p class="confirm-sub">Your review helps more families find trusted care. Now share with friends — they get a special offer.</p>
+        </div>
+        <div class="clinic-row">
+          <div class="clinic-logo">D</div>
+          <div>
+            <div class="clinic-name">Dr. Huang Acupuncture</div>
+            <div class="clinic-meta">Middletown, NY</div>
+          </div>
+          <div class="clinic-stars">★★★★★</div>
+        </div>
+      </div>
+
+      <!-- Next-steps card with referral framing -->
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="next-card-head">
+          <div class="next-eyebrow">A few things you might want to do</div>
+          <h2 class="next-title">Share with a friend, <em>they get $20 off.</em></h2>
+          <div class="next-sub">A personal recommendation means more than any ad.</div>
+        </div>
+        <div class="actions">
+          <button class="action action-primary">
+            <span class="action-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 0 0-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1-.356-1.857M7 20H2v-2a3 3 0 0 1 5.356-1.857M7 20v-2c0-.656.126-1 .356-1.857m0 0a5 5 0 0 1 9.288 0M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+            </span>
+            <div class="action-text">
+              <div class="action-title">Send the share card</div>
+              <div class="action-desc">Friends get $20 off · You stay anonymous to them.</div>
+            </div>
+            <div class="action-arrow">→</div>
+          </button>
+
+          <button class="action">
+            <span class="action-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/></svg>
+            </span>
+            <div class="action-text">
+              <div class="action-title">Book your next visit</div>
+              <div class="action-desc">Open slots this week.</div>
+            </div>
+            <div class="action-arrow">→</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- THE RECOMMENDATION CARD (the share artifact) -->
+      <div class="rec-card" style="margin-bottom: 14px;">
+        <div class="rec-mark">★ Recommended by Lili</div>
+        <div class="rec-stars">★★★★★</div>
+        <div class="rec-quote">"Dr. Huang takes her time, explains everything, and genuinely listens. The clinic is calm and clean."</div>
+        <div class="rec-attr">
+          <div class="rec-avatar">L</div>
+          <div>
+            <div class="rec-attr-name">Lili Zhou</div>
+            <div class="rec-attr-meta">Verified Google review</div>
+          </div>
+        </div>
+
+        <!-- OFFER block -->
+        <div class="rec-offer">
+          <img class="rec-offer-image" src="https://oakahkxpbmmodpcpocio.supabase.co/storage/v1/object/public/chinesemedicine-media/dr-huang-clinic/general/acupuncture-10.jpeg" alt="Acupuncture session" onerror="this.style.display='none'">
+          <span class="rec-offer-tag">Limited offer</span>
+          <div class="rec-offer-title">$20 off your first visit</div>
+          <div class="rec-offer-sub">Use this code at booking. Valid for new patients only.</div>
+          <div class="rec-offer-code-row">
+            <span class="rec-offer-code">FRIEND10</span>
+            <button class="rec-offer-copy">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="rec-offer-expiry">Expires March 31</div>
+        </div>
+
+        <div class="rec-card-footer">
+          <div class="rec-clinic">
+            <div class="rec-clinic-mark">D</div>
+            <div>
+              <div class="rec-clinic-name">Dr. Huang Acupuncture</div>
+              <div class="rec-clinic-loc">Middletown, NY · drhuang.com</div>
+            </div>
+          </div>
+          <div class="rec-qr">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" fill="white"/>
+              <g fill="#962D22">
+                <rect x="0" y="0" width="6" height="6"/>
+                <rect x="1" y="1" width="4" height="4" fill="white"/>
+                <rect x="2" y="2" width="2" height="2"/>
+                <rect x="18" y="0" width="6" height="6"/>
+                <rect x="19" y="1" width="4" height="4" fill="white"/>
+                <rect x="20" y="2" width="2" height="2"/>
+                <rect x="0" y="18" width="6" height="6"/>
+                <rect x="1" y="19" width="4" height="4" fill="white"/>
+                <rect x="2" y="20" width="2" height="2"/>
+                <rect x="8" y="0" width="1" height="1"/><rect x="10" y="0" width="2" height="1"/><rect x="13" y="0" width="1" height="1"/><rect x="8" y="2" width="2" height="1"/><rect x="11" y="2" width="1" height="1"/><rect x="13" y="2" width="2" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="3" height="1"/><rect x="0" y="8" width="1" height="1"/><rect x="2" y="8" width="2" height="1"/><rect x="5" y="8" width="1" height="1"/><rect x="8" y="8" width="2" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="14" y="8" width="2" height="1"/><rect x="17" y="8" width="1" height="1"/><rect x="20" y="8" width="2" height="1"/><rect x="23" y="8" width="1" height="1"/><rect x="0" y="10" width="2" height="1"/><rect x="3" y="10" width="1" height="1"/><rect x="5" y="10" width="2" height="1"/><rect x="9" y="10" width="1" height="1"/><rect x="11" y="10" width="2" height="1"/><rect x="14" y="10" width="1" height="1"/><rect x="17" y="10" width="2" height="1"/><rect x="20" y="10" width="1" height="1"/><rect x="22" y="10" width="2" height="1"/><rect x="0" y="12" width="1" height="1"/><rect x="3" y="12" width="2" height="1"/><rect x="6" y="12" width="1" height="1"/><rect x="8" y="12" width="1" height="1"/><rect x="11" y="12" width="2" height="1"/><rect x="14" y="12" width="2" height="1"/><rect x="17" y="12" width="2" height="1"/><rect x="21" y="12" width="2" height="1"/><rect x="8" y="14" width="1" height="1"/><rect x="10" y="14" width="2" height="1"/><rect x="13" y="14" width="1" height="1"/><rect x="15" y="14" width="2" height="1"/><rect x="18" y="14" width="1" height="1"/><rect x="20" y="14" width="2" height="1"/><rect x="23" y="14" width="1" height="1"/><rect x="8" y="16" width="2" height="1"/><rect x="11" y="16" width="1" height="1"/><rect x="13" y="16" width="2" height="1"/><rect x="16" y="16" width="1" height="1"/><rect x="18" y="16" width="2" height="1"/><rect x="22" y="16" width="2" height="1"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Share destinations -->
+      <div class="card" style="margin-bottom: 14px;">
+        <div class="share-dests">
+          <button class="share-dest">
+            <div class="share-dest-icon fb">
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.25-1.5 1.55-1.5H16.7V4.65A22.5 22.5 0 0 0 14.3 4.5c-2.35 0-4 1.45-4 4.1V10.9H7.6V14h2.7v8h3.2z"/></svg>
+            </div>
+            <span class="share-dest-label">Facebook</span>
+          </button>
+          <button class="share-dest">
+            <div class="share-dest-icon sms">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12c0 4.418-4.03 8-9 8a9.9 9.9 0 0 1-4.255-.949L3 20l1.4-3.72C3.5 15.04 3 13.57 3 12c0-4.42 4.03-8 9-8s9 3.58 9 8z"/></svg>
+            </div>
+            <span class="share-dest-label">SMS</span>
+          </button>
+          <button class="share-dest">
+            <div class="share-dest-icon copy">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </div>
+            <span class="share-dest-label">Copy</span>
+          </button>
+          <button class="share-dest">
+            <div class="share-dest-icon x">
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2H21.5l-7.13 8.158L22.5 22h-6.81l-5.34-6.97L4.18 22H.92l7.63-8.73L1.5 2h6.97l4.84 6.39L18.244 2z"/></svg>
+            </div>
+            <span class="share-dest-label">More</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="done-row">
+        <button class="done-btn">All done — close this page</button>
+      </div>
+      <div class="footer-tiny">
+        <a href="#" class="footer-baam">
+          <span class="footer-baam-mark">B</span>
+          Powered by BAAM Review
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: annotation callouts for thank-you page -->
+  <div>
+    <div style="margin-bottom: 16px;">
+      <h3 style="font-family: 'Fraunces', serif; font-size: 24px; font-weight: 500; letter-spacing: -0.015em; margin-bottom: 8px;">
+        The thank-you page is where <em style="font-style: italic; color: var(--brand-primary);">the loop closes.</em>
+      </h3>
+      <p style="font-family: 'Newsreader', serif; font-size: 16px; color: var(--text-soft); line-height: 1.55;">
+        Five seconds after posting their Google review, the customer sees their own personal recommendation card with an offer attached. The framing isn't "do me a favor and share" — it's "your friends get $20 off, here's your card."
+      </p>
+    </div>
+
+    <div class="callouts">
+      <div class="callout">
+        <div class="callout-num">1</div>
+        <div class="callout-title">Re-framed CTA</div>
+        <div class="callout-text">Headline shifts from "While you're here" to <strong>"they get $20 off"</strong>. The reviewer is now <em>giving</em>, not being asked.</div>
+      </div>
+      <div class="callout">
+        <div class="callout-num">2</div>
+        <div class="callout-title">Personal recommendation</div>
+        <div class="callout-text">Card carries the reviewer's name + quote + their Google avatar (not initials). Looks like THEM endorsing, not BAAM.</div>
+      </div>
+      <div class="callout">
+        <div class="callout-num">3</div>
+        <div class="callout-title">Offer with code</div>
+        <div class="callout-text">Visible discount + clearly-formatted code. Hero image optional (uploaded in admin). Expiry creates urgency.</div>
+      </div>
+      <div class="callout">
+        <div class="callout-num">4</div>
+        <div class="callout-title">Tracked share targets</div>
+        <div class="callout-text">FB / SMS / Copy / More. Each click writes a <code style="font-family:monospace;font-size:11px;">share_view</code> event tied to the advocate.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ============ SECTION B: RECOMMENDATION CARD — DETAIL ============ -->
+<div class="section-label">
+  <span class="section-label-num">B</span>
+  <span class="section-label-text">Recommendation card — detail</span>
+  <span class="section-label-hint">— the artifact that gets shared. Adjustable via brand color above.</span>
+</div>
+
+<div class="standalone-row">
+  <div>
+    <div class="standalone-label">With hero image</div>
+    <div class="rec-card">
+      <div class="rec-mark">★ Recommended by Lili</div>
+      <div class="rec-stars">★★★★★</div>
+      <div class="rec-quote">"Dr. Huang takes her time, explains everything, and genuinely listens. The clinic is calm and clean."</div>
+      <div class="rec-attr">
+        <div class="rec-avatar">L</div>
+        <div>
+          <div class="rec-attr-name">Lili Zhou</div>
+          <div class="rec-attr-meta">Verified Google review</div>
+        </div>
+      </div>
+      <div class="rec-offer">
+        <img class="rec-offer-image" src="https://oakahkxpbmmodpcpocio.supabase.co/storage/v1/object/public/chinesemedicine-media/dr-huang-clinic/general/acupuncture-10.jpeg" alt="" onerror="this.style.display='none'">
+        <span class="rec-offer-tag">Limited offer</span>
+        <div class="rec-offer-title">$20 off your first visit</div>
+        <div class="rec-offer-sub">Use this code at booking. Valid for new patients only.</div>
+        <div class="rec-offer-code-row">
+          <span class="rec-offer-code">FRIEND10</span>
+          <button class="rec-offer-copy">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <div class="rec-offer-expiry">Expires March 31</div>
+      </div>
+      <div class="rec-card-footer">
+        <div class="rec-clinic">
+          <div class="rec-clinic-mark">D</div>
+          <div>
+            <div class="rec-clinic-name">Dr. Huang Acupuncture</div>
+            <div class="rec-clinic-loc">Middletown, NY · drhuang.com</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="standalone-label">Text-only (no image)</div>
+    <div class="rec-card">
+      <div class="rec-mark">★ Recommended by Mei</div>
+      <div class="rec-stars">★★★★★</div>
+      <div class="rec-quote">"Came in for chronic migraines and after three sessions I'm sleeping through the night again. Worth the trip from Manhattan."</div>
+      <div class="rec-attr">
+        <div class="rec-avatar">M</div>
+        <div>
+          <div class="rec-attr-name">Mei Lin</div>
+          <div class="rec-attr-meta">Verified Google review</div>
+        </div>
+      </div>
+      <div class="rec-offer">
+        <span class="rec-offer-tag">First visit deal</span>
+        <div class="rec-offer-title">Free 30-min consultation</div>
+        <div class="rec-offer-sub">Book before Sunday and your first consult is on the house.</div>
+        <div class="rec-offer-code-row">
+          <span class="rec-offer-code">WELCOME</span>
+          <button class="rec-offer-copy">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+      <div class="rec-card-footer">
+        <div class="rec-clinic">
+          <div class="rec-clinic-mark">D</div>
+          <div>
+            <div class="rec-clinic-name">Dr. Huang Acupuncture</div>
+            <div class="rec-clinic-loc">Middletown, NY</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callouts" style="margin-top: 30px;">
+  <div class="callout">
+    <div class="callout-num">A</div>
+    <div class="callout-title">Brand-color gradient</div>
+    <div class="callout-text">Background uses <code style="font-family:monospace;font-size:11px;">linear-gradient(--brand-primary → --brand-dark)</code>. The color picker above drives this.</div>
+  </div>
+  <div class="callout">
+    <div class="callout-num">B</div>
+    <div class="callout-title">Offer block on white</div>
+    <div class="callout-text">Inverted contrast — sits on a white inner card so the discount feels like a real coupon, not part of the photo.</div>
+  </div>
+  <div class="callout">
+    <div class="callout-num">C</div>
+    <div class="callout-title">Optional hero image</div>
+    <div class="callout-text">Owner uploads from admin (reuse <code style="font-family:monospace;font-size:11px;">LogoUploader</code>). Falls back to text-only when not set.</div>
+  </div>
+  <div class="callout">
+    <div class="callout-num">D</div>
+    <div class="callout-title">Code is the action</div>
+    <div class="callout-text">Monospace, brand-soft background, dashed border so it reads as a clipping coupon. Copy button beside it.</div>
+  </div>
+</div>
+
+
+<!-- ============ SECTION C: FRIEND LANDING (/s/<token>) ============ -->
+<div class="section-label">
+  <span class="section-label-num">C</span>
+  <span class="section-label-text">Friend's landing page</span>
+  <span class="section-label-hint">— /s/&lt;advocate_id&gt; — what the friend sees after clicking the share link.</span>
+</div>
+
+<div class="flow-grid">
+
+  <div class="phone-frame">
+    <div class="phone-label">Friend of Lili (on mobile)</div>
+    <div class="phone-screen">
+      <div class="friend-eyebrow">A friend just recommended a clinic</div>
+
+      <div class="rec-card">
+        <div class="rec-mark">★ Recommended by Lili</div>
+        <div class="rec-stars">★★★★★</div>
+        <div class="rec-quote">"Dr. Huang takes her time, explains everything, and genuinely listens. The clinic is calm and clean."</div>
+        <div class="rec-attr">
+          <div class="rec-avatar">L</div>
+          <div>
+            <div class="rec-attr-name">Lili Zhou</div>
+            <div class="rec-attr-meta">Verified Google review</div>
+          </div>
+        </div>
+        <div class="rec-offer">
+          <img class="rec-offer-image" src="https://oakahkxpbmmodpcpocio.supabase.co/storage/v1/object/public/chinesemedicine-media/dr-huang-clinic/general/acupuncture-10.jpeg" alt="" onerror="this.style.display='none'">
+          <span class="rec-offer-tag">Limited offer</span>
+          <div class="rec-offer-title">$20 off your first visit</div>
+          <div class="rec-offer-sub">Use this code at booking. Valid for new patients only.</div>
+          <div class="rec-offer-code-row">
+            <span class="rec-offer-code">FRIEND10</span>
+            <button class="rec-offer-copy">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy code
+            </button>
+          </div>
+          <div class="rec-offer-expiry">Expires March 31</div>
+        </div>
+      </div>
+
+      <div class="friend-cta-card">
+        <button class="friend-cta">
+          <span class="friend-cta-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/></svg>
+          </span>
+          Book with this offer
+          <span class="friend-cta-arrow">→</span>
+        </button>
+        <button class="friend-cta-secondary">
+          <span class="friend-cta-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </span>
+          Open in Maps
+          <span class="friend-cta-arrow">→</span>
+        </button>
+        <button class="friend-cta-secondary">
+          <span class="friend-cta-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>
+          </span>
+          Leave your own review
+          <span class="friend-cta-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="footer-tiny" style="margin-top: 14px;">
+        <a href="#" class="footer-baam">
+          <span class="footer-baam-mark">B</span>
+          Powered by BAAM Review
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="margin-bottom: 16px;">
+      <h3 style="font-family: 'Fraunces', serif; font-size: 24px; font-weight: 500; letter-spacing: -0.015em; margin-bottom: 8px;">
+        Friend lands here <em style="font-style: italic; color: var(--brand-primary);">already half-sold.</em>
+      </h3>
+      <p style="font-family: 'Newsreader', serif; font-size: 16px; color: var(--text-soft); line-height: 1.55;">
+        They got the link from someone they trust. The page shows that recommendation in detail, then makes the next step ridiculously easy: one tap to book with the offer pre-applied.
+      </p>
+    </div>
+
+    <div class="callouts">
+      <div class="callout">
+        <div class="callout-num">1</div>
+        <div class="callout-title">Eyebrow re-states the trust signal</div>
+        <div class="callout-text">"A friend just recommended a clinic" — immediately answers <em>why am I here?</em></div>
+      </div>
+      <div class="callout">
+        <div class="callout-num">2</div>
+        <div class="callout-title">Same card they saw shared</div>
+        <div class="callout-text">Visual continuity from WhatsApp/SMS preview → landing. No bait-and-switch feeling.</div>
+      </div>
+      <div class="callout">
+        <div class="callout-num">3</div>
+        <div class="callout-title">Primary CTA = book with offer</div>
+        <div class="callout-text">URL appends <code style="font-family:monospace;font-size:11px;">?code=FRIEND10</code> so booking platform pre-fills it.</div>
+      </div>
+      <div class="callout">
+        <div class="callout-num">4</div>
+        <div class="callout-title">Soft fallbacks</div>
+        <div class="callout-text">Maps and "Leave your own review" cover the "I'm not ready to book" and "I'm already a patient" cases.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ============ ADMIN SETUP PREVIEW (Section D) ============ -->
+<div class="section-label">
+  <span class="section-label-num">D</span>
+  <span class="section-label-text">Admin: where the owner sets this up</span>
+  <span class="section-label-hint">— /app/referrals/setup — fields owner edits + live preview iframe.</span>
+</div>
+
+<div style="background: var(--paper); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-md);">
+  <div style="background: var(--cream-deep); padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; gap: 28px; align-items: center;">
+    <span style="font-family: 'Fraunces', serif; font-size: 14px; color: var(--ink); font-weight: 500;">Referrals</span>
+    <span style="font-family: 'Onest', sans-serif; font-size: 13px; color: var(--brand-primary); border-bottom: 2px solid var(--brand-primary); padding-bottom: 4px;">Setup</span>
+    <span style="font-family: 'Onest', sans-serif; font-size: 13px; color: var(--text-muted);">Best advocates</span>
+    <span style="font-family: 'Onest', sans-serif; font-size: 13px; color: var(--text-muted);">Activity</span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 360px; gap: 36px; padding: 28px;">
+    <!-- Form column -->
+    <div>
+      <div style="font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; margin-bottom: 16px;">Offer</div>
+
+      <div style="margin-bottom: 14px;">
+        <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500;">Offer title</label>
+        <div style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 13.5px;">$20 off your first visit</div>
+      </div>
+      <div style="margin-bottom: 14px;">
+        <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500;">Offer subtitle</label>
+        <div style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 13.5px;">Use this code at booking. Valid for new patients only.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 160px 1fr; gap: 12px; margin-bottom: 14px;">
+        <div>
+          <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500;">Code</label>
+          <div style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 13.5px; font-family: 'JetBrains Mono', monospace; font-weight: 500;">FRIEND10</div>
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500;">Expires</label>
+          <div style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 13.5px;">2026-03-31</div>
+        </div>
+      </div>
+
+      <div style="font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; margin: 24px 0 14px;">Visual</div>
+      <div style="margin-bottom: 14px;">
+        <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500;">Hero image</label>
+        <div style="background: white; border: 1px dashed var(--border); border-radius: 10px; padding: 18px; text-align: center; color: var(--text-muted); font-size: 13px;">
+          📷 Drop or click to upload (1200×630 recommended)
+        </div>
+      </div>
+
+      <div style="font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; margin: 24px 0 14px;">Call to action</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+        <div>
+          <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500;">Button label</label>
+          <div style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 13.5px;">Book with this offer</div>
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500;">URL</label>
+          <div style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-soft); overflow: hidden; text-overflow: ellipsis;">book.example.com/?code=FRIEND10</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: center; margin-top: 22px;">
+        <button style="background: var(--brand-primary); color: white; border: 0; padding: 10px 22px; border-radius: 999px; font-family: 'Onest', sans-serif; font-size: 13.5px; font-weight: 500; cursor: pointer;">Save changes</button>
+        <span style="font-size: 12px; color: var(--text-muted);">Changes apply to all share links generated after save.</span>
+      </div>
+    </div>
+
+    <!-- Preview column -->
+    <div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; font-weight: 500;">Live preview</div>
+      <div style="background: var(--cream-deep); border-radius: 16px; padding: 16px;">
+        <div class="rec-card" style="margin: 0; box-shadow: 0 6px 18px rgba(15, 31, 26, 0.15);">
+          <div class="rec-mark">★ Recommended by Lili</div>
+          <div class="rec-stars">★★★★★</div>
+          <div class="rec-quote">"Dr. Huang takes her time, explains everything, and genuinely listens."</div>
+          <div class="rec-attr">
+            <div class="rec-avatar">L</div>
+            <div>
+              <div class="rec-attr-name">Lili Zhou</div>
+              <div class="rec-attr-meta">Verified Google review</div>
+            </div>
+          </div>
+          <div class="rec-offer">
+            <span class="rec-offer-tag">Limited offer</span>
+            <div class="rec-offer-title">$20 off your first visit</div>
+            <div class="rec-offer-sub">Use this code at booking. Valid for new patients only.</div>
+            <div class="rec-offer-code-row">
+              <span class="rec-offer-code">FRIEND10</span>
+              <button class="rec-offer-copy">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+  // Brand color picker — drives --brand-primary, --brand-dark, --brand-soft.
+  const root = document.documentElement;
+  const primaryInput = document.getElementById('primary');
+  const primaryHex = document.getElementById('primary-hex');
+  const presets = document.querySelectorAll('.picker-preset');
+  const resetBtn = document.getElementById('reset');
+
+  function darken(hex, amount) {
+    if (!/^#[0-9a-f]{6}$/i.test(hex)) return hex;
+    const n = parseInt(hex.slice(1), 16);
+    const r = Math.max(0, Math.floor(((n >> 16) & 0xff) * (1 - amount)));
+    const g = Math.max(0, Math.floor(((n >> 8) & 0xff) * (1 - amount)));
+    const b = Math.max(0, Math.floor((n & 0xff) * (1 - amount)));
+    return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+  }
+  function softTint(hex, amount) {
+    if (!/^#[0-9a-f]{6}$/i.test(hex)) return hex;
+    const n = parseInt(hex.slice(1), 16);
+    const r = Math.min(255, Math.floor(((n >> 16) & 0xff) + (255 - ((n >> 16) & 0xff)) * amount));
+    const g = Math.min(255, Math.floor(((n >> 8) & 0xff) + (255 - ((n >> 8) & 0xff)) * amount));
+    const b = Math.min(255, Math.floor((n & 0xff) + (255 - (n & 0xff)) * amount));
+    return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+  }
+
+  function apply(primary, dark, soft) {
+    root.style.setProperty('--brand-primary', primary);
+    root.style.setProperty('--brand-dark', dark || darken(primary, 0.25));
+    root.style.setProperty('--brand-soft', soft || softTint(primary, 0.88));
+    primaryInput.value = primary;
+    primaryHex.textContent = primary.toUpperCase();
+  }
+
+  primaryInput.addEventListener('input', (e) => {
+    apply(e.target.value);
+    presets.forEach((b) => b.classList.remove('active'));
+  });
+
+  presets.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      presets.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      apply(btn.dataset.c, btn.dataset.d, btn.dataset.s);
+    });
+  });
+
+  resetBtn.addEventListener('click', () => {
+    presets.forEach((b) => b.classList.remove('active'));
+    presets[0].classList.add('active');
+    apply('#962D22', '#6F1F18', '#F8E5E1');
+  });
+</script>
+
+</body>
+</html>

@@ -179,13 +179,13 @@ export async function GET(
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={review.reviewer_profile_photo_url!}
-                width={fonts.attr * 1.9}
-                height={fonts.attr * 1.9}
+                width={fonts.attr * 3.8}
+                height={fonts.attr * 3.8}
                 alt=""
                 style={{
                   borderRadius: "50%",
                   objectFit: "cover",
-                  border: `2px solid ${themeUse.key === "quiet-cream" ? "rgba(15,31,26,0.12)" : "rgba(255,255,255,0.25)"}`,
+                  border: `3px solid ${themeUse.key === "quiet-cream" ? "rgba(15,31,26,0.12)" : "rgba(255,255,255,0.25)"}`,
                 }}
               />
             )}

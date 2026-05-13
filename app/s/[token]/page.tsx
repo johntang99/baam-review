@@ -8,7 +8,13 @@ import {
   isLanguage,
   type Language,
 } from "@/lib/i18n/review";
+import type { ReferralConfig } from "@/lib/database.types";
+import {
+  buildCtaUrl,
+  resolveReferralConfig,
+} from "@/lib/referral/config";
 import { ShareReferralTracker } from "./share-referral-tracker";
+import { OfferBlock } from "./offer-block";
 
 export const dynamic = "force-dynamic";
 
@@ -101,10 +107,23 @@ export default async function SharePage({
   searchParams,
 }: {
   params: Promise<{ token: string }>;
-  searchParams: Promise<{ lang?: string }>;
+  searchParams: Promise<{
+    lang?: string;
+    preview?: string;
+    enabled?: string;
+    offer_title?: string;
+    offer_subtitle?: string;
+    offer_code?: string;
+    offer_image?: string;
+    cta_label?: string;
+    cta_url?: string;
+    expires_at?: string;
+  }>;
 }) {
   const { token } = await params;
-  const { lang: langOverride } = await searchParams;
+  const sp = await searchParams;
+  const langOverride = sp.lang;
+  const isPreview = sp.preview === "1";
 
   const supabase = createServiceClient();
   const { data: req } = await supabase
@@ -119,7 +138,7 @@ export default async function SharePage({
   const { data: location } = await supabase
     .from("locations")
     .select(
-      "id, slug, display_name, address, brand_color, logo_url, booking_url, default_language, supported_languages",
+      "id, slug, display_name, address, brand_color, logo_url, booking_url, default_language, supported_languages, referral_config",
     )
     .eq("id", req.location_id)
     .maybeSingle();
@@ -163,22 +182,45 @@ export default async function SharePage({
       )}`
     : null;
   const reviewPageUrl = `/r/${location.slug}?lang=${lang}&ref=${req.id}`;
+
+  // Resolve referral offer config — layer URL overrides on top of the saved
+  // config when the admin preview iframe is asking. Preview mode also skips
+  // the share_view insert so the leaderboard isn't polluted by previews.
+  const baseRefCfg = location.referral_config as ReferralConfig | null;
+  const previewRefCfg: ReferralConfig | null = isPreview
+    ? {
+        enabled: sp.enabled === "0" ? false : true,
+        offer_title: sp.offer_title ?? baseRefCfg?.offer_title ?? null,
+        offer_subtitle: sp.offer_subtitle ?? baseRefCfg?.offer_subtitle ?? null,
+        offer_code: sp.offer_code ?? baseRefCfg?.offer_code ?? null,
+        offer_image_url: sp.offer_image ?? baseRefCfg?.offer_image_url ?? null,
+        cta_label: sp.cta_label ?? baseRefCfg?.cta_label ?? null,
+        cta_url: sp.cta_url ?? baseRefCfg?.cta_url ?? null,
+        expires_at: sp.expires_at ?? baseRefCfg?.expires_at ?? null,
+      }
+    : null;
+  const offer = resolveReferralConfig(previewRefCfg ?? baseRefCfg);
+  const ctaOfferUrl = offer.hasOffer
+    ? buildCtaUrl(offer, location.booking_url, req.id)
+    : null;
   const bookingUrl = location.booking_url
     ? appendRefParam(location.booking_url, req.id)
     : null;
 
-  // Log the share_view referral. We skip when the request originator is
-  // viewing their own share page (rare in prod; protects analytics in dev).
+  // Log the share_view referral. Skip in preview mode so admin testing
+  // doesn't pollute the leaderboard.
   const hdrs = await headers();
   const refererHost = parseHost(hdrs.get("referer"));
   const userAgent = hdrs.get("user-agent")?.slice(0, 500) ?? null;
-  await supabase.from("referrals").insert({
-    location_id: location.id,
-    advocate_request_id: req.id,
-    event_type: "share_view",
-    referrer_host: refererHost,
-    user_agent: userAgent,
-  });
+  if (!isPreview) {
+    await supabase.from("referrals").insert({
+      location_id: location.id,
+      advocate_request_id: req.id,
+      event_type: "share_view",
+      referrer_host: refererHost,
+      user_agent: userAgent,
+    });
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-cream px-4 pb-10 sm:px-6">
@@ -245,9 +287,26 @@ export default async function SharePage({
           </div>
         </section>
 
+        {/* Referral offer — promotional block above the action buttons.
+            Renders only when the location has an offer configured. */}
+        {offer.hasOffer && (
+          <OfferBlock
+            accent={accent}
+            title={offer.offerTitle!}
+            subtitle={offer.offerSubtitle}
+            code={offer.offerCode}
+            imageUrl={offer.offerImageUrl}
+            ctaLabel={offer.ctaLabel}
+            ctaUrl={ctaOfferUrl}
+            expiresAt={offer.expiresAt}
+            isExpired={offer.isExpired}
+            lang={lang}
+          />
+        )}
+
         {/* Action buttons */}
         <section className="space-y-2.5">
-          {bookingUrl && (
+          {bookingUrl && !offer.hasOffer && (
             <a
               href={bookingUrl}
               target="_blank"
