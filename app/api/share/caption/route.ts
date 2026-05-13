@@ -10,9 +10,9 @@ export const maxDuration = 30;
 
 const VALID_PLATFORMS: CaptionPlatform[] = [
   "instagram",
-  "xiaohongshu",
   "facebook",
-  "wechat",
+  "twitter",
+  "linkedin",
 ];
 
 interface Body {

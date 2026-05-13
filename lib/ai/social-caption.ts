@@ -5,9 +5,9 @@ const DEFAULT_MODEL = "claude-haiku-4-5-20251001";
 
 export type CaptionPlatform =
   | "instagram"
-  | "xiaohongshu"
   | "facebook"
-  | "wechat";
+  | "twitter"
+  | "linkedin";
 
 export interface CaptionInputs {
   reviewerName: string | null;
@@ -34,12 +34,12 @@ const LANG_NAME: Record<string, string> = {
 const PLATFORM_GUIDE: Record<CaptionPlatform, string> = {
   instagram:
     "Instagram feed post. 60–140 words. Lead with the review's strongest line. Sprinkle 1–2 tasteful emojis if natural. Include a soft CTA. 5–10 specific hashtags (location + service + condition).",
-  xiaohongshu:
-    "Xiaohongshu (小红书) post. Audience is overseas Chinese (海外华人). 80–180 characters. Conversational, slightly emotional. Use a relatable hook line. 4–8 specific hashtags in #话题 format including the city and modality.",
   facebook:
-    "Facebook Page post. 80–160 words. More narrative, more trustworthy. Keep it informational; avoid emoji-heavy style. 0–3 hashtags max.",
-  wechat:
-    "WeChat Moments (朋友圈). 50–120 characters. Casual, personal voice as if recommending to friends. No hashtags (WeChat doesn't surface them). End with the clinic / business name.",
+    "Facebook Page post. 80–160 words. Narrative and trustworthy. Keep it informational; avoid emoji-heavy style. 0–3 hashtags max.",
+  twitter:
+    "X / Twitter post. Hard limit 240 characters total including hashtags. Punchy hook, the reviewer's strongest line, then a soft CTA. 1–3 hashtags max.",
+  linkedin:
+    "LinkedIn post. 80–180 words. Professional tone — frame the review as social proof of expertise. Mention the practice's specialty. No emojis. 0–3 industry hashtags.",
 };
 
 function buildSystemPrompt(input: CaptionInputs): string {

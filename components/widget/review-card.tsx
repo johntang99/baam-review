@@ -10,6 +10,7 @@ export interface WidgetReview {
   id: string;
   google_review_id: string;
   reviewer_display_name: string | null;
+  reviewer_profile_photo_url: string | null;
   rating: number;
   comment: string | null;
   review_create_time: string;
@@ -83,12 +84,11 @@ export function ReviewCard({
         {comment}
       </p>
       <div className="mt-1 flex items-center gap-2.5 border-t border-border-soft pt-3">
-        <span
-          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[10.5px] font-semibold text-cream"
-          style={{ background: cfg.accentColor }}
-        >
-          {initials || "?"}
-        </span>
+        <ReviewerAvatar
+          photoUrl={review.reviewer_profile_photo_url}
+          initials={initials}
+          accent={cfg.accentColor}
+        />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[12.5px] font-medium text-ink">
             {review.reviewer_display_name ?? "Verified customer"}
@@ -199,5 +199,69 @@ export function formatDate(iso: string): string {
     return d.toLocaleDateString("en-US", { year: "numeric", month: "short" });
   } catch {
     return "";
+  }
+}
+
+/**
+ * Reviewer avatar — Google's profile photo when present (the GBP sync fills
+ * `reviewer_profile_photo_url`; ~30% of reviewers have one), otherwise the
+ * initials disc tinted with the location's accent color. Only renders Google-
+ * hosted URLs so a malformed value can't load an arbitrary remote image.
+ */
+function ReviewerAvatar({
+  photoUrl,
+  initials,
+  accent,
+}: {
+  photoUrl: string | null;
+  initials: string;
+  accent: string;
+}) {
+  const safePhoto = isSafeGooglePhotoUrl(photoUrl) ? photoUrl : null;
+  if (safePhoto) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={safePhoto}
+        alt=""
+        width={28}
+        height={28}
+        referrerPolicy="no-referrer"
+        className="h-7 w-7 flex-shrink-0 rounded-full bg-cream-deep object-cover"
+        onError={(e) => {
+          // Hide the broken-image icon; the initials disc isn't rendered as
+          // a sibling, so use the parent's background-color via a fallback
+          // class. Cheapest fallback: drop the img and let the alt-empty
+          // styling carry the disc shape.
+          const target = e.currentTarget;
+          target.style.display = "none";
+          const fallback = target.nextElementSibling as HTMLElement | null;
+          if (fallback) fallback.style.display = "flex";
+        }}
+      />
+    );
+  }
+  return (
+    <span
+      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[10.5px] font-semibold text-cream"
+      style={{ background: accent }}
+    >
+      {initials || "?"}
+    </span>
+  );
+}
+
+function isSafeGooglePhotoUrl(u: string | null | undefined): u is string {
+  if (!u) return false;
+  try {
+    const url = new URL(u);
+    return (
+      url.protocol === "https:" &&
+      (url.hostname.endsWith(".googleusercontent.com") ||
+        url.hostname.endsWith(".googleapis.com") ||
+        url.hostname === "lh3.google.com")
+    );
+  } catch {
+    return false;
   }
 }

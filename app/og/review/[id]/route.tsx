@@ -35,7 +35,7 @@ export async function GET(
   const { data: review } = await supabase
     .from("google_reviews")
     .select(
-      "id, google_review_id, reviewer_display_name, rating, comment, review_create_time, location_id",
+      "id, google_review_id, reviewer_display_name, reviewer_profile_photo_url, rating, comment, review_create_time, location_id",
     )
     .eq("google_review_id", id)
     .maybeSingle();
@@ -168,12 +168,30 @@ export async function GET(
           <div
             style={{
               display: "flex",
+              alignItems: "center",
+              gap: 12,
               fontSize: fonts.attr,
               color: themeUse.fgMuted,
               marginBottom: 28,
             }}
           >
-            — {review.reviewer_display_name}, satisfied customer
+            {isSafeGooglePhotoUrl(review.reviewer_profile_photo_url) && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={review.reviewer_profile_photo_url!}
+                width={fonts.attr * 1.9}
+                height={fonts.attr * 1.9}
+                alt=""
+                style={{
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: `2px solid ${themeUse.key === "quiet-cream" ? "rgba(15,31,26,0.12)" : "rgba(255,255,255,0.25)"}`,
+                }}
+              />
+            )}
+            <span style={{ display: "flex" }}>
+              — {review.reviewer_display_name}, satisfied customer
+            </span>
           </div>
         )}
 
@@ -256,6 +274,9 @@ export async function GET(
       headers: {
         "Cache-Control":
           "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+        // Allow cross-origin fetch so customer sites + the admin running on
+        // localhost can download the PNG via JS without CORS preflight pain.
+        "Access-Control-Allow-Origin": "*",
       },
     },
   );
@@ -286,7 +307,14 @@ export async function GET(
           {loc.display_name}
         </div>
       ),
-      { width, height, headers: { "Cache-Control": "no-store" } },
+      {
+        width,
+        height,
+        headers: {
+          "Cache-Control": "no-store",
+          "Access-Control-Allow-Origin": "*",
+        },
+      },
     );
   }
 }
@@ -353,6 +381,26 @@ function pickQuoteFontSize(
  * Unicode codepoint (U+2605), so emitting "★" as text renders as a tofu box
  * on the server. SVG renders identically regardless of font availability.
  */
+/**
+ * Validate Google-hosted profile photo URLs before fetching them via Satori.
+ * Restricts to known Google hostnames so a malicious or stale value can't
+ * coerce the server into fetching an arbitrary remote URL.
+ */
+function isSafeGooglePhotoUrl(u: string | null | undefined): u is string {
+  if (!u) return false;
+  try {
+    const url = new URL(u);
+    return (
+      url.protocol === "https:" &&
+      (url.hostname.endsWith(".googleusercontent.com") ||
+        url.hostname.endsWith(".googleapis.com") ||
+        url.hostname === "lh3.google.com")
+    );
+  } catch {
+    return false;
+  }
+}
+
 function StarSvg({ size, color }: { size: number; color: string }) {
   return (
     <svg

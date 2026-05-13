@@ -30,6 +30,7 @@ interface ShareBuilderProps {
     id: string;
     googleReviewId: string;
     reviewerName: string | null;
+    reviewerPhotoUrl: string | null;
     rating: number;
     comment: string | null;
     createdAt: string;
@@ -53,7 +54,7 @@ export function ShareBuilder({
 
   // Caption state
   const [captionPlatform, setCaptionPlatform] = useState<
-    "instagram" | "xiaohongshu" | "facebook" | "wechat"
+    "instagram" | "facebook" | "twitter" | "linkedin"
   >("instagram");
   const [caption, setCaption] = useState<string>("");
   const [hashtags, setHashtags] = useState<string[]>([]);
@@ -146,20 +147,27 @@ export function ShareBuilder({
       theme,
       action: "download",
     });
+    // Fetch from the SAME origin (previewSrc) — the canonical prod URL
+    // (imgUrl) would be cross-origin from localhost and CORS-blocked. Same
+    // image content either way since both hit the OG route with identical
+    // query params.
     try {
-      const res = await fetch(imgUrl);
+      const res = await fetch(previewSrc);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = fileName();
+      a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch {
-      // Fallback: just open in new tab.
-      window.open(imgUrl, "_blank", "noopener,noreferrer");
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch (err) {
+      console.error("download failed", err);
+      // Fallback: open in a new tab so the user can right-click → Save As.
+      window.open(previewSrc, "_blank", "noopener,noreferrer");
     }
   }
 
@@ -254,37 +262,137 @@ export function ShareBuilder({
     }
   }
 
+  // Helper — fetch the rendered image as a Blob (same-origin to avoid CORS).
+  async function fetchImageBlob(): Promise<Blob | null> {
+    try {
+      const res = await fetch(previewSrc);
+      if (!res.ok) return null;
+      return await res.blob();
+    } catch {
+      return null;
+    }
+  }
+
+  function captionPlusUrl(): string {
+    if (!caption) return imgUrl;
+    return hashtags.length
+      ? `${caption}\n\n${hashtags.join(" ")}\n\n${imgUrl}`
+      : `${caption}\n\n${imgUrl}`;
+  }
+
+  function logOpen() {
+    void logShareEvent({
+      locationId,
+      googleReviewId: review.googleReviewId,
+      size,
+      theme,
+      action: "open",
+    });
+  }
+
+  // — Platform handlers —
+
+  function shareFacebook() {
+    logOpen();
+    const u = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(imgUrl)}&quote=${encodeURIComponent(caption || "")}`;
+    window.open(u, "_blank", "noopener,noreferrer,width=626,height=436");
+  }
+
+  function shareTwitter() {
+    logOpen();
+    const u = `https://twitter.com/intent/tweet?text=${encodeURIComponent(caption || "")}&url=${encodeURIComponent(imgUrl)}`;
+    window.open(u, "_blank", "noopener,noreferrer,width=550,height=420");
+  }
+
+  function shareLinkedin() {
+    logOpen();
+    const u = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(imgUrl)}`;
+    window.open(u, "_blank", "noopener,noreferrer,width=600,height=520");
+  }
+
+  function shareWhatsApp() {
+    logOpen();
+    const u = `https://wa.me/?text=${encodeURIComponent(captionPlusUrl())}`;
+    window.open(u, "_blank", "noopener,noreferrer");
+  }
+
+  function shareMessages() {
+    logOpen();
+    // iOS / macOS pick this up as iMessage; other platforms fall through to
+    // whatever SMS client is registered.
+    window.location.href = `sms:?&body=${encodeURIComponent(captionPlusUrl())}`;
+  }
+
+  function shareEmail() {
+    logOpen();
+    const subject = `${review.rating}★ review of ${locationName}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(captionPlusUrl())}`;
+  }
+
+  async function copyTextAndImage() {
+    const text = caption
+      ? hashtags.length
+        ? `${caption}\n\n${hashtags.join(" ")}`
+        : caption
+      : `${review.rating}★ review of ${locationName}`;
+
+    const blob = await fetchImageBlob();
+
+    // Try image + text on clipboard via ClipboardItem. If unsupported
+    // (Safari sometimes refuses image/png + text together), fall back to
+    // text-only. The image is on the clipboard only when both succeed.
+    try {
+      if (blob && typeof ClipboardItem !== "undefined") {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            [blob.type]: blob,
+            "text/plain": new Blob([text], { type: "text/plain" }),
+          }),
+        ]);
+      } else {
+        await navigator.clipboard.writeText(text);
+      }
+    } catch {
+      await navigator.clipboard.writeText(text);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function copyLinkAndCaption() {
+    await navigator.clipboard.writeText(captionPlusUrl());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   async function nativeShare() {
     try {
-      // Fetch the image as a Blob so we can pass it as a File to navigator.share.
-      // iOS Safari supports File[]; Android Chrome supports it too.
-      const res = await fetch(imgUrl);
-      const blob = await res.blob();
-      const file = new File([blob], fileName(), { type: blob.type });
-      const shareData: ShareData = {
-        files: [file],
-        title: locationName,
-        text: caption || `${review.rating}★ from ${review.reviewerName ?? "a customer"} — ${locationName}`,
-      };
-      if (navigator.canShare && !navigator.canShare(shareData)) {
-        // Fallback: share text + URL only when file sharing isn't supported.
-        await navigator.share({
+      const blob = await fetchImageBlob();
+      const text =
+        caption ||
+        `${review.rating}★ from ${review.reviewerName ?? "a customer"} — ${locationName}`;
+      if (blob) {
+        const file = new File([blob], fileName(), { type: blob.type });
+        const shareData: ShareData = {
+          files: [file],
           title: locationName,
-          text: caption,
-          url: imgUrl,
-        });
-      } else {
-        await navigator.share(shareData);
+          text,
+        };
+        if (!navigator.canShare || navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+          logOpen();
+          return;
+        }
       }
-      void logShareEvent({
-        locationId,
-        googleReviewId: review.googleReviewId,
-        size,
-        theme,
-        action: "open",
+      // Fallback when file sharing is unavailable (some desktop browsers).
+      await navigator.share({
+        title: locationName,
+        text,
+        url: imgUrl,
       });
+      logOpen();
     } catch {
-      // User dismissed share sheet — no-op
+      // User dismissed share sheet — no-op.
     }
   }
 
@@ -311,9 +419,27 @@ export function ShareBuilder({
           <p className="line-clamp-5 text-[14px] leading-relaxed text-text">
             {review.comment ?? "(No comment text)"}
           </p>
-          <p className="mt-2 text-[12px] text-text-muted">
-            — {review.reviewerName ?? "Verified customer"}
-          </p>
+          <div className="mt-3 flex items-center gap-2">
+            {review.reviewerPhotoUrl &&
+            isSafeGooglePhotoUrl(review.reviewerPhotoUrl) ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={review.reviewerPhotoUrl}
+                alt=""
+                width={22}
+                height={22}
+                referrerPolicy="no-referrer"
+                className="h-[22px] w-[22px] flex-shrink-0 rounded-full object-cover"
+              />
+            ) : (
+              <span className="flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded-full bg-forest/15 text-[10px] font-semibold text-forest">
+                {(review.reviewerName ?? "?").charAt(0).toUpperCase()}
+              </span>
+            )}
+            <p className="text-[12px] text-text-muted">
+              — {review.reviewerName ?? "Verified customer"}
+            </p>
+          </div>
         </section>
 
         {/* Theme picker */}
@@ -440,9 +566,9 @@ export function ShareBuilder({
               {(
                 [
                   { v: "instagram", label: "IG" },
-                  { v: "xiaohongshu", label: "小红书" },
                   { v: "facebook", label: "FB" },
-                  { v: "wechat", label: "微信" },
+                  { v: "twitter", label: "X" },
+                  { v: "linkedin", label: "LinkedIn" },
                 ] as const
               ).map((opt) => (
                 <button
@@ -561,27 +687,94 @@ export function ShareBuilder({
           </div>
         </section>
 
-        {/* Image actions — desktop downloads + mobile native share */}
-        <div className="flex flex-wrap items-center gap-2 border-t border-border-base pt-5">
+        {/* Share targets — 4-col icon grid, mirrors prototype 07's share-row */}
+        <section className="space-y-3 border-t border-border-base pt-5">
+          <p className="text-[12.5px] font-medium tracking-tight text-text-soft">
+            Share to
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            <ShareTile
+              label="Facebook"
+              hint="Web share"
+              bg="#1877F2"
+              onClick={shareFacebook}
+              icon={<FacebookGlyph />}
+            />
+            <ShareTile
+              label="X"
+              hint="Tweet"
+              bg="#0F1419"
+              onClick={shareTwitter}
+              icon={<XGlyph />}
+            />
+            <ShareTile
+              label="LinkedIn"
+              hint="Web share"
+              bg="#0A66C2"
+              onClick={shareLinkedin}
+              icon={<LinkedinGlyph />}
+            />
+            <ShareTile
+              label="WhatsApp"
+              hint="Send link"
+              bg="#25D366"
+              onClick={shareWhatsApp}
+              icon={<WhatsAppGlyph />}
+            />
+            <ShareTile
+              label="Messages"
+              hint="SMS / iMessage"
+              bg="#1F4D3F"
+              onClick={shareMessages}
+              icon={<MessagesGlyph />}
+            />
+            <ShareTile
+              label="Email"
+              hint="With image link"
+              bg="#5A6660"
+              onClick={shareEmail}
+              icon={<MailGlyph />}
+            />
+            <ShareTile
+              label="Copy"
+              hint="Text + image"
+              bg="#0F1F1A"
+              onClick={copyTextAndImage}
+              icon={
+                copied ? (
+                  <Check className="h-[18px] w-[18px]" />
+                ) : (
+                  <Copy className="h-[18px] w-[18px]" />
+                )
+              }
+            />
+            <ShareTile
+              label="Link"
+              hint="Text + URL"
+              bg="#0F1F1A"
+              onClick={copyLinkAndCaption}
+              icon={<LinkGlyph />}
+            />
+          </div>
+
           {canNativeShare && (
             <button
               type="button"
               onClick={nativeShare}
-              className="inline-flex items-center gap-2 rounded-full bg-forest px-5 py-2.5 text-[14px] font-medium text-cream transition-all hover:-translate-y-px hover:bg-forest-dark"
+              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-forest px-5 py-2.5 text-[14px] font-medium text-cream transition-all hover:-translate-y-px hover:bg-forest-dark"
             >
               <Share2 className="h-4 w-4" />
-              Share to app
+              More apps…
             </button>
           )}
+        </section>
+
+        {/* Other actions: download + open */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
           <button
             type="button"
             onClick={download}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-medium transition-all hover:-translate-y-px",
-              canNativeShare
-                ? "border border-border-base bg-paper text-text hover:bg-hover"
-                : "bg-forest text-cream hover:bg-forest-dark",
-            )}
+            className="inline-flex items-center gap-2 rounded-full border border-border-base bg-paper px-5 py-2.5 text-[14px] font-medium text-text transition-colors hover:bg-hover"
           >
             <Download className="h-4 w-4" />
             Download PNG
@@ -591,17 +784,8 @@ export function ShareBuilder({
             onClick={copyUrl}
             className="inline-flex items-center gap-2 rounded-full border border-border-base bg-paper px-5 py-2.5 text-[14px] font-medium text-text transition-colors hover:bg-hover"
           >
-            {copied ? (
-              <>
-                <Check className="h-4 w-4 text-success" />
-                Copied
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" />
-                Copy image URL
-              </>
-            )}
+            <Copy className="h-4 w-4" />
+            Copy image URL
           </button>
           <button
             type="button"
@@ -664,6 +848,163 @@ export function ShareBuilder({
  * sheets can hand the image directly to Instagram / Xiaohongshu / WeChat —
  * something we can't do from desktop browsers.
  */
+function isSafeGooglePhotoUrl(u: string | null | undefined): u is string {
+  if (!u) return false;
+  try {
+    const url = new URL(u);
+    return (
+      url.protocol === "https:" &&
+      (url.hostname.endsWith(".googleusercontent.com") ||
+        url.hostname.endsWith(".googleapis.com") ||
+        url.hostname === "lh3.google.com")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function ShareTile({
+  label,
+  hint,
+  bg,
+  icon,
+  onClick,
+}: {
+  label: string;
+  hint: string;
+  bg: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={hint}
+      className="flex flex-col items-center gap-1.5 rounded-2xl border border-border-base bg-cream-deep px-2 py-3.5 text-center transition-all hover:-translate-y-0.5 hover:bg-paper hover:shadow-sm"
+    >
+      <span
+        className="flex h-9 w-9 items-center justify-center rounded-[10px] text-white"
+        style={{ background: bg }}
+      >
+        {icon}
+      </span>
+      <span className="text-[12px] font-medium text-text">{label}</span>
+      <span className="text-[10.5px] text-text-muted leading-tight">
+        {hint}
+      </span>
+    </button>
+  );
+}
+
+/* Inline brand glyphs — lucide-react v1.14 dropped most brand logos for
+   trademark reasons, so we inline minimal SVG paths. */
+function FacebookGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      width="18"
+      height="18"
+    >
+      <path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.25-1.5 1.55-1.5H16.7V4.65A22.5 22.5 0 0 0 14.3 4.5c-2.35 0-4 1.45-4 4.1V10.9H7.6V14h2.7v8h3.2z" />
+    </svg>
+  );
+}
+function XGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      width="16"
+      height="16"
+    >
+      <path d="M18.244 2H21.5l-7.13 8.158L22.5 22h-6.81l-5.34-6.97L4.18 22H.92l7.63-8.73L1.5 2h6.97l4.84 6.39L18.244 2zm-1.2 18h1.81L7.04 4H5.1l11.944 16z" />
+    </svg>
+  );
+}
+function LinkedinGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      width="18"
+      height="18"
+    >
+      <path d="M20.45 20.45h-3.55V14.9c0-1.32-.03-3.02-1.84-3.02-1.84 0-2.12 1.44-2.12 2.92v5.65H9.4V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.21 0 22.23 0z" />
+    </svg>
+  );
+}
+function WhatsAppGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      width="18"
+      height="18"
+    >
+      <path d="M17.5 14.4c-.3-.15-1.78-.88-2.05-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.95 1.18-.18.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.67-2.08-.18-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.63-.93-2.23-.24-.58-.49-.5-.67-.51-.18-.01-.39-.01-.59-.01-.2 0-.53.08-.8.38-.28.3-1.05 1.03-1.05 2.5 0 1.48 1.08 2.9 1.23 3.1.15.2 2.13 3.25 5.16 4.55.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.78-.73 2.03-1.43.25-.7.25-1.3.18-1.43-.08-.13-.28-.2-.58-.35zM12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.38 5.06L2 22l5.05-1.36A9.95 9.95 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18a8 8 0 0 1-4.08-1.12l-.29-.17-3 .8.8-2.92-.19-.3A8 8 0 1 1 12 20z" />
+    </svg>
+  );
+}
+function MessagesGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      width="18"
+      height="18"
+    >
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+    </svg>
+  );
+}
+function MailGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      width="18"
+      height="18"
+    >
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </svg>
+  );
+}
+function LinkGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      width="18"
+      height="18"
+    >
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.71" />
+    </svg>
+  );
+}
+
 function QrHandoff() {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
 

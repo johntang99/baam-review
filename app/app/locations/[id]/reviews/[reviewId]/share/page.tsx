@@ -30,7 +30,7 @@ export default async function ShareReviewPage({
     supabase
       .from("google_reviews")
       .select(
-        "id, google_review_id, reviewer_display_name, rating, comment, review_create_time",
+        "id, google_review_id, reviewer_display_name, reviewer_profile_photo_url, rating, comment, review_create_time",
       )
       .eq("id", reviewId)
       .maybeSingle(),
@@ -68,6 +68,7 @@ export default async function ShareReviewPage({
             id: review.id,
             googleReviewId: review.google_review_id,
             reviewerName: review.reviewer_display_name,
+            reviewerPhotoUrl: review.reviewer_profile_photo_url,
             rating: review.rating,
             comment: review.comment,
             createdAt: review.review_create_time,

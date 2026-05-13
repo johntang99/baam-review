@@ -166,7 +166,7 @@ export default async function WidgetPage({
   const { data: reviews } = await supabase
     .from("google_reviews")
     .select(
-      "id, google_review_id, reviewer_display_name, rating, comment, review_create_time, reply_comment",
+      "id, google_review_id, reviewer_display_name, reviewer_profile_photo_url, rating, comment, review_create_time, reply_comment",
     )
     .eq("location_id", location.id)
     .gte("rating", cfg.minRating)
