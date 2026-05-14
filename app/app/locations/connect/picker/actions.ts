@@ -48,7 +48,11 @@ export async function createLocationFromGoogle(formData: FormData) {
       typeof primaryCategory === "string" && primaryCategory
         ? primaryCategory.toLowerCase()
         : null,
-    custom_url: typeof websiteUri === "string" ? websiteUri || null : null,
+    // Save GBP's website URI to the dedicated `website_url` column — used
+    // by /s/<advocate_id> as the "learn more" target for friends who land
+    // on a recommendation card. `custom_url` stays free for owners to point
+    // at alternate review platforms (Xiaohongshu, etc.).
+    website_url: typeof websiteUri === "string" ? websiteUri || null : null,
     // Multilingual is the BAAM Review wedge — default all three on. Owner can
     // narrow this in Location Settings if their customer base is monolingual.
     default_language: "en",

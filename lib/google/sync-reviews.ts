@@ -45,19 +45,23 @@ export async function syncReviewsForAccount(
   const { data: locations } = await supabase
     .from("locations")
     .select(
-      "id, display_name, google_place_id, google_resource_name",
+      "id, display_name, google_place_id, google_resource_name, website_url",
     )
     .eq("account_id", accountId);
 
   if (!locations || locations.length === 0) return [];
 
-  // Resolve resource_name for any location that's missing it. The picker
-  // didn't store it in earlier sessions, so existing rows need backfill.
+  // Fetch the GBP location list when ANY of our locations is missing either
+  // a resource_name or a website_url. Pulls websiteUri straight from Google
+  // so owners don't need to type it in manually. Skipped only when every
+  // location already has both, since the API call is non-trivial.
   const needResource = locations.filter((l) => !l.google_resource_name);
-  if (needResource.length > 0) {
+  const needWebsite = locations.filter((l) => !l.website_url);
+  if (needResource.length > 0 || needWebsite.length > 0) {
     try {
       const gbpAccounts = await listGoogleAccounts(accessToken);
       const placeIdToResource = new Map<string, string>();
+      const placeIdToWebsite = new Map<string, string>();
       for (const gbpAcct of gbpAccounts) {
         const gbpLocs = await listGoogleLocations(accessToken, gbpAcct.name);
         for (const loc of gbpLocs) {
@@ -67,22 +71,32 @@ export async function syncReviewsForAccount(
               loc.placeId,
               `${gbpAcct.name}/${loc.name}`,
             );
+            if (loc.websiteUri) {
+              placeIdToWebsite.set(loc.placeId, loc.websiteUri);
+            }
           }
         }
       }
-      for (const ourLoc of needResource) {
+      for (const ourLoc of locations) {
         if (!ourLoc.google_place_id) continue;
-        const resource = placeIdToResource.get(ourLoc.google_place_id);
-        if (resource) {
-          await supabase
-            .from("locations")
-            .update({ google_resource_name: resource })
-            .eq("id", ourLoc.id);
-          ourLoc.google_resource_name = resource;
+        const updates: { google_resource_name?: string; website_url?: string } =
+          {};
+        if (!ourLoc.google_resource_name) {
+          const resource = placeIdToResource.get(ourLoc.google_place_id);
+          if (resource) updates.google_resource_name = resource;
         }
+        if (!ourLoc.website_url) {
+          const site = placeIdToWebsite.get(ourLoc.google_place_id);
+          if (site) updates.website_url = site;
+        }
+        if (Object.keys(updates).length === 0) continue;
+        await supabase.from("locations").update(updates).eq("id", ourLoc.id);
+        if (updates.google_resource_name)
+          ourLoc.google_resource_name = updates.google_resource_name;
+        if (updates.website_url) ourLoc.website_url = updates.website_url;
       }
     } catch (e) {
-      console.error("Resource backfill failed", e);
+      console.error("GBP location backfill failed", e);
     }
   }
 
