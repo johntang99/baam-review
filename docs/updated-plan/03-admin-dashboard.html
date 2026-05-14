@@ -859,6 +859,182 @@ main {
 .action-btn .action-arrow { color: var(--text-muted); }
 .action-btn:hover .action-arrow { color: var(--forest); }
 
+/* ============ SAMPLE CARDS (dashboard previews) ============ */
+.sample-card { padding: 20px 22px 22px; }
+.sample-eyebrow {
+  font-size: 11.5px;
+  color: var(--text-soft);
+  margin-bottom: 14px;
+  font-style: italic;
+  font-family: 'Newsreader', serif;
+}
+.sample-eyebrow b { color: var(--ink); font-style: normal; font-weight: 500; }
+
+/* Share review preview — burgundy testimonial card */
+.share-preview {
+  background: linear-gradient(135deg, #962D22 0%, #6F1F18 100%);
+  color: var(--cream);
+  border-radius: 16px;
+  padding: 20px 22px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.share-preview::after {
+  content: '';
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(201,169,97,0.18), transparent 65%);
+  pointer-events: none;
+}
+.share-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(250,247,242,0.14);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--cream);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+.share-pill::before { content: '★'; color: var(--gold); font-size: 10px; }
+.share-stars {
+  color: var(--gold);
+  font-size: 17px;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+  display: block;
+}
+.share-quote {
+  font-family: 'Newsreader', 'Noto Sans SC', serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--cream);
+  margin-bottom: 14px;
+  font-style: normal;
+}
+.share-attr {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11.5px;
+  color: rgba(250,247,242,0.78);
+  margin-bottom: 14px;
+  position: relative; z-index: 1;
+}
+.share-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: rgba(250,247,242,0.18);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600;
+}
+.share-business {
+  background: rgba(250,247,242,0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex; align-items: center; gap: 10px;
+  position: relative; z-index: 1;
+}
+.share-business-icon {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: var(--cream);
+  color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600;
+  flex-shrink: 0;
+}
+.share-business-name { font-size: 12px; font-weight: 500; color: var(--cream); line-height: 1.3; }
+.share-business-meta { font-size: 10.5px; color: rgba(250,247,242,0.6); margin-top: 1px; }
+
+/* Referral offer preview — coupon card */
+.offer-preview {
+  background: linear-gradient(135deg, #962D22 0%, #6F1F18 100%);
+  border-radius: 16px;
+  padding: 12px;
+}
+.offer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(250,247,242,0.14);
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--cream);
+  font-weight: 500;
+  margin: 4px 0 12px 4px;
+}
+.offer-pill::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--gold); border-radius: 50%;
+}
+.offer-inner {
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 12px 12px 14px;
+}
+.offer-hero {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  object-fit: cover;
+  display: block;
+  background: linear-gradient(135deg, #E8D9B5 0%, #C9D4CE 100%);
+}
+.offer-title {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+.offer-subtitle { font-size: 11.5px; color: var(--text-soft); margin-bottom: 12px; }
+.offer-code-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.offer-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #6F1F18;
+  background: #FAEEEC;
+  border: 1.5px dashed #962D22;
+  border-radius: 7px;
+  padding: 6px 12px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+.offer-copy-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Onest', sans-serif;
+}
+.offer-copy-btn svg { width: 11px; height: 11px; }
+.offer-book {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%;
+  background: #962D22;
+  color: var(--cream);
+  border: none;
+  padding: 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Onest', sans-serif;
+}
+.offer-book svg { width: 12px; height: 12px; }
+
 /* ============ RESPONSIVE ============ */
 @media (max-width: 1280px) {
   .revenue-strip { grid-template-columns: 1.2fr 1fr 1fr 1fr; }
@@ -1148,6 +1324,43 @@ main {
           </div>
         </div>
 
+        <!-- SAMPLE SHARE CARD (preview of what customers see when you share a 5★ review) -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <div class="card-title">Share a review</div>
+              <span class="card-badge gold">Latest 5★</span>
+            </div>
+            <a href="#" class="card-link">Open share studio →</a>
+          </div>
+          <div class="sample-card">
+            <p class="sample-eyebrow">
+              What your audience sees when you <b>share Sarah Liu's review</b> to
+              Facebook, X, LinkedIn, or WhatsApp.
+            </p>
+            <div class="share-preview">
+              <span class="share-pill">RECOMMENDED BY A CUSTOMER</span>
+              <span class="share-stars">★★★★★</span>
+              <p class="share-quote">
+                "黃醫師醫術高明，下針又快又準，如有神通 😇 我常年久坐，
+                舊傷骨盆錯位致使右髖筋膜沾黏，幾年走路一瘸一拐。經友人推薦
+                求診於黃醫師，每一次針灸都有明顯的改善。"
+              </p>
+              <div class="share-attr">
+                <span class="share-avatar">SC</span>
+                <span>— Shuhua Chang, satisfied customer</span>
+              </div>
+              <div class="share-business">
+                <span class="share-business-icon">D</span>
+                <div>
+                  <div class="share-business-name">DR. Huang Acupuncture and Green Eastern Beauty</div>
+                  <div class="share-business-meta">71 East Main Street, Middletown, NY 10940</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- ACTIVITY -->
         <div class="card">
           <div class="card-header">
@@ -1268,6 +1481,42 @@ main {
               <div class="top-referrer-avatar">MD</div>
               <div class="top-referrer-name">Marcus Davis</div>
               <div class="top-referrer-stat"><strong>1</strong> booking</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SAMPLE REFERRAL OFFER CARD (preview of what friends see) -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <div class="card-title">Your referral offer</div>
+              <span class="card-badge gold">LIVE</span>
+            </div>
+            <a href="#" class="card-link">Edit offer →</a>
+          </div>
+          <div class="sample-card">
+            <p class="sample-eyebrow">
+              What a friend sees on the <b>landing page</b> after a reviewer
+              shares your recommendation card.
+            </p>
+            <div class="offer-preview">
+              <span class="offer-pill">LIMITED OFFER</span>
+              <div class="offer-inner">
+                <img class="offer-hero" src="assets/offer-sample.webp" alt="Acupuncture treatment session" />
+                <div class="offer-title">$20 Off your first visit</div>
+                <div class="offer-subtitle">Use this coupon code</div>
+                <div class="offer-code-row">
+                  <span class="offer-code">FRIEND20</span>
+                  <button class="offer-copy-btn" type="button">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Copy
+                  </button>
+                </div>
+                <button class="offer-book" type="button">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Book with this offer →
+                </button>
+              </div>
             </div>
           </div>
         </div>

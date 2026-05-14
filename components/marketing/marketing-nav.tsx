@@ -13,8 +13,16 @@ const NAV_LINKS: NavLink[] = [
   { href: "/#loop", label: "How it works" },
   { href: "/pricing", label: "Pricing" },
   { href: "/#roi", label: "ROI" },
+  { href: "/review-value.html#top", label: "Review Value" },
   { href: "/#languages", label: "Languages" },
 ];
+
+/**
+ * Where the admin app lives. In production, marketing is on baamreview.com
+ * and the admin is on review.baamplatform.com — Log in / Start free trial
+ * must cross-origin. In dev (no env var), stay same-origin so localhost works.
+ */
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "";
 
 export function MarketingNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -58,18 +66,18 @@ export function MarketingNav() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/login"
+          <a
+            href={`${APP_URL}/login`}
             className="hidden rounded-full px-5 py-2.5 text-[14.5px] font-medium text-text transition-colors hover:bg-cream-deep sm:inline-flex"
           >
             Log in
-          </Link>
-          <Link
-            href="/signup"
+          </a>
+          <a
+            href={`${APP_URL}/signup`}
             className="inline-flex items-center justify-center rounded-full bg-forest px-5 py-2.5 text-[14.5px] font-medium text-cream transition-all hover:-translate-y-px hover:bg-forest-dark hover:shadow-md"
           >
             Start free trial
-          </Link>
+          </a>
         </div>
       </div>
     </nav>

@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What is a Google review actually worth? — BAAM Review Research</title>
+<meta name="description" content="A research-backed analysis of what one Google review is worth to local businesses, with sources from Harvard Business School, BrightLocal, Whitespark, and the FTC.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --forest-light: #2A6B57;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88847;
+  --gold-soft: #E8D9B5;
+  --clinic: #962D22;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --success: #2D7A5F;
+  --alert: #B5443A;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 28px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 120px; }
+body { font-family: 'Onest', system-ui, sans-serif; color: var(--text); background: var(--cream); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: var(--forest); text-decoration: underline; text-decoration-color: rgba(31, 77, 63, 0.3); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--forest); }
+
+/* TOP BAR */
+.topbar { background: var(--ink); color: var(--cream); padding: 14px 0; font-size: 13.5px; position: relative; z-index: 100; }
+.topbar-inner { max-width: 1080px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
+.topbar-brand { display: flex; align-items: center; gap: 10px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; color: var(--cream); text-decoration: none; }
+.topbar-brand-mark { width: 26px; height: 26px; background: var(--gold); color: var(--ink); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; font-family: 'Onest', sans-serif; }
+.topbar-cta { padding: 7px 16px; background: rgba(250, 247, 242, 0.08); border: 1px solid rgba(250, 247, 242, 0.15); border-radius: 999px; color: var(--cream); text-decoration: none; font-weight: 500; font-size: 13px; }
+.topbar-cta:hover { background: rgba(201, 169, 97, 0.15); border-color: var(--gold); color: var(--gold); }
+.topbar-volume {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 1px solid rgba(250, 247, 242, 0.18);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(232, 217, 181, 0.78);
+}
+.topbar-actions { display: flex; align-items: center; gap: 14px; }
+.lang-toggle {
+  display: inline-flex;
+  padding: 3px;
+  background: rgba(250, 247, 242, 0.06);
+  border: 1px solid rgba(250, 247, 242, 0.15);
+  border-radius: 999px;
+}
+.lang-toggle-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: rgba(250, 247, 242, 0.65);
+  font-family: 'Onest', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.lang-toggle-btn:hover { color: var(--cream); }
+.lang-toggle-btn.active {
+  background: var(--gold);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Language visibility — block elements use `display: revert` so divs/h2s/etc.
+   restore their natural display value; inline `.lang-en` / `.lang-zh` spans
+   restore to inline. */
+.lang-zh { display: none; }
+body[data-lang="zh"] .lang-en { display: none; }
+body[data-lang="zh"] .lang-zh { display: revert; }
+
+/* Slightly larger line-height for CJK in body copy — Chinese needs more
+   vertical breathing room than Latin text at the same font-size. */
+body[data-lang="zh"] {
+  font-family: 'Onest', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+body[data-lang="zh"] p,
+body[data-lang="zh"] li { line-height: 1.75; }
+body[data-lang="zh"] .hero h1,
+body[data-lang="zh"] .section-h2 { line-height: 1.18; letter-spacing: -0.02em; }
+
+/* SECTION NAV — sticky tab bar */
+.section-nav {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  background: rgba(250, 247, 242, 0.94);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.section-nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.section-nav-inner::-webkit-scrollbar { display: none; }
+.section-nav-progress {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  padding: 16px 0;
+  letter-spacing: 0.12em;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding-right: 24px;
+}
+.section-nav-progress strong { color: var(--gold-dark); font-weight: 600; }
+.section-nav-tabs { display: flex; gap: 4px; }
+.section-nav-tab {
+  position: relative;
+  padding: 16px 14px 15px;
+  font-family: 'Onest', sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  transition: color 0.18s ease;
+}
+.section-nav-tab::after {
+  content: '';
+  position: absolute;
+  left: 14px; right: 14px; bottom: -1px;
+  height: 2px;
+  background: var(--forest);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.25s ease;
+}
+.section-nav-tab:hover { color: var(--ink); text-decoration: none; }
+.section-nav-tab.active { color: var(--ink); font-weight: 600; }
+.section-nav-tab.active::after { transform: scaleX(1); }
+.section-nav-tab .tab-num {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  color: var(--gold-dark);
+  margin-right: 7px;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+}
+.section-nav-tab.active .tab-num { opacity: 1; color: var(--gold-dark); }
+
+/* Reading-progress bar — sits at the bottom edge of the sticky nav */
+.section-nav-progress-bar {
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-dark) 100%);
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+.section-nav-mobile { display: none; padding: 12px 0; }
+.section-nav-mobile select { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--paper); font-family: 'Onest', sans-serif; font-size: 14px; color: var(--text); font-weight: 500; }
+
+.container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+.container-wide { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+/* HERO */
+.hero { padding: 70px 0 50px; text-align: center; }
+.hero-eyebrow { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dark); font-weight: 600; margin-bottom: 24px; }
+.hero-eyebrow::before, .hero-eyebrow::after { content: '·'; margin: 0 12px; color: var(--text-muted); }
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 68px;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  margin-bottom: 26px;
+}
+.hero h1 em { font-style: italic; color: var(--forest); }
+.hero-sub {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 21px;
+  color: var(--text-soft);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.45;
+}
+.hero-meta {
+  margin-top: 36px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.hero-meta strong { color: var(--ink); font-weight: 500; }
+.hero-meta-sep { margin: 0 14px; opacity: 0.4; }
+
+/* TL;DR */
+.tldr {
+  margin: 24px auto 60px;
+  max-width: 720px;
+  padding: 30px 36px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  position: relative;
+}
+.tldr-label {
+  position: absolute;
+  top: -10px; left: 32px;
+  background: var(--cream);
+  padding: 0 12px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  font-weight: 600;
+}
+.tldr p { font-family: 'Newsreader', serif; font-size: 18px; line-height: 1.55; color: var(--text); }
+.tldr p + p { margin-top: 14px; }
+.tldr strong { font-style: italic; color: var(--forest); font-weight: 500; }
+
+/* SECTIONS */
+section { padding: 56px 0; scroll-margin-top: 80px; }
+.section-eyebrow { font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-dark); font-weight: 600; margin-bottom: 14px; }
+.section-h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 1.08;
+  letter-spacing: -0.028em;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+.section-h2 em { font-style: italic; color: var(--forest); }
+
+/* Ornamental section divider — appears at the END of each main section. The
+   gold three-dot mark gives long-form scrolling a clear visual cadence and
+   reads like a research-journal section break. */
+.section-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin: 72px auto 12px;
+  max-width: 560px;
+  color: var(--gold);
+  opacity: 0.55;
+}
+.section-rule::before, .section-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 30%, var(--border) 70%, transparent);
+}
+.section-rule-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Fraunces', serif;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--gold-dark);
+}
+.section-rule-mark span {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.section-rule-mark span:nth-child(2) { background: var(--gold-dark); }
+
+.section-lead {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 19px;
+  color: var(--text-soft);
+  margin-bottom: 36px;
+  max-width: 640px;
+  line-height: 1.5;
+}
+.body p { margin-bottom: 18px; font-size: 17px; }
+.body p strong { color: var(--ink); font-weight: 600; }
+.body h3 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 40px 0 14px;
+}
+
+/* INLINE CITATION */
+sup.cite { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold-dark); font-weight: 500; padding-left: 1px; }
+sup.cite a { color: var(--gold-dark); text-decoration: none; }
+sup.cite a:hover { text-decoration: underline; }
+
+/* FORCE CARDS — Section 1 redesign */
+.force-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin: 40px 0;
+}
+.force-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.force-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+.force-num {
+  width: 36px; height: 36px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.force-headline {
+  flex: 1;
+}
+.force-claim {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.force-claim em { font-style: italic; color: var(--forest); }
+.force-source {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+.force-body {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 36px;
+  align-items: center;
+}
+.force-body-text {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.force-body-text strong { color: var(--ink); font-weight: 600; }
+.force-body-viz {
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 18px 20px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* CHART STYLES */
+.chart-title { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 14px; }
+.chart-svg { width: 100%; overflow: visible; }
+.chart-caption { font-size: 11.5px; color: var(--text-muted); margin-top: 12px; font-style: italic; font-family: 'Newsreader', serif; line-height: 1.4; }
+
+/* BIG NUMBER VIZ */
+.bignum-viz { text-align: center; padding: 12px 0; }
+.bignum-viz-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 64px;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  line-height: 1;
+}
+.bignum-viz-num em { font-style: italic; color: var(--forest); }
+.bignum-viz-unit { font-size: 18px; color: var(--gold-dark); margin-left: 4px; }
+.bignum-viz-label { font-family: 'Newsreader', serif; font-style: italic; font-size: 14px; color: var(--text-soft); margin-top: 10px; line-height: 1.4; }
+
+/* CALLOUT BOX with chart */
+.callout {
+  background: linear-gradient(135deg, var(--ink) 0%, #1B2E27 100%);
+  color: var(--cream);
+  border-radius: 22px;
+  padding: 42px 44px;
+  margin: 48px 0;
+  position: relative;
+  overflow: hidden;
+}
+.callout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 20%, rgba(201, 169, 97, 0.15), transparent 50%);
+}
+.callout > * { position: relative; z-index: 1; }
+.callout-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; font-weight: 600; }
+.callout-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 30px; line-height: 1.2; letter-spacing: -0.02em; color: var(--cream); margin-bottom: 18px; }
+.callout-title em { font-style: italic; color: var(--gold); }
+.callout-body { font-family: 'Newsreader', serif; font-size: 17px; line-height: 1.55; color: rgba(250, 247, 242, 0.86); }
+.callout-body strong { color: var(--cream); font-weight: 500; font-style: italic; }
+.callout-chart { margin-top: 28px; padding-top: 28px; border-top: 1px solid rgba(250, 247, 242, 0.15); }
+
+/* FORMULA CARD */
+.formula {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 36px 40px;
+  margin: 36px 0;
+  position: relative;
+}
+.formula-label {
+  position: absolute;
+  top: -10px; left: 32px;
+  background: var(--cream);
+  padding: 0 12px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  font-weight: 600;
+}
+.formula-eq {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--ink);
+  text-align: center;
+  padding: 14px 0;
+}
+.formula-eq .var { color: var(--forest); font-weight: 500; }
+.formula-eq .op { color: var(--text-muted); margin: 0 8px; font-style: normal; }
+.formula-divider { display: block; margin: 8px auto; height: 1px; background: var(--border); width: 60%; }
+.formula-vars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 28px; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--border-soft); }
+.formula-var-item { font-size: 14px; color: var(--text-soft); }
+.formula-var-item strong { color: var(--forest); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+/* FORMULA FLOW DIAGRAM */
+.flow-diagram { margin: 30px 0; padding: 28px; background: var(--cream-deep); border-radius: 16px; }
+.flow-svg { width: 100%; }
+
+/* WORKED EXAMPLE */
+.example {
+  background: var(--cream-deep);
+  border-radius: 18px;
+  padding: 36px 40px;
+  margin: 36px 0;
+}
+.example-h { font-family: 'Fraunces', serif; font-weight: 500; font-size: 22px; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.01em; }
+.example-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: var(--text-soft); margin-bottom: 24px; }
+.example-row { display: flex; justify-content: space-between; align-items: baseline; padding: 11px 0; border-bottom: 1px dashed rgba(138, 147, 142, 0.3); font-size: 15.5px; }
+.example-row:last-child { border-bottom: none; }
+.example-row-label { color: var(--text-soft); }
+.example-row-val { font-family: 'JetBrains Mono', monospace; color: var(--ink); font-weight: 500; }
+.example-row.result { padding-top: 18px; margin-top: 8px; border-top: 1px solid var(--border); border-bottom: none; }
+.example-row.result .example-row-label { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; color: var(--ink); }
+.example-row.result .example-row-val { font-family: 'Fraunces', serif; font-weight: 400; font-size: 26px; color: var(--gold-dark); letter-spacing: -0.01em; }
+
+/* VERTICAL TABLE */
+.table-wrap { background: var(--paper); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin: 32px 0; }
+.vtable { width: 100%; border-collapse: collapse; font-size: 15px; }
+.vtable thead th { background: var(--cream-deep); padding: 16px 20px; text-align: left; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+.vtable tbody td { padding: 16px 20px; border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+.vtable tbody tr:last-child td { border-bottom: none; }
+.vtable tbody tr:nth-child(even) td { background: rgba(248, 245, 238, 0.5); }
+.vtable .vertical-name { font-weight: 500; color: var(--ink); }
+.vtable .vertical-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+.vtable .vertical-range { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; color: var(--forest); letter-spacing: -0.01em; }
+.vtable .vertical-assumptions { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-muted); }
+.table-note { padding: 16px 20px; background: var(--cream-deep); font-size: 13px; color: var(--text-soft); font-style: italic; font-family: 'Newsreader', serif; }
+.table-note strong { font-style: normal; font-family: 'Onest', sans-serif; color: var(--ink); font-weight: 600; }
+
+/* VERTICAL BAR CHART */
+.vert-chart { background: var(--paper); border: 1px solid var(--border); border-radius: 16px; padding: 30px 32px; margin: 32px 0; }
+.vert-chart-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; color: var(--ink); margin-bottom: 4px; letter-spacing: -0.01em; }
+.vert-chart-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 13.5px; color: var(--text-muted); margin-bottom: 22px; }
+.vchart-row { display: flex; align-items: center; gap: 16px; padding: 10px 0; }
+.vchart-label { width: 200px; flex-shrink: 0; font-size: 13.5px; color: var(--text); font-weight: 500; }
+.vchart-bar-wrap { flex: 1; position: relative; height: 22px; background: var(--cream-deep); border-radius: 11px; overflow: hidden; }
+.vchart-bar { position: absolute; top: 0; bottom: 0; background: linear-gradient(90deg, var(--forest-light), var(--gold)); border-radius: 11px; }
+.vchart-value { width: 140px; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--ink); font-weight: 500; text-align: right; }
+.vchart-scale { display: flex; justify-content: space-between; padding-left: 216px; padding-right: 156px; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--text-muted); }
+
+/* CALCULATOR */
+.calc {
+  background: var(--paper);
+  border: 1.5px solid var(--forest);
+  border-radius: 22px;
+  padding: 40px 44px;
+  margin: 40px 0;
+  position: relative;
+}
+.calc-eyebrow { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-dark); font-weight: 600; margin-bottom: 6px; }
+.calc-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 26px; color: var(--ink); margin-bottom: 4px; letter-spacing: -0.015em; }
+.calc-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: var(--text-soft); margin-bottom: 28px; }
+.calc-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; margin-bottom: 28px; }
+.calc-field label { display: block; font-size: 12.5px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.calc-field label .hint { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 6px; }
+.calc-field-input-wrap { position: relative; }
+.calc-field-input-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 14px; pointer-events: none; }
+.calc-field-input-suffix { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 14px; pointer-events: none; }
+.calc-input { width: 100%; padding: 12px 14px; background: var(--cream); border: 1px solid var(--border); border-radius: 9px; font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--ink); font-weight: 500; text-align: right; }
+.calc-input.has-prefix { padding-left: 28px; text-align: right; }
+.calc-input.has-suffix { padding-right: 36px; text-align: right; }
+.calc-input:focus { outline: none; border-color: var(--forest); background: var(--paper); }
+
+.calc-result { background: linear-gradient(135deg, var(--cream-deep) 0%, var(--gold-soft) 100%); border-radius: 16px; padding: 28px 32px; }
+.calc-result-label { font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-soft); font-weight: 600; margin-bottom: 10px; }
+.calc-result-num { font-family: 'Fraunces', serif; font-weight: 400; font-size: 56px; letter-spacing: -0.03em; color: var(--ink); line-height: 1; }
+.calc-result-num em { font-style: italic; color: var(--forest); }
+.calc-result-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: var(--text-soft); margin-top: 12px; }
+.calc-result-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 22px; padding-top: 22px; border-top: 1px solid rgba(168, 136, 71, 0.25); }
+.calc-result-item-num { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--ink); font-weight: 500; }
+.calc-result-item-label { font-size: 11.5px; color: var(--text-soft); margin-top: 3px; }
+
+/* MULTIPLIER STACK — Section 7 */
+.mult-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 28px;
+  margin: 32px 0;
+}
+.mult-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mult-item {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: default;
+  transition: all 0.15s;
+}
+.mult-item:hover { border-color: var(--forest); transform: translateX(2px); }
+.mult-strength {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.mult-strength-high { background: rgba(45, 122, 95, 0.15); color: var(--success); }
+.mult-strength-med { background: rgba(201, 169, 97, 0.18); color: var(--gold-dark); }
+.mult-strength-base { background: var(--cream-deep); color: var(--text-soft); }
+.mult-text { flex: 1; }
+.mult-name { font-weight: 600; color: var(--ink); font-size: 14.5px; }
+.mult-desc { font-size: 12.5px; color: var(--text-soft); margin-top: 2px; line-height: 1.45; }
+.mult-multiplier { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; color: var(--forest); }
+
+.mult-visual { background: var(--cream-deep); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.mult-visual-h { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--ink); margin-bottom: 18px; text-align: center; letter-spacing: -0.005em; }
+
+/* WARNING BOX */
+.warning { background: rgba(181, 68, 58, 0.04); border-left: 3px solid var(--alert); border-radius: 0 12px 12px 0; padding: 22px 26px; margin: 32px 0; }
+.warning-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--alert); font-weight: 600; margin-bottom: 8px; }
+.warning-body { font-size: 15.5px; color: var(--text); line-height: 1.55; }
+.warning-body strong { color: var(--ink); font-weight: 600; }
+
+/* DIVIDER */
+.divider { width: 60px; height: 1px; background: var(--gold); margin: 60px auto; }
+
+/* BAAM CTA */
+.baam-cta-section { background: var(--ink); color: var(--cream); padding: 90px 0; margin-top: 60px; position: relative; overflow: hidden; }
+.baam-cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 80% 30%, rgba(201, 169, 97, 0.1), transparent 60%); }
+.baam-cta-inner { position: relative; z-index: 1; text-align: center; }
+.baam-cta-eyebrow { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 22px; font-weight: 600; }
+.baam-cta-h { font-family: 'Fraunces', serif; font-weight: 400; font-size: 56px; line-height: 1.05; letter-spacing: -0.03em; color: var(--cream); margin-bottom: 26px; max-width: 680px; margin-left: auto; margin-right: auto; }
+.baam-cta-h em { font-style: italic; color: var(--gold); }
+.baam-cta-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 20px; color: rgba(250, 247, 242, 0.78); max-width: 580px; margin: 0 auto 36px; line-height: 1.5; }
+.baam-cta-btn { display: inline-flex; align-items: center; gap: 10px; padding: 16px 32px; background: var(--gold); color: var(--ink); border-radius: 999px; font-family: 'Onest', sans-serif; font-weight: 500; font-size: 15px; text-decoration: none; }
+.baam-cta-btn:hover { background: var(--gold-dark); color: var(--cream); }
+.baam-cta-btn svg { width: 16px; height: 16px; }
+
+/* SOURCES */
+.sources-section { background: var(--cream-deep); padding: 60px 0 80px; scroll-margin-top: 80px; }
+.sources-section h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; color: var(--ink); letter-spacing: -0.015em; margin-bottom: 8px; }
+.sources-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: var(--text-soft); margin-bottom: 32px; }
+.sources-list { list-style: none; counter-reset: src-counter; }
+.sources-list li {
+  counter-increment: src-counter;
+  padding: 16px 0 16px 44px;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.sources-list li::before {
+  content: counter(src-counter);
+  position: absolute;
+  left: 0; top: 16px;
+  width: 30px; height: 30px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-soft);
+}
+.sources-list li strong { font-weight: 600; color: var(--ink); }
+.sources-list li em { font-style: italic; color: var(--text-soft); }
+
+footer { background: var(--ink); color: rgba(250, 247, 242, 0.6); padding: 30px 0; font-size: 13px; }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.footer-brand { color: var(--cream); font-family: 'Fraunces', serif; font-style: italic; }
+
+@media (max-width: 900px) {
+  .force-body { grid-template-columns: 1fr; gap: 20px; }
+  .force-body-viz { min-height: 140px; }
+  .mult-grid { grid-template-columns: 1fr; }
+  .section-nav-tabs { display: none; }
+  .section-nav-mobile { display: block; }
+  .section-nav-progress { display: none; }
+  .section-nav-inner { padding: 0 24px; }
+}
+@media (max-width: 760px) {
+  .hero { padding: 50px 0 40px; }
+  .hero h1 { font-size: 42px; }
+  .hero-sub { font-size: 18px; }
+  .section-h2 { font-size: 32px; }
+  .force-card { padding: 26px 22px; }
+  .force-claim { font-size: 20px; }
+  .formula { padding: 28px 24px; }
+  .formula-eq { font-size: 17px; }
+  .formula-vars { grid-template-columns: 1fr; }
+  .calc { padding: 28px 24px; }
+  .calc-fields { grid-template-columns: 1fr; }
+  .calc-result-num { font-size: 40px; }
+  .calc-result-breakdown { grid-template-columns: 1fr; }
+  .vchart-label { width: 130px; font-size: 12px; }
+  .vchart-value { width: 100px; font-size: 11px; }
+  .vchart-scale { padding-left: 146px; padding-right: 116px; }
+  .baam-cta-h { font-size: 38px; }
+  .callout { padding: 32px 26px; }
+  .callout-title { font-size: 24px; }
+}
+</style>
+</head>
+<body data-lang="en">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="#top" class="topbar-brand">
+      <span class="topbar-brand-mark">B</span>
+      <span class="lang-en">BAAM Review · Research</span><span class="lang-zh">BAAM Review · 研究報告</span>
+      <span class="topbar-volume"><span class="lang-en">Vol. I &middot; No. 14</span><span class="lang-zh">第一卷 &middot; 第十四期</span></span>
+    </a>
+    <div class="topbar-actions">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" class="lang-toggle-btn active" data-lang-set="en">EN</button>
+        <button type="button" class="lang-toggle-btn" data-lang-set="zh">中文</button>
+      </div>
+      <a href="/" class="topbar-cta">
+        <span class="lang-en">See BAAM Review →</span><span class="lang-zh">瀏覽 BAAM Review →</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY SECTION NAV -->
+<nav class="section-nav" id="section-nav">
+  <div class="section-nav-inner">
+    <div class="section-nav-progress"><strong id="nav-progress">01</strong> / 07</div>
+    <div class="section-nav-tabs">
+      <a href="#why-now" class="section-nav-tab active" data-target="why-now"><span class="tab-num">01</span><span class="lang-en">Context</span><span class="lang-zh">背景</span></a>
+      <a href="#research" class="section-nav-tab" data-target="research"><span class="tab-num">02</span><span class="lang-en">Evidence</span><span class="lang-zh">證據</span></a>
+      <a href="#formula" class="section-nav-tab" data-target="formula"><span class="tab-num">03</span><span class="lang-en">Method</span><span class="lang-zh">方法</span></a>
+      <a href="#by-vertical" class="section-nav-tab" data-target="by-vertical"><span class="tab-num">04</span><span class="lang-en">Verticals</span><span class="lang-zh">行業</span></a>
+      <a href="#calculator" class="section-nav-tab" data-target="calculator"><span class="tab-num">05</span><span class="lang-en">Calculator</span><span class="lang-zh">試算</span></a>
+      <a href="#what-makes-valuable" class="section-nav-tab" data-target="what-makes-valuable"><span class="tab-num">06</span><span class="lang-en">Quality</span><span class="lang-zh">品質</span></a>
+      <a href="#reporting" class="section-nav-tab" data-target="reporting"><span class="tab-num">07</span><span class="lang-en">Reporting</span><span class="lang-zh">呈現</span></a>
+    </div>
+    <div class="section-nav-mobile">
+      <select class="lang-en" onchange="window.location.href=this.value">
+        <option value="#why-now">01 · Context</option>
+        <option value="#research">02 · Evidence</option>
+        <option value="#formula">03 · Method</option>
+        <option value="#by-vertical">04 · Verticals</option>
+        <option value="#calculator">05 · Calculator</option>
+        <option value="#what-makes-valuable">06 · Quality</option>
+        <option value="#reporting">07 · Reporting</option>
+      </select>
+      <select class="lang-zh" onchange="window.location.href=this.value">
+        <option value="#why-now">01 · 背景</option>
+        <option value="#research">02 · 證據</option>
+        <option value="#formula">03 · 方法</option>
+        <option value="#by-vertical">04 · 行業</option>
+        <option value="#calculator">05 · 試算</option>
+        <option value="#what-makes-valuable">06 · 品質</option>
+        <option value="#reporting">07 · 呈現</option>
+      </select>
+    </div>
+  </div>
+  <div class="section-nav-progress-bar" id="nav-progress-bar"></div>
+</nav>
+
+<a id="top"></a>
+
+<!-- HERO -->
+<div class="container">
+  <div class="hero">
+    <div class="hero-eyebrow"><span class="lang-en">BAAM Review Research · May 2026</span><span class="lang-zh">BAAM Review 研究報告 · 2026 年 5 月</span></div>
+    <h1 class="lang-en">What is a Google review<br><em>actually worth?</em></h1>
+    <h1 class="lang-zh">一則 Google 評論<br><em>究竟價值多少？</em></h1>
+    <p class="hero-sub lang-en">There isn't one number. There's a method. After 14 years of academic and industry data, here's how to calculate it — and why the answer is bigger than most small businesses realize.</p>
+    <p class="hero-sub lang-zh">沒有一個固定的數字，但有一套方法。綜合 14 年的學術研究與行業數據，本文示範如何計算它，並說明為何這個答案比多數小商家所想像的還要大。</p>
+    <div class="hero-meta">
+      <span class="lang-en"><strong>14-min read</strong></span><span class="lang-zh"><strong>14 分鐘閱讀</strong></span><span class="hero-meta-sep">·</span>
+      <span class="lang-en"><strong>15 sources cited</strong></span><span class="lang-zh"><strong>引用 15 份資料來源</strong></span><span class="hero-meta-sep">·</span>
+      <span class="lang-en">Includes a working calculator</span><span class="lang-zh">附互動式試算工具</span>
+    </div>
+  </div>
+</div>
+
+<!-- TL;DR -->
+<div class="container">
+  <div class="tldr">
+    <div class="tldr-label"><span class="lang-en">Quick take</span><span class="lang-zh">速覽結論</span></div>
+    <p class="lang-en">One Google review is worth somewhere between <strong>$30 and $12,000+</strong> to the business that earns it. The range isn't a hedge — it's the actual finding. A single review's value is a direct function of your customer lifetime value, your current review profile, and your competitive density.</p>
+    <p class="lang-zh">對賺得它的商家而言，一則 Google 評論的價值介於 <strong>30 美元到 12,000 美元以上</strong> 之間。這個範圍並非含糊其詞，而是研究的實際結論。一則評論的價值，直接取決於您的顧客終身價值、目前的評論狀況，以及所在地的競爭強度。</p>
+    <p class="lang-en">For a typical Chinese-speaking acupuncture clinic in NY metro, <strong>one strong Google review is conservatively worth $400–$2,400 over 24 months.</strong> For an immigration lawyer, the same review is worth <strong>$1,200–$12,000+.</strong> Below, we'll show the math, the sources, and how to estimate it for your business.</p>
+    <p class="lang-zh">以紐約都會區一間典型的華語針灸診所為例，<strong>一則優質的 Google 評論在 24 個月內保守估計價值 400–2,400 美元。</strong>對於一位移民律師而言，同一則評論的價值則高達 <strong>1,200–12,000 美元以上。</strong>下文將完整呈現計算方法、資料來源，以及如何為您自己的生意估算這個數字。</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 1 — REDESIGNED WITH FORCE CARDS -->
+<!-- ============================================ -->
+<div class="container">
+  <section id="why-now">
+    <div class="section-eyebrow"><span class="lang-en">§ 01 · Context</span><span class="lang-zh">§ 01 · 背景</span></div>
+    <h2 class="section-h2 lang-en">Why this question <em>matters more now</em> than five years ago.</h2>
+    <h2 class="section-h2 lang-zh">為何這個問題<em>現在比五年前更重要。</em></h2>
+    <p class="section-lead lang-en">Three structural changes between 2020 and 2026 made Google reviews more valuable than they used to be. Each is measurable. Together, they explain why review-collection ROI has roughly doubled in the past five years.</p>
+    <p class="section-lead lang-zh">2020 至 2026 年間，三項結構性的變化讓 Google 評論變得比過去更有價值。每一項都可量化。它們共同解釋了為什麼收集評論的投資報酬率在過去五年內幾乎翻了一倍。</p>
+
+    <div class="force-stack">
+
+      <!-- FORCE 1: RANKING WEIGHT RISING -->
+      <div class="force-card">
+        <div class="force-card-header">
+          <div class="force-num">1</div>
+          <div class="force-headline">
+            <div class="force-claim lang-en">Reviews became a <em>measurable ranking factor.</em></div>
+            <div class="force-claim lang-zh">評論成為<em>可量化的排名因子。</em></div>
+            <div class="force-source"><span class="lang-en">Whitespark Local Search Ranking Factors · 2020 – 2026</span><span class="lang-zh">Whitespark 本地搜尋排名因素報告 · 2020 – 2026</span></div>
+          </div>
+        </div>
+        <div class="force-body">
+          <div class="force-body-text lang-en">
+            Whitespark's annual survey of 47 working local SEO experts — the industry's most-cited methodology — now puts review signals at <strong>roughly 16–20% of Local Pack ranking weight</strong>. Five years ago that number was around 11%. The share has risen every single year and is expected to keep rising as Google's AI search overviews increasingly cite review content directly.<sup class="cite"><a href="#source-1">1</a></sup><sup class="cite"><a href="#source-2">2</a></sup>
+          </div>
+          <div class="force-body-text lang-zh">
+            Whitespark 每年對 47 位本地 SEO 專家所做的調查——業界引用最廣泛的方法——目前將評論訊號的影響力定為<strong>本地搜尋結果（Local Pack）排名權重的約 16–20%</strong>。五年前這個數字僅約 11%，每年都在上升，預期還會持續上升，因為 Google AI 搜尋摘要愈來愈直接引用評論內容。<sup class="cite"><a href="#source-1">1</a></sup><sup class="cite"><a href="#source-2">2</a></sup>
+          </div>
+          <div class="force-body-viz">
+            <div class="chart-title">Review signal weight · % of Local Pack rank</div>
+            <svg class="chart-svg" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid meet">
+              <!-- Y-axis grid lines -->
+              <g stroke="#E8E2D5" stroke-width="1" stroke-dasharray="2 3">
+                <line x1="20" y1="20" x2="240" y2="20"/>
+                <line x1="20" y1="50" x2="240" y2="50"/>
+                <line x1="20" y1="80" x2="240" y2="80"/>
+              </g>
+              <!-- Y labels -->
+              <g font-family="JetBrains Mono" font-size="8" fill="#8A938E">
+                <text x="0" y="23">20%</text>
+                <text x="0" y="53">15%</text>
+                <text x="0" y="83">10%</text>
+              </g>
+              <!-- Bars showing rising trend -->
+              <g>
+                <rect x="32" y="76" width="22" height="24" fill="#87A899" rx="2"/>
+                <rect x="64" y="72" width="22" height="28" fill="#87A899" rx="2"/>
+                <rect x="96" y="62" width="22" height="38" fill="#A88847" rx="2"/>
+                <rect x="128" y="50" width="22" height="50" fill="#A88847" rx="2"/>
+                <rect x="160" y="40" width="22" height="60" fill="#C9A961" rx="2"/>
+                <rect x="192" y="30" width="22" height="70" fill="#1F4D3F" rx="2"/>
+              </g>
+              <!-- X axis -->
+              <line x1="20" y1="100" x2="240" y2="100" stroke="#1A1F1C" stroke-width="1"/>
+              <!-- Year labels -->
+              <g font-family="JetBrains Mono" font-size="8" fill="#5A6660" text-anchor="middle">
+                <text x="43" y="112">'20</text>
+                <text x="75" y="112">'21</text>
+                <text x="107" y="112">'22</text>
+                <text x="139" y="112">'23</text>
+                <text x="171" y="112">'24</text>
+                <text x="203" y="112">'26</text>
+              </g>
+              <!-- Top value label -->
+              <text x="203" y="25" font-family="JetBrains Mono" font-size="8" fill="#1F4D3F" font-weight="600" text-anchor="middle">~18%</text>
+            </svg>
+            <div class="chart-caption"><span class="lang-en">Source: Whitespark, annual Local Search Ranking Factors Report</span><span class="lang-zh">資料來源：Whitespark 年度本地搜尋排名因素報告</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORCE 2: PLATFORM TRUST CONCENTRATING -->
+      <div class="force-card">
+        <div class="force-card-header">
+          <div class="force-num">2</div>
+          <div class="force-headline">
+            <div class="force-claim lang-en">Google won the <em>review platform war.</em></div>
+            <div class="force-claim lang-zh">Google 贏得了<em>評論平台之戰。</em></div>
+            <div class="force-source"><span class="lang-en">BrightLocal Local Consumer Review Survey · 14 annual editions</span><span class="lang-zh">BrightLocal 本地消費者評論調查 · 14 年連續發布</span></div>
+          </div>
+        </div>
+        <div class="force-body">
+          <div class="force-body-text lang-en">
+            BrightLocal's 2026 survey found <strong>81% of consumers use Google for local business reviews</strong> — more than any other platform. Crucially, Google is the only major review platform whose usage is rising, while Yelp, Facebook, and BBB are all declining year-over-year.<sup class="cite"><a href="#source-3">3</a></sup> For most local searches, reviews aren't just one signal among many. They are the deciding signal — and they live on Google.
+          </div>
+          <div class="force-body-text lang-zh">
+            BrightLocal 2026 年的調查發現，<strong>81% 的消費者使用 Google 查看本地商家評論</strong>——超越任何其他平台。關鍵在於，Google 是唯一一個使用率仍在上升的主流評論平台，而 Yelp、Facebook、BBB 都在逐年下滑。<sup class="cite"><a href="#source-3">3</a></sup> 對絕大多數的本地搜尋而言，評論不再只是眾多訊號中的一個，而是決定性的訊號——而它住在 Google 上。
+          </div>
+          <div class="force-body-viz">
+            <div class="chart-title">Consumers using platform for reviews</div>
+            <svg class="chart-svg" viewBox="0 0 240 130" preserveAspectRatio="xMidYMid meet">
+              <!-- Google bar -->
+              <text x="0" y="20" font-family="Onest" font-size="9" fill="#1A1F1C" font-weight="500">Google</text>
+              <rect x="48" y="13" width="170" height="11" fill="#1F4D3F" rx="2"/>
+              <text x="222" y="22" font-family="JetBrains Mono" font-size="9" fill="#1F4D3F" font-weight="600">81%</text>
+              <text x="48" y="34" font-family="JetBrains Mono" font-size="7" fill="#2D7A5F">▲ rising</text>
+
+              <!-- Yelp -->
+              <text x="0" y="55" font-family="Onest" font-size="9" fill="#1A1F1C" font-weight="500">Yelp</text>
+              <rect x="48" y="48" width="71" height="11" fill="#A88847" rx="2"/>
+              <text x="123" y="57" font-family="JetBrains Mono" font-size="9" fill="#A88847" font-weight="600">34%</text>
+              <text x="48" y="69" font-family="JetBrains Mono" font-size="7" fill="#B5443A">▼ declining</text>
+
+              <!-- Facebook -->
+              <text x="0" y="90" font-family="Onest" font-size="9" fill="#1A1F1C" font-weight="500">Facebook</text>
+              <rect x="48" y="83" width="52" height="11" fill="#87A899" rx="2"/>
+              <text x="104" y="92" font-family="JetBrains Mono" font-size="9" fill="#5A6660" font-weight="600">25%</text>
+              <text x="48" y="104" font-family="JetBrains Mono" font-size="7" fill="#B5443A">▼ declining</text>
+
+              <!-- BBB -->
+              <text x="0" y="125" font-family="Onest" font-size="9" fill="#1A1F1C" font-weight="500">BBB</text>
+              <rect x="48" y="118" width="33" height="11" fill="#87A899" rx="2"/>
+              <text x="85" y="127" font-family="JetBrains Mono" font-size="9" fill="#5A6660" font-weight="600">16%</text>
+            </svg>
+            <div class="chart-caption">Source: BrightLocal 2026 Local Consumer Review Survey</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORCE 3: FAKE REVIEWS CRACKDOWN -->
+      <div class="force-card">
+        <div class="force-card-header">
+          <div class="force-num">3</div>
+          <div class="force-headline">
+            <div class="force-claim lang-en">The FTC made fake reviews <em>legally costly.</em></div>
+            <div class="force-claim lang-zh">美國聯邦貿易委員會讓<em>假評論在法律上付出代價。</em></div>
+            <div class="force-source"><span class="lang-en">FTC Final Rule (2024) + Google Transparency Report</span><span class="lang-zh">FTC 2024 年最終規則 + Google 透明度報告</span></div>
+          </div>
+        </div>
+        <div class="force-body">
+          <div class="force-body-text lang-en">
+            In 2024, the FTC finalized a rule explicitly banning fake reviews with civil penalties for knowing violations.<sup class="cite"><a href="#source-4">4</a></sup> Google blocked <strong>240 million policy-violating reviews</strong> in 2024 alone.<sup class="cite"><a href="#source-5">5</a></sup> The result: the supply of trustworthy reviews has tightened while consumer dependence on them has deepened. <strong>Real reviews from real customers are now scarcer — and therefore worth more.</strong>
+          </div>
+          <div class="force-body-text lang-zh">
+            2024 年，美國聯邦貿易委員會（FTC）正式發布最終規則，明令禁止假評論，並對「明知違反」者處以民事罰款。<sup class="cite"><a href="#source-4">4</a></sup> Google 光是在 2024 年就攔截了 <strong>2.4 億則違反政策的評論</strong>。<sup class="cite"><a href="#source-5">5</a></sup> 結果是：可信評論的供給變少，但消費者對它的依賴更深。<strong>來自真實顧客的真實評論變得更稀缺——因此也更有價值。</strong>
+          </div>
+          <div class="force-body-viz">
+            <div class="bignum-viz">
+              <div class="bignum-viz-num">240<span class="bignum-viz-unit">M</span></div>
+              <div class="bignum-viz-label"><span class="lang-en">policy-violating reviews removed from Google Maps in 2024</span><span class="lang-zh">2024 年 Google Maps 移除的違規評論則數</span></div>
+            </div>
+            <div class="chart-caption" style="text-align: center; margin-top: 8px;"><span class="lang-en">Source: Google Transparency Report 2024</span><span class="lang-zh">資料來源：Google 透明度報告 2024</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <div class="section-rule"><span class="section-rule-mark"><span></span><span></span><span></span></span></div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 2 — THE ACADEMIC EVIDENCE WITH THRESHOLD CHART -->
+<!-- ============================================ -->
+<div class="container">
+  <section id="research">
+    <div class="section-eyebrow"><span class="lang-en">§ 02 · Evidence</span><span class="lang-zh">§ 02 · 證據</span></div>
+    <h2 class="section-h2 lang-en">The peer-reviewed evidence on <em>review-driven revenue.</em></h2>
+    <h2 class="section-h2 lang-zh">關於<em>評論驅動營收</em>的同儕審查證據。</h2>
+    <p class="section-lead lang-en">Two foundational studies — both replicated and cited hundreds of times — quantify the causal link between online ratings and business outcomes. Both are worth understanding before estimating anything.</p>
+    <p class="section-lead lang-zh">兩篇奠基性研究——皆已被重複驗證，並被引用數百次——量化了線上評等與商家業績之間的因果關係。在做任何估算之前，這兩項研究都值得先了解。</p>
+
+    <div class="body lang-en">
+      <h3>Luca (Harvard Business School, 2011/2016)</h3>
+      <p>Michael Luca, working with Washington State Department of Revenue tax data and Yelp ratings, used a regression discontinuity design that exploits Yelp's rounding thresholds to isolate causation, not correlation. His finding: <strong>a one-star increase in Yelp rating leads to a 5–9% increase in restaurant revenue.</strong> The effect is concentrated in independent restaurants; chain restaurants showed no effect, suggesting reviews substitute for traditional brand reputation.<sup class="cite"><a href="#source-6">6</a></sup></p>
+
+      <h3>Anderson &amp; Magruder (Berkeley, Economic Journal, 2012)</h3>
+      <p>Two Berkeley economists used the same regression discontinuity approach but measured reservation availability rather than revenue. Their finding: <strong>an extra half-star rating causes restaurants to sell out 19 percentage points more frequently at 7pm</strong> — a 49% relative increase in peak-hour bookings. Crucially, they confirmed the effect comes from the rating itself, not from changes in food quality, service, or price.<sup class="cite"><a href="#source-7">7</a></sup></p>
+
+      <h3>What these findings mean (and don't mean)</h3>
+      <p>Both studies are restaurant-specific. The 5–9% revenue lift per star isn't a universal constant; for higher-consideration purchases (medical, legal, contracting), the effect is almost certainly larger because review reliance grows as transaction stakes rise.<sup class="cite"><a href="#source-8">8</a></sup> But the studies establish three things definitively:</p>
+
+      <p><strong>(1) Online ratings cause revenue, not just correlate with it.</strong> The regression discontinuity design rules out the "good restaurants get good reviews and also more customers" confound.</p>
+
+      <p><strong>(2) The effect is non-linear at thresholds.</strong> Going from 3.5 stars to 4.0 produces a much larger lift than 4.0 to 4.5, because Google and Yelp round and the rounded display is what consumers see.</p>
+
+      <p><strong>(3) Independent businesses benefit more than chains.</strong> If you're an independent local business — which describes virtually every BAAM Review customer — review impact is at the upper end of the published range, not the lower.</p>
+    </div>
+    <div class="body lang-zh">
+      <h3>Luca（哈佛商學院，2011 / 2016）</h3>
+      <p>Michael Luca 結合華盛頓州稅務局的營業稅資料與 Yelp 評等，採用「斷點迴歸」設計，利用 Yelp 的四捨五入門檻來分離因果關係，而非僅是相關性。他的結論是：<strong>Yelp 評等每上升一顆星，餐廳營收將增加 5–9%。</strong>這個效應主要集中在獨立餐廳；連鎖餐廳則沒有觀察到影響——這顯示評論在功能上取代了傳統的品牌聲譽。<sup class="cite"><a href="#source-6">6</a></sup></p>
+
+      <h3>Anderson &amp; Magruder（柏克萊，Economic Journal，2012）</h3>
+      <p>兩位柏克萊經濟學家採用同樣的斷點迴歸方法，但測量的是訂位的可得性而非營收。他們的結論是：<strong>多半顆星評等會讓餐廳在晚間 7 點訂滿的機率提升 19 個百分點</strong>——相當於尖峰時段訂位量相對增加 49%。重要的是，他們確認了效應來自評等本身，而非餐廳食物品質、服務或價格的變化。<sup class="cite"><a href="#source-7">7</a></sup></p>
+
+      <h3>這些發現代表什麼（以及不代表什麼）</h3>
+      <p>兩項研究都僅以餐廳為對象。每顆星 5–9% 的營收提升並非普世常數；對於決策成本較高的消費（醫療、法律、裝修），這個效應幾乎肯定更大，因為交易金額愈高、消費者愈仰賴評論。<sup class="cite"><a href="#source-8">8</a></sup>不過，這些研究確立了三件事：</p>
+
+      <p><strong>(1) 線上評等直接造成營收，並非僅有相關性。</strong>斷點迴歸排除了「好餐廳剛好同時得到好評和更多客人」這個干擾因素。</p>
+
+      <p><strong>(2) 效應在門檻處呈非線性。</strong>從 3.5 升到 4.0 顆星帶來的提升，遠大於 4.0 升到 4.5——因為 Google 和 Yelp 都會四捨五入，而消費者看到的是四捨五入後的顯示值。</p>
+
+      <p><strong>(3) 獨立商家的受益高於連鎖品牌。</strong>如果您是獨立的本地商家——幾乎所有 BAAM Review 客戶都是——評論影響落在已發表範圍的高端，而非低端。</p>
+    </div>
+
+    <!-- THE NON-LINEAR CONVERSION CURVE - THE MOST IMPORTANT CHART IN THE REPORT -->
+    <div class="callout">
+      <div class="callout-label"><span class="lang-en">The most important finding most people miss</span><span class="lang-zh">大多數人遺漏的最重要發現</span></div>
+      <div class="callout-title lang-en">Conversion is <em>non-linear</em> at the 4-star threshold.</div>
+      <div class="callout-title lang-zh">在「4 星門檻」處，轉換率<em>呈非線性。</em></div>
+      <div class="callout-body lang-en">A 0.1-star rating increase has been shown to lift conversion by <strong>25%</strong> in brick-and-mortar businesses.<sup class="cite" style="color: var(--gold);"><a href="#source-9" style="color: var(--gold);">9</a></sup> 70% of consumers use rating filters when searching, and the most common filter is "4 stars and above."<sup class="cite" style="color: var(--gold);"><a href="#source-10" style="color: var(--gold);">10</a></sup> Moving from 3.9 to 4.0 isn't a 2.5% improvement — it's the difference between being shown to the 70% of consumers who filter, and being invisible to them entirely.</div>
+      <div class="callout-body lang-zh">研究顯示，實體店家評等每上升 0.1 顆星，轉換率可提升 <strong>25%</strong>。<sup class="cite" style="color: var(--gold);"><a href="#source-9" style="color: var(--gold);">9</a></sup> 70% 的消費者在搜尋時會使用評等篩選器，而最常用的篩選條件正是「4 星以上」。<sup class="cite" style="color: var(--gold);"><a href="#source-10" style="color: var(--gold);">10</a></sup> 從 3.9 升到 4.0 並非僅僅 2.5% 的進步——而是「被 70% 會篩選的消費者看見」與「對他們完全隱形」之間的差別。</div>
+
+      <div class="callout-chart">
+        <svg viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto;">
+          <!-- Grid background -->
+          <g stroke="rgba(250, 247, 242, 0.08)" stroke-width="1">
+            <line x1="80" y1="30" x2="700" y2="30"/>
+            <line x1="80" y1="75" x2="700" y2="75"/>
+            <line x1="80" y1="120" x2="700" y2="120"/>
+            <line x1="80" y1="165" x2="700" y2="165"/>
+          </g>
+
+          <!-- Y axis labels (conversion %) -->
+          <g font-family="JetBrains Mono" font-size="10" fill="rgba(250, 247, 242, 0.6)">
+            <text x="50" y="34" text-anchor="end">100%</text>
+            <text x="50" y="79" text-anchor="end">75%</text>
+            <text x="50" y="124" text-anchor="end">50%</text>
+            <text x="50" y="169" text-anchor="end">25%</text>
+            <text x="50" y="195" text-anchor="end">0%</text>
+          </g>
+
+          <!-- Axis labels -->
+          <text x="20" y="115" font-family="Onest" font-size="10" fill="rgba(250, 247, 242, 0.55)" text-anchor="middle" transform="rotate(-90 20 115)">Relative conversion rate</text>
+          <text x="390" y="215" font-family="Onest" font-size="10" fill="rgba(250, 247, 242, 0.55)" text-anchor="middle">Star rating displayed on search</text>
+
+          <!-- X axis -->
+          <line x1="80" y1="190" x2="700" y2="190" stroke="rgba(250, 247, 242, 0.3)" stroke-width="1"/>
+
+          <!-- X axis tick labels -->
+          <g font-family="JetBrains Mono" font-size="10" fill="rgba(250, 247, 242, 0.6)" text-anchor="middle">
+            <text x="100" y="205">2.5</text>
+            <text x="200" y="205">3.0</text>
+            <text x="300" y="205">3.5</text>
+            <text x="400" y="205">4.0</text>
+            <text x="500" y="205">4.5</text>
+            <text x="600" y="205">5.0</text>
+          </g>
+
+          <!-- The S-curve showing non-linear conversion -->
+          <path d="M 80,178 C 200,176 280,168 380,140 C 410,118 430,80 480,55 C 540,40 600,38 700,35"
+                fill="none" stroke="#C9A961" stroke-width="3" stroke-linecap="round"/>
+
+          <!-- The 4.0 threshold inflection point -->
+          <line x1="400" y1="30" x2="400" y2="190" stroke="rgba(201, 169, 97, 0.4)" stroke-width="1" stroke-dasharray="3 4"/>
+          <circle cx="400" cy="140" r="5" fill="#C9A961"/>
+          <circle cx="410" cy="118" r="5" fill="#C9A961"/>
+
+          <!-- Annotations at threshold -->
+          <g>
+            <line x1="405" y1="129" x2="500" y2="100" stroke="rgba(250, 247, 242, 0.4)" stroke-width="1"/>
+            <rect x="495" y="78" width="195" height="42" rx="8" fill="rgba(15, 31, 26, 0.85)" stroke="rgba(201, 169, 97, 0.5)" stroke-width="1"/>
+            <text x="592" y="94" font-family="Onest" font-size="11" fill="#C9A961" text-anchor="middle" font-weight="600">The 4-star threshold</text>
+            <text x="592" y="110" font-family="Onest" font-size="10" fill="rgba(250, 247, 242, 0.85)" text-anchor="middle">3.9 → 4.0 = ~25% conversion lift</text>
+          </g>
+
+          <!-- Below 4.0 zone label -->
+          <text x="240" y="50" font-family="Onest" font-size="10" fill="rgba(181, 68, 58, 0.85)" text-anchor="middle" font-style="italic">Below the 70% filter floor</text>
+
+          <!-- Above 4.0 zone label -->
+          <text x="550" y="50" font-family="Onest" font-size="10" fill="rgba(45, 200, 100, 0.85)" text-anchor="middle" font-style="italic">Visible to filtering customers</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <div class="section-rule"><span class="section-rule-mark"><span></span><span></span><span></span></span></div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 3 — FORMULA WITH FLOW DIAGRAM -->
+<!-- ============================================ -->
+<div class="container">
+  <section id="formula">
+    <div class="section-eyebrow"><span class="lang-en">§ 03 · Method</span><span class="lang-zh">§ 03 · 方法</span></div>
+    <h2 class="section-h2 lang-en">A defensible formula for <em>one review's value.</em></h2>
+    <h2 class="section-h2 lang-zh">一條可站得住腳的<em>單則評論價值公式。</em></h2>
+    <p class="section-lead lang-en">No formula gets you a single perfect number. A good formula gets you a defensible range with the assumptions made explicit.</p>
+    <p class="section-lead lang-zh">沒有任何公式能給出單一完美的答案；好公式給出的是一個可以辯護的範圍，並把所有假設攤在陽光下。</p>
+
+    <div class="body">
+      <p class="lang-en">The structure most marketing analysts use, and the one that maps cleanly to what BrightLocal and Whitespark have measured, looks like this:</p>
+      <p class="lang-zh">大多數行銷分析師使用的結構，也是與 BrightLocal、Whitespark 量測結果相對應的公式如下：</p>
+    </div>
+
+    <div class="formula">
+      <div class="formula-label"><span class="lang-en">The review value equation</span><span class="lang-zh">評論價值方程式</span></div>
+      <div class="formula-eq lang-en">
+        <span class="var">Value per review</span> <span class="op">=</span><br>
+        <span class="var">Monthly visibility</span> <span class="op">×</span> <span class="var">Conversion lift</span> <span class="op">×</span> <span class="var">Close rate</span> <span class="op">×</span> <span class="var">Customer LTV</span>
+        <span class="formula-divider"></span>
+        <span class="var">Reviews driving the lift</span>
+      </div>
+      <div class="formula-eq lang-zh">
+        <span class="var">每則評論價值</span> <span class="op">=</span><br>
+        <span class="var">每月曝光量</span> <span class="op">×</span> <span class="var">轉換率提升</span> <span class="op">×</span> <span class="var">成交率</span> <span class="op">×</span> <span class="var">顧客終身價值</span>
+        <span class="formula-divider"></span>
+        <span class="var">帶動提升的評論數</span>
+      </div>
+      <div class="formula-vars lang-en">
+        <div class="formula-var-item"><strong>Monthly visibility</strong> — your Google Business Profile views per month (a real metric in your GBP dashboard)</div>
+        <div class="formula-var-item"><strong>Conversion lift</strong> — the % uplift in profile-to-action conversion from an improved review profile (research-supported range: 5–30%)</div>
+        <div class="formula-var-item"><strong>Close rate</strong> — % of inbound leads that become paying customers (yours, not industry average)</div>
+        <div class="formula-var-item"><strong>Customer LTV</strong> — average revenue from one customer over their full relationship</div>
+        <div class="formula-var-item"><strong>Reviews driving the lift</strong> — how many new reviews collectively earned that uplift (typically 20–50)</div>
+        <div class="formula-var-item"><strong>Result</strong> — value per review per month; multiply by 24 months for fair long-term value</div>
+      </div>
+      <div class="formula-vars lang-zh">
+        <div class="formula-var-item"><strong>每月曝光量</strong>——您 Google Business Profile 每月的瀏覽次數（GBP 後台的真實數據）</div>
+        <div class="formula-var-item"><strong>轉換率提升</strong>——優化評論狀況後，資料頁瀏覽到聯繫動作的轉換率上升幅度（研究支持的範圍：5–30%）</div>
+        <div class="formula-var-item"><strong>成交率</strong>——進線客戶最終成為付費顧客的比例（用您自己的數字，不要用行業平均值）</div>
+        <div class="formula-var-item"><strong>顧客終身價值</strong>——一位顧客在完整關係期間內帶來的平均營收</div>
+        <div class="formula-var-item"><strong>帶動提升的評論數</strong>——共同帶動該轉換率提升的新評論則數（通常為 20–50 則）</div>
+        <div class="formula-var-item"><strong>結果</strong>——每則評論每月的價值；再乘以 24 個月，可得到較公允的長期價值</div>
+      </div>
+    </div>
+
+    <!-- FLOW DIAGRAM showing inputs → output -->
+    <div class="flow-diagram">
+      <div class="chart-title" style="text-align: center; margin-bottom: 20px;"><span class="lang-en">How a single review compounds into revenue</span><span class="lang-zh">單則評論如何複利成營收</span></div>
+      <svg viewBox="0 0 740 180" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto;">
+        <!-- Stage 1: Review collected -->
+        <g>
+          <rect x="10" y="60" width="120" height="60" rx="12" fill="#FFFFFF" stroke="#E8E2D5" stroke-width="1"/>
+          <text x="70" y="85" font-family="Fraunces" font-style="italic" font-size="13" fill="#1F4D3F" text-anchor="middle" font-weight="500">A review</text>
+          <text x="70" y="105" font-family="Onest" font-size="10" fill="#5A6660" text-anchor="middle">5 stars · in language</text>
+        </g>
+
+        <!-- Arrow 1 -->
+        <path d="M 130 90 L 165 90" stroke="#A88847" stroke-width="2" fill="none" marker-end="url(#arr1)"/>
+
+        <!-- Stage 2: Rank lift + Trust lift -->
+        <g>
+          <rect x="170" y="20" width="140" height="50" rx="12" fill="#FAF7F2" stroke="#C9A961" stroke-width="1"/>
+          <text x="240" y="42" font-family="Onest" font-size="11" fill="#A88847" text-anchor="middle" font-weight="600">RANKING ↑</text>
+          <text x="240" y="58" font-family="JetBrains Mono" font-size="10" fill="#1A1F1C" text-anchor="middle">+1 position in Local Pack</text>
+
+          <rect x="170" y="110" width="140" height="50" rx="12" fill="#FAF7F2" stroke="#C9A961" stroke-width="1"/>
+          <text x="240" y="132" font-family="Onest" font-size="11" fill="#A88847" text-anchor="middle" font-weight="600">TRUST ↑</text>
+          <text x="240" y="148" font-family="JetBrains Mono" font-size="10" fill="#1A1F1C" text-anchor="middle">0.02 ★ rating bump</text>
+        </g>
+
+        <!-- Arrows 2 -->
+        <path d="M 310 45 C 340 45, 340 90, 360 90" stroke="#A88847" stroke-width="2" fill="none" marker-end="url(#arr1)"/>
+        <path d="M 310 135 C 340 135, 340 90, 360 90" stroke="#A88847" stroke-width="2" fill="none" marker-end="url(#arr1)"/>
+
+        <!-- Stage 3: More views + better conversion -->
+        <g>
+          <rect x="365" y="60" width="150" height="60" rx="12" fill="#FFFFFF" stroke="#E8E2D5" stroke-width="1"/>
+          <text x="440" y="83" font-family="Fraunces" font-style="italic" font-size="13" fill="#1F4D3F" text-anchor="middle" font-weight="500">More views</text>
+          <text x="440" y="103" font-family="Onest" font-size="10" fill="#5A6660" text-anchor="middle">at higher conversion</text>
+        </g>
+
+        <!-- Arrow 3 -->
+        <path d="M 515 90 L 550 90" stroke="#A88847" stroke-width="2" fill="none" marker-end="url(#arr1)"/>
+
+        <!-- Stage 4: New customers -->
+        <g>
+          <rect x="555" y="60" width="170" height="60" rx="12" fill="#0F1F1A" stroke="#C9A961" stroke-width="1.5"/>
+          <text x="640" y="82" font-family="Fraunces" font-style="italic" font-size="14" fill="#C9A961" text-anchor="middle" font-weight="500">$ Revenue</text>
+          <text x="640" y="102" font-family="Onest" font-size="10" fill="#FAF7F2" text-anchor="middle">over 24 months</text>
+        </g>
+
+        <!-- Arrow marker definition -->
+        <defs>
+          <marker id="arr1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#A88847"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="body">
+      <p class="lang-en"><strong>Why 24 months?</strong> Reviews don't disappear, but consumer attention to old reviews does. BrightLocal found that 22% of consumers only consider reviews from the past two weeks and 26% only the past month.<sup class="cite"><a href="#source-11">11</a></sup> A 24-month horizon captures the conservative "useful life" of a review — the period during which it's still influencing search ranking and consumer perception.</p>
+      <p class="lang-zh"><strong>為什麼是 24 個月？</strong>評論本身不會消失，但消費者對舊評論的注意力會。BrightLocal 發現，22% 的消費者只看過去兩週內的評論，26% 的消費者只看過去一個月。<sup class="cite"><a href="#source-11">11</a></sup>24 個月的時間長度是一則評論「有效壽命」的保守估計——亦即它仍在影響搜尋排名與消費者感知的期間。</p>
+
+      <p class="lang-en"><strong>Why divide by reviews driving the lift?</strong> Because no single review moves your rating from 4.2 to 4.7. A cluster of new reviews does. Attributing the entire lift to one review would over-count; attributing none to it would under-count. Dividing by the cohort that produced the lift gives a defensible per-review number.</p>
+      <p class="lang-zh"><strong>為什麼要除以帶動提升的評論數？</strong>因為沒有任何單一評論能把您的評等從 4.2 拉到 4.7，是一群新評論共同辦到的。把整個提升歸於一則評論會高估；完全不歸給它則會低估。除以「帶動該提升的這一批評論」，可以得到一個可以站得住腳的「每則評論」數值。</p>
+    </div>
+
+    <!-- WORKED EXAMPLE -->
+    <h3 style="font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; color: var(--ink); margin: 50px 0 18px; letter-spacing: -0.015em;" class="lang-en">A worked example: <em style="font-style: italic; color: var(--forest);">Dr. Huang Acupuncture</em></h3>
+    <h3 style="font-family: 'Fraunces', serif; font-weight: 500; font-size: 28px; color: var(--ink); margin: 50px 0 18px; letter-spacing: -0.015em;" class="lang-zh">實例試算：<em style="font-style: italic; color: var(--forest);">黃醫師中醫針灸</em></h3>
+    <p style="font-family: 'Newsreader', serif; font-style: italic; font-size: 17px; color: var(--text-soft); margin-bottom: 24px;" class="lang-en">Real numbers from a real-world archetype — bilingual TCM clinic in Flushing, NY.</p>
+    <p style="font-family: 'Newsreader', serif; font-style: italic; font-size: 17px; color: var(--text-soft); margin-bottom: 24px;" class="lang-zh">取自真實原型的真實數據——紐約法拉盛的雙語中醫診所。</p>
+
+    <div class="example">
+      <div class="example-h"><span class="lang-en">Inputs (from Dr. Huang's actual Google Business Profile)</span><span class="lang-zh">輸入數據（取自黃醫師實際的 Google Business Profile）</span></div>
+      <div class="example-sub"><span class="lang-en">Numbers a local clinic owner can pull from their own GBP dashboard in two minutes.</span><span class="lang-zh">本地診所老闆兩分鐘內就能從自己的 GBP 後台取得的數字。</span></div>
+
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Monthly Google Business Profile views</span><span class="lang-zh">每月 Google Business Profile 瀏覽次數</span></span><span class="example-row-val">2,000</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Current profile-to-action conversion rate</span><span class="lang-zh">目前資料頁→動作轉換率</span></span><span class="example-row-val">3.0%</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Estimated conversion lift after 30 new strong reviews</span><span class="lang-zh">收集 30 則優質新評論後估計轉換率提升</span></span><span class="example-row-val">+15%</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">New conversion rate (3.0% × 1.15)</span><span class="lang-zh">新轉換率（3.0% × 1.15）</span></span><span class="example-row-val">3.45%</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Extra leads per month (2,000 × 0.45%)</span><span class="lang-zh">每月額外進線（2,000 × 0.45%）</span></span><span class="example-row-val"><span class="lang-en">9 leads</span><span class="lang-zh">9 件</span></span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Close rate (inbound lead → paying patient)</span><span class="lang-zh">成交率（進線→付費病人）</span></span><span class="example-row-val">40%</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">New patients per month attributable to review lift</span><span class="lang-zh">每月可歸因於評論提升的新病人數</span></span><span class="example-row-val"><span class="lang-en">3.6 patients</span><span class="lang-zh">3.6 位</span></span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Average patient lifetime value (5 visits × $120)</span><span class="lang-zh">平均病人終身價值（5 次門診 × $120）</span></span><span class="example-row-val">$600</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Monthly revenue lift</span><span class="lang-zh">每月營收提升</span></span><span class="example-row-val">$2,160</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Reviews that produced this lift</span><span class="lang-zh">產生此次提升的評論則數</span></span><span class="example-row-val"><span class="lang-en">30 reviews</span><span class="lang-zh">30 則</span></span></div>
+
+      <div class="example-row result"><span class="example-row-label"><span class="lang-en">Value per review, per month</span><span class="lang-zh">每則評論每月價值</span></span><span class="example-row-val">$72</span></div>
+      <div class="example-row result"><span class="example-row-label"><span class="lang-en">Annualized (× 12)</span><span class="lang-zh">年化（× 12）</span></span><span class="example-row-val">$864</span></div>
+      <div class="example-row result"><span class="example-row-label"><span class="lang-en">24-month horizon (conservative)</span><span class="lang-zh">24 個月（保守估計）</span></span><span class="example-row-val">$1,728</span></div>
+    </div>
+
+    <div class="body">
+      <p class="lang-en">For Dr. Huang, <strong>one strong Google review is worth roughly $1,700 over 24 months.</strong> Change one input and the answer changes — if her average patient comes for 8 visits instead of 5, the per-review value rises to ~$2,760. If her current review profile is already strong (4.7+) and the lift is closer to 8% instead of 15%, the per-review value drops to ~$920. Both are still meaningful numbers for a business sending out review requests, but they're different decisions about how aggressively to invest in review collection.</p>
+      <p class="lang-zh">對黃醫師而言，<strong>一則優質的 Google 評論在 24 個月內價值約 1,700 美元。</strong>任何一個輸入變動，答案都會改變——如果平均病人從 5 次回診增加到 8 次，每則評論價值上升至約 2,760 美元；如果她目前的評論狀況已經很強（4.7 以上），轉換率提升幅度從 15% 縮小至 8%，每則評論價值則降至約 920 美元。對任何在發送評論邀請的商家來說，這兩個數字都仍然有意義；但它們意味著「該多大力投入收集評論」的不同決策。</p>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <div class="section-rule"><span class="section-rule-mark"><span></span><span></span><span></span></span></div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 4 — BY VERTICAL WITH HORIZONTAL BAR CHART -->
+<!-- ============================================ -->
+<div class="container">
+  <section id="by-vertical">
+    <div class="section-eyebrow"><span class="lang-en">§ 04 · Verticals</span><span class="lang-zh">§ 04 · 行業</span></div>
+    <h2 class="section-h2 lang-en">Modeled value <em>by vertical.</em></h2>
+    <h2 class="section-h2 lang-zh">各行業的<em>建模估值。</em></h2>
+    <p class="section-lead lang-en">The same formula applied to seven common local business types. These are modeled estimates with the assumptions visible — not industry truths to repeat without context.</p>
+    <p class="section-lead lang-zh">同一條公式套用至七種常見的本地商業類型。這些是把所有假設攤開的建模估算——並非可以脫離脈絡引用的「行業定論」。</p>
+
+    <!-- VISUAL CHART FIRST -->
+    <div class="vert-chart">
+      <div class="vert-chart-title"><span class="lang-en">Modeled value of one strong Google review, by vertical</span><span class="lang-zh">各行業一則優質 Google 評論的建模價值</span></div>
+      <div class="vert-chart-sub"><span class="lang-en">Over a 24-month horizon, using the formula in Section 3 with vertical-specific assumptions.</span><span class="lang-zh">採用第 03 節的公式，並以各行業特定假設計算，時間長度 24 個月。</span></div>
+
+      <div class="vchart-row">
+        <div class="vchart-label"><span class="lang-en">Coffee / Café</span><span class="lang-zh">咖啡 / 餐飲</span></div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 0.25%; width: 1.5%;"></div></div>
+        <div class="vchart-value">$30 – $180</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label"><span class="lang-en">Salon / Spa</span><span class="lang-zh">美髮 / 美容</span></div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 1%; width: 5%;"></div></div>
+        <div class="vchart-value">$120 – $600</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label"><span class="lang-en">Insurance Agent</span><span class="lang-zh">保險經紀</span></div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 2.5%; width: 15%;"></div></div>
+        <div class="vchart-value">$300 – $1,800</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label"><span class="lang-en">Acupuncture / Clinic</span><span class="lang-zh">針灸 / 診所</span></div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 3.3%; width: 20%;"></div></div>
+        <div class="vchart-value">$400 – $2,400</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label"><span class="lang-en">Contractor / Roofing</span><span class="lang-zh">建築承包 / 屋頂</span></div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 5%; width: 50%;"></div></div>
+        <div class="vchart-value">$600 – $6,000+</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label"><span class="lang-en">Lawyer / Immigration</span><span class="lang-zh">律師 / 移民</span></div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 10%; width: 90%;"></div></div>
+        <div class="vchart-value">$1,200 – $12,000+</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label"><span class="lang-en">Real Estate Agent</span><span class="lang-zh">房地產經紀</span></div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 12.5%; width: 67.5%;"></div></div>
+        <div class="vchart-value">$1,500 – $8,000+</div>
+      </div>
+
+      <div class="vchart-scale">
+        <span>$0</span>
+        <span>$3,000</span>
+        <span>$6,000</span>
+        <span>$9,000</span>
+        <span>$12,000+</span>
+      </div>
+    </div>
+
+    <!-- DETAILED TABLE WITH ASSUMPTIONS -->
+    <div class="table-wrap">
+      <table class="vtable">
+        <thead>
+          <tr>
+            <th style="width: 32%;"><span class="lang-en">Business type</span><span class="lang-zh">行業類型</span></th>
+            <th style="width: 28%;"><span class="lang-en">Modeled value per review<br><span style="font-weight: 400; text-transform: none; letter-spacing: 0;">(over 24 months)</span></span><span class="lang-zh">每則評論建模價值<br><span style="font-weight: 400; text-transform: none; letter-spacing: 0;">（24 個月）</span></span></th>
+            <th><span class="lang-en">Key assumptions used</span><span class="lang-zh">使用的關鍵假設</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="vertical-name"><span class="lang-en">Coffee shop / Café</span><span class="lang-zh">咖啡店 / 餐廳</span></div><div class="vertical-sub"><span class="lang-en">Restaurants, casual dining</span><span class="lang-zh">餐廳、輕食</span></div></td>
+            <td><div class="vertical-range">$30 – $180</div></td>
+            <td><div class="vertical-assumptions"><span class="lang-en">LTV $40–$200<br>Close rate 60%<br>Lift 5–9% (Luca)</span><span class="lang-zh">終身價值 $40–$200<br>成交率 60%<br>提升 5–9%（Luca）</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="vertical-name"><span class="lang-en">Salon / Spa / Beauty</span><span class="lang-zh">美髮 / 美容 / SPA</span></div><div class="vertical-sub"><span class="lang-en">Hair, nails, massage, aesthetics</span><span class="lang-zh">美髮、美甲、按摩、美容</span></div></td>
+            <td><div class="vertical-range">$120 – $600</div></td>
+            <td><div class="vertical-assumptions"><span class="lang-en">LTV $250–$900<br>Close rate 45%<br>Lift 10–18%</span><span class="lang-zh">終身價值 $250–$900<br>成交率 45%<br>提升 10–18%</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="vertical-name"><span class="lang-en">Acupuncture / Clinic / Dental</span><span class="lang-zh">針灸 / 診所 / 牙科</span></div><div class="vertical-sub"><span class="lang-en">TCM, chiro, primary care, dental</span><span class="lang-zh">中醫、整脊、家醫、牙科</span></div></td>
+            <td><div class="vertical-range">$400 – $2,400</div></td>
+            <td><div class="vertical-assumptions"><span class="lang-en">LTV $500–$2,000<br>Close rate 35–45%<br>Lift 12–20%</span><span class="lang-zh">終身價值 $500–$2,000<br>成交率 35–45%<br>提升 12–20%</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="vertical-name"><span class="lang-en">Lawyer / Immigration / PI</span><span class="lang-zh">律師 / 移民 / 人身傷害</span></div><div class="vertical-sub"><span class="lang-en">Legal services, high-consideration</span><span class="lang-zh">法律服務，高決策成本</span></div></td>
+            <td><div class="vertical-range">$1,200 – $12,000+</div></td>
+            <td><div class="vertical-assumptions"><span class="lang-en">LTV $2,000–$15,000<br>Close rate 20–30%<br>Lift 15–25%</span><span class="lang-zh">終身價值 $2,000–$15,000<br>成交率 20–30%<br>提升 15–25%</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="vertical-name"><span class="lang-en">Contractor / Roofing / HVAC</span><span class="lang-zh">承包商 / 屋頂 / 空調</span></div><div class="vertical-sub"><span class="lang-en">Home improvement, large project</span><span class="lang-zh">居家改造、大型工程</span></div></td>
+            <td><div class="vertical-range">$600 – $6,000+</div></td>
+            <td><div class="vertical-assumptions"><span class="lang-en">LTV $3,000–$25,000<br>Close rate 15–25%<br>Lift 12–22%</span><span class="lang-zh">終身價值 $3,000–$25,000<br>成交率 15–25%<br>提升 12–22%</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="vertical-name"><span class="lang-en">Real Estate Agent</span><span class="lang-zh">房地產經紀</span></div><div class="vertical-sub"><span class="lang-en">Buying, selling, rental</span><span class="lang-zh">買賣、出租</span></div></td>
+            <td><div class="vertical-range">$1,500 – $8,000+</div></td>
+            <td><div class="vertical-assumptions"><span class="lang-en">LTV $5,000–$30,000<br>Close rate 10–18%<br>Lift 15–22%</span><span class="lang-zh">終身價值 $5,000–$30,000<br>成交率 10–18%<br>提升 15–22%</span></div></td>
+          </tr>
+          <tr>
+            <td><div class="vertical-name"><span class="lang-en">Insurance Agent</span><span class="lang-zh">保險經紀</span></div><div class="vertical-sub"><span class="lang-en">Auto, home, life, commercial</span><span class="lang-zh">汽車、住房、壽險、商業</span></div></td>
+            <td><div class="vertical-range">$300 – $1,800</div></td>
+            <td><div class="vertical-assumptions"><span class="lang-en">LTV $400–$2,500<br>Close rate 25–35%<br>Lift 10–18%</span><span class="lang-zh">終身價值 $400–$2,500<br>成交率 25–35%<br>提升 10–18%</span></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-note">
+        <span class="lang-en"><strong>How to read this:</strong> These ranges come from applying the formula above with the stated assumptions. The low end of each range uses conservative LTV and conversion lift values; the high end uses ranges that match well-performing businesses in each vertical. Your actual number depends on your specific LTV, close rate, and current review profile. Use the calculator below to model your own.</span>
+        <span class="lang-zh"><strong>如何閱讀本表：</strong>這些範圍是將前述公式搭配各項假設套用而得。每個範圍的下限採用保守的 LTV 與轉換率提升；上限則對應該行業中表現良好的商家。您實際的數字將取決於您自己的 LTV、成交率與目前評論狀況。請使用下方的試算工具，建模您自己的數值。</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <div class="section-rule"><span class="section-rule-mark"><span></span><span></span><span></span></span></div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 5 — CALCULATOR -->
+<!-- ============================================ -->
+<div class="container">
+  <section id="calculator">
+    <div class="section-eyebrow"><span class="lang-en">§ 05 · Calculator</span><span class="lang-zh">§ 05 · 試算</span></div>
+    <h2 class="section-h2 lang-en">What is <em>your</em> review worth?</h2>
+    <h2 class="section-h2 lang-zh"><em>您的</em>評論價值多少？</h2>
+    <p class="section-lead lang-en">Five inputs from your own business — most pullable from Google Business Profile in three minutes.</p>
+    <p class="section-lead lang-zh">五項您自家生意的數據——大多數可以在 Google Business Profile 上三分鐘內取得。</p>
+
+    <div class="calc">
+      <div class="calc-eyebrow"><span class="lang-en">Live calculator</span><span class="lang-zh">互動試算工具</span></div>
+      <div class="calc-title"><span class="lang-en">Review value estimator</span><span class="lang-zh">評論價值估算器</span></div>
+      <div class="calc-sub"><span class="lang-en">Adjust the inputs and the answer updates instantly. Defaults are set to Dr. Huang Acupuncture's example.</span><span class="lang-zh">調整輸入值，答案會即時更新。預設為黃醫師中醫針灸的案例數字。</span></div>
+
+      <div class="calc-fields">
+        <div class="calc-field">
+          <label><span class="lang-en">Monthly GBP views <span class="hint">(from your dashboard)</span></span><span class="lang-zh">每月 GBP 瀏覽次數 <span class="hint">（取自您的後台）</span></span></label>
+          <div class="calc-field-input-wrap"><input class="calc-input" type="number" id="calc-views" value="2000" min="0" step="100"></div>
+        </div>
+        <div class="calc-field">
+          <label><span class="lang-en">Current conversion rate <span class="hint">(views → calls/clicks)</span></span><span class="lang-zh">目前轉換率 <span class="hint">（瀏覽→來電 / 點擊）</span></span></label>
+          <div class="calc-field-input-wrap"><input class="calc-input has-suffix" type="number" id="calc-conv" value="3.0" min="0" max="100" step="0.1"><span class="calc-field-input-suffix">%</span></div>
+        </div>
+        <div class="calc-field">
+          <label><span class="lang-en">Expected conversion lift <span class="hint">(typical 5–25%)</span></span><span class="lang-zh">預期轉換率提升 <span class="hint">（常見 5–25%）</span></span></label>
+          <div class="calc-field-input-wrap"><input class="calc-input has-suffix" type="number" id="calc-lift" value="15" min="0" max="100" step="1"><span class="calc-field-input-suffix">%</span></div>
+        </div>
+        <div class="calc-field">
+          <label><span class="lang-en">Close rate <span class="hint">(lead → paying customer)</span></span><span class="lang-zh">成交率 <span class="hint">（進線→付費顧客）</span></span></label>
+          <div class="calc-field-input-wrap"><input class="calc-input has-suffix" type="number" id="calc-close" value="40" min="0" max="100" step="1"><span class="calc-field-input-suffix">%</span></div>
+        </div>
+        <div class="calc-field">
+          <label><span class="lang-en">Customer lifetime value <span class="hint">(avg revenue per customer)</span></span><span class="lang-zh">顧客終身價值 <span class="hint">（每位顧客平均營收）</span></span></label>
+          <div class="calc-field-input-wrap"><span class="calc-field-input-prefix">$</span><input class="calc-input has-prefix" type="number" id="calc-ltv" value="600" min="0" step="50"></div>
+        </div>
+        <div class="calc-field">
+          <label><span class="lang-en">Reviews driving the lift <span class="hint">(typically 20–50)</span></span><span class="lang-zh">帶動提升的評論則數 <span class="hint">（常見 20–50 則）</span></span></label>
+          <div class="calc-field-input-wrap"><input class="calc-input" type="number" id="calc-reviews" value="30" min="1" step="1"></div>
+        </div>
+      </div>
+
+      <div class="calc-result">
+        <div class="calc-result-label"><span class="lang-en">Estimated value of one strong Google review</span><span class="lang-zh">一則優質 Google 評論的估計價值</span></div>
+        <div class="calc-result-num">$<span id="calc-result-24mo">1,728</span></div>
+        <div class="calc-result-sub"><span class="lang-en">over 24 months · <em>conservative horizon</em></span><span class="lang-zh">24 個月 · <em>保守時間長度</em></span></div>
+        <div class="calc-result-breakdown">
+          <div><div class="calc-result-item-num">$<span id="calc-result-month">72</span></div><div class="calc-result-item-label"><span class="lang-en">per month</span><span class="lang-zh">每月</span></div></div>
+          <div><div class="calc-result-item-num">$<span id="calc-result-year">864</span></div><div class="calc-result-item-label"><span class="lang-en">per year</span><span class="lang-zh">每年</span></div></div>
+          <div><div class="calc-result-item-num"><span id="calc-result-customers">3.6</span></div><div class="calc-result-item-label"><span class="lang-en">new customers/month</span><span class="lang-zh">每月新客戶</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <div class="section-rule"><span class="section-rule-mark"><span></span><span></span><span></span></span></div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 6 — WHAT MAKES A REVIEW VALUABLE -->
+<!-- ============================================ -->
+<div class="container">
+  <section id="what-makes-valuable">
+    <div class="section-eyebrow"><span class="lang-en">§ 06 · Quality</span><span class="lang-zh">§ 06 · 品質</span></div>
+    <h2 class="section-h2 lang-en">Not all reviews are <em>equally valuable.</em></h2>
+    <h2 class="section-h2 lang-zh">並非所有評論<em>價值都相同。</em></h2>
+    <p class="section-lead lang-en">The same star rating from two different reviewers can have wildly different impact. Six factors separate a $100 review from a $2,000 one.</p>
+    <p class="section-lead lang-zh">兩位不同顧客給出相同的星級，影響力可能天差地遠。下面六個因素決定了一則評論是「100 美元」還是「2,000 美元」。</p>
+
+    <div class="mult-grid">
+      <div class="mult-list">
+
+        <div class="mult-item">
+          <div class="mult-strength mult-strength-high">3×</div>
+          <div class="mult-text">
+            <div class="mult-name"><span class="lang-en">Recency</span><span class="lang-zh">新鮮度</span></div>
+            <div class="mult-desc lang-en">22% of consumers only consider reviews from the past two weeks; 26% only the past month.<sup class="cite"><a href="#source-11">11</a></sup> Old reviews still help SEO but lose conversion weight rapidly.</div>
+            <div class="mult-desc lang-zh">22% 的消費者只看過去兩週的評論，26% 只看過去一個月。<sup class="cite"><a href="#source-11">11</a></sup>舊評論對 SEO 仍有幫助，但對轉換的影響力迅速下降。</div>
+          </div>
+        </div>
+
+        <div class="mult-item">
+          <div class="mult-strength mult-strength-high">2.5×</div>
+          <div class="mult-text">
+            <div class="mult-name"><span class="lang-en">Specificity in the text</span><span class="lang-zh">文字具體性</span></div>
+            <div class="mult-desc lang-en">Reviews with detail — specific outcomes, named services, real situations — convert dramatically better than "great service!" Generic reviews look fake even when they're real.</div>
+            <div class="mult-desc lang-zh">寫得具體的評論——明確的結果、提到的服務名稱、真實的情境——其轉換力遠遠優於「服務很好！」這樣的籠統話。即便是真實評論，過於空泛也會被誤認為造假。</div>
+          </div>
+        </div>
+
+        <div class="mult-item">
+          <div class="mult-strength mult-strength-med">1.9×</div>
+          <div class="mult-text">
+            <div class="mult-name"><span class="lang-en">Owner response</span><span class="lang-zh">商家回覆</span></div>
+            <div class="mult-desc lang-en">88% of consumers would use a business that responds to all reviews vs. 47% for one that doesn't.<sup class="cite"><a href="#source-12">12</a></sup> Response also indexes for search relevance.</div>
+            <div class="mult-desc lang-zh">88% 的消費者願意光顧會回覆所有評論的商家，而對不回覆者只有 47%。<sup class="cite"><a href="#source-12">12</a></sup>回覆同時也會被搜尋演算法納入相關性評估。</div>
+          </div>
+        </div>
+
+        <div class="mult-item">
+          <div class="mult-strength mult-strength-med">1.7×</div>
+          <div class="mult-text">
+            <div class="mult-name"><span class="lang-en">Reviewer profile quality</span><span class="lang-zh">評論者的個人檔案品質</span></div>
+            <div class="mult-desc lang-en">Google weights reviews from accounts with photos, history, and Local Guide status much more heavily than reviews from blank accounts.</div>
+            <div class="mult-desc lang-zh">Google 給予「有照片、有歷史紀錄、具 Local Guide 身分」的帳號高得多的權重，而空白帳號的權重則低許多。</div>
+          </div>
+        </div>
+
+        <div class="mult-item">
+          <div class="mult-strength mult-strength-med">1.5×</div>
+          <div class="mult-text">
+            <div class="mult-name"><span class="lang-en">Language diversity</span><span class="lang-zh">語言多樣性</span></div>
+            <div class="mult-desc lang-en">For bilingual markets, reviews in your customers' actual languages widen your discoverable audience. A Chinese-language review surfaces to a different consumer pool.</div>
+            <div class="mult-desc lang-zh">在雙語市場中，以顧客原語言所寫的評論能擴大您被搜尋到的受眾。一則中文評論會出現在另一群消費者的搜尋結果裡。</div>
+          </div>
+        </div>
+
+        <div class="mult-item">
+          <div class="mult-strength mult-strength-high">2.2×</div>
+          <div class="mult-text">
+            <div class="mult-name"><span class="lang-en">Velocity, not just count</span><span class="lang-zh">速度，而非只是數量</span></div>
+            <div class="mult-desc lang-en">Whitespark's 2026 survey lists review velocity (the steady pace) as a stronger ranking signal than total count.<sup class="cite"><a href="#source-13">13</a></sup> 4 new reviews a month beats 200 old ones.</div>
+            <div class="mult-desc lang-zh">Whitespark 2026 年調查指出，評論的「持續速度」是比「累計總數」更強的排名訊號。<sup class="cite"><a href="#source-13">13</a></sup>每月 4 則新評論，勝過 200 則陳舊評論。</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VALUE MULTIPLIER STACK VISUAL -->
+      <div class="mult-visual">
+        <div class="mult-visual-h"><span class="lang-en">Stacking the multipliers</span><span class="lang-zh">倍率疊加</span></div>
+        <svg viewBox="0 0 220 320" preserveAspectRatio="xMidYMid meet" style="width: 100%; max-width: 220px;">
+          <!-- Base review -->
+          <rect x="40" y="280" width="140" height="32" rx="6" fill="#E8E2D5"/>
+          <text x="110" y="300" font-family="Onest" font-size="11" fill="#5A6660" text-anchor="middle" font-weight="500">Base review</text>
+          <text x="190" y="300" font-family="JetBrains Mono" font-size="10" fill="#8A938E">$100</text>
+
+          <!-- + Recency -->
+          <rect x="40" y="240" width="140" height="32" rx="6" fill="#87A899" opacity="0.6"/>
+          <text x="110" y="260" font-family="Onest" font-size="10" fill="#1A1F1C" text-anchor="middle" font-weight="500">+ Recency</text>
+          <text x="190" y="260" font-family="JetBrains Mono" font-size="10" fill="#5A6660">×3</text>
+
+          <!-- + Specificity -->
+          <rect x="40" y="200" width="140" height="32" rx="6" fill="#87A899" opacity="0.8"/>
+          <text x="110" y="220" font-family="Onest" font-size="10" fill="#1A1F1C" text-anchor="middle" font-weight="500">+ Specificity</text>
+          <text x="190" y="220" font-family="JetBrains Mono" font-size="10" fill="#5A6660">×2.5</text>
+
+          <!-- + Velocity -->
+          <rect x="40" y="160" width="140" height="32" rx="6" fill="#A88847"/>
+          <text x="110" y="180" font-family="Onest" font-size="10" fill="#FFFFFF" text-anchor="middle" font-weight="500">+ Velocity</text>
+          <text x="190" y="180" font-family="JetBrains Mono" font-size="10" fill="#5A6660">×2.2</text>
+
+          <!-- + Response -->
+          <rect x="40" y="120" width="140" height="32" rx="6" fill="#A88847"/>
+          <text x="110" y="140" font-family="Onest" font-size="10" fill="#FFFFFF" text-anchor="middle" font-weight="500">+ Owner reply</text>
+          <text x="190" y="140" font-family="JetBrains Mono" font-size="10" fill="#5A6660">×1.9</text>
+
+          <!-- = -->
+          <line x1="50" y1="100" x2="170" y2="100" stroke="#A88847" stroke-width="1.5"/>
+
+          <!-- Result -->
+          <rect x="20" y="40" width="180" height="50" rx="10" fill="#1F4D3F"/>
+          <text x="110" y="62" font-family="Fraunces" font-style="italic" font-size="13" fill="#C9A961" text-anchor="middle" font-weight="500">Stacked value</text>
+          <text x="110" y="83" font-family="Fraunces" font-size="22" fill="#FAF7F2" text-anchor="middle" font-weight="500" letter-spacing="-0.02em">~$2,000+</text>
+
+          <!-- Down arrow indicator -->
+          <text x="110" y="14" font-family="Onest" font-size="9" fill="#A88847" text-anchor="middle" font-weight="600" letter-spacing="0.1em">COMPOUNDED</text>
+          <path d="M 105 22 L 110 28 L 115 22" stroke="#A88847" stroke-width="1.5" fill="none"/>
+        </svg>
+        <div style="font-family: 'Newsreader', serif; font-style: italic; font-size: 11.5px; color: var(--text-muted); margin-top: 10px; text-align: center; line-height: 1.4; max-width: 200px;"><span class="lang-en">A $100 baseline review becomes a $2,000 asset when all six factors stack.</span><span class="lang-zh">當六項因素同時疊加時，一則 100 美元的基本評論可變成 2,000 美元的資產。</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="container">
+  <div class="section-rule"><span class="section-rule-mark"><span></span><span></span><span></span></span></div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 7 — REPORTING + WHY MOST FAIL -->
+<!-- ============================================ -->
+<div class="container">
+  <section id="reporting">
+    <div class="section-eyebrow"><span class="lang-en">§ 07 · Reporting</span><span class="lang-zh">§ 07 · 呈現</span></div>
+    <h2 class="section-h2 lang-en">If reviews are worth this much,<br><em>why don't more businesses have them?</em></h2>
+    <h2 class="section-h2 lang-zh">既然評論這麼有價值，<br><em>為什麼大多數商家還是沒有？</em></h2>
+    <p class="section-lead lang-en">Three observable reasons, each measurable in BrightLocal's annual surveys.</p>
+    <p class="section-lead lang-zh">三個可觀察的原因，每一個都能在 BrightLocal 的年度調查中量化。</p>
+
+    <div class="body lang-en">
+      <h3>1. Asking is uncomfortable</h3>
+      <p>Most business owners feel awkward asking for reviews, particularly for service businesses where the relationship is personal. The result: most happy customers never get asked. BrightLocal found that <strong>most consumers say they'd happily write a review if asked</strong> — but the asking rarely happens.<sup class="cite"><a href="#source-14">14</a></sup> The gap between willing reviewers and actual reviews written is enormous, and it's almost entirely an asking gap, not a willingness gap.</p>
+
+      <h3>2. The friction is real</h3>
+      <p>Asking is step one. Step two — the customer actually writing the review — is where most attempts die. Writing a thoughtful review from a blank screen on a phone, in a moment after a doctor's visit, is harder than it looks. Industry-typical completion rates for review requests sit around <strong>10%</strong>. Most happy customers, even those who genuinely want to help, never complete the task.</p>
+
+      <h3>3. Incentivization is illegal — and consumers know it</h3>
+      <p>Offering discounts or gifts in exchange for reviews violates Google's policies and, as of 2024, may violate FTC rules with civil penalty exposure.<sup class="cite"><a href="#source-4">4</a></sup> Many businesses still do it (BrightLocal's 2026 survey shows 11% of consumers were offered a positive-review incentive), but it's a legally and reputationally risky shortcut.<sup class="cite"><a href="#source-15">15</a></sup> The right answer isn't bribing reviewers — it's lowering the friction of asking real customers.</p>
+    </div>
+    <div class="body lang-zh">
+      <h3>1. 開口邀請令人不自在</h3>
+      <p>多數商家覺得邀請顧客寫評論很尷尬，尤其是關係比較個人化的服務業。結果是：絕大多數的滿意顧客從來沒被開口邀請過。BrightLocal 的研究發現，<strong>多數消費者表示「如果被邀請會樂意寫評論」</strong>——但這個邀請的動作很少真的發生。<sup class="cite"><a href="#source-14">14</a></sup>「願意寫評論的人」與「實際寫了評論的人」之間的差距非常大，而這個差距幾乎完全來自「沒人開口」，而非「沒人願意」。</p>
+
+      <h3>2. 摩擦是真實存在的</h3>
+      <p>「開口邀請」只是第一步；「顧客真的寫下評論」是第二步——也是多數嘗試告終的地方。在看完醫生後、在手機螢幕前從零開始寫出一則用心的評論，比想像中困難得多。業界邀請評論的完成率通常落在約 <strong>10%</strong>。即便是真心想幫忙的滿意顧客，多數人最終都未完成任務。</p>
+
+      <h3>3. 給好處換評論是違法的——而且消費者也知道</h3>
+      <p>用折扣或禮品換取評論違反 Google 政策；自 2024 年起，更可能違反 FTC 規則並面臨民事罰款。<sup class="cite"><a href="#source-4">4</a></sup> 雖然許多商家仍在這麼做（BrightLocal 2026 年的調查指出，11% 的消費者曾被提供「換好評」的誘因），但這條捷徑在法律與聲譽上都有重大風險。<sup class="cite"><a href="#source-15">15</a></sup>正確的解法不是賄賂評論者，而是降低邀請真實顧客時的摩擦。</p>
+    </div>
+
+    <div class="warning">
+      <div class="warning-label"><span class="lang-en">Important: what NOT to do</span><span class="lang-zh">重要提醒：絕對不要做的事</span></div>
+      <div class="warning-body lang-en">
+        <strong>Do not pay for reviews. Do not offer discounts or gifts in exchange for reviews.</strong> Google's policy explicitly prohibits incentivized reviews and the FTC's 2024 Final Rule on fake reviews allows civil penalties for knowing violations.<sup class="cite"><a href="#source-4">4</a></sup> Beyond the legal risk: consumers are increasingly good at detecting fake reviews, and platforms remove them aggressively (Google blocked 240 million in 2024<sup class="cite"><a href="#source-5">5</a></sup>). The only sustainable path is genuine reviews from real customers, asked at the right moment, with the friction reduced.
+      </div>
+      <div class="warning-body lang-zh">
+        <strong>不要付錢買評論，也不要用折扣或禮品換評論。</strong>Google 政策明令禁止「給予好處換取的評論」；FTC 2024 年發布的最終規則更允許對「明知違反」者處以民事罰款。<sup class="cite"><a href="#source-4">4</a></sup> 法律風險之外，消費者愈來愈擅長辨識假評論，平台也愈來愈嚴格地移除（Google 在 2024 年就攔截了 2.4 億則<sup class="cite"><a href="#source-5">5</a></sup>）。唯一可持續的做法，是在「對的時機、降低摩擦地」邀請真實顧客寫下真實評論。
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3 style="font-family: 'Fraunces', serif; font-weight: 500; font-size: 32px; color: var(--ink); margin: 0 0 18px; letter-spacing: -0.018em;" class="lang-en">How to <em style="font-style: italic; color: var(--forest);">report this</em> to your stakeholders</h3>
+    <h3 style="font-family: 'Fraunces', serif; font-weight: 500; font-size: 32px; color: var(--ink); margin: 0 0 18px; letter-spacing: -0.018em;" class="lang-zh">如何向相關人員<em style="font-style: italic; color: var(--forest);">呈現這份成果</em></h3>
+    <p style="font-family: 'Newsreader', serif; font-style: italic; font-size: 18px; color: var(--text-soft); margin-bottom: 28px;" class="lang-en">Reviews shouldn't be treated as a reputation asset. They're a revenue asset, and they should be reported like one.</p>
+    <p style="font-family: 'Newsreader', serif; font-style: italic; font-size: 18px; color: var(--text-soft); margin-bottom: 28px;" class="lang-zh">不要把評論當成聲譽資產，它們是營收資產——也應當這樣呈現。</p>
+
+    <div class="body">
+      <p class="lang-en">If you're a marketing agency, BAAM Studio partner, or in-house owner reporting to a board, never lead with raw counts. "We got 10 reviews this month" is a vanity number. The numbers that matter are these:</p>
+      <p class="lang-zh">無論您是行銷公司、BAAM Studio 合作夥伴，或是要向董事會匯報的內部主管，都不要以「原始評論數」開頭。「本月拿到 10 則評論」是個虛榮指標。真正重要的數字是這些：</p>
+    </div>
+
+    <div class="example" style="margin-top: 20px;">
+      <div class="example-h"><span class="lang-en">A complete monthly review-program report</span><span class="lang-zh">一份完整的「月度評論計畫」報告</span></div>
+      <div class="example-sub"><span class="lang-en">Numbers that frame reviews as ROI, not reputation.</span><span class="lang-zh">把評論定位為投資報酬、而不是聲譽的數字。</span></div>
+
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">New reviews this month</span><span class="lang-zh">本月新評論</span></span><span class="example-row-val">10</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Average rating</span><span class="lang-zh">平均評等</span></span><span class="example-row-val">4.4 → 4.7</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Review freshness (avg age, days)</span><span class="lang-zh">評論新鮮度（平均天數）</span></span><span class="example-row-val">340 → 24</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Calls from Google Business Profile</span><span class="lang-zh">透過 GBP 來的電話</span></span><span class="example-row-val">+18%</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Direction requests from GBP</span><span class="lang-zh">透過 GBP 的路線查詢</span></span><span class="example-row-val">+12%</span></div>
+      <div class="example-row"><span class="example-row-label"><span class="lang-en">Website clicks from GBP</span><span class="lang-zh">透過 GBP 點擊網站</span></span><span class="example-row-val">+22%</span></div>
+      <div class="example-row result"><span class="example-row-label"><span class="lang-en">Estimated added revenue (24-mo horizon)</span><span class="lang-zh">估計增加營收（24 個月）</span></span><span class="example-row-val">$17,280</span></div>
+    </div>
+
+    <div class="body">
+      <p style="margin-top: 24px;" class="lang-en">This is how a $99/month investment in a review-collection tool justifies itself a hundred times over for a typical Growth-tier customer. The math, transparently shown, is the strongest sales argument in the local marketing category.</p>
+      <p style="margin-top: 24px;" class="lang-zh">這就是為什麼對一個典型的 Growth 方案客戶而言，每月 99 美元的評論收集工具能輕鬆帶來百倍以上的回報。把計算過程透明地呈現出來，是本地行銷品類中最強的銷售論點。</p>
+    </div>
+  </section>
+</div>
+
+<!-- BAAM CTA -->
+<div class="baam-cta-section">
+  <div class="container">
+    <div class="baam-cta-inner">
+      <div class="baam-cta-eyebrow"><span class="lang-en">Built for this exact problem</span><span class="lang-zh">為這個問題而生</span></div>
+      <h2 class="baam-cta-h lang-en">If reviews are worth this much,<br>the asking should be <em>frictionless.</em></h2>
+      <h2 class="baam-cta-h lang-zh">既然評論這麼值錢，<br>邀請的動作就應當<em>毫無摩擦。</em></h2>
+      <p class="baam-cta-sub lang-en">BAAM Review is built around the asking gap. AI-assisted drafting, three-language support, and a customer experience that completes 38% of the time — nearly four times the industry average. First 50 customers lock in founding pricing forever.</p>
+      <p class="baam-cta-sub lang-zh">BAAM Review 就是為了消弭「沒人開口」這個缺口而設計：AI 輔助撰寫、支援三種語言，加上完成率達 38% 的顧客流程——接近業界平均的四倍。前 50 位客戶可永久鎖定創始定價。</p>
+      <a href="/" class="baam-cta-btn">
+        <span class="lang-en">See how BAAM Review works</span><span class="lang-zh">了解 BAAM Review 如何運作</span>
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- SOURCES -->
+<div class="sources-section" id="sources">
+  <div class="container">
+    <h2><span class="lang-en">Sources cited</span><span class="lang-zh">引用資料來源</span></h2>
+    <div class="sources-sub"><span class="lang-en">All numbers in this report trace to one of these 15 sources. Click any to verify.</span><span class="lang-zh">本報告中的所有數據都可追溯至以下 15 份資料來源。點擊任何一筆即可驗證。</span></div>
+
+    <ol class="sources-list">
+      <li id="source-1"><strong>Whitespark, Local Search Ranking Factors 2024/2026</strong> — annual industry survey of 47 local SEO experts; reports review signals at 16–20% of Local Pack ranking weight. <em>whitespark.ca/local-search-ranking-factors</em></li>
+
+      <li id="source-2"><strong>SOCi (2026)</strong> — coverage of Whitespark's 2026 findings on behavioral and AI search signal weight in local search. <em>soci.ai/blog/local-memo-local-ranking-factors-of-2026</em></li>
+
+      <li id="source-3"><strong>BrightLocal, Local Consumer Review Survey (2024 &amp; 2025/26 editions)</strong> — 14-year-running consumer survey on review behavior; reports 81% Google usage and platform trust trends. <em>brightlocal.com/research/local-consumer-review-survey</em></li>
+
+      <li id="source-4"><strong>Federal Trade Commission, Final Rule on the Use of Consumer Reviews and Testimonials (2024)</strong> — establishes civil penalties for knowingly using fake or deceptive reviews. <em>ftc.gov</em></li>
+
+      <li id="source-5"><strong>Google Transparency Report (2024)</strong> — reported 240 million policy-violating reviews blocked or removed from Google Maps in 2024.</li>
+
+      <li id="source-6"><strong>Luca, M. "Reviews, Reputation, and Revenue: The Case of Yelp.com"</strong> (Harvard Business School Working Paper No. 12-016, 2011; revised 2016). Peer-reviewed regression discontinuity analysis; 1-star Yelp rating increase = 5–9% revenue increase for independent restaurants. <em>SSRN: ssrn.com/abstract=1928601</em></li>
+
+      <li id="source-7"><strong>Anderson, M. &amp; Magruder, J. "Learning from the Crowd"</strong> (The Economic Journal, vol. 122, 2012). Regression discontinuity analysis of Yelp ratings and restaurant reservation availability; 0.5-star rating increase = 19 percentage point increase in 7pm sell-out frequency. <em>onlinelibrary.wiley.com/doi/abs/10.1111/j.1468-0297.2012.02512.x</em></li>
+
+      <li id="source-8"><strong>NYU Stern, "From Ratings to Revenues: The Impact of Social Media"</strong> — academic survey extending Luca's findings beyond restaurants to higher-consideration purchases. <em>stern.nyu.edu</em></li>
+
+      <li id="source-9"><strong>Uberall study (cited in BrightLocal industry stats)</strong> — analysis finding a 0.1-star rating increase produces a 25% conversion lift for brick-and-mortar businesses. <em>Reported in: brightlocal.com/resources/online-reviews-statistics</em></li>
+
+      <li id="source-10"><strong>ReviewTrackers, "Is a 4.5-Star Rating Better Than 5 Stars?"</strong> — 70% of consumers use rating filters when searching, with "4+ stars" the most common filter applied.</li>
+
+      <li id="source-11"><strong>BrightLocal Local Consumer Review Survey</strong> — 22% of consumers only consider reviews from the past two weeks; 26% only the past month. <em>brightlocal.com/research/local-consumer-review-survey-2024</em></li>
+
+      <li id="source-12"><strong>SearchLab Digital coverage of BrightLocal 2024 survey</strong> — 88% of consumers will choose a business that responds to all reviews vs. 47% for one that doesn't respond.</li>
+
+      <li id="source-13"><strong>Whitespark Local Search Ranking Factors 2026</strong> — review velocity ranked as more influential than total review count in 2026 local search ranking.</li>
+
+      <li id="source-14"><strong>BrightLocal Local Consumer Review Survey 2025/26</strong> — most consumers say they would write a review if asked, but the asking rarely happens.</li>
+
+      <li id="source-15"><strong>BrightLocal Local Consumer Review Survey 2026</strong> — 11% of consumers reported being offered an incentive for a positive review; 59% offered some form of reward.</li>
+    </ol>
+
+    <div style="margin-top: 32px; padding: 22px 26px; background: var(--paper); border: 1px solid var(--border); border-radius: 14px; font-size: 13.5px; color: var(--text-soft); line-height: 1.55;" class="lang-en">
+      <strong style="color: var(--ink); font-weight: 600;">Methodology note.</strong> The modeled per-vertical value ranges in Section 4 apply the Section 3 formula with assumptions calibrated to that vertical's typical customer lifetime value, close rate, and conversion lift (drawing from the Luca and Anderson &amp; Magruder findings, scaled for higher-consideration verticals per the NYU Stern extension). These are estimates with the assumptions transparently shown — not industry truths. Your actual per-review value depends on your specific business inputs, modeled in Section 5's calculator. This report was prepared by BAAM Studio for educational purposes and is not legal, financial, or marketing advice.
+    </div>
+    <div style="margin-top: 32px; padding: 22px 26px; background: var(--paper); border: 1px solid var(--border); border-radius: 14px; font-size: 13.5px; color: var(--text-soft); line-height: 1.75;" class="lang-zh">
+      <strong style="color: var(--ink); font-weight: 600;">方法說明。</strong>第 04 節的各行業建模價值範圍，是將第 03 節公式套用該行業典型的顧客終身價值、成交率與轉換率提升所得（依據 Luca 與 Anderson &amp; Magruder 的研究，並參考 NYU Stern 將其延伸至高決策成本行業的研究進行調整）。這些是把所有假設攤開的估算——並非「行業定論」。您實際的每則評論價值取決於您自身的商業數據，可使用第 05 節的試算工具自行建模。本報告由 BAAM Studio 編製，僅供教育目的，並不構成法律、財務或行銷建議。
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container-wide">
+    <div class="footer-inner">
+      <div><span class="footer-brand">BAAM Review</span><span class="lang-en"> — built by BAAM Studio for local businesses in the New York metro area.</span><span class="lang-zh"> — 由 BAAM Studio 為紐約都會區的本地商家而打造。</span></div>
+      <div>© 2026 BAAM Studio · <a href="/" style="color: rgba(250,247,242,0.7);">baamreview.com</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// === LANGUAGE TOGGLE ===
+(function() {
+  const STORAGE_KEY = 'baam-report-lang';
+  const buttons = document.querySelectorAll('.lang-toggle-btn');
+  const body = document.body;
+
+  function setLang(lang) {
+    if (lang !== 'en' && lang !== 'zh') lang = 'en';
+    body.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-Hant' : 'en');
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.langSet === lang));
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* ignore */ }
+  }
+
+  buttons.forEach(b => {
+    b.addEventListener('click', () => setLang(b.dataset.langSet));
+  });
+
+  let saved = 'en';
+  try { saved = localStorage.getItem(STORAGE_KEY) || 'en'; } catch (e) { /* ignore */ }
+  setLang(saved);
+})();
+
+// === LIVE CALCULATOR ===
+(function() {
+  const $ = id => document.getElementById(id);
+  const fmt = n => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n);
+  const fmt1 = n => new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(n);
+
+  function calc() {
+    const views = parseFloat($('calc-views').value) || 0;
+    const conv = (parseFloat($('calc-conv').value) || 0) / 100;
+    const lift = (parseFloat($('calc-lift').value) || 0) / 100;
+    const close = (parseFloat($('calc-close').value) || 0) / 100;
+    const ltv = parseFloat($('calc-ltv').value) || 0;
+    const reviews = parseFloat($('calc-reviews').value) || 1;
+
+    const newConv = conv * (1 + lift);
+    const extraLeads = views * (newConv - conv);
+    const extraCustomers = extraLeads * close;
+    const monthlyRevenue = extraCustomers * ltv;
+    const perReviewMonth = monthlyRevenue / reviews;
+    const perReviewYear = perReviewMonth * 12;
+    const perReview24 = perReviewMonth * 24;
+
+    $('calc-result-24mo').textContent = fmt(perReview24);
+    $('calc-result-month').textContent = fmt(perReviewMonth);
+    $('calc-result-year').textContent = fmt(perReviewYear);
+    $('calc-result-customers').textContent = fmt1(extraCustomers);
+  }
+
+  ['calc-views', 'calc-conv', 'calc-lift', 'calc-close', 'calc-ltv', 'calc-reviews'].forEach(id => {
+    $(id).addEventListener('input', calc);
+  });
+  calc();
+})();
+
+// === SECTION NAV — active section highlight + reading-progress bar ===
+(function() {
+  const sections = ['why-now', 'research', 'formula', 'by-vertical', 'calculator', 'what-makes-valuable', 'reporting'];
+  const tabs = document.querySelectorAll('.section-nav-tab');
+  const progress = document.getElementById('nav-progress');
+  const progressBar = document.getElementById('nav-progress-bar');
+
+  function updateActive() {
+    const scrollPos = window.scrollY + 120;
+    let activeIdx = 0;
+    sections.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && el.offsetTop <= scrollPos) activeIdx = i;
+    });
+    tabs.forEach((tab, i) => {
+      tab.classList.toggle('active', i === activeIdx);
+    });
+    if (progress) progress.textContent = String(activeIdx + 1).padStart(2, '0');
+
+    if (progressBar) {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = h > 0 ? Math.min(100, (window.scrollY / h) * 100) : 0;
+      progressBar.style.width = pct + '%';
+    }
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  window.addEventListener('resize', updateActive, { passive: true });
+  updateActive();
+})();
+</script>
+
+</body>
+</html>

@@ -1050,6 +1050,806 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   .roi-calc { padding: 28px 24px; }
 }
 
+/* ============ HERO RESEARCH BADGE ============ */
+.hero-research-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 9px 14px 9px 9px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--text-soft);
+  text-decoration: none;
+  transition: border-color 0.18s, color 0.18s, transform 0.18s;
+  max-width: 100%;
+  flex-wrap: nowrap;
+}
+.hero-research-badge:hover {
+  border-color: var(--gold);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.hero-research-badge-tag {
+  display: inline-block;
+  padding: 3px 9px;
+  background: var(--ink);
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.hero-research-badge-arrow {
+  color: var(--gold-dark);
+  font-weight: 500;
+  margin-left: 2px;
+}
+
+/* ============ THE RESEARCH (dedicated section) ============ */
+.research-section {
+  padding: 110px 0;
+  background:
+    linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+  position: relative;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.research-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100px; height: 1px;
+  background: var(--gold);
+  opacity: 0.5;
+}
+.research-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 22px;
+}
+.research-eyebrow::before, .research-eyebrow::after {
+  content: '';
+  width: 22px; height: 1px;
+  background: var(--gold);
+  opacity: 0.55;
+}
+.research-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 50px;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 760px;
+  margin-bottom: 22px;
+}
+.research-title em { font-style: italic; color: var(--forest); }
+.research-deck {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  max-width: 660px;
+  margin-bottom: 50px;
+}
+.research-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 50px;
+}
+.research-stat {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 26px 24px 22px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.research-stat:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.research-stat-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 42px;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: var(--forest);
+  margin-bottom: 12px;
+}
+.research-stat-num.gold { color: var(--gold-dark); }
+.research-stat-label {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.research-stat-label b { color: var(--ink); font-weight: 500; }
+.research-stat-source {
+  padding-top: 12px;
+  border-top: 1px solid var(--border-soft);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+/* Industry verticals chart */
+.research-verticals {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 36px 28px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-sm);
+}
+.research-verticals-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border-soft);
+  flex-wrap: wrap;
+}
+.research-verticals-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 23px;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  max-width: 420px;
+}
+.research-verticals-title em { font-style: italic; color: var(--forest); }
+.research-verticals-sub {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--text-soft);
+  max-width: 360px;
+  line-height: 1.55;
+  text-align: right;
+}
+.vchart-row {
+  display: grid;
+  grid-template-columns: 170px 1fr 110px;
+  gap: 18px;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.vchart-row:last-of-type { border-bottom: none; }
+.vchart-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.vchart-bar-wrap {
+  position: relative;
+  height: 9px;
+  background: var(--cream-deep);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.vchart-bar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--forest) 0%, var(--gold) 100%);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+.vchart-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--forest);
+  text-align: right;
+  white-space: nowrap;
+}
+.vchart-row.highlight .vchart-value { color: var(--gold-dark); font-weight: 600; }
+.vchart-scale {
+  display: grid;
+  grid-template-columns: 170px 1fr 110px;
+  gap: 18px;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.vchart-scale-marks {
+  display: flex;
+  justify-content: space-between;
+}
+.vchart-foot {
+  margin-top: 18px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-style: italic;
+  font-family: 'Newsreader', serif;
+  line-height: 1.55;
+}
+.vchart-foot a { color: var(--forest); font-weight: 500; }
+
+.research-cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 26px 30px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 18px;
+  box-shadow: var(--shadow-md);
+  flex-wrap: wrap;
+}
+.research-cta-left {
+  flex: 1;
+  min-width: 280px;
+}
+.research-cta-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--cream);
+  margin-bottom: 6px;
+}
+.research-cta-title em { font-style: italic; color: var(--gold); }
+.research-cta-sub {
+  font-size: 13.5px;
+  color: rgba(250, 247, 242, 0.7);
+  line-height: 1.5;
+}
+.research-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.18s, transform 0.18s;
+  white-space: nowrap;
+}
+.research-cta-btn:hover {
+  background: #B6985A;
+  transform: translateY(-1px);
+}
+.research-sources-line {
+  margin-top: 26px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-align: center;
+}
+.research-sources-line b { color: var(--text-soft); font-weight: 500; }
+
+@media (max-width: 980px) {
+  .research-stats { grid-template-columns: repeat(2, 1fr); }
+  .research-title { font-size: 38px; }
+  .research-section { padding: 80px 0; }
+  .research-verticals { padding: 28px 24px 22px; }
+  .research-verticals-head { flex-direction: column; align-items: flex-start; }
+  .research-verticals-sub { text-align: left; }
+  .vchart-row, .vchart-scale { grid-template-columns: 130px 1fr 90px; gap: 12px; }
+  .vchart-label { font-size: 13px; }
+}
+@media (max-width: 540px) {
+  .research-stats { grid-template-columns: 1fr; }
+  .research-cta-row { flex-direction: column; align-items: flex-start; padding: 24px; }
+  .hero-research-badge { font-size: 12px; padding: 8px 12px 8px 8px; }
+  .vchart-row, .vchart-scale { grid-template-columns: 110px 1fr 80px; gap: 10px; }
+  .vchart-label { font-size: 12.5px; }
+  .vchart-value { font-size: 11.5px; }
+}
+
+/* ============ REVIEW REVENUE ENGINE (3 artifacts) ============ */
+.engine-section {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(201,169,97,0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(31,77,63,0.06) 0%, transparent 50%),
+    var(--cream);
+  padding: 100px 0;
+}
+.engine-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #836A30;
+  margin-bottom: 18px;
+}
+.engine-eyebrow::before, .engine-eyebrow::after {
+  content: '';
+  width: 22px; height: 1px;
+  background: var(--gold);
+  opacity: 0.6;
+}
+.engine-flow-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 36px auto 56px;
+  max-width: 720px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.engine-flow-pill {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-sm);
+}
+.engine-flow-pill svg { width: 14px; height: 14px; color: var(--forest); }
+.engine-flow-pill.terminal {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+.engine-flow-pill.terminal svg { color: var(--gold); }
+.engine-flow-arrow {
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 400;
+}
+/* Subhead between hero and streams */
+.engine-streams-intro {
+  text-align: center;
+  margin: 52px auto 24px;
+  max-width: 640px;
+}
+.engine-streams-intro h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+.engine-streams-intro h3 em { font-style: italic; color: var(--forest); }
+.engine-streams-intro p {
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+/* Two bucket cards mirroring the Analytics page */
+.engine-streams {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+.engine-stream {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 26px 26px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.engine-stream:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.engine-stream-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.engine-stream-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Fraunces', serif;
+  font-size: 21px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.engine-stream-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: var(--cream-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+.engine-tag {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.engine-tag.direct { background: rgba(31,77,63,0.1); color: var(--forest); }
+.engine-tag.modeled { background: rgba(201,169,97,0.2); color: #836A30; }
+
+.engine-preview { position: relative; margin: 4px 0; }
+
+.engine-section-label {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 4px;
+}
+.engine-data-block {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.engine-data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+.engine-data-row b {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink);
+}
+.engine-calc-block {
+  background: linear-gradient(180deg, rgba(31,77,63,0.04) 0%, rgba(31,77,63,0.09) 100%);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.engine-calc-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.engine-calc-formula b { color: var(--ink); font-weight: 600; }
+.engine-calc-result {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(31,77,63,0.2);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.engine-calc-result .label { font-size: 12px; color: var(--text-soft); }
+.engine-calc-result .amount {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 30px;
+  color: var(--forest);
+  letter-spacing: -0.015em;
+  line-height: 1;
+}
+.engine-calc-result .note {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+.engine-ltv-footer {
+  border: 1px dashed rgba(201,169,97,0.5);
+  background: linear-gradient(180deg, rgba(201,169,97,0.08) 0%, rgba(201,169,97,0.14) 100%);
+  border-radius: 12px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.engine-ltv-footer .arrow { color: #A88840; font-size: 15px; }
+.engine-ltv-footer .text {
+  flex: 1;
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+.engine-ltv-footer .text b { color: var(--ink); font-weight: 500; }
+.engine-ltv-footer .ltv-amount {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: #A88840;
+  letter-spacing: -0.01em;
+}
+
+/* Section footer summary */
+.engine-summary {
+  margin-top: 36px;
+  text-align: center;
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--text-soft);
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.55;
+}
+.engine-summary strong { font-style: normal; color: var(--ink); font-weight: 500; }
+
+/* Share card (square) preview — burgundy testimonial */
+.engine-share {
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #962D22 0%, #6F1F18 100%);
+  color: var(--cream);
+  padding: 22px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.engine-share::after {
+  content: '';
+  position: absolute;
+  right: -50px; top: -50px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(201,169,97,0.2), transparent 65%);
+  pointer-events: none;
+}
+.engine-share-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(250,247,242,0.16);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  margin-bottom: 12px;
+  align-self: flex-start;
+}
+.engine-share-pill::before { content: '★'; color: var(--gold); font-size: 10px; }
+.engine-share-stars {
+  color: var(--gold);
+  font-size: 18px;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+.engine-share-quote {
+  font-family: 'Newsreader', 'Noto Sans SC', serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--cream);
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  z-index: 1;
+}
+.engine-share-attr {
+  font-size: 11px;
+  color: rgba(250,247,242,0.78);
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+}
+.engine-share-avatar {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(250,247,242,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Referral card preview */
+.engine-offer {
+  background: linear-gradient(135deg, #962D22 0%, #6F1F18 100%);
+  border-radius: 16px;
+  padding: 10px;
+}
+.engine-offer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(250,247,242,0.16);
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: var(--cream);
+  font-weight: 500;
+  margin: 4px 4px 10px;
+}
+.engine-offer-pill::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--gold); border-radius: 50%;
+}
+.engine-offer-inner {
+  background: var(--paper);
+  border-radius: 11px;
+  padding: 10px 11px 12px;
+}
+.engine-offer-hero {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 7px;
+  object-fit: cover;
+  margin-bottom: 9px;
+  display: block;
+  background: linear-gradient(135deg, #E8D9B5 0%, #C9D4CE 100%);
+}
+.engine-offer-title {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.engine-offer-sub { font-size: 10.5px; color: var(--text-soft); margin: 2px 0 10px; }
+.engine-offer-code-row { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; }
+.engine-offer-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: #6F1F18;
+  background: #FAEEEC;
+  border: 1.5px dashed #962D22;
+  border-radius: 6px;
+  padding: 4px 9px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+.engine-offer-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 4px;
+  flex: 1;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 500;
+  font-family: 'Onest', sans-serif;
+}
+.engine-offer-book {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  width: 100%;
+  background: #962D22;
+  color: var(--cream);
+  border: none;
+  padding: 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'Onest', sans-serif;
+}
+
+/* Revenue dashboard preview */
+.engine-revenue {
+  background: linear-gradient(135deg, var(--forest) 0%, #143427 100%);
+  color: var(--cream);
+  border-radius: 16px;
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.engine-revenue::after {
+  content: '';
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(201,169,97,0.2), transparent 65%);
+  pointer-events: none;
+}
+.engine-revenue-row {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 18px;
+  position: relative;
+  z-index: 1;
+}
+.engine-revenue-col-divider { background: rgba(250,247,242,0.2); }
+.engine-revenue-eyebrow {
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(232,217,181,0.8);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.engine-revenue-num {
+  font-family: 'Fraunces', serif;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.engine-revenue-num.gold { color: #E8D9B5; }
+.engine-revenue-meta {
+  margin-top: 8px;
+  font-size: 10.5px;
+  color: rgba(250,247,242,0.72);
+}
+.engine-revenue-pill {
+  display: inline-block;
+  background: rgba(250,247,242,0.14);
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+.engine-revenue-bars {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(250,247,242,0.15);
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 38px;
+  position: relative;
+  z-index: 1;
+}
+.engine-revenue-bar {
+  flex: 1;
+  background: linear-gradient(180deg, rgba(201,169,97,0.7) 0%, rgba(201,169,97,1) 100%);
+  border-radius: 2px 2px 0 0;
+}
+
+@media (max-width: 1100px) {
+  .engine-streams { grid-template-columns: 1fr; }
+  .engine-share { aspect-ratio: 16 / 11; }
+}
+@media (max-width: 760px) {
+  .engine-section { padding: 70px 0; }
+  .engine-flow-bar { gap: 8px; }
+  .engine-flow-pill { padding: 7px 13px; font-size: 12px; }
+}
+
 /* Entrance animations */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
@@ -1074,7 +1874,8 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
     <div class="nav-links">
       <a href="#loop">How it works</a>
       <a href="02-marketing-pricing.html">Pricing</a>
-      <a href="#roi">ROI calculator</a>
+      <a href="#engine">Review Revenue</a>
+      <a href="14-report-google-review-value.html#top">Review Value</a>
       <a href="#languages">Languages</a>
     </div>
     <div class="nav-cta">
@@ -1090,20 +1891,20 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
     <div class="hero-grid">
       <div>
         <div class="hero-eyebrow">
-          From BAAM Studio · A Review-to-Revenue Engine
+          From BAAM Studio · The Review Revenue Engine
           <span class="hero-eyebrow-dot"></span>
         </div>
         <h1>
-          Turn happy customers<br>
-          into <em>reviews,</em><br>
-          <span class="gold-em">referrals,</span> &amp; <em>revenue.</em>
+          Reviews are the <em>raw material.</em><br>
+          <span class="gold-em">Review Revenue</span><br>
+          is the output.
         </h1>
         <p class="hero-sub">
-          Most review tools stop at collection. BAAM Review owns the whole loop — collect Google reviews in 60 seconds, display them on your website to convert visitors, distribute to Xiaohongshu and social, and turn happy customers into referrals. Three languages, from $49 a month.
+          Other tools stop at collection. BAAM Review turns every 5★ review into share cards that travel, referral cards that convert, and a dashboard that puts a dollar number on the loop. Three languages, from $49 a month — and an honest measure of what your reviews are actually worth.
         </p>
         <div class="hero-ctas">
           <a href="#" class="btn btn-primary btn-large">Start free trial →</a>
-          <a href="#roi" class="btn btn-ghost btn-large">See your ROI</a>
+          <a href="#engine" class="btn btn-ghost btn-large">See the math</a>
         </div>
         <div class="hero-trust">
           <span>14-day trial</span>
@@ -1114,6 +1915,11 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="hero-trust-line"></span>
           <span>Five-minute setup</span>
         </div>
+        <a href="14-report-google-review-value.html#top" class="hero-research-badge">
+          <span class="hero-research-badge-tag">Research</span>
+          Backed by independent evidence — Harvard Business School · BrightLocal · Whitespark · FTC
+          <span class="hero-research-badge-arrow">→</span>
+        </a>
       </div>
 
       <div class="phone-frame">
@@ -1163,7 +1969,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   <div class="container">
     <div class="thesis-mark">"</div>
     <div class="thesis-text">
-      Reviews are not the end goal. Reviews are the <em>raw material</em> for trust, content, SEO, referrals, and revenue. BAAM Review is the engine that turns the one into the others.
+      Reviews are not the end goal. They are the <em>raw material</em> for trust, content, SEO, referrals, and revenue. BAAM Review is the engine that turns reviews into <em>Review Revenue</em> — and shows you the number.
     </div>
   </div>
 </div>
@@ -1255,6 +2061,315 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         Starter unlocks stages <strong>i &amp; ii</strong>. Growth unlocks <strong>iii through vi</strong>. Agency adds <strong>vii at scale</strong> across many client accounts. Every stage compounds the last.
       </p>
     </div>
+  </div>
+</section>
+
+<!-- ============ REVIEW REVENUE ENGINE ============ -->
+<section class="engine-section" id="engine">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="engine-eyebrow">Review Revenue</div>
+      <h2 class="section-title">Reviews are the <em>raw material.</em><br>Revenue is the output.</h2>
+      <p class="section-sub">
+        Other tools stop at collecting reviews. We turn each review into three
+        revenue-generating artifacts — share cards that travel, referral cards
+        that convert, and a dashboard that puts a dollar number on it. We call
+        the dollar number <strong>Review Revenue</strong>.
+      </p>
+    </div>
+
+    <!-- Visual flow above the three artifacts -->
+    <div class="engine-flow-bar">
+      <span class="engine-flow-pill">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg>
+        Collect great reviews
+      </span>
+      <span class="engine-flow-arrow">→</span>
+      <span class="engine-flow-pill">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0-12.814a2.25 2.25 0 1 0 3.935-2.186 2.25 2.25 0 0 0-3.935 2.186Zm0 12.814a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Z"/></svg>
+        Share &amp; refer
+      </span>
+      <span class="engine-flow-arrow">→</span>
+      <span class="engine-flow-pill terminal">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-2.485 0-4.5-1.343-4.5-3s2.015-3 4.5-3c1.11 0 2.122.268 2.9.718"/></svg>
+        Earn measurable revenue
+      </span>
+    </div>
+
+    <!-- HERO — two big numbers, mirrors Analytics > Estimated Revenue -->
+    <div class="engine-revenue">
+      <div class="engine-revenue-row">
+        <div>
+          <div class="engine-revenue-eyebrow">Review Revenue · last 30 days</div>
+          <div class="engine-revenue-num">$1,763</div>
+          <div class="engine-revenue-meta">Conservative $1,540 · Optimistic $1,985</div>
+        </div>
+        <div class="engine-revenue-col-divider"></div>
+        <div>
+          <div class="engine-revenue-eyebrow">Lifetime value of these customers</div>
+          <div class="engine-revenue-num gold">$11,760</div>
+          <div class="engine-revenue-meta">12 new customers × $980 LTV</div>
+        </div>
+      </div>
+      <div class="engine-revenue-bars" aria-hidden="true">
+        <div class="engine-revenue-bar" style="height: 40%"></div>
+        <div class="engine-revenue-bar" style="height: 56%"></div>
+        <div class="engine-revenue-bar" style="height: 70%"></div>
+        <div class="engine-revenue-bar" style="height: 100%"></div>
+      </div>
+    </div>
+
+    <!-- Lead-in to the two streams -->
+    <div class="engine-streams-intro">
+      <h3>Built from <em>two streams</em>, one engine.</h3>
+      <p>
+        One stream is fully tracked. The other is grounded in your Google
+        Business Profile data. Both feed the same total — no fairy-dust math.
+      </p>
+    </div>
+
+    <!-- TWO BUCKETS — mirror Analytics > Estimated Revenue page -->
+    <div class="engine-streams">
+
+      <!-- STREAM 1: Referral revenue (Direct) -->
+      <article class="engine-stream">
+        <div class="engine-stream-head">
+          <div class="engine-stream-name">
+            <span class="engine-stream-icon">👥</span>
+            Referral revenue
+          </div>
+          <span class="engine-tag direct">Direct</span>
+        </div>
+
+        <!-- Visual: referral offer card -->
+        <div class="engine-preview">
+          <div class="engine-offer">
+            <span class="engine-offer-pill">LIMITED OFFER</span>
+            <div class="engine-offer-inner">
+              <img class="engine-offer-hero" src="assets/offer-sample.webp" alt="Acupuncture treatment session" />
+              <div class="engine-offer-title">$20 Off your first visit</div>
+              <div class="engine-offer-sub">Use this coupon code</div>
+              <div class="engine-offer-code-row">
+                <span class="engine-offer-code">FRIEND20</span>
+                <button class="engine-offer-btn" type="button">Copy</button>
+              </div>
+              <button class="engine-offer-book" type="button">Book with this offer →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="engine-section-label">Data this period</div>
+        <div class="engine-data-block">
+          <div class="engine-data-row"><span>Reviewers who saw a share prompt</span><b>54</b></div>
+          <div class="engine-data-row"><span>Sent a recommendation card</span><b>31</b></div>
+          <div class="engine-data-row"><span>Friends who clicked "Book"</span><b>15</b></div>
+          <div class="engine-data-row"><span>Estimated to convert (50% close rate)</span><b>≈ 8</b></div>
+        </div>
+
+        <div class="engine-section-label">Calculation</div>
+        <div class="engine-calc-block">
+          <p class="engine-calc-formula">
+            <b>15 book clicks</b> × <b>50% close rate</b> × <b>$150 ticket</b>
+          </p>
+          <div class="engine-calc-result">
+            <span class="label">Referral revenue</span>
+            <span class="amount">$1,125</span>
+            <span class="note">tracked, no modeling</span>
+          </div>
+        </div>
+
+        <div class="engine-ltv-footer">
+          <span class="arrow">↳</span>
+          <span class="text"><b>≈ 8</b> new customers × <b>$980</b> LTV</span>
+          <span class="ltv-amount">$7,840</span>
+        </div>
+      </article>
+
+      <!-- STREAM 2: New review revenue (Modeled) -->
+      <article class="engine-stream">
+        <div class="engine-stream-head">
+          <div class="engine-stream-name">
+            <span class="engine-stream-icon">⭐</span>
+            New review revenue
+          </div>
+          <span class="engine-tag modeled">Modeled</span>
+        </div>
+
+        <!-- Visual: share card square -->
+        <div class="engine-preview">
+          <div class="engine-share">
+            <span class="engine-share-pill">RECOMMENDED BY A CUSTOMER</span>
+            <div class="engine-share-stars">★★★★★</div>
+            <p class="engine-share-quote">
+              "黃醫師醫術高明，下針又快又準。我常年久坐，舊傷骨盆錯位致使
+              右髖筋膜沾黏，幾年走路一瘸一拐。經友人推薦求診於黃醫師，
+              每一次針灸都有明顯的改善。"
+            </p>
+            <div class="engine-share-attr">
+              <span class="engine-share-avatar">SC</span>
+              <span>— Shuhua Chang, satisfied customer</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="engine-section-label">Data this period (from GBP Insights)</div>
+        <div class="engine-data-block">
+          <div class="engine-data-row"><span>New 4★+ reviews</span><b>21</b></div>
+          <div class="engine-data-row"><span>Profile views — prior period</span><b>2,400</b></div>
+          <div class="engine-data-row"><span>Profile views — this period</span><b>3,250</b></div>
+          <div class="engine-data-row"><span>View lift vs prior period</span><b>+850</b></div>
+          <div class="engine-data-row"><span>Attributed to new reviews (50%)</span><b>425 views</b></div>
+        </div>
+
+        <div class="engine-section-label">Calculation</div>
+        <div class="engine-calc-block">
+          <p class="engine-calc-formula">
+            <b>425 attributed views</b> × <b>1% profile→booking</b> × <b>$150 ticket</b>
+          </p>
+          <div class="engine-calc-result">
+            <span class="label">New review revenue</span>
+            <span class="amount">$638</span>
+            <span class="note">range $415 – $861 (±35%)</span>
+          </div>
+        </div>
+
+        <div class="engine-ltv-footer">
+          <span class="arrow">↳</span>
+          <span class="text"><b>≈ 4</b> new customers × <b>$980</b> LTV</span>
+          <span class="ltv-amount">$3,920</span>
+        </div>
+      </article>
+    </div>
+
+    <p class="engine-summary">
+      Two streams. One engine. <strong>One number</strong> you can show your accountant.
+      That's the <strong>Review Revenue Engine</strong> — and it's the difference
+      between a review tool and a growth tool.
+    </p>
+  </div>
+</section>
+
+<!-- ============ THE RESEARCH ============ -->
+<section class="research-section" id="research">
+  <div class="container">
+    <div class="research-eyebrow">BAAM Research Brief · 14-min read</div>
+    <h2 class="research-title">The <em>independent evidence</em> on what a Google review is actually worth.</h2>
+    <p class="research-deck">
+      We didn't make these numbers up. Below are the four findings we lean on
+      most heavily — pulled from peer-reviewed academic research, fourteen
+      annual industry surveys, and the FTC&rsquo;s own enforcement data.
+    </p>
+
+    <div class="research-stats">
+      <div class="research-stat">
+        <div class="research-stat-num">16–20%</div>
+        <div class="research-stat-label">
+          of Google&rsquo;s Local Pack ranking weight comes from <b>review signals</b> — up from ~11% five years ago.
+        </div>
+        <div class="research-stat-source">Whitespark · 2026</div>
+      </div>
+      <div class="research-stat">
+        <div class="research-stat-num gold">5–9%</div>
+        <div class="research-stat-label">
+          revenue increase per <b>1-star Yelp rating bump</b>, established with regression-discontinuity causal inference.
+        </div>
+        <div class="research-stat-source">M. Luca · HBS 2016</div>
+      </div>
+      <div class="research-stat">
+        <div class="research-stat-num">25%</div>
+        <div class="research-stat-label">
+          conversion lift for brick-and-mortar businesses from a single <b>0.1-star rating increase</b>.
+        </div>
+        <div class="research-stat-source">Uberall · BrightLocal</div>
+      </div>
+      <div class="research-stat">
+        <div class="research-stat-num gold">240M</div>
+        <div class="research-stat-label">
+          policy-violating reviews <b>removed by Google in 2024 alone</b> — real reviews are now scarcer and worth more.
+        </div>
+        <div class="research-stat-source">Google Transparency · 2024</div>
+      </div>
+    </div>
+
+    <!-- INDUSTRY VALUE TABLE — visual horizontal bars -->
+    <div class="research-verticals">
+      <div class="research-verticals-head">
+        <h3 class="research-verticals-title">What&rsquo;s your industry's <em>per-review value?</em></h3>
+        <p class="research-verticals-sub">Same formula, applied to seven common local-business types. Higher LTV → higher per-review value.</p>
+      </div>
+
+      <div class="vchart-row">
+        <div class="vchart-label">Coffee / Café</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 0.25%; width: 1.5%;"></div></div>
+        <div class="vchart-value">$30 – $180</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label">Salon / Spa</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 1%; width: 5%;"></div></div>
+        <div class="vchart-value">$120 – $600</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label">Insurance Agent</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 2.5%; width: 15%;"></div></div>
+        <div class="vchart-value">$300 – $1,800</div>
+      </div>
+      <div class="vchart-row highlight">
+        <div class="vchart-label">Acupuncture / Clinic</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 3.3%; width: 20%;"></div></div>
+        <div class="vchart-value">$400 – $2,400</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label">Contractor / Roofing</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 5%; width: 50%;"></div></div>
+        <div class="vchart-value">$600 – $6,000+</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label">Real Estate Agent</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 12.5%; width: 67.5%;"></div></div>
+        <div class="vchart-value">$1,500 – $8,000+</div>
+      </div>
+      <div class="vchart-row highlight">
+        <div class="vchart-label">Lawyer / Immigration</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 10%; width: 90%;"></div></div>
+        <div class="vchart-value">$1,200 – $12,000+</div>
+      </div>
+
+      <div class="vchart-scale">
+        <span></span>
+        <span class="vchart-scale-marks">
+          <span>$0</span>
+          <span>$3K</span>
+          <span>$6K</span>
+          <span>$9K</span>
+          <span>$12K+</span>
+        </span>
+        <span></span>
+      </div>
+
+      <p class="vchart-foot">
+        Ranges modeled over 24 months. Low end = conservative LTV and conversion lift; high end = well-performing businesses. <a href="14-report-google-review-value.html#by-vertical">See the per-vertical assumptions in the research brief →</a>
+      </p>
+    </div>
+
+    <div class="research-cta-row">
+      <div class="research-cta-left">
+        <p class="research-cta-title">The full math, the seven sections, the <em>live calculator.</em></p>
+        <p class="research-cta-sub">
+          14-minute brief with 15 cited sources. Includes a calculator that
+          models the per-review value for your specific business.
+        </p>
+      </div>
+      <a href="14-report-google-review-value.html#top" class="research-cta-btn">
+        Read the research →
+      </a>
+    </div>
+
+    <p class="research-sources-line">
+      Sources cited:
+      <b>Harvard Business School</b> · <b>BrightLocal</b> · <b>Whitespark</b> ·
+      <b>Berkeley / Economic Journal</b> · <b>NYU Stern</b> ·
+      <b>Federal Trade Commission</b> · <b>Google Transparency Report</b>
+    </p>
   </div>
 </section>
 
@@ -1374,61 +2489,6 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="stars">★★★★★</span>
           <span>· Publicado en Google</span>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ ROI CALCULATOR ============ -->
-<section class="roi-section" id="roi">
-  <div class="container">
-    <div class="roi-grid">
-      <div class="roi-narrative">
-        <div class="section-eyebrow" style="color: #836A30;">What does this actually do for revenue?</div>
-        <h2 class="section-title">Reviews are <em>worth</em> something. Let's calculate.</h2>
-        <p class="section-sub">A Google review is worth $50–200 in lifetime customer value for most local businesses. More reviews mean better SEO, better trust, more bookings. Adjust the sliders and see what your number looks like.</p>
-        <p class="section-sub" style="margin-top: 20px; font-size: 16px;">
-          The math assumes a conservative 5% lift in monthly customers from going from 3 reviews/month to 15 reviews/month — well below what most BAAM Review customers see in practice.
-        </p>
-      </div>
-      <div class="roi-calc">
-        <div class="roi-calc-title">Quick ROI estimate</div>
-        <div class="roi-calc-sub">No signup required. Just slide.</div>
-
-        <div class="roi-input-group">
-          <div class="roi-input-label">
-            <span>Average customer value</span>
-            <span class="roi-input-value">$<span id="roi-cv-val">300</span></span>
-          </div>
-          <input type="range" class="roi-slider" id="roi-cv" min="50" max="2000" step="50" value="300">
-        </div>
-
-        <div class="roi-input-group">
-          <div class="roi-input-label">
-            <span>Monthly customers today</span>
-            <span class="roi-input-value"><span id="roi-cm-val">80</span></span>
-          </div>
-          <input type="range" class="roi-slider" id="roi-cm" min="10" max="500" step="5" value="80">
-        </div>
-
-        <div class="roi-input-group">
-          <div class="roi-input-label">
-            <span>Conversion lift from better reviews</span>
-            <span class="roi-input-value"><span id="roi-lift-val">5</span>%</span>
-          </div>
-          <input type="range" class="roi-slider" id="roi-lift" min="2" max="20" step="1" value="5">
-        </div>
-
-        <div class="roi-result">
-          <div class="roi-result-label">Estimated monthly revenue impact</div>
-          <div class="roi-result-num">$<span id="roi-out">1,200</span></div>
-          <div class="roi-result-period">per month, conservatively</div>
-          <div class="roi-result-detail">
-            That's roughly <strong><span id="roi-extra-customers">4</span> additional customers per month</strong> — and a <strong><span id="roi-multiple">12×</span> return on the $99 Growth plan</strong>.
-          </div>
-        </div>
-
-        <p class="roi-disclaimer">Estimates only. Actual results vary by industry, location, current ranking, and execution.</p>
       </div>
     </div>
   </div>
@@ -1619,7 +2679,8 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         <ul>
           <li><a href="#loop">How it works</a></li>
           <li><a href="02-marketing-pricing.html">Pricing</a></li>
-          <li><a href="#roi">ROI calculator</a></li>
+          <li><a href="#engine">Review Revenue</a></li>
+          <li><a href="14-report-google-review-value.html#top">Review Value</a></li>
           <li><a href="#languages">Languages</a></li>
           <li><a href="#">Integrations</a></li>
         </ul>

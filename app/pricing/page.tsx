@@ -326,12 +326,12 @@ export default function PricingPage() {
             BAAM Review doesn&apos;t earn its place in your week, you walk
             away with nothing lost.
           </p>
-          <Link
-            href="/signup"
+          <a
+            href={`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/signup`}
             className="mt-10 inline-flex items-center gap-2 rounded-full bg-gold px-8 py-4 text-[16px] font-medium text-ink transition-all hover:-translate-y-px hover:bg-[#B8985A] hover:shadow-md"
           >
             Start free trial →
-          </Link>
+          </a>
         </div>
       </div>
 

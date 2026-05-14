@@ -161,12 +161,12 @@ export default function MarketingHome() {
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3.5">
-              <Link
-                href="/signup"
+              <a
+                href={`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/signup`}
                 className="inline-flex items-center gap-2 rounded-full bg-forest px-7 py-4 text-[15.5px] font-medium text-cream transition-all hover:-translate-y-px hover:bg-forest-dark hover:shadow-md"
               >
                 Start free trial →
-              </Link>
+              </a>
               <Link
                 href="#roi"
                 className="inline-flex items-center gap-2 rounded-full px-7 py-4 text-[15.5px] font-medium text-text transition-colors hover:bg-cream-deep"
