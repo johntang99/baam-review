@@ -140,7 +140,7 @@ export default async function SharePage({
   const { data: location } = await supabase
     .from("locations")
     .select(
-      "id, slug, display_name, address, brand_color, logo_url, booking_url, default_language, supported_languages, referral_config",
+      "id, slug, display_name, address, brand_color, logo_url, booking_url, website_url, default_language, supported_languages, referral_config",
     )
     .eq("id", req.location_id)
     .maybeSingle();
@@ -184,6 +184,10 @@ export default async function SharePage({
       )}`
     : null;
   const reviewPageUrl = `/r/${location.slug}?lang=${lang}&ref=${req.id}`;
+  // The recommendation card footer links to the clinic's website when set.
+  // Friends just got a recommendation; the natural next step is to learn
+  // about the business, not to leave their own review.
+  const businessHref = location.website_url ?? mapsUrl ?? null;
 
   // Resolve referral offer config — layer URL overrides on top of the saved
   // config when the admin preview iframe is asking. Preview mode also skips
@@ -270,36 +274,49 @@ export default async function SharePage({
           )}
 
           <div className="relative flex items-center justify-between border-t border-white/[0.22] pt-5">
-            <Link
-              href={reviewPageUrl}
-              className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-90"
-            >
-              {location.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={location.logo_url}
-                  alt=""
-                  className="h-11 w-11 flex-shrink-0 rounded-[10px] object-cover bg-white"
-                />
-              ) : (
-                <span
-                  className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[10px] bg-white font-display text-[22px] font-semibold"
-                  style={{ color: accent }}
-                >
-                  {initial}
-                </span>
-              )}
-              <span className="min-w-0">
-                <span className="block truncate text-[14px] font-semibold">
-                  {location.display_name}
-                </span>
-                {location.address && (
-                  <span className="block truncate text-[12px] text-white/70">
-                    {location.address}
+            {(() => {
+              const inner = (
+                <>
+                  {location.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={location.logo_url}
+                      alt=""
+                      className="h-11 w-11 flex-shrink-0 rounded-[10px] object-cover bg-white"
+                    />
+                  ) : (
+                    <span
+                      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[10px] bg-white font-display text-[22px] font-semibold"
+                      style={{ color: accent }}
+                    >
+                      {initial}
+                    </span>
+                  )}
+                  <span className="min-w-0">
+                    <span className="block truncate text-[14px] font-semibold">
+                      {location.display_name}
+                    </span>
+                    {location.address && (
+                      <span className="block truncate text-[12px] text-white/70">
+                        {location.address}
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-            </Link>
+                </>
+              );
+              return businessHref ? (
+                <a
+                  href={businessHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-90"
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div className="flex min-w-0 items-center gap-3">{inner}</div>
+              );
+            })()}
           </div>
         </section>
 

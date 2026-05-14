@@ -166,6 +166,7 @@ export interface Database {
           yelp_url: string | null;
           custom_url: string | null;
           custom_url_label: Json;
+          website_url: string | null;
           sender_email: string | null;
           sender_name: string | null;
           sender_verified_at: string | null;
@@ -199,6 +200,7 @@ export interface Database {
           yelp_url?: string | null;
           custom_url?: string | null;
           custom_url_label?: Json;
+          website_url?: string | null;
           sender_email?: string | null;
           sender_name?: string | null;
           sender_verified_at?: string | null;

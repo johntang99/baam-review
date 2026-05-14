@@ -91,6 +91,7 @@ export async function updateLocation(locationId: string, formData: FormData) {
     prompt_questions: promptQuestions,
     yelp_url: getString(formData, "yelp_url"),
     custom_url: getString(formData, "custom_url"),
+    website_url: getString(formData, "website_url"),
     custom_url_label: getJsonbPerLang(formData, "custom_url_label", supported),
     sender_email: senderEmail,
     sender_name: senderName,

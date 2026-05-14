@@ -159,6 +159,20 @@ export function SettingsForm({
         title="External links"
         description="Optional alternatives shown alongside Google on the public review page."
       >
+        <Field
+          label="Website URL"
+          htmlFor="website_url"
+          hint="Your business homepage. Used when a referred friend clicks the business name on the recommendation card — they land here instead of the review form."
+        >
+          <Input
+            id="website_url"
+            name="website_url"
+            type="url"
+            placeholder="https://drhuang.com"
+            defaultValue={location.website_url ?? ""}
+          />
+        </Field>
+
         <Field label="Yelp URL" htmlFor="yelp_url">
           <Input
             id="yelp_url"
