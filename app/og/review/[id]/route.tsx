@@ -61,15 +61,15 @@ export async function GET(
   const initial = loc.display_name.charAt(0).toUpperCase();
 
   // Strip Google's "(Translated by Google) ... (Original) ..." wrapper so the
-  // card shows ONE version, not both concatenated. Default to the translated
-  // (English) variant for broadest social-share audience; ?lang=zh|es flips
-  // the preference per pickComment's rules.
+  // card shows ONE version, not both concatenated. `auto` lets ?lang=zh show
+  // the original (Chinese / Japanese / Korean) source while ?lang=en|es shows
+  // Google's translated variant — matches the share-builder language toggle.
   const langParam = url.searchParams.get("lang");
   const preferLang =
     langParam === "zh" || langParam === "es" || langParam === "en"
       ? langParam
       : "en";
-  const commentOne = pickComment(review.comment, preferLang, "translated") ?? "";
+  const commentOne = pickComment(review.comment, preferLang, "auto") ?? "";
 
   const quote = commentOne.trim();
   const isCJK = /[　-鿿぀-ヿ가-힯]/.test(quote);

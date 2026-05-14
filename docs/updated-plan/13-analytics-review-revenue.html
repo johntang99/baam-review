@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototype — Analytics & Review Revenue (v2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #143427;
+  --forest-light: #3A6B5C;
+  --sage: #7A9085;
+  --sage-soft: #C9D4CE;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88840;
+  --gold-soft: #E8D9B5;
+  --alert: #B14545;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 12px 30px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream-deep);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding: 32px 28px 80px;
+}
+.page { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+
+/* ── Page header + tabs ──────────────────────────── */
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+.page-header h1 { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 500; letter-spacing: -0.01em; color: var(--ink); }
+.eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+.page-header p { color: var(--text-soft); font-size: 13.5px; max-width: 620px; margin-top: 4px; }
+.period-picker { display: inline-flex; border: 1px solid var(--border); background: var(--paper); border-radius: 9999px; padding: 3px; font-size: 12.5px; font-weight: 500; }
+.period-picker button { border: none; background: transparent; padding: 6px 14px; border-radius: 9999px; cursor: pointer; color: var(--text-soft); }
+.period-picker button.active { background: var(--ink); color: var(--cream); }
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  padding-left: 4px;
+}
+.tab-bar button {
+  background: transparent;
+  border: none;
+  padding: 12px 22px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+  position: relative;
+  border-radius: 8px 8px 0 0;
+}
+.tab-bar button.active {
+  color: var(--ink);
+  font-weight: 600;
+}
+.tab-bar button.active::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: var(--forest);
+  border-radius: 2px 2px 0 0;
+}
+.tab-bar button:hover:not(.active) { color: var(--ink); }
+
+.tab-pane { display: none; flex-direction: column; gap: 22px; }
+.tab-pane.active { display: flex; }
+
+/* ── Cards (shared) ──────────────────────────────── */
+.card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+}
+.card-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; gap: 16px; }
+.card-head h2 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; }
+.card-head a { color: var(--forest); font-size: 12.5px; font-weight: 500; }
+
+/* ============ TAB 1: Activity & Funnel ============ */
+
+/* funnel */
+.funnel-stage-label {
+  font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 500; margin-bottom: 12px;
+}
+.funnel-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 70px 50px;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.funnel-label { font-size: 13px; color: var(--text); font-weight: 500; }
+.funnel-bar { height: 30px; background: var(--cream-deep); border-radius: 7px; overflow: hidden; position: relative; }
+.funnel-fill { height: 100%; border-radius: 7px; display: flex; align-items: center; padding-left: 12px; font-size: 12.5px; font-weight: 500; color: var(--cream); }
+.funnel-fill.l1 { background: var(--ink); width: 100%; }
+.funnel-fill.l2 { background: var(--forest); width: 78%; }
+.funnel-fill.l3 { background: var(--forest-light); width: 64%; }
+.funnel-fill.l4 { background: var(--sage); width: 38%; color: var(--ink); }
+.funnel-num { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; color: var(--ink); letter-spacing: -0.01em; }
+.funnel-pct { font-size: 12px; color: var(--text-muted); text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+.dual-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; }
+
+/* referrals tiles */
+.ref-headline {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 16.5px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.ref-headline .num {
+  font-style: normal;
+  font-size: 38px;
+  font-weight: 500;
+  color: var(--gold-dark);
+  margin-right: 8px;
+  vertical-align: -4px;
+}
+.ref-headline b { font-style: normal; color: var(--ink); font-weight: 500; }
+.ref-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.ref-tile {
+  background: var(--cream-deep);
+  border-radius: 12px;
+  padding: 14px 12px;
+  text-align: center;
+  position: relative;
+}
+.ref-tile + .ref-tile::before {
+  content: '→';
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+.ref-tile .n { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 500; color: var(--ink); }
+.ref-tile .l { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+/* top referrers list */
+.referrers-head {
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 500; margin: 18px 0 8px;
+  padding-top: 16px; border-top: 1px solid var(--border-soft);
+}
+.referrer-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--border-soft); font-size: 13px;
+}
+.referrer-row:last-child { border-bottom: none; }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--sage); color: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; flex-shrink: 0;
+}
+.referrer-row .name { flex: 1; color: var(--text); font-weight: 500; }
+.referrer-row .meta { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.referrer-row .meta b { color: var(--gold-dark); font-family: 'Fraunces', serif; font-size: 14px; font-weight: 500; }
+
+/* activity stream */
+.activity-row {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.activity-row:last-child { border-bottom: none; }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot.green { background: var(--forest); }
+.dot.gold { background: var(--gold); }
+.dot.sage { background: var(--sage); }
+.activity-row .when { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.activity-row b { color: var(--ink); font-weight: 500; }
+
+/* ============ TAB 2: Revenue ============ */
+.hero {
+  background: linear-gradient(135deg, var(--forest) 0%, var(--forest-dark) 100%);
+  color: var(--cream);
+  border-radius: 24px;
+  padding: 32px 40px;
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 32px;
+  align-items: stretch;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: ''; position: absolute; right: -80px; top: -80px;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(201,169,97,0.18), transparent 65%);
+  pointer-events: none;
+}
+.hero-col { position: relative; z-index: 1; }
+.hero-divider { background: rgba(250, 247, 242, 0.18); }
+.hero-eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-soft); font-weight: 500; margin-bottom: 8px; }
+.hero-number { font-family: 'Fraunces', serif; font-size: 50px; font-weight: 500; letter-spacing: -0.02em; line-height: 1; }
+.hero-range { margin-top: 12px; font-size: 13.5px; color: rgba(250, 247, 242, 0.78); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.pill { background: rgba(250, 247, 242, 0.12); padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+.hero-sub { margin-top: 16px; font-size: 13px; color: rgba(250, 247, 242, 0.85); line-height: 1.55; }
+.hero-sub b { color: var(--cream); font-weight: 500; }
+
+/* inputs */
+.inputs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.ltv-explainer {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--cream);
+  border-radius: 12px;
+  border-left: 3px solid var(--gold);
+  font-size: 12.5px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.ltv-explainer h3 {
+  font-family: 'Fraunces', serif; font-size: 14px; font-weight: 500;
+  color: var(--ink); margin-bottom: 4px;
+}
+.ltv-explainer b { color: var(--ink); font-weight: 500; }
+.ltv-explainer .example {
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--text);
+  background: var(--paper);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.input-field label {
+  display: block; font-size: 11.5px; font-weight: 500; color: var(--text-soft);
+  margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.input-field .wrap {
+  position: relative; border: 1px solid var(--border);
+  border-radius: 10px; background: var(--cream);
+}
+.input-field .wrap:focus-within { border-color: var(--forest); background: var(--paper); }
+.input-field input {
+  border: none; background: transparent; width: 100%;
+  font-family: 'Fraunces', serif; font-size: 22px; font-weight: 500;
+  color: var(--ink); padding: 12px 16px 12px 28px; outline: none;
+}
+.input-field .prefix, .input-field .suffix {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); pointer-events: none;
+}
+.input-field .prefix { left: 14px; font-family: 'Fraunces', serif; font-size: 15px; }
+.input-field .suffix { right: 14px; font-size: 13px; font-family: 'Onest', sans-serif; }
+.input-field .hint { margin-top: 6px; font-size: 11.5px; color: var(--text-muted); line-height: 1.55; }
+.input-field .hint b { color: var(--text-soft); font-weight: 500; }
+
+/* bucket cards — data-first then calc */
+.buckets { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.bucket {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.bucket-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.bucket-name {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Fraunces', serif; font-size: 17.5px; font-weight: 500; color: var(--ink);
+}
+.bucket-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--cream-deep); font-size: 16px;
+}
+.tag {
+  font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  font-weight: 600; padding: 4px 9px; border-radius: 9999px;
+}
+.tag-direct { background: rgba(31,77,63,0.1); color: var(--forest); }
+.tag-modeled { background: rgba(201,169,97,0.18); color: var(--gold-dark); }
+
+.section-label {
+  font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600;
+}
+.data-block {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.data-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 13px; color: var(--text-soft);
+}
+.data-row b { color: var(--ink); font-weight: 500; font-family: 'Fraunces', serif; font-size: 15px; }
+.calc-block {
+  background: linear-gradient(180deg, rgba(31,77,63,0.04) 0%, rgba(31,77,63,0.08) 100%);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.calc-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.calc-formula b { color: var(--ink); font-weight: 600; }
+.calc-result {
+  margin-top: 8px;
+  display: flex; align-items: baseline; gap: 10px;
+  border-top: 1px dashed rgba(31,77,63,0.2);
+  padding-top: 10px;
+}
+.calc-result .label { font-size: 12px; color: var(--text-soft); }
+.calc-result .amount {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 28px; color: var(--forest-dark); letter-spacing: -0.015em;
+}
+.calc-result .range { font-size: 11.5px; color: var(--text-muted); margin-left: auto; }
+
+.ltv-line {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(201,169,97,0.08) 0%, rgba(201,169,97,0.14) 100%);
+  border-radius: 12px;
+  border: 1px dashed rgba(201,169,97,0.4);
+}
+.ltv-line .arrow { color: var(--gold-dark); font-size: 14px; }
+.ltv-line .label { font-size: 12px; color: var(--text-soft); flex: 1; }
+.ltv-line .label b { color: var(--ink); font-weight: 500; }
+.ltv-line .amount {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 22px; color: var(--gold-dark); letter-spacing: -0.01em;
+}
+
+/* trend chart */
+.trend-section {
+  background: var(--paper); border: 1px solid var(--border);
+  border-radius: 18px; padding: 24px 28px; box-shadow: var(--shadow-sm);
+}
+.trend-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; gap: 16px; }
+.trend-head h2 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; }
+.trend-legend { display: flex; gap: 18px; font-size: 12.5px; color: var(--text-soft); flex-wrap: wrap; }
+.legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+.chart {
+  height: 180px;
+  border-bottom: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  padding: 0 8px;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+.bar-stack {
+  flex: 1; display: flex; flex-direction: column-reverse;
+  gap: 2px; height: 100%; justify-content: flex-end;
+}
+.bar { border-radius: 3px 3px 0 0; }
+.bar.referrals { background: var(--forest); }
+.bar.reviews { background: var(--sage); }
+.chart-x { display: flex; margin-top: 6px; padding: 0 8px; gap: 14px; }
+.chart-x span { flex: 1; font-size: 10.5px; color: var(--text-muted); text-align: center; font-family: 'JetBrains Mono', monospace; }
+
+/* assumptions */
+.assumptions {
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: 18px; padding: 22px 26px;
+}
+.assumptions summary {
+  cursor: pointer; list-style: none;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'Fraunces', serif; font-size: 16.5px; font-weight: 500; color: var(--ink);
+}
+.assumptions summary::-webkit-details-marker { display: none; }
+.assumptions summary::after { content: '▾'; font-size: 12px; color: var(--text-muted); transition: transform 0.2s; }
+.assumptions[open] summary::after { transform: rotate(180deg); }
+.assumptions ul {
+  margin-top: 16px; list-style: none;
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 12px 28px; font-size: 12.5px; color: var(--text-soft); line-height: 1.7;
+}
+.assumptions ul li::before { content: '·'; margin-right: 8px; color: var(--gold); font-weight: bold; }
+.assumptions ul li b { color: var(--ink); font-weight: 500; }
+.foot { font-size: 11.5px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+.foot a { color: var(--text-soft); text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="page-header">
+    <div>
+      <div class="eyebrow">Analytics & Review Revenue</div>
+      <h1>Activity, funnels, and the revenue you've earned</h1>
+      <p>Two views: how the funnels are flowing, and an estimate of the dollar
+      value those flows produced.</p>
+    </div>
+    <div class="period-picker">
+      <button>7d</button>
+      <button class="active">30d</button>
+      <button>90d</button>
+      <button>YTD</button>
+    </div>
+  </header>
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button data-tab="activity" class="active">Activity & Funnel</button>
+    <button data-tab="revenue">Estimated Revenue</button>
+  </div>
+
+  <!-- ============ TAB 1: ACTIVITY & FUNNEL ============ -->
+  <div class="tab-pane active" data-pane="activity">
+
+    <!-- Collection funnel -->
+    <section class="card">
+      <div class="card-head">
+        <h2>From request sent to revenue</h2>
+        <a href="#">Full activity log →</a>
+      </div>
+      <div class="funnel-stage-label">Collection funnel</div>
+
+      <div class="funnel-row">
+        <span class="funnel-label">Sent</span>
+        <div class="funnel-bar"><div class="funnel-fill l1">142</div></div>
+        <span class="funnel-num">142</span>
+        <span class="funnel-pct">100%</span>
+      </div>
+      <div class="funnel-row">
+        <span class="funnel-label">Delivered</span>
+        <div class="funnel-bar"><div class="funnel-fill l2">111</div></div>
+        <span class="funnel-num">111</span>
+        <span class="funnel-pct">78%</span>
+      </div>
+      <div class="funnel-row">
+        <span class="funnel-label">Clicked</span>
+        <div class="funnel-bar"><div class="funnel-fill l3">91</div></div>
+        <span class="funnel-num">91</span>
+        <span class="funnel-pct">64%</span>
+      </div>
+      <div class="funnel-row">
+        <span class="funnel-label">Completed</span>
+        <div class="funnel-bar"><div class="funnel-fill l4">54</div></div>
+        <span class="funnel-num">54</span>
+        <span class="funnel-pct">38%</span>
+      </div>
+    </section>
+
+    <!-- Referrals + Activity side-by-side -->
+    <div class="dual-grid">
+
+      <!-- Referrals card -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Referrals</h2>
+          <a href="#">Details →</a>
+        </div>
+        <p class="ref-headline">
+          <span class="num">3</span>new customers attributable to
+          <b>reviewer-driven referrals</b> this month.
+        </p>
+        <div class="ref-tiles">
+          <div class="ref-tile"><div class="n">54</div><div class="l">Reviewers</div></div>
+          <div class="ref-tile"><div class="n">31</div><div class="l">Shared</div></div>
+          <div class="ref-tile"><div class="n">23</div><div class="l">Clicked</div></div>
+          <div class="ref-tile"><div class="n">15</div><div class="l">Booked*</div></div>
+        </div>
+
+        <p class="referrers-head">Top referrers this month</p>
+        <div class="referrer-row">
+          <span class="avatar">SL</span>
+          <span class="name">Sarah Liu</span>
+          <span class="meta"><b>2</b> bookings</span>
+        </div>
+        <div class="referrer-row">
+          <span class="avatar">MD</span>
+          <span class="name">Marcus Davis</span>
+          <span class="meta"><b>1</b> booking</span>
+        </div>
+        <div class="referrer-row">
+          <span class="avatar">CW</span>
+          <span class="name">Cindy Wong</span>
+          <span class="meta"><b>1</b> booking</span>
+        </div>
+      </section>
+
+      <!-- Activity stream -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Recent activity</h2>
+          <a href="#">Inbox →</a>
+        </div>
+        <div class="activity-row">
+          <span class="dot green"></span>
+          <span><b>5★ review</b> from Annie Orio — Google</span>
+          <span class="when">2d</span>
+        </div>
+        <div class="activity-row">
+          <span class="dot gold"></span>
+          <span><b>FRIEND10 used</b> by a friend of Sarah Liu</span>
+          <span class="when">3d</span>
+        </div>
+        <div class="activity-row">
+          <span class="dot sage"></span>
+          <span><b>Reply posted</b> to Julie's 5★ review</span>
+          <span class="when">5d</span>
+        </div>
+        <div class="activity-row">
+          <span class="dot green"></span>
+          <span><b>4★ review</b> from Ronald Leone — Google</span>
+          <span class="when">1w</span>
+        </div>
+        <div class="activity-row">
+          <span class="dot gold"></span>
+          <span><b>23 share-card views</b> from Marcus Davis's post</span>
+          <span class="when">1w</span>
+        </div>
+        <div class="activity-row">
+          <span class="dot sage"></span>
+          <span><b>Sync completed</b> · 3 new reviews · 0 alerts</span>
+          <span class="when">1w</span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ============ TAB 2: ESTIMATED REVENUE ============ -->
+  <div class="tab-pane" data-pane="revenue">
+
+    <!-- HERO — two big numbers: this period + lifetime -->
+    <section class="hero">
+      <div class="hero-col">
+        <div class="hero-eyebrow">Revenue this period · 30d</div>
+        <div class="hero-number" id="period-total">$1,763</div>
+        <div class="hero-range">
+          <span class="pill">Conservative <span id="period-low">$1,540</span></span>
+          <span class="pill">Optimistic <span id="period-high">$1,985</span></span>
+        </div>
+        <p class="hero-sub">
+          What new customers from BAAM Review spent on their <b>first visit</b>
+          this period. Grounded in tracked referral clicks + Google profile-view
+          lift.
+        </p>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-col">
+        <div class="hero-eyebrow">Lifetime value of these customers</div>
+        <div class="hero-number" id="ltv-total" style="color: var(--gold-soft);">$11,760</div>
+        <div class="hero-range">
+          <span class="pill"><span id="new-customers">12</span> new customers × <span id="ltv-per">$980</span> LTV</span>
+        </div>
+        <p class="hero-sub">
+          What those same customers will spend with you <b>across 12 months</b>
+          of repeat visits. This is the real return on getting them in the door.
+        </p>
+      </div>
+    </section>
+
+    <!-- INPUTS PANEL -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>Your business numbers</h2>
+          <p style="color: var(--text-soft); font-size: 12.5px;">Used in both calculations. Saved per location.</p>
+        </div>
+        <span style="font-size: 12px; color: var(--text-muted);">✓ Auto-saved</span>
+      </div>
+      <div class="inputs-grid">
+        <div class="input-field">
+          <label for="ticket">Avg ticket</label>
+          <div class="wrap">
+            <span class="prefix">$</span>
+            <input id="ticket" type="number" value="150" />
+          </div>
+          <p class="hint">What a customer spends on their first visit.</p>
+        </div>
+        <div class="input-field">
+          <label for="ltv">LTV per customer</label>
+          <div class="wrap">
+            <span class="prefix">$</span>
+            <input id="ltv" type="number" value="980" />
+          </div>
+          <p class="hint">12-month total revenue per customer (see below).</p>
+        </div>
+        <div class="input-field">
+          <label for="close">Referral close rate</label>
+          <div class="wrap">
+            <input id="close" type="number" value="50" style="padding-left:16px;" />
+            <span class="suffix">%</span>
+          </div>
+          <p class="hint">Of friends who click Book, % who actually show up. <b>Default 50%</b>.</p>
+        </div>
+        <div class="input-field">
+          <label for="attr">Review attribution</label>
+          <div class="wrap">
+            <input id="attr" type="number" value="50" style="padding-left:16px;" />
+            <span class="suffix">%</span>
+          </div>
+          <p class="hint">% of GBP view-lift we credit to new reviews. <b>Default 50%</b>.</p>
+        </div>
+      </div>
+
+      <!-- LTV explainer — sits inside the inputs panel so the input field has
+           immediate context the first time the owner sees it. -->
+      <div class="ltv-explainer">
+        <h3>What is "LTV per customer"?</h3>
+        <p>
+          <b>Lifetime value (LTV)</b> is the total revenue you expect to earn
+          from one customer across <b>all the visits</b> they'll make over a
+          12-month window — not just their first visit. The ticket revenue
+          above shows what BAAM Review earned you <em>this month</em>. LTV
+          shows what those same customers will be worth across the year.
+        </p>
+        <div class="example">
+          Acupuncture example: $150 ticket × ~6.5 visits/year ≈ <b>$980 LTV</b>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUCKETS — data first, then calculation -->
+    <section class="buckets">
+
+      <!-- Card 1: Referrals -->
+      <article class="bucket">
+        <div class="bucket-head">
+          <div class="bucket-name">
+            <span class="bucket-icon">👥</span>
+            Referral revenue
+          </div>
+          <span class="tag tag-direct">Direct</span>
+        </div>
+
+        <div class="section-label">Data this period</div>
+        <div class="data-block">
+          <div class="data-row"><span>Reviewers who saw a share prompt</span><b>54</b></div>
+          <div class="data-row"><span>Sent a recommendation card</span><b>31</b></div>
+          <div class="data-row"><span>Friends who clicked "Book"</span><b>15</b></div>
+          <div class="data-row"><span>Estimated to actually convert (close rate)</span><b id="closed">≈ 8</b></div>
+        </div>
+
+        <div class="section-label">Calculation</div>
+        <div class="calc-block">
+          <div class="calc-formula" id="ref-formula">
+            <b>15 book clicks</b> × <b>50% close rate</b> × <b>$150 ticket</b>
+          </div>
+          <div class="calc-result">
+            <span class="label">Referral revenue</span>
+            <span class="amount" id="ref-amount">$1,125</span>
+            <span class="range">no modeling — bookings are tracked</span>
+          </div>
+        </div>
+
+        <div class="ltv-line">
+          <span class="arrow">↳</span>
+          <span class="label">
+            <b id="ref-customers">≈ 8</b> new customers × <b id="ref-ltv-per">$980</b> LTV
+          </span>
+          <span class="amount" id="ref-ltv-amount">$7,840</span>
+        </div>
+      </article>
+
+      <!-- Card 2: New review revenue -->
+      <article class="bucket">
+        <div class="bucket-head">
+          <div class="bucket-name">
+            <span class="bucket-icon">⭐</span>
+            New review revenue
+          </div>
+          <span class="tag tag-modeled">Modeled</span>
+        </div>
+
+        <div class="section-label">Data this period (from GBP Insights)</div>
+        <div class="data-block">
+          <div class="data-row"><span>New 4★+ reviews</span><b>21</b></div>
+          <div class="data-row"><span>Profile views — prior period</span><b>2,400</b></div>
+          <div class="data-row"><span>Profile views — this period</span><b>3,250</b></div>
+          <div class="data-row"><span>View lift vs prior period</span><b>+850</b></div>
+          <div class="data-row"><span>Lift attributed to new reviews (50%)</span><b id="attr-views">425 views</b></div>
+        </div>
+
+        <div class="section-label">Calculation</div>
+        <div class="calc-block">
+          <div class="calc-formula" id="rev-formula">
+            <b>425 attributed views</b> × <b>1% profile→booking</b> × <b>$150 ticket</b>
+          </div>
+          <div class="calc-result">
+            <span class="label">New review revenue</span>
+            <span class="amount" id="rev-amount">$638</span>
+            <span class="range">range $415 – $860 (±35%)</span>
+          </div>
+        </div>
+
+        <div class="ltv-line">
+          <span class="arrow">↳</span>
+          <span class="label">
+            <b id="rev-customers">≈ 4</b> new customers × <b id="rev-ltv-per">$980</b> LTV
+          </span>
+          <span class="amount" id="rev-ltv-amount">$3,920</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- Weekly trend -->
+    <section class="trend-section">
+      <div class="trend-head">
+        <h2>Week by week</h2>
+        <div class="trend-legend">
+          <span><span class="legend-dot" style="background:var(--forest)"></span>Referrals</span>
+          <span><span class="legend-dot" style="background:var(--sage)"></span>New reviews</span>
+        </div>
+      </div>
+      <div class="chart">
+        <div class="bar-stack">
+          <div class="bar reviews" style="height: 18%"></div>
+          <div class="bar referrals" style="height: 26%"></div>
+        </div>
+        <div class="bar-stack">
+          <div class="bar reviews" style="height: 24%"></div>
+          <div class="bar referrals" style="height: 30%"></div>
+        </div>
+        <div class="bar-stack">
+          <div class="bar reviews" style="height: 28%"></div>
+          <div class="bar referrals" style="height: 36%"></div>
+        </div>
+        <div class="bar-stack">
+          <div class="bar reviews" style="height: 32%"></div>
+          <div class="bar referrals" style="height: 42%"></div>
+        </div>
+      </div>
+      <div class="chart-x">
+        <span>Apr 21</span>
+        <span>Apr 28</span>
+        <span>May 5</span>
+        <span>May 12</span>
+      </div>
+    </section>
+
+    <!-- Assumptions -->
+    <details class="assumptions" id="assumptions" open>
+      <summary>Show assumptions behind the numbers</summary>
+      <ul>
+        <li><b>Avg ticket</b> — your input. Drives the "Revenue this period" number on the left of the hero.</li>
+        <li><b>LTV per customer</b> — your input. Drives the "Lifetime value" number on the right of the hero. Equals avg ticket × visits/year. Use a 12-month window.</li>
+        <li><b>Close rate (50%)</b> — your input. Not every friend who clicks Book actually converts; 50% is a conservative default.</li>
+        <li><b>Profile-view → booking (1%)</b> — fixed at 1%. BrightLocal 2024 shows 1–3% for local services; we use the floor.</li>
+        <li><b>Review attribution share (50%)</b> — your input. Profile-view lift comes from many things (ads, new content, seasonality); we credit half to new reviews by default.</li>
+        <li><b>Profile views</b> — pulled from your Google Business Profile Performance API, period-over-period.</li>
+        <li><b>Conservative / optimistic range</b> — ±35% applied only to the modeled (review) bucket.</li>
+        <li><b>What we deliberately don't count</b> — ranking lift, brand equity, widget impressions. Too speculative to defend.</li>
+      </ul>
+    </details>
+
+    <p class="foot">
+      Numbers update nightly. Sources:
+      <a href="#">Google Business Profile Performance API</a>,
+      <a href="#">BrightLocal Local Consumer Review Survey 2024</a>.
+    </p>
+
+  </div>
+
+</div>
+
+<script>
+// Tabs
+document.querySelectorAll('.tab-bar button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tab-bar button').forEach(x => x.classList.toggle('active', x === b));
+    document.querySelectorAll('.tab-pane').forEach(p =>
+      p.classList.toggle('active', p.dataset.pane === b.dataset.tab));
+  });
+});
+
+// Live recalculation
+function recalc() {
+  const ticket = +document.getElementById('ticket').value || 0;
+  const ltv    = +document.getElementById('ltv').value    || 0;
+  const close  = (+document.getElementById('close').value || 0) / 100;
+  const attr   = (+document.getElementById('attr').value  || 0) / 100;
+
+  // Hardcoded period data (in production: from DB + GBP API)
+  const BOOK_CLICKS = 15;
+  const VIEW_LIFT   = 850;
+  const CONV        = 0.01;
+
+  // Referral bucket
+  const refCustomers = Math.round(BOOK_CLICKS * close);
+  const referralsRev = Math.round(BOOK_CLICKS * close * ticket);
+  const referralsLtv = refCustomers * ltv;
+
+  // Review bucket
+  const attrViews = Math.round(VIEW_LIFT * attr);
+  const revCustomers = Math.round(attrViews * CONV);
+  const reviewsRev = Math.round(attrViews * CONV * ticket);
+  const reviewsLow = Math.round(reviewsRev * 0.65);
+  const reviewsHigh = Math.round(reviewsRev * 1.35);
+  const reviewsLtv = revCustomers * ltv;
+
+  // Totals
+  const periodTotal = referralsRev + reviewsRev;
+  const periodLow = referralsRev + reviewsLow;
+  const periodHigh = referralsRev + reviewsHigh;
+  const totalCustomers = refCustomers + revCustomers;
+  const totalLtv = totalCustomers * ltv;
+
+  // — Render: bucket 1 (referrals) —
+  document.getElementById('closed').textContent = '≈ ' + refCustomers;
+  document.getElementById('ref-formula').innerHTML =
+    `<b>${BOOK_CLICKS} book clicks</b> × <b>${Math.round(close*100)}% close rate</b> × <b>$${ticket} ticket</b>`;
+  document.getElementById('ref-amount').textContent = '$' + referralsRev.toLocaleString();
+  document.getElementById('ref-customers').textContent = '≈ ' + refCustomers;
+  document.getElementById('ref-ltv-per').textContent = '$' + ltv.toLocaleString();
+  document.getElementById('ref-ltv-amount').textContent = '$' + referralsLtv.toLocaleString();
+
+  // — Render: bucket 2 (reviews) —
+  document.getElementById('attr-views').textContent = attrViews.toLocaleString() + ' views';
+  document.getElementById('rev-formula').innerHTML =
+    `<b>${attrViews.toLocaleString()} attributed views</b> × <b>1% profile→booking</b> × <b>$${ticket} ticket</b>`;
+  document.getElementById('rev-amount').textContent = '$' + reviewsRev.toLocaleString();
+  document.querySelector('#rev-amount').nextElementSibling.textContent =
+    `range $${reviewsLow.toLocaleString()} – $${reviewsHigh.toLocaleString()} (±35%)`;
+  document.getElementById('rev-customers').textContent = '≈ ' + revCustomers;
+  document.getElementById('rev-ltv-per').textContent = '$' + ltv.toLocaleString();
+  document.getElementById('rev-ltv-amount').textContent = '$' + reviewsLtv.toLocaleString();
+
+  // — Render: hero (two numbers) —
+  document.getElementById('period-total').textContent = '$' + periodTotal.toLocaleString();
+  document.getElementById('period-low').textContent = '$' + periodLow.toLocaleString();
+  document.getElementById('period-high').textContent = '$' + periodHigh.toLocaleString();
+  document.getElementById('ltv-total').textContent = '$' + totalLtv.toLocaleString();
+  document.getElementById('new-customers').textContent = totalCustomers;
+  document.getElementById('ltv-per').textContent = '$' + ltv.toLocaleString();
+}
+['ticket','ltv','close','attr'].forEach(id =>
+  document.getElementById(id).addEventListener('input', recalc));
+recalc();
+</script>
+
+</body>
+</html>

@@ -25,11 +25,11 @@ interface SidebarProps {
 
 const workspaceItems = [
   { href: "/app", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/app/send", label: "Send request", icon: Send },
-  { href: "/app/reviews", label: "Reviews", icon: Star },
-  { href: "/app/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/app/send", label: "Send review request", icon: Send },
+  { href: "/app/reviews", label: "Reviews Reply & Share", icon: Star },
+  { href: "/app/referrals", label: "Referral settings", icon: Users },
   { href: "/app/share", label: "Widget & QR poster", icon: Share2 },
-  { href: "/app/referrals", label: "Referrals", icon: Users },
+  { href: "/app/analytics", label: "Analytics & Review Revenue", icon: BarChart3 },
 ];
 
 const accountItems = [
@@ -44,7 +44,7 @@ export function Sidebar({
   selectedLocationId,
 }: SidebarProps) {
   return (
-    <aside className="sticky top-0 flex h-screen w-[240px] flex-col bg-ink text-cream/90 px-4 py-6">
+    <aside className="sticky top-0 flex h-screen w-[270px] flex-col bg-ink text-cream/90 px-4 py-6">
       <Link href="/app" className="flex items-center gap-2.5 px-2 pb-4">
         <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gold text-ink font-semibold text-[13px]">
           B

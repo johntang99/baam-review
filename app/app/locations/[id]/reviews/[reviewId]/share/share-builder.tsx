@@ -17,6 +17,7 @@ import {
   type ShareSize,
   type ShareThemeKey,
 } from "@/lib/share/themes";
+import { pickComment } from "@/components/widget/review-card";
 import { cn } from "@/lib/utils";
 import { logShareEvent, setDefaultShareTheme } from "./actions";
 
@@ -26,6 +27,7 @@ interface ShareBuilderProps {
   locationName: string;
   brandColor: string;
   defaultTheme: string;
+  defaultLang?: "en" | "zh" | "es";
   review: {
     id: string;
     googleReviewId: string;
@@ -43,13 +45,23 @@ export function ShareBuilder({
   locationName,
   brandColor,
   defaultTheme,
+  defaultLang = "en",
   review,
 }: ShareBuilderProps) {
   const [size, setSize] = useState<ShareSize>("og");
   const [theme, setTheme] = useState<ShareThemeKey>(
     (defaultTheme as ShareThemeKey) ?? "warm-clinic",
   );
-  const [lang, setLang] = useState<"en" | "zh" | "es">("en");
+  const [lang, setLang] = useState<"en" | "zh" | "es">(defaultLang);
+
+  // Mirror the share card's pick: in EN, show the translation; in ZH, show
+  // the source. Keeps the left-side review summary in sync with the live
+  // preview rather than leaking Google's raw "(Translated by Google) ...
+  // (Original) ..." wrapper.
+  const summaryComment = useMemo(
+    () => pickComment(review.comment, lang, "auto"),
+    [review.comment, lang],
+  );
   const [copied, setCopied] = useState(false);
 
   // Caption state
@@ -417,7 +429,7 @@ export function ShareBuilder({
             </span>
           </div>
           <p className="line-clamp-5 text-[14px] leading-relaxed text-text">
-            {review.comment ?? "(No comment text)"}
+            {summaryComment ?? "(No comment text)"}
           </p>
           <div className="mt-3 flex items-center gap-2">
             {review.reviewerPhotoUrl &&
@@ -490,7 +502,7 @@ export function ShareBuilder({
         {/* Language toggle */}
         <div className="space-y-2.5">
           <p className="text-[12.5px] font-medium tracking-tight text-text-soft">
-            Caption language
+            Language
           </p>
           <div className="inline-flex rounded-full border border-border-base bg-paper p-1">
             {(
@@ -516,8 +528,8 @@ export function ShareBuilder({
             ))}
           </div>
           <p className="text-[11.5px] text-text-muted">
-            Sets the share-card&apos;s comment variant (translated vs original)
-            and the AI caption language below.
+            EN shows Google&apos;s translation; 中文 shows the customer&apos;s
+            original wording. Also drives the AI caption language below.
           </p>
         </div>
 

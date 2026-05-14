@@ -12,7 +12,7 @@ import {
   Send,
   Trash2,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { relativeTime } from "@/lib/analytics/aggregate";
 import { syncReviews, type SyncResult } from "./actions";
@@ -191,19 +191,9 @@ function ReviewCard({ r, locationId }: { r: Review; locationId: string }) {
             <p className="text-[13.5px] text-ink truncate font-medium">
               {r.reviewer_display_name ?? "Anonymous"}
             </p>
-            <div className="flex items-center gap-3 whitespace-nowrap text-[11.5px] text-text-muted">
-              {r.rating >= 4 && r.comment && (
-                <Link
-                  href={`/app/locations/${locationId}/reviews/${r.id}/share`}
-                  className="inline-flex items-center gap-1 text-forest hover:underline"
-                  title="Generate a share card for this review"
-                >
-                  <Share2 className="h-3 w-3" />
-                  Share
-                </Link>
-              )}
-              <span>{relativeTime(r.review_create_time)}</span>
-            </div>
+            <span className="text-[11.5px] text-text-muted whitespace-nowrap">
+              {relativeTime(r.review_create_time)}
+            </span>
           </div>
           <p className="text-gold text-[14px]">
             {"★".repeat(r.rating)}
@@ -218,12 +208,15 @@ function ReviewCard({ r, locationId }: { r: Review; locationId: string }) {
         </p>
       )}
 
-      <ReplySection r={r} />
+      <ReplySection r={r} locationId={locationId} />
     </li>
   );
 }
 
-function ReplySection({ r }: { r: Review }) {
+function ReplySection({ r, locationId }: { r: Review; locationId: string }) {
+  const canShare = r.rating >= 4 && !!r.comment;
+  const shareHref = `/app/locations/${locationId}/reviews/${r.id}/share`;
+
   // Three states:
   //   "viewing"  — existing reply already posted; show with Edit/Delete
   //   "editing"  — textarea open for first-time draft OR re-edit
@@ -327,6 +320,16 @@ function ReplySection({ r }: { r: Review }) {
         >
           Write manually
         </Button>
+        {canShare && (
+          <Link
+            href={shareHref}
+            className={buttonVariants({ variant: "secondary", size: "sm" })}
+            title="Generate a share card for this review"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            Share review
+          </Link>
+        )}
         {error && (
           <p className="text-[12.5px] text-alert" role="alert">
             {error}
@@ -348,6 +351,16 @@ function ReplySection({ r }: { r: Review }) {
             )}
           </p>
           <div className="flex items-center gap-2.5 text-[11.5px]">
+            {canShare && (
+              <Link
+                href={shareHref}
+                className="inline-flex items-center gap-1 text-forest hover:underline"
+                title="Generate a share card for this review"
+              >
+                <Share2 className="h-3 w-3" />
+                Share
+              </Link>
+            )}
             <button
               type="button"
               onClick={startEditing}

@@ -34,7 +34,7 @@ export default async function AppLayout({
     : null;
 
   return (
-    <div className="grid min-h-screen grid-cols-[240px_1fr] bg-cream">
+    <div className="grid min-h-screen grid-cols-[270px_1fr] bg-cream">
       <Sidebar
         fullName={fullName}
         email={user.email!}

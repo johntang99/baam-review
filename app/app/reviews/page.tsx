@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Phone, ExternalLink, Lock, Star } from "lucide-react";
+import { Mail, Phone, ExternalLink, Lock, Star, MessageSquareReply } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import { PageHeader } from "@/components/admin/page-header";
@@ -8,11 +8,8 @@ import {
   PLATFORM_LABEL,
   LANGUAGE_LABEL,
 } from "@/lib/analytics/aggregate";
-import {
-  markFeedbackRead,
-  markFeedbackUnread,
-  focusLocationInReviews,
-} from "./actions";
+import { markFeedbackRead, markFeedbackUnread } from "./actions";
+import { SyncButton } from "./sync-button";
 
 export const metadata = {
   title: "Reviews — BAAM Review",
@@ -94,15 +91,18 @@ export default async function ReviewsPage({
 
   return (
     <main className="px-10 py-10 space-y-6">
-      <PageHeader
-        eyebrow="Inbox"
-        title={selectedLocation ? `Reviews · ${selectedLocation.display_name}` : "Reviews"}
-        description={
-          selectedLocation
-            ? "Google reviews, private feedback, and click-throughs for this location."
-            : "All locations. Switch via the dropdown in the sidebar to focus on one."
-        }
-      />
+      <div className="flex items-start justify-between gap-6 flex-wrap">
+        <PageHeader
+          eyebrow="Inbox"
+          title={selectedLocation ? `Reviews · ${selectedLocation.display_name}` : "Reviews"}
+          description={
+            selectedLocation
+              ? "Google reviews, private feedback, and click-throughs for this location."
+              : "All locations. Switch via the dropdown in the sidebar to focus on one."
+          }
+        />
+        <SyncButton />
+      </div>
 
       <nav className="flex gap-1 border-b border-border-base">
         {TABS.map((t) => {
@@ -133,7 +133,6 @@ export default async function ReviewsPage({
             items={googleReviews ?? []}
             locName={locName}
             emptyMessage="No Google reviews synced yet. Open a location and click Sync now."
-            currentTab={tab}
           />
         ) : tab === "completed" ? (
           <CompletedList
@@ -160,7 +159,6 @@ export default async function ReviewsPage({
             completed={completed ?? []}
             googleReviews={googleReviews ?? []}
             locName={locName}
-            currentTab={tab}
           />
         )}
       </div>
@@ -209,23 +207,16 @@ function GoogleReviewsList({
   items,
   locName,
   emptyMessage,
-  currentTab,
 }: {
   items: GoogleReviewRow[];
   locName: Map<string, string>;
   emptyMessage: string;
-  currentTab: string;
 }) {
   if (items.length === 0) return <EmptyState message={emptyMessage} />;
   return (
     <ul className="space-y-3">
       {items.map((r) => (
-        <GoogleReviewCard
-          key={r.id}
-          r={r}
-          locName={locName}
-          currentTab={currentTab}
-        />
+        <GoogleReviewCard key={r.id} r={r} locName={locName} />
       ))}
     </ul>
   );
@@ -234,11 +225,9 @@ function GoogleReviewsList({
 function GoogleReviewCard({
   r,
   locName,
-  currentTab,
 }: {
   r: GoogleReviewRow;
   locName: Map<string, string>;
-  currentTab: string;
 }) {
   const low = r.rating <= 2;
   return (
@@ -308,23 +297,13 @@ function GoogleReviewCard({
         </div>
       )}
 
-      <div className="mt-3 flex items-center justify-end gap-3">
-        <form
-          action={focusLocationInReviews.bind(null, r.location_id, currentTab)}
-        >
-          <button
-            type="submit"
-            className="text-[12px] text-forest hover:underline"
-            title="Filter this Reviews page to only this location"
-          >
-            Focus on {locName.get(r.location_id) ?? "this location"} →
-          </button>
-        </form>
+      <div className="mt-3 flex items-center justify-end">
         <Link
           href={`/app/locations/${r.location_id}/reviews`}
-          className="text-[12px] text-text-soft hover:text-ink"
+          className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-forest hover:text-forest-dark hover:underline"
         >
-          Open settings
+          <MessageSquareReply className="h-4 w-4" />
+          Review Reply &amp; Share
         </Link>
       </div>
     </li>
@@ -507,13 +486,11 @@ function UnifiedList({
   completed,
   googleReviews,
   locName,
-  currentTab,
 }: {
   feedback: FeedbackRow[];
   completed: CompletedRow[];
   googleReviews: GoogleReviewRow[];
   locName: Map<string, string>;
-  currentTab: string;
 }) {
   type Item =
     | { kind: "google"; at: string; data: GoogleReviewRow }
@@ -554,7 +531,6 @@ function UnifiedList({
             key={`g-${it.data.id}`}
             r={it.data}
             locName={locName}
-            currentTab={currentTab}
           />
         ) : it.kind === "feedback" ? (
           <FeedbackCard key={`f-${it.data.id}`} f={it.data} locName={locName} />

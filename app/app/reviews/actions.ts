@@ -2,31 +2,75 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { syncReviewsForAccount } from "@/lib/google/sync-reviews";
 
-const SELECTED_LOCATION_COOKIE = "baam_selected_location_id";
+export interface SyncAllResult {
+  ok: boolean;
+  inserted?: number;
+  updated?: number;
+  alerts?: number;
+  locations?: number;
+  errors?: string[];
+  error?: string;
+}
 
 /**
- * Focus the sidebar on a specific location and stay on /app/reviews.
- * Used by the "Open in location" link on Google review cards: clicking
- * shouldn't navigate to the management area, just narrow the inbox to
- * that location.
+ * Sync every location in the current account. Backs the Sync button on the
+ * global /app/reviews inbox. Returns aggregated totals across locations and
+ * collects per-location errors so a partial failure still reports useful info.
  */
-export async function focusLocationInReviews(
-  locationId: string,
-  tab: string | undefined,
-): Promise<void> {
-  const store = await cookies();
-  store.set(SELECTED_LOCATION_COOKIE, locationId, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-  });
-  const qs = tab && tab !== "all" ? `?tab=${tab}` : "";
-  redirect(`/app/reviews${qs}`);
+export async function syncAllReviews(): Promise<SyncAllResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("account_id")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile?.account_id) {
+    return { ok: false, error: "No account for current user." };
+  }
+
+  let summaries;
+  try {
+    summaries = await syncReviewsForAccount(profile.account_id);
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : "Sync failed.",
+    };
+  }
+
+  if (summaries.length === 0) {
+    return {
+      ok: false,
+      error: "No locations connected to Google Business Profile yet.",
+    };
+  }
+
+  const inserted = summaries.reduce((s, x) => s + x.inserted, 0);
+  const updated = summaries.reduce((s, x) => s + x.updated, 0);
+  const alerts = summaries.reduce((s, x) => s + x.alerts, 0);
+  const errors = summaries
+    .filter((s) => s.error)
+    .map((s) => `${s.locationName}: ${s.error}`);
+
+  revalidatePath("/app/reviews");
+  revalidatePath("/app");
+
+  return {
+    ok: errors.length < summaries.length,
+    inserted,
+    updated,
+    alerts,
+    locations: summaries.length,
+    errors: errors.length > 0 ? errors : undefined,
+  };
 }
 
 export async function markFeedbackRead(id: string) {

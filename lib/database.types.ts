@@ -173,6 +173,9 @@ export interface Database {
           google_resource_name: string | null;
           reviews_synced_at: string | null;
           avg_customer_value_cents: number | null;
+          ltv_per_customer_cents: number | null;
+          referral_close_rate: number;
+          review_attribution_share: number;
           booking_url: string | null;
           social_handles: SocialHandles;
           consent_display_enabled: boolean;
@@ -207,6 +210,9 @@ export interface Database {
           google_resource_name?: string | null;
           reviews_synced_at?: string | null;
           avg_customer_value_cents?: number | null;
+          ltv_per_customer_cents?: number | null;
+          referral_close_rate?: number;
+          review_attribution_share?: number;
           booking_url?: string | null;
           social_handles?: SocialHandles;
           consent_display_enabled?: boolean;

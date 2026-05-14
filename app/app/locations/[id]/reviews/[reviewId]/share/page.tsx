@@ -3,7 +3,23 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
+import { parseGoogleComment } from "@/components/widget/review-card";
 import { ShareBuilder } from "./share-builder";
+
+const CJK_RE = /[぀-ヿ㐀-䶿一-鿿가-힯]/;
+
+function detectDefaultLang(
+  raw: string | null,
+): "en" | "zh" | "es" {
+  if (!raw) return "en";
+  const { original, translated } = parseGoogleComment(raw);
+  // Only flip away from English when Google's API explicitly gave us an
+  // (Original) block AND it looks CJK — that's the only case where the
+  // translated variant would be unreadable to the original audience.
+  if (original && CJK_RE.test(original)) return "zh";
+  if (!translated && CJK_RE.test(raw)) return "zh";
+  return "en";
+}
 
 export const metadata = { title: "Share review — BAAM Review" };
 
@@ -64,6 +80,7 @@ export default async function ShareReviewPage({
           locationName={location.display_name}
           brandColor={location.brand_color ?? "#1F4D3F"}
           defaultTheme={location.default_share_theme ?? "warm-clinic"}
+          defaultLang={detectDefaultLang(review.comment)}
           review={{
             id: review.id,
             googleReviewId: review.google_review_id,
