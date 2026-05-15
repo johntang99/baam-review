@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lists — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --forest-light: #2A6B57;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88847;
+  --gold-soft: #E8D9B5;
+  --clinic: #962D22;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --success: #2D7A5F;
+  --success-soft: #DCEEE3;
+  --warn: #D4924A;
+  --warn-soft: #FBEAD3;
+  --alert: #B5443A;
+  --alert-soft: #FCE8E5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif; color: var(--text); background: var(--cream); font-size: 14.5px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+/* SIDEBAR */
+aside { background: var(--ink); color: var(--cream); padding: 24px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 24px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; }
+.brand-mark { width: 28px; height: 28px; background: var(--gold); color: var(--ink); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+.location-switcher { background: rgba(250, 247, 242, 0.06); border: 1px solid rgba(250, 247, 242, 0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.location-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #C0392B, #962D22); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; flex-shrink: 0; color: white; }
+.location-text { flex: 1; min-width: 0; }
+.location-name { font-size: 13.5px; font-weight: 500; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.location-sub { font-size: 11.5px; color: rgba(250, 247, 242, 0.55); }
+.nav-label { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250, 247, 242, 0.4); padding: 0 8px 8px; margin-top: 8px; font-weight: 500; }
+.nav-list { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.nav-list a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; color: rgba(250, 247, 242, 0.7); transition: all 0.15s; }
+.nav-list a:hover { background: rgba(250, 247, 242, 0.06); color: var(--cream); }
+.nav-list a.active { background: rgba(201, 169, 97, 0.12); color: var(--gold); }
+.nav-list a svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; font-size: 10px; padding: 1px 6px; border-radius: 999px; font-weight: 600; font-family: 'JetBrains Mono', monospace; background: var(--gold); color: var(--ink); }
+.nav-badge.new { background: rgba(45, 122, 95, 0.85); color: var(--cream); font-family: 'Onest', sans-serif; font-size: 9.5px; letter-spacing: 0.05em; padding: 1px 7px; }
+.user-card { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; }
+.user-avatar { width: 32px; height: 32px; background: var(--sage); color: var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+.user-tier { font-size: 11px; color: rgba(250, 247, 242, 0.5); }
+
+/* MAIN */
+main { padding: 32px 40px 60px; max-width: 1280px; }
+
+.top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; gap: 16px; }
+.crumb { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; }
+.btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; font-family: 'Onest', sans-serif; font-size: 13.5px; font-weight: 500; border-radius: 9px; border: 1px solid var(--border); background: var(--paper); color: var(--text); cursor: pointer; text-decoration: none; }
+.btn:hover { background: var(--cream-deep); }
+.btn-primary { background: var(--forest); color: var(--cream); border-color: var(--forest); }
+.btn-primary:hover { background: var(--forest-dark); color: var(--cream); }
+.btn svg { width: 14px; height: 14px; }
+
+.page-header { margin-bottom: 32px; }
+.page-eyebrow { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+.page-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 44px; letter-spacing: -0.025em; color: var(--ink); line-height: 1.05; margin-bottom: 10px; }
+.page-title em { font-style: italic; color: var(--forest); }
+.page-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 17px; color: var(--text-soft); max-width: 600px; line-height: 1.5; }
+
+/* STATS STRIP */
+.stats-strip { display: flex; gap: 28px; padding: 20px 28px; background: var(--paper); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 30px; }
+.stat-mini { flex: 1; }
+.stat-mini-num { font-family: 'Fraunces', serif; font-weight: 400; font-size: 30px; color: var(--ink); letter-spacing: -0.02em; line-height: 1; margin-bottom: 4px; }
+.stat-mini-num.gold { color: var(--gold-dark); }
+.stat-mini-num.warn { color: var(--warn); }
+.stat-mini-num.alert { color: var(--alert); }
+.stat-mini-label { font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; }
+.stat-mini-sub { font-size: 11.5px; color: var(--text-soft); margin-top: 4px; font-style: italic; font-family: 'Newsreader', serif; }
+.stat-divider { width: 1px; background: var(--border); }
+
+/* FILTERS */
+.filter-row { display: flex; gap: 18px; align-items: center; margin-bottom: 24px; flex-wrap: wrap; }
+.filter-label { font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; }
+.filter-pills { display: flex; gap: 6px; }
+.filter-pill { padding: 7px 14px; background: var(--paper); border: 1px solid var(--border); border-radius: 999px; font-family: 'Onest', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-soft); cursor: pointer; transition: all 0.15s; }
+.filter-pill:hover { border-color: var(--forest); }
+.filter-pill.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.filter-pill .count { margin-left: 6px; padding: 1px 7px; background: rgba(250, 247, 242, 0.2); color: var(--cream); border-radius: 999px; font-size: 10.5px; font-family: 'JetBrains Mono', monospace; }
+.filter-pill:not(.active) .count { background: var(--cream-deep); color: var(--text-muted); }
+
+.filter-search { margin-left: auto; position: relative; }
+.filter-search-input { padding: 8px 14px 8px 36px; background: var(--paper); border: 1px solid var(--border); border-radius: 9px; font-family: 'Onest', sans-serif; font-size: 13px; color: var(--text); width: 220px; }
+.filter-search-input:focus { outline: none; border-color: var(--forest); }
+.filter-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); }
+
+/* LIST CARDS */
+.lists-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.list-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 26px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 30px;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.list-card:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(15, 31, 26, 0.06); border-color: var(--forest); }
+
+.list-card-left {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  min-width: 0;
+}
+
+.list-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.list-status-dot.active { background: var(--success); box-shadow: 0 0 0 3px rgba(45, 122, 95, 0.18); }
+.list-status-dot.pending { background: var(--warn); box-shadow: 0 0 0 3px rgba(212, 146, 74, 0.18); }
+.list-status-dot.draft { background: var(--text-muted); box-shadow: 0 0 0 3px rgba(138, 147, 142, 0.15); }
+.list-status-dot.completed { background: var(--sage); }
+
+.list-card-body { flex: 1; min-width: 0; }
+.list-card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.list-card-client {
+  font-size: 11.5px;
+  color: var(--gold-dark);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.list-card-meta-dot { width: 3px; height: 3px; background: var(--text-muted); border-radius: 50%; }
+.list-card-meta-text { font-size: 12px; color: var(--text-muted); }
+.list-card-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 19px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+.list-card-next-action {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--text-soft);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.list-card-next-action .action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  background: var(--warn-soft);
+  color: var(--warn);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.list-card-next-action .action-pill.success {
+  background: var(--success-soft);
+  color: var(--success);
+}
+.list-card-next-action .action-pill.draft {
+  background: var(--cream-deep);
+  color: var(--text-soft);
+}
+
+/* FUNNEL VISUALIZATION */
+.list-funnel { min-width: 0; }
+.funnel-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.funnel-step {
+  text-align: center;
+}
+.funnel-step-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1;
+}
+.funnel-step-num.gold { color: var(--gold-dark); }
+.funnel-step-num.dim { color: var(--text-muted); }
+.funnel-step-label {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-weight: 500;
+}
+.funnel-bar {
+  height: 6px;
+  background: var(--cream-deep);
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+}
+.funnel-bar-seg {
+  height: 100%;
+  border-right: 1.5px solid var(--paper);
+}
+.funnel-bar-seg.sent { background: var(--sage); }
+.funnel-bar-seg.delivered { background: var(--forest-light); }
+.funnel-bar-seg.opened { background: var(--gold); }
+.funnel-bar-seg.clicked { background: var(--gold-dark); }
+.funnel-bar-seg.reviewed { background: var(--forest); }
+.funnel-bar-seg:last-child { border-right: none; }
+
+/* DRAFT special card style */
+.list-card.draft { background: var(--cream-deep); border-style: dashed; }
+.list-card.draft .list-funnel { opacity: 0.5; }
+
+/* EMPTY STATE for completed (less data shown) */
+.list-card.completed .funnel-step-num { color: var(--text-muted); }
+.list-card.completed .funnel-bar { opacity: 0.55; }
+
+@media (max-width: 1100px) {
+  .list-card { grid-template-columns: 1fr; gap: 20px; }
+  .stats-strip { flex-direction: column; gap: 18px; }
+  .stat-divider { display: none; }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  aside { display: none; }
+  main { padding: 20px 18px; }
+  .page-title { font-size: 32px; }
+  .filter-search { margin-left: 0; width: 100%; }
+  .filter-search-input { width: 100%; }
+  .funnel-row { grid-template-columns: repeat(3, 1fr) repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="brand"><span class="brand-mark">B</span> BAAM Review</div>
+    <div class="location-switcher">
+      <div class="location-icon">D</div>
+      <div class="location-text">
+        <div class="location-name">Dr. Huang Acupuncture</div>
+        <div class="location-sub">5 managed clients</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Workspace</div>
+    <ul class="nav-list">
+      <li><a href="03-admin-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3"/></svg> Dashboard</a></li>
+      <li><a href="04-admin-send-request.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg> Send request</a></li>
+      <li><a href="#" class="active"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg> Lists <span class="nav-badge">3</span></a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118L12 17.347l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L3.665 10.437c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z"/></svg> Reviews Reply &amp; Share</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg> Referral settings</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"/></svg> Widget &amp; QR poster</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Analytics</a></li>
+    </ul>
+
+    <div class="nav-label">Compound</div>
+    <ul class="nav-list">
+      <li><a href="09-admin-themes-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846"/></svg> Themes</a></li>
+      <li><a href="10-admin-ad-copy-generator.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14"/></svg> Ad Copy</a></li>
+      <li><a href="11-admin-testimonial-pages.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4"/></svg> Landing Pages</a></li>
+      <li><a href="12-admin-review-studio.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276"/></svg> Review Studio</a></li>
+    </ul>
+
+    <div class="user-card">
+      <div class="user-avatar">JT</div>
+      <div>
+        <div class="user-name">John Tang</div>
+        <div class="user-tier">Managed account</div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top-bar">
+      <div class="crumb">Workspace · Lists</div>
+      <a href="16-admin-list-intake.html" class="btn btn-primary">
+        <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+        New list
+      </a>
+    </div>
+
+    <div class="page-header">
+      <div class="page-eyebrow">For managed customers</div>
+      <h1 class="page-title">Lists.</h1>
+      <p class="page-sub">Customer batches your clients send you each week. Import once, send to all, track every step, resend only to the right people.</p>
+    </div>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip">
+      <div class="stat-mini">
+        <div class="stat-mini-num">3</div>
+        <div class="stat-mini-label">Active lists</div>
+        <div class="stat-mini-sub">across 2 clients</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-mini">
+        <div class="stat-mini-num gold">147</div>
+        <div class="stat-mini-label">Customers in flight</div>
+        <div class="stat-mini-sub">sent in last 14 days</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-mini">
+        <div class="stat-mini-num warn">23</div>
+        <div class="stat-mini-label">Eligible for resend</div>
+        <div class="stat-mini-sub">past 5-day threshold</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-mini">
+        <div class="stat-mini-num">38<span style="font-size: 16px; color: var(--text-muted);">%</span></div>
+        <div class="stat-mini-label">Completion rate</div>
+        <div class="stat-mini-sub">trailing 30 days</div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-row">
+      <span class="filter-label">Show</span>
+      <div class="filter-pills">
+        <button class="filter-pill active">All <span class="count">12</span></button>
+        <button class="filter-pill">Active <span class="count">3</span></button>
+        <button class="filter-pill">Awaiting resend <span class="count">2</span></button>
+        <button class="filter-pill">Drafts <span class="count">1</span></button>
+        <button class="filter-pill">Completed <span class="count">6</span></button>
+      </div>
+      <div class="filter-search">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input class="filter-search-input" placeholder="Search lists or clients">
+      </div>
+    </div>
+
+    <!-- LIST CARDS -->
+    <div class="lists-grid">
+
+      <!-- DRAFT - newest, not yet sent -->
+      <a href="17-admin-list-presend.html" class="list-card draft">
+        <div class="list-card-left">
+          <div class="list-status-dot draft"></div>
+          <div class="list-card-body">
+            <div class="list-card-meta">
+              <span class="list-card-client">Dr. Huang Acupuncture</span>
+              <span class="list-card-meta-dot"></span>
+              <span class="list-card-meta-text">Created 2 hours ago · 47 customers imported</span>
+            </div>
+            <div class="list-card-name">Week of May 12 · Patients</div>
+            <div class="list-card-next-action">
+              <span class="action-pill draft">DRAFT</span>
+              Review and send when ready
+            </div>
+          </div>
+        </div>
+        <div class="list-funnel">
+          <div class="funnel-row">
+            <div class="funnel-step"><div class="funnel-step-num dim">47</div><div class="funnel-step-label">Pending</div></div>
+            <div class="funnel-step"><div class="funnel-step-num dim">—</div><div class="funnel-step-label">Delivered</div></div>
+            <div class="funnel-step"><div class="funnel-step-num dim">—</div><div class="funnel-step-label">Opened</div></div>
+            <div class="funnel-step"><div class="funnel-step-num dim">—</div><div class="funnel-step-label">Clicked</div></div>
+            <div class="funnel-step"><div class="funnel-step-num dim">—</div><div class="funnel-step-label">Reviewed</div></div>
+          </div>
+          <div class="funnel-bar"></div>
+        </div>
+      </a>
+
+      <!-- ACTIVE - just sent, data still coming in -->
+      <a href="18-admin-list-detail.html" class="list-card">
+        <div class="list-card-left">
+          <div class="list-status-dot active"></div>
+          <div class="list-card-body">
+            <div class="list-card-meta">
+              <span class="list-card-client">Dr. Huang Acupuncture</span>
+              <span class="list-card-meta-dot"></span>
+              <span class="list-card-meta-text">Sent 2 days ago · 47 customers</span>
+            </div>
+            <div class="list-card-name">Week of May 5 · Patients</div>
+            <div class="list-card-next-action">
+              <span class="action-pill success">IN FLIGHT</span>
+              Reviews still coming in · check back in 3 days
+            </div>
+          </div>
+        </div>
+        <div class="list-funnel">
+          <div class="funnel-row">
+            <div class="funnel-step"><div class="funnel-step-num">47</div><div class="funnel-step-label">Sent</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">45</div><div class="funnel-step-label">Delivered</div></div>
+            <div class="funnel-step"><div class="funnel-step-num gold">28</div><div class="funnel-step-label">Opened</div></div>
+            <div class="funnel-step"><div class="funnel-step-num gold">18</div><div class="funnel-step-label">Clicked</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">9</div><div class="funnel-step-label">Reviewed</div></div>
+          </div>
+          <div class="funnel-bar">
+            <div class="funnel-bar-seg sent" style="width: 96%;"></div>
+            <div class="funnel-bar-seg delivered" style="width: 60%;"></div>
+            <div class="funnel-bar-seg opened" style="width: 38%;"></div>
+            <div class="funnel-bar-seg clicked" style="width: 19%;"></div>
+          </div>
+        </div>
+      </a>
+
+      <!-- AWAITING RESEND - past 5-day threshold, has non-clickers -->
+      <a href="18-admin-list-detail.html" class="list-card">
+        <div class="list-card-left">
+          <div class="list-status-dot pending"></div>
+          <div class="list-card-body">
+            <div class="list-card-meta">
+              <span class="list-card-client">Dr. Huang Acupuncture</span>
+              <span class="list-card-meta-dot"></span>
+              <span class="list-card-meta-text">Sent 8 days ago · 52 customers</span>
+            </div>
+            <div class="list-card-name">Week of April 28 · Patients</div>
+            <div class="list-card-next-action">
+              <span class="action-pill">RESEND READY</span>
+              15 customers eligible for second-touch email
+            </div>
+          </div>
+        </div>
+        <div class="list-funnel">
+          <div class="funnel-row">
+            <div class="funnel-step"><div class="funnel-step-num">52</div><div class="funnel-step-label">Sent</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">51</div><div class="funnel-step-label">Delivered</div></div>
+            <div class="funnel-step"><div class="funnel-step-num gold">36</div><div class="funnel-step-label">Opened</div></div>
+            <div class="funnel-step"><div class="funnel-step-num gold">24</div><div class="funnel-step-label">Clicked</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">19</div><div class="funnel-step-label">Reviewed</div></div>
+          </div>
+          <div class="funnel-bar">
+            <div class="funnel-bar-seg sent" style="width: 98%;"></div>
+            <div class="funnel-bar-seg delivered" style="width: 69%;"></div>
+            <div class="funnel-bar-seg opened" style="width: 46%;"></div>
+            <div class="funnel-bar-seg clicked" style="width: 37%;"></div>
+          </div>
+        </div>
+      </a>
+
+      <!-- AWAITING RESEND - different client -->
+      <a href="18-admin-list-detail.html" class="list-card">
+        <div class="list-card-left">
+          <div class="list-status-dot pending"></div>
+          <div class="list-card-body">
+            <div class="list-card-meta">
+              <span class="list-card-client">Acu-Flushing</span>
+              <span class="list-card-meta-dot"></span>
+              <span class="list-card-meta-text">Sent 6 days ago · 31 customers</span>
+            </div>
+            <div class="list-card-name">Week of April 28 · Patients</div>
+            <div class="list-card-next-action">
+              <span class="action-pill">RESEND READY</span>
+              8 customers eligible for second-touch email
+            </div>
+          </div>
+        </div>
+        <div class="list-funnel">
+          <div class="funnel-row">
+            <div class="funnel-step"><div class="funnel-step-num">31</div><div class="funnel-step-label">Sent</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">30</div><div class="funnel-step-label">Delivered</div></div>
+            <div class="funnel-step"><div class="funnel-step-num gold">22</div><div class="funnel-step-label">Opened</div></div>
+            <div class="funnel-step"><div class="funnel-step-num gold">14</div><div class="funnel-step-label">Clicked</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">11</div><div class="funnel-step-label">Reviewed</div></div>
+          </div>
+          <div class="funnel-bar">
+            <div class="funnel-bar-seg sent" style="width: 97%;"></div>
+            <div class="funnel-bar-seg delivered" style="width: 71%;"></div>
+            <div class="funnel-bar-seg opened" style="width: 45%;"></div>
+            <div class="funnel-bar-seg clicked" style="width: 35%;"></div>
+          </div>
+        </div>
+      </a>
+
+      <!-- COMPLETED - older, settled -->
+      <a href="18-admin-list-detail.html" class="list-card completed">
+        <div class="list-card-left">
+          <div class="list-status-dot completed"></div>
+          <div class="list-card-body">
+            <div class="list-card-meta">
+              <span class="list-card-client">Dr. Huang Acupuncture</span>
+              <span class="list-card-meta-dot"></span>
+              <span class="list-card-meta-text">Sent 22 days ago · 49 customers · 2 touches</span>
+            </div>
+            <div class="list-card-name">Week of April 14 · Patients</div>
+            <div class="list-card-next-action">
+              <span class="action-pill success">COMPLETED</span>
+              22 reviews collected · $38k estimated impact
+            </div>
+          </div>
+        </div>
+        <div class="list-funnel">
+          <div class="funnel-row">
+            <div class="funnel-step"><div class="funnel-step-num">49</div><div class="funnel-step-label">Sent</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">48</div><div class="funnel-step-label">Delivered</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">37</div><div class="funnel-step-label">Opened</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">28</div><div class="funnel-step-label">Clicked</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">22</div><div class="funnel-step-label">Reviewed</div></div>
+          </div>
+          <div class="funnel-bar">
+            <div class="funnel-bar-seg sent" style="width: 98%;"></div>
+            <div class="funnel-bar-seg delivered" style="width: 76%;"></div>
+            <div class="funnel-bar-seg opened" style="width: 57%;"></div>
+            <div class="funnel-bar-seg clicked" style="width: 45%;"></div>
+          </div>
+        </div>
+      </a>
+
+      <!-- COMPLETED - different client -->
+      <a href="18-admin-list-detail.html" class="list-card completed">
+        <div class="list-card-left">
+          <div class="list-status-dot completed"></div>
+          <div class="list-card-body">
+            <div class="list-card-meta">
+              <span class="list-card-client">Acu-Flushing</span>
+              <span class="list-card-meta-dot"></span>
+              <span class="list-card-meta-text">Sent 20 days ago · 28 customers · 2 touches</span>
+            </div>
+            <div class="list-card-name">Week of April 14 · Patients</div>
+            <div class="list-card-next-action">
+              <span class="action-pill success">COMPLETED</span>
+              13 reviews collected · $19k estimated impact
+            </div>
+          </div>
+        </div>
+        <div class="list-funnel">
+          <div class="funnel-row">
+            <div class="funnel-step"><div class="funnel-step-num">28</div><div class="funnel-step-label">Sent</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">27</div><div class="funnel-step-label">Delivered</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">21</div><div class="funnel-step-label">Opened</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">17</div><div class="funnel-step-label">Clicked</div></div>
+            <div class="funnel-step"><div class="funnel-step-num">13</div><div class="funnel-step-label">Reviewed</div></div>
+          </div>
+          <div class="funnel-bar">
+            <div class="funnel-bar-seg sent" style="width: 97%;"></div>
+            <div class="funnel-bar-seg delivered" style="width: 75%;"></div>
+            <div class="funnel-bar-seg opened" style="width: 61%;"></div>
+            <div class="funnel-bar-seg clicked" style="width: 46%;"></div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

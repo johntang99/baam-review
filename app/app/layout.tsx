@@ -33,6 +33,13 @@ export default async function AppLayout({
     ? selectedLocationId
     : null;
 
+  // Sidebar badge: active + pending (draft/sending/active) lists. RLS scopes
+  // this to the account automatically. head:true keeps it a count-only query.
+  const { count: listsBadge } = await supabase
+    .from("lists")
+    .select("id", { count: "exact", head: true })
+    .in("status", ["draft", "sending", "active"]);
+
   return (
     <div className="grid min-h-screen grid-cols-[270px_1fr] bg-cream">
       <Sidebar
@@ -40,6 +47,7 @@ export default async function AppLayout({
         email={user.email!}
         locations={locations ?? []}
         selectedLocationId={validSelectedId}
+        listsBadge={listsBadge ?? 0}
       />
       <div className="flex min-h-screen flex-col">{children}</div>
     </div>

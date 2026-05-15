@@ -12,6 +12,7 @@
   --color-paper: #FFFFFF;
   --color-gold: #C9A961;
   --color-gold-soft: #E8D9B5;
+  --color-gold-dark: #A88847;
 
   --color-text: #1A1F1C;
   --color-text-soft: #5A6660;
@@ -20,8 +21,11 @@
   --color-border-soft: #F0ECE1;
   --color-hover: #F5F1E8;
   --color-success: #2D7A5F;
+  --color-success-soft: #DCEEE3;
   --color-alert: #B5443A;
+  --color-alert-soft: #FCE8E5;
   --color-warn: #D4924A;
+  --color-warn-soft: #FBEAD3;
 
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;

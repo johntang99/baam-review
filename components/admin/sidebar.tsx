@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Send,
+  ClipboardCheck,
   Star,
   BarChart3,
   Settings,
@@ -21,18 +22,28 @@ interface SidebarProps {
   email: string;
   locations: LocationSwitcherLocation[];
   selectedLocationId: string | null;
+  /** Count of active+pending lists, shown as a badge on the Lists item. */
+  listsBadge?: number;
 }
 
-const workspaceItems = [
+interface WorkspaceItem {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badgeKey?: "lists";
+}
+
+const workspaceItems: WorkspaceItem[] = [
   { href: "/app", label: "Dashboard", icon: LayoutDashboard },
   { href: "/app/send", label: "Send review request", icon: Send },
+  { href: "/app/lists", label: "Lists", icon: ClipboardCheck, badgeKey: "lists" },
   { href: "/app/reviews", label: "Reviews Reply & Share", icon: Star },
   { href: "/app/referrals", label: "Referral settings", icon: Users },
   { href: "/app/share", label: "Widget & QR poster", icon: Share2 },
   { href: "/app/analytics", label: "Analytics & Review Revenue", icon: BarChart3 },
 ];
 
-const accountItems = [
+const accountItems: WorkspaceItem[] = [
   { href: "/app/settings", label: "Settings", icon: Settings },
   { href: "/app/billing", label: "Billing", icon: CreditCard },
 ];
@@ -42,6 +53,7 @@ export function Sidebar({
   email,
   locations,
   selectedLocationId,
+  listsBadge,
 }: SidebarProps) {
   return (
     <aside className="sticky top-0 flex h-screen w-[270px] flex-col bg-ink text-cream/90 px-4 py-6">
@@ -62,7 +74,11 @@ export function Sidebar({
       </div>
 
       <nav className="flex-1 space-y-5">
-        <NavSection label="Workspace" items={workspaceItems} />
+        <NavSection
+          label="Workspace"
+          items={workspaceItems}
+          listsBadge={listsBadge}
+        />
         <NavSection label="Account" items={accountItems} />
       </nav>
 
@@ -74,9 +90,11 @@ export function Sidebar({
 function NavSection({
   label,
   items,
+  listsBadge,
 }: {
   label: string;
-  items: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }[];
+  items: WorkspaceItem[];
+  listsBadge?: number;
 }) {
   return (
     <div>
@@ -92,6 +110,7 @@ function NavSection({
                 href={item.href}
                 label={item.label}
                 icon={<Icon className="h-4 w-4" />}
+                badge={item.badgeKey === "lists" ? listsBadge : undefined}
               />
             </li>
           );

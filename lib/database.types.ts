@@ -401,6 +401,174 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["google_reviews"]["Insert"]>;
         Relationships: [];
       };
+      opt_outs: {
+        Row: {
+          id: string;
+          location_id: string;
+          contact: string;
+          channel: "email" | "sms";
+          opted_out_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          contact: string;
+          channel: "email" | "sms";
+          opted_out_at?: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["opt_outs"]["Insert"]>;
+        Relationships: [];
+      };
+      lists: {
+        Row: {
+          id: string;
+          location_id: string;
+          name: string;
+          default_language: "en" | "zh" | "es";
+          status: "draft" | "sending" | "active" | "completed" | "archived";
+          customer_count: number;
+          sent_at: string | null;
+          completed_at: string | null;
+          max_touches: number;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          name: string;
+          default_language?: "en" | "zh" | "es";
+          status?: "draft" | "sending" | "active" | "completed" | "archived";
+          customer_count?: number;
+          sent_at?: string | null;
+          completed_at?: string | null;
+          max_touches?: number;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["lists"]["Insert"]>;
+        Relationships: [];
+      };
+      list_customers: {
+        Row: {
+          id: string;
+          list_id: string;
+          location_id: string;
+          name: string;
+          email: string | null;
+          phone: string | null;
+          language: "en" | "zh" | "es";
+          channel: "email" | "sms";
+          visit_date: string | null;
+          notes: string | null;
+          status:
+            | "pending"
+            | "sent"
+            | "delivered"
+            | "opened"
+            | "clicked"
+            | "reviewed"
+            | "bounced"
+            | "optout"
+            | "excluded";
+          touches: number;
+          selected: boolean;
+          excluded_reason:
+            | "duplicate_60d"
+            | "opted_out"
+            | "no_contact"
+            | "manual"
+            | null;
+          send_request_id: string | null;
+          review_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          list_id: string;
+          location_id: string;
+          name: string;
+          email?: string | null;
+          phone?: string | null;
+          language?: "en" | "zh" | "es";
+          channel?: "email" | "sms";
+          visit_date?: string | null;
+          notes?: string | null;
+          status?:
+            | "pending"
+            | "sent"
+            | "delivered"
+            | "opened"
+            | "clicked"
+            | "reviewed"
+            | "bounced"
+            | "optout"
+            | "excluded";
+          touches?: number;
+          selected?: boolean;
+          excluded_reason?:
+            | "duplicate_60d"
+            | "opted_out"
+            | "no_contact"
+            | "manual"
+            | null;
+          send_request_id?: string | null;
+          review_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["list_customers"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      list_events: {
+        Row: {
+          id: string;
+          list_customer_id: string;
+          list_id: string;
+          location_id: string;
+          event_type:
+            | "sent"
+            | "delivered"
+            | "opened"
+            | "clicked"
+            | "reviewed"
+            | "bounced"
+            | "optout"
+            | "resent";
+          metadata: Json;
+          occurred_at: string;
+        };
+        Insert: {
+          id?: string;
+          list_customer_id: string;
+          list_id: string;
+          location_id: string;
+          event_type:
+            | "sent"
+            | "delivered"
+            | "opened"
+            | "clicked"
+            | "reviewed"
+            | "bounced"
+            | "optout"
+            | "resent";
+          metadata?: Json;
+          occurred_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["list_events"]["Insert"]
+        >;
+        Relationships: [];
+      };
       referrals: {
         Row: {
           id: string;

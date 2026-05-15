@@ -1,0 +1,401 @@
+"use client";
+
+import { useMemo, useState, useTransition } from "react";
+import {
+  Mail,
+  MessageSquare,
+  X,
+  Check,
+  TriangleAlert,
+  Clock,
+  ChevronDown,
+} from "lucide-react";
+import { formatPhone } from "@/lib/lists/normalize";
+import { updateListCustomer, saveListAsDraft } from "../../actions";
+
+export interface PresendCustomer {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  language: string;
+  channel: "email" | "sms";
+  visitDate: string | null;
+  notes: string;
+  status: string;
+  selected: boolean;
+  excludedReason: string | null;
+}
+
+type Filter = "all" | "ready" | "excluded";
+
+const LANG_PILL: Record<string, { text: string; cls: string }> = {
+  en: { text: "EN", cls: "bg-success-soft text-success" },
+  zh: { text: "中文", cls: "bg-alert-soft text-alert" },
+  es: { text: "ES", cls: "bg-warn-soft text-warn" },
+};
+
+export function PresendTable({
+  listId,
+  initialRows,
+}: {
+  listId: string;
+  initialRows: PresendCustomer[];
+}) {
+  const [rows, setRows] = useState(initialRows);
+  const [filter, setFilter] = useState<Filter>("all");
+  const [, startTransition] = useTransition();
+  const [sendNotice, setSendNotice] = useState<string | null>(null);
+  const [savingDraft, setSavingDraft] = useState(false);
+
+  const counts = useMemo(
+    () => ({
+      all: rows.length,
+      ready: rows.filter((r) => !r.excludedReason && r.selected).length,
+      excluded: rows.filter((r) => r.excludedReason).length,
+    }),
+    [rows],
+  );
+
+  const visible = rows.filter((r) => {
+    if (filter === "ready") return !r.excludedReason && r.selected;
+    if (filter === "excluded") return !!r.excludedReason;
+    return true;
+  });
+
+  const selectedCount = rows.filter(
+    (r) => r.selected && !r.excludedReason,
+  ).length;
+  const emailCount = rows.filter(
+    (r) => r.selected && !r.excludedReason && r.channel === "email",
+  ).length;
+  const smsCount = rows.filter(
+    (r) => r.selected && !r.excludedReason && r.channel === "sms",
+  ).length;
+
+  function patch(
+    id: string,
+    p: Partial<Pick<PresendCustomer, "selected" | "channel" | "notes">>,
+  ) {
+    setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...p } : r)));
+    startTransition(async () => {
+      await updateListCustomer(id, p);
+    });
+  }
+
+  function bulkChannel(channel: "email" | "sms") {
+    const targets = rows.filter(
+      (r) =>
+        r.selected &&
+        !r.excludedReason &&
+        !(channel === "sms" && !r.phone),
+    );
+    setRows((rs) =>
+      rs.map((r) =>
+        targets.some((t) => t.id === r.id) ? { ...r, channel } : r,
+      ),
+    );
+    startTransition(async () => {
+      await Promise.all(
+        targets.map((t) => updateListCustomer(t.id, { channel })),
+      );
+    });
+  }
+
+  return (
+    <>
+      {/* TOOLBAR */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-4">
+          <span className="text-[13px] font-medium text-text">
+            {selectedCount} selected
+          </span>
+          <span className="h-4 w-px bg-border-base" />
+          <div className="flex gap-1">
+            {(
+              [
+                ["all", "All"],
+                ["ready", "Ready"],
+                ["excluded", "Excluded"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setFilter(id)}
+                className={`inline-flex items-center rounded-full border px-3 py-1.5 text-[12px] font-medium ${
+                  filter === id
+                    ? "bg-ink text-cream border-ink"
+                    : "bg-paper text-text-soft border-border-base hover:border-forest"
+                }`}
+              >
+                {label}
+                <span
+                  className={`ml-1.5 font-mono text-[10.5px] ${
+                    filter === id ? "text-cream/60" : "text-text-muted"
+                  }`}
+                >
+                  {counts[id]}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => bulkChannel("sms")}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3 py-2 text-[12.5px] font-medium text-text hover:bg-cream-deep"
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+            SMS all
+          </button>
+          <button
+            type="button"
+            onClick={() => bulkChannel("email")}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3 py-2 text-[12.5px] font-medium text-text hover:bg-cream-deep"
+          >
+            <Mail className="h-3.5 w-3.5" />
+            Email all
+          </button>
+        </div>
+      </div>
+
+      {/* TABLE */}
+      <div className="bg-paper border border-border-base rounded-xl overflow-hidden overflow-x-auto">
+        <table className="w-full border-collapse text-[13.5px]">
+          <thead>
+            <tr>
+              <th className="w-10 bg-cream-deep px-3 py-2.5 border-b border-border-base" />
+              <th className="bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
+                Customer
+              </th>
+              <th className="bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
+                Contact
+              </th>
+              <th className="bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
+                Channel
+              </th>
+              <th className="bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
+                Lang
+              </th>
+              <th className="bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
+                Notes for AI{" "}
+                <span className="font-normal normal-case tracking-normal text-text-muted">
+                  — editable
+                </span>
+              </th>
+              <th className="w-28 bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
+                Status
+              </th>
+              <th className="w-10 bg-cream-deep px-3 py-2.5 border-b border-border-base" />
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map((r) => {
+              const excluded = !!r.excludedReason;
+              const pill = LANG_PILL[r.language] ?? LANG_PILL.en;
+              return (
+                <tr
+                  key={r.id}
+                  className={`border-b border-border-soft last:border-b-0 ${
+                    excluded ? "bg-alert/[0.04]" : ""
+                  }`}
+                >
+                  <td className="px-3 py-3 align-top">
+                    <input
+                      type="checkbox"
+                      checked={r.selected && !excluded}
+                      disabled={excluded}
+                      onChange={(e) =>
+                        patch(r.id, { selected: e.target.checked })
+                      }
+                      className="h-4 w-4 accent-forest disabled:opacity-40"
+                    />
+                  </td>
+                  <td className="px-3.5 py-3 align-top">
+                    <div
+                      className={`font-medium ${
+                        excluded ? "text-alert" : "text-ink"
+                      }`}
+                    >
+                      {r.name}
+                    </div>
+                    {r.visitDate && (
+                      <div className="text-[11.5px] text-text-muted mt-0.5">
+                        visit {r.visitDate}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-3.5 py-3 align-top">
+                    <div className="space-y-0.5 font-mono text-[12px] text-text-soft">
+                      <div
+                        className={`flex items-center gap-1.5 ${
+                          !r.email ? "text-text-muted/50" : ""
+                        }`}
+                      >
+                        <Mail className="h-3 w-3" />
+                        {r.email ?? "—"}
+                      </div>
+                      <div
+                        className={`flex items-center gap-1.5 ${
+                          !r.phone ? "text-text-muted/50" : ""
+                        }`}
+                      >
+                        <MessageSquare className="h-3 w-3" />
+                        {r.phone ? formatPhone(r.phone) : "—"}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-3.5 py-3 align-top">
+                    <div className="inline-flex rounded-md border border-border-base bg-cream p-0.5">
+                      <button
+                        type="button"
+                        disabled={excluded || !r.phone}
+                        onClick={() => patch(r.id, { channel: "sms" })}
+                        className={`inline-flex items-center gap-1 rounded px-2 py-1 text-[11.5px] font-medium disabled:opacity-40 ${
+                          r.channel === "sms"
+                            ? "bg-forest text-cream"
+                            : "text-text-soft"
+                        }`}
+                      >
+                        <MessageSquare className="h-3 w-3" />
+                        SMS
+                      </button>
+                      <button
+                        type="button"
+                        disabled={excluded || !r.email}
+                        onClick={() => patch(r.id, { channel: "email" })}
+                        className={`inline-flex items-center gap-1 rounded px-2 py-1 text-[11.5px] font-medium disabled:opacity-40 ${
+                          r.channel === "email"
+                            ? "bg-forest text-cream"
+                            : "text-text-soft"
+                        }`}
+                      >
+                        <Mail className="h-3 w-3" />
+                        Email
+                      </button>
+                    </div>
+                  </td>
+                  <td className="px-3.5 py-3 align-top">
+                    <span
+                      className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${pill.cls}`}
+                    >
+                      {pill.text}
+                    </span>
+                  </td>
+                  <td className="px-3.5 py-3 align-top">
+                    <textarea
+                      defaultValue={r.notes}
+                      rows={1}
+                      disabled={excluded}
+                      onBlur={(e) => {
+                        if (e.target.value !== r.notes)
+                          patch(r.id, { notes: e.target.value });
+                      }}
+                      className="w-full min-w-[160px] rounded-md border border-border-base bg-cream px-2.5 py-1.5 text-[12px] text-text resize-y focus:border-forest focus:bg-paper focus:outline-none disabled:opacity-50"
+                    />
+                  </td>
+                  <td className="px-3.5 py-3 align-top">
+                    {excluded ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-alert-soft px-2 py-0.5 text-[11px] font-medium text-alert">
+                        <X className="h-3 w-3" />
+                        {r.excludedReason === "duplicate_60d"
+                          ? "Sent <60d"
+                          : r.excludedReason === "no_contact"
+                            ? "No contact"
+                            : r.excludedReason === "opted_out"
+                              ? "Opted out"
+                              : "Excluded"}
+                      </span>
+                    ) : !r.phone ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-warn-soft px-2 py-0.5 text-[11px] font-medium text-warn">
+                        <TriangleAlert className="h-3 w-3" />
+                        Email only
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-2 py-0.5 text-[11px] font-medium text-success">
+                        <Check className="h-3 w-3" />
+                        Ready
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-3 py-3 align-top">
+                    {!excluded && (
+                      <button
+                        type="button"
+                        onClick={() => patch(r.id, { selected: false })}
+                        className="flex h-7 w-7 items-center justify-center rounded-md text-text-muted hover:bg-cream-deep hover:text-alert"
+                        aria-label="Remove from send"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* STICKY SEND BAR */}
+      <div className="fixed bottom-0 left-[270px] right-0 z-40 flex flex-wrap items-center justify-between gap-4 border-t border-border-base bg-paper/95 px-10 py-4 backdrop-blur">
+        <div className="flex items-center gap-6">
+          <div>
+            <div className="font-display text-[22px] font-medium text-forest leading-none">
+              {selectedCount}
+            </div>
+            <div className="text-[11px] uppercase tracking-[0.08em] text-text-muted font-medium mt-1">
+              Ready to send
+            </div>
+          </div>
+          <span className="h-8 w-px bg-border-base" />
+          <div>
+            <div className="text-[15px] text-text-soft font-medium">
+              {emailCount} email · {smsCount} SMS
+            </div>
+            <div className="text-[11px] uppercase tracking-[0.08em] text-text-muted font-medium mt-1">
+              Channel mix
+            </div>
+          </div>
+          <span className="h-8 w-px bg-border-base" />
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-cream px-3 py-2 text-[12.5px] text-text">
+            <Clock className="h-3.5 w-3.5 text-text-soft" />
+            Send <strong className="font-semibold">now</strong>
+            <ChevronDown className="h-3 w-3 text-text-muted" />
+          </span>
+        </div>
+        <div className="flex items-center gap-2.5">
+          {sendNotice && (
+            <span className="text-[12.5px] text-warn font-medium mr-2">
+              {sendNotice}
+            </span>
+          )}
+          <button
+            type="button"
+            disabled={savingDraft}
+            onClick={() => {
+              setSavingDraft(true);
+              startTransition(async () => {
+                await saveListAsDraft(listId);
+              });
+            }}
+            className="rounded-lg border border-border-base bg-paper px-4 py-2.5 text-[13.5px] font-medium text-text hover:bg-cream-deep disabled:opacity-50"
+          >
+            {savingDraft ? "Saving…" : "Save as draft"}
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              setSendNotice("Send not yet implemented — coming in Session 14.")
+            }
+            className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-5 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark"
+          >
+            Send to {selectedCount} customer{selectedCount === 1 ? "" : "s"}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}

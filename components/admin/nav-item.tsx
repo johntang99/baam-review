@@ -14,9 +14,11 @@ interface NavItemProps {
    * the React element they produce is.
    */
   icon: React.ReactNode;
+  /** Optional trailing count chip (e.g. active+pending Lists). Hidden when 0. */
+  badge?: number;
 }
 
-export function NavItem({ href, label, icon }: NavItemProps) {
+export function NavItem({ href, label, icon, badge }: NavItemProps) {
   const pathname = usePathname();
 
   // Exact match for /app (dashboard) to avoid matching every /app/* path.
@@ -38,7 +40,12 @@ export function NavItem({ href, label, icon }: NavItemProps) {
       )}
     >
       {icon}
-      {label}
+      <span className="flex-1">{label}</span>
+      {badge !== undefined && badge > 0 && (
+        <span className="min-w-[18px] rounded-full bg-gold px-1.5 py-px text-center text-[10px] font-semibold tabular-nums text-ink">
+          {badge}
+        </span>
+      )}
     </Link>
   );
 }

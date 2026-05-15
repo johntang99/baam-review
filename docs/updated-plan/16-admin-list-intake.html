@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New list — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --sage: #87A899;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #A88847;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --success: #2D7A5F;
+  --success-soft: #DCEEE3;
+  --warn: #D4924A;
+  --warn-soft: #FBEAD3;
+  --alert: #B5443A;
+  --alert-soft: #FCE8E5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Onest', 'Noto Sans SC', system-ui, sans-serif; color: var(--text); background: var(--cream); font-size: 14.5px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+/* SIDEBAR (shared - condensed) */
+aside { background: var(--ink); color: var(--cream); padding: 24px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 24px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; }
+.brand-mark { width: 28px; height: 28px; background: var(--gold); color: var(--ink); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+.location-switcher { background: rgba(250, 247, 242, 0.06); border: 1px solid rgba(250, 247, 242, 0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+.location-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #C0392B, #962D22); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; flex-shrink: 0; color: white; }
+.location-name { font-size: 13.5px; font-weight: 500; color: var(--cream); }
+.location-sub { font-size: 11.5px; color: rgba(250, 247, 242, 0.55); }
+.nav-label { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250, 247, 242, 0.4); padding: 0 8px 8px; margin-top: 8px; font-weight: 500; }
+.nav-list { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.nav-list a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; color: rgba(250, 247, 242, 0.7); transition: all 0.15s; }
+.nav-list a:hover { background: rgba(250, 247, 242, 0.06); color: var(--cream); }
+.nav-list a.active { background: rgba(201, 169, 97, 0.12); color: var(--gold); }
+.nav-list a svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; font-size: 10px; padding: 1px 6px; border-radius: 999px; font-weight: 600; font-family: 'JetBrains Mono', monospace; background: var(--gold); color: var(--ink); }
+.user-card { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; }
+.user-avatar { width: 32px; height: 32px; background: var(--sage); color: var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+.user-tier { font-size: 11px; color: rgba(250, 247, 242, 0.5); }
+
+/* MAIN */
+main { padding: 32px 40px 60px; max-width: 1100px; }
+
+.top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+.crumb-link { font-size: 12px; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+.crumb-link:hover { color: var(--ink); }
+.crumb-link svg { width: 12px; height: 12px; }
+.crumb-link .cur { color: var(--ink); }
+
+.page-header { margin-bottom: 32px; }
+.page-eyebrow { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+.page-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 42px; letter-spacing: -0.025em; color: var(--ink); line-height: 1.05; margin-bottom: 10px; }
+.page-title em { font-style: italic; color: var(--forest); }
+.page-sub { font-family: 'Newsreader', serif; font-style: italic; font-size: 17px; color: var(--text-soft); max-width: 600px; line-height: 1.5; }
+
+/* LIST METADATA */
+.meta-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 26px 30px;
+  margin-bottom: 24px;
+}
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.field-label { display: block; font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 8px; letter-spacing: 0.02em; }
+.field-input, .field-select {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+}
+.field-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'><path d='M1 1l4 4 4-4' stroke='%235A6660' stroke-width='1.5' stroke-linecap='round'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px; }
+.field-input:focus, .field-select:focus { outline: none; border-color: var(--forest); background: var(--paper); }
+
+/* INTAKE TABS */
+.intake-card { background: var(--paper); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.intake-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--cream-deep); }
+.intake-tab {
+  flex: 1;
+  padding: 18px 22px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.intake-tab:hover { color: var(--text); }
+.intake-tab.active { color: var(--ink); border-bottom-color: var(--forest); background: var(--paper); }
+.intake-tab-icon { width: 32px; height: 32px; background: var(--cream); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-soft); flex-shrink: 0; }
+.intake-tab.active .intake-tab-icon { background: var(--forest); color: var(--cream); border-color: var(--forest); }
+.intake-tab-icon svg { width: 16px; height: 16px; }
+.intake-tab-text-h { font-weight: 600; line-height: 1.2; }
+.intake-tab-text-sub { font-size: 11.5px; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
+
+.intake-body { padding: 32px 36px; }
+.intake-body-h {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.intake-body-sub {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--text-soft);
+  margin-bottom: 24px;
+}
+
+/* PASTE INPUT */
+.paste-textarea {
+  width: 100%;
+  min-height: 220px;
+  padding: 16px 18px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+  resize: vertical;
+  white-space: pre;
+  overflow-x: auto;
+}
+.paste-textarea:focus { outline: none; border-color: var(--forest); background: var(--paper); }
+
+.paste-help {
+  display: flex;
+  gap: 14px;
+  margin-top: 14px;
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+.paste-help-item { display: inline-flex; align-items: center; gap: 6px; }
+.paste-help-item svg { width: 13px; height: 13px; color: var(--success); }
+
+/* PREVIEW SECTION */
+.preview-section {
+  margin-top: 30px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border-soft);
+}
+.preview-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+.preview-h-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.preview-h-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.preview-h-meta strong { color: var(--ink); font-weight: 500; }
+
+/* COLUMN MAPPING */
+.col-mapping {
+  background: var(--cream);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+.col-map-item-label { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+.col-map-item-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink); padding: 5px 10px; background: var(--paper); border: 1px solid var(--border); border-radius: 6px; display: inline-block; }
+.col-map-item-status { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 11px; color: var(--success); font-weight: 500; }
+.col-map-item-status svg { width: 11px; height: 11px; }
+
+/* PREVIEW TABLE */
+.preview-table-wrap { background: var(--paper); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.preview-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.preview-table thead th { background: var(--cream-deep); padding: 11px 14px; text-align: left; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+.preview-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+.preview-table tbody tr:last-child td { border-bottom: none; }
+.preview-table .name-cell { font-weight: 500; color: var(--ink); }
+.preview-table .contact-cell { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-soft); }
+.preview-table .lang-cell { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; display: inline-block; }
+.lang-en { background: #E5EDDF; color: var(--forest); }
+.lang-zh { background: #F8E5E1; color: #8B3A2A; }
+.lang-es { background: #FBEAD3; color: #A06820; }
+.preview-table .notes-cell { font-size: 12px; color: var(--text-soft); max-width: 180px; }
+
+.preview-table .row-warning td { background: rgba(212, 146, 74, 0.04); }
+.preview-table .row-warning .name-cell { color: var(--warn); }
+.preview-table .row-error td { background: rgba(181, 68, 58, 0.04); }
+.preview-table .row-error .name-cell { color: var(--alert); }
+
+.warning-icon { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; }
+.warning-icon.warn { color: var(--warn); }
+.warning-icon.alert { color: var(--alert); }
+.warning-icon svg { width: 12px; height: 12px; }
+
+/* VALIDATION SUMMARY */
+.validation-strip {
+  margin-top: 18px;
+  padding: 14px 18px;
+  background: var(--warn-soft);
+  border-radius: 10px;
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  align-items: center;
+}
+.validation-strip svg { width: 16px; height: 16px; color: var(--warn); flex-shrink: 0; }
+.validation-strip strong { color: var(--ink); font-weight: 600; }
+
+/* FOOTER ACTIONS */
+.action-bar {
+  margin-top: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.action-bar-left { font-size: 13px; color: var(--text-soft); }
+.action-bar-left strong { color: var(--ink); font-weight: 600; }
+.action-bar-right { display: flex; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; font-family: 'Onest', sans-serif; font-size: 13.5px; font-weight: 500; border-radius: 9px; border: 1px solid var(--border); background: var(--paper); color: var(--text); cursor: pointer; text-decoration: none; }
+.btn:hover { background: var(--cream-deep); }
+.btn-primary { background: var(--forest); color: var(--cream); border-color: var(--forest); }
+.btn-primary:hover { background: var(--forest-dark); color: var(--cream); }
+.btn svg { width: 14px; height: 14px; }
+
+@media (max-width: 900px) {
+  .meta-grid { grid-template-columns: 1fr; }
+  .intake-tabs { flex-direction: column; }
+  .intake-tab { border-bottom: 1px solid var(--border); border-right: none; }
+  .intake-tab.active { border-bottom-color: var(--forest); }
+  .col-mapping { grid-template-columns: 1fr 1fr; }
+  .preview-table { font-size: 12px; }
+  .preview-table tbody td { padding: 10px; }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  aside { display: none; }
+  main { padding: 20px 18px; }
+  .page-title { font-size: 30px; }
+  .intake-body { padding: 22px 20px; }
+  .action-bar { flex-direction: column; gap: 16px; align-items: stretch; }
+  .action-bar-right { flex-direction: column; }
+  .preview-table-wrap { overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside>
+    <div class="brand"><span class="brand-mark">B</span> BAAM Review</div>
+    <div class="location-switcher">
+      <div class="location-icon">D</div>
+      <div>
+        <div class="location-name">Dr. Huang Acupuncture</div>
+        <div class="location-sub">5 managed clients</div>
+      </div>
+    </div>
+    <div class="nav-label">Workspace</div>
+    <ul class="nav-list">
+      <li><a href="03-admin-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12l2-2"/></svg> Dashboard</a></li>
+      <li><a href="04-admin-send-request.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 5l7 7"/></svg> Send request</a></li>
+      <li><a href="15-admin-lists.html" class="active"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg> Lists <span class="nav-badge">3</span></a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674"/></svg> Reviews Reply</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 20h5"/></svg> Referrals</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1"/></svg> Widget &amp; QR</a></li>
+      <li><a href="#"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 19v-6"/></svg> Analytics</a></li>
+    </ul>
+    <div class="nav-label">Compound</div>
+    <ul class="nav-list">
+      <li><a href="09-admin-themes-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75"/></svg> Themes</a></li>
+      <li><a href="10-admin-ad-copy-generator.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2"/></svg> Ad Copy</a></li>
+      <li><a href="11-admin-testimonial-pages.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 17v-2"/></svg> Landing Pages</a></li>
+      <li><a href="12-admin-review-studio.html"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M15 10"/></svg> Review Studio</a></li>
+    </ul>
+    <div class="user-card">
+      <div class="user-avatar">JT</div>
+      <div>
+        <div class="user-name">John Tang</div>
+        <div class="user-tier">Managed account</div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top-bar">
+      <a href="15-admin-lists.html" class="crumb-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+        Lists / <span class="cur">New list</span>
+      </a>
+    </div>
+
+    <div class="page-header">
+      <div class="page-eyebrow">Step 1 of 2 · Import customers</div>
+      <h1 class="page-title">Create a new <em>list.</em></h1>
+      <p class="page-sub">Import your client's customer list, review it, then send all in one batch. Three ways to import — pick whichever matches how you got the data.</p>
+    </div>
+
+    <!-- LIST METADATA -->
+    <div class="meta-card">
+      <div class="meta-grid">
+        <div>
+          <label class="field-label">List name</label>
+          <input class="field-input" value="Week of May 12 · Patients">
+        </div>
+        <div>
+          <label class="field-label">Source client (location)</label>
+          <select class="field-select">
+            <option>Dr. Huang Acupuncture · Flushing</option>
+            <option>Acu-Flushing</option>
+            <option>Acu-Shi</option>
+            <option>Wei Zhang Immigration Law</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Default language <span style="color: var(--text-muted); font-weight: 400; margin-left: 4px;">if not specified</span></label>
+          <select class="field-select">
+            <option>中文 (Chinese)</option>
+            <option>English</option>
+            <option>Español</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTAKE METHOD TABS -->
+    <div class="intake-card">
+      <div class="intake-tabs">
+        <button class="intake-tab">
+          <div class="intake-tab-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          </div>
+          <div>
+            <div class="intake-tab-text-h">CSV upload</div>
+            <div class="intake-tab-text-sub">From practice software</div>
+          </div>
+        </button>
+        <button class="intake-tab active">
+          <div class="intake-tab-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-2M8 5a2 2 0 002 2h4a2 2 0 002-2M8 5a2 2 0 012-2h4a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+          </div>
+          <div>
+            <div class="intake-tab-text-h">Paste from spreadsheet</div>
+            <div class="intake-tab-text-sub">Most common path</div>
+          </div>
+        </button>
+        <button class="intake-tab">
+          <div class="intake-tab-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          </div>
+          <div>
+            <div class="intake-tab-text-h">Manual entry</div>
+            <div class="intake-tab-text-sub">Short lists, fast adds</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- INTAKE BODY (Paste from spreadsheet shown active) -->
+      <div class="intake-body">
+        <div class="intake-body-h">Paste from a spreadsheet</div>
+        <div class="intake-body-sub">Copy rows from Google Sheets or Excel and paste below. Columns can be in any order — we'll auto-detect them.</div>
+
+        <textarea class="paste-textarea" spellcheck="false">Name	Email	Phone	Language	Visit date	Notes
+Marcus Davis	marcus.d@gmail.com	(917) 555-0234	English	2026-05-05	chronic migraines, 3rd visit
+Sarah Liu	sarah.liu@outlook.com	(929) 555-1102	中文	2026-05-06	long-time patient, back pain
+Elena Ramírez	elena.r@yahoo.com	(347) 555-8821	Español	2026-05-06	first visit, stress
+Wei Zhang	wzhang2025@gmail.com		中文	2026-05-07	fertility consultation
+Priya Sharma	priya.s@outlook.com	(212) 555-3344	English	2026-05-07	migraine follow-up
+James Kim	jkim.nyc@gmail.com	(917) 555-7782	English	2026-05-08	insomnia, 5th visit
+Mei Hong	meihong88@163.com	(646) 555-9912	中文	2026-05-08	stress, weekly patient
+David Park	dpark.brooklyn@gmail.com		English	2026-05-09	allergies, first time
+Lin Chen	linchen.flushing@gmail.com	(929) 555-4501	中文	2026-05-09	worth-the-trip from Manhattan
+Maria Cruz	maria.cruz@yahoo.com	(347) 555-1199	Español	2026-05-10	digestion, 2nd visit
+Hong Wei	hwei.tcm@gmail.com	(929) 555-6677	中文	2026-05-10	wrist pain
+Tom Garcia	tomg.nyc@outlook.com	(347) 555-3389	English	2026-05-10	allergies
+</textarea>
+
+        <div class="paste-help">
+          <div class="paste-help-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Header row auto-detected
+          </div>
+          <div class="paste-help-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            12 rows parsed
+          </div>
+          <div class="paste-help-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Tab-separated detected
+          </div>
+        </div>
+
+        <!-- PREVIEW SECTION -->
+        <div class="preview-section">
+          <div class="preview-h">
+            <div class="preview-h-title">Preview</div>
+            <div class="preview-h-meta"><strong>12</strong> rows · <strong>10</strong> ready · <strong>2</strong> need attention</div>
+          </div>
+
+          <!-- COLUMN MAPPING -->
+          <div class="col-mapping">
+            <div>
+              <div class="col-map-item-label">Name</div>
+              <div class="col-map-item-val">Name</div>
+              <div class="col-map-item-status">
+                <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Mapped
+              </div>
+            </div>
+            <div>
+              <div class="col-map-item-label">Email</div>
+              <div class="col-map-item-val">Email</div>
+              <div class="col-map-item-status">
+                <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Mapped
+              </div>
+            </div>
+            <div>
+              <div class="col-map-item-label">Phone</div>
+              <div class="col-map-item-val">Phone</div>
+              <div class="col-map-item-status">
+                <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Mapped
+              </div>
+            </div>
+            <div>
+              <div class="col-map-item-label">Language</div>
+              <div class="col-map-item-val">Language</div>
+              <div class="col-map-item-status">
+                <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Mapped
+              </div>
+            </div>
+            <div>
+              <div class="col-map-item-label">Notes (optional)</div>
+              <div class="col-map-item-val">Notes</div>
+              <div class="col-map-item-status">
+                <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Mapped
+              </div>
+            </div>
+          </div>
+
+          <!-- PREVIEW TABLE -->
+          <div class="preview-table-wrap">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th style="width: 22%;">Name</th>
+                  <th style="width: 26%;">Contact</th>
+                  <th style="width: 10%;">Lang</th>
+                  <th>Notes</th>
+                  <th style="width: 110px;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="name-cell">Marcus Davis</td>
+                  <td class="contact-cell">marcus.d@gmail.com</td>
+                  <td><span class="lang-cell lang-en">EN</span></td>
+                  <td class="notes-cell">chronic migraines, 3rd visit</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+                <tr>
+                  <td class="name-cell">Sarah Liu</td>
+                  <td class="contact-cell">sarah.liu@outlook.com</td>
+                  <td><span class="lang-cell lang-zh">中文</span></td>
+                  <td class="notes-cell">long-time patient, back pain</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+                <tr>
+                  <td class="name-cell">Elena Ramírez</td>
+                  <td class="contact-cell">elena.r@yahoo.com</td>
+                  <td><span class="lang-cell lang-es">ES</span></td>
+                  <td class="notes-cell">first visit, stress</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+                <tr class="row-warning">
+                  <td class="name-cell">Wei Zhang</td>
+                  <td class="contact-cell">wzhang2025@gmail.com</td>
+                  <td><span class="lang-cell lang-zh">中文</span></td>
+                  <td class="notes-cell">fertility consultation</td>
+                  <td>
+                    <span class="warning-icon warn">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01M5.07 19h13.86A2 2 0 0020.66 16L13.73 4a2 2 0 00-3.46 0L3.34 16A2 2 0 005.07 19z"/></svg>
+                      No phone
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="name-cell">Priya Sharma</td>
+                  <td class="contact-cell">priya.s@outlook.com</td>
+                  <td><span class="lang-cell lang-en">EN</span></td>
+                  <td class="notes-cell">migraine follow-up</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+                <tr>
+                  <td class="name-cell">James Kim</td>
+                  <td class="contact-cell">jkim.nyc@gmail.com</td>
+                  <td><span class="lang-cell lang-en">EN</span></td>
+                  <td class="notes-cell">insomnia, 5th visit</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+                <tr class="row-error">
+                  <td class="name-cell">Mei Hong</td>
+                  <td class="contact-cell">meihong88@163.com</td>
+                  <td><span class="lang-cell lang-zh">中文</span></td>
+                  <td class="notes-cell">stress, weekly patient</td>
+                  <td>
+                    <span class="warning-icon alert">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6m0-6l-6 6"/></svg>
+                      Sent &lt;60d ago
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="name-cell">David Park</td>
+                  <td class="contact-cell">dpark.brooklyn@gmail.com</td>
+                  <td><span class="lang-cell lang-en">EN</span></td>
+                  <td class="notes-cell">allergies, first time</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+                <tr>
+                  <td class="name-cell">Lin Chen</td>
+                  <td class="contact-cell">linchen.flushing@gmail.com</td>
+                  <td><span class="lang-cell lang-zh">中文</span></td>
+                  <td class="notes-cell">worth-the-trip, Manhattan</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+                <tr>
+                  <td class="name-cell">Maria Cruz</td>
+                  <td class="contact-cell">maria.cruz@yahoo.com</td>
+                  <td><span class="lang-cell lang-es">ES</span></td>
+                  <td class="notes-cell">digestion, 2nd visit</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+                <tr>
+                  <td class="name-cell">Hong Wei</td>
+                  <td class="contact-cell">hwei.tcm@gmail.com</td>
+                  <td><span class="lang-cell lang-zh">中文</span></td>
+                  <td class="notes-cell">wrist pain</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+                <tr>
+                  <td class="name-cell">Tom Garcia</td>
+                  <td class="contact-cell">tomg.nyc@outlook.com</td>
+                  <td><span class="lang-cell lang-en">EN</span></td>
+                  <td class="notes-cell">allergies</td>
+                  <td><span style="font-size: 11px; color: var(--success);">Ready</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- VALIDATION SUMMARY -->
+          <div class="validation-strip">
+            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01M5.07 19h13.86A2 2 0 0020.66 16L13.73 4a2 2 0 00-3.46 0L3.34 16A2 2 0 005.07 19z"/></svg>
+            <div>
+              <strong>2 customers need attention.</strong> Wei Zhang has no phone (email-only OK). Mei Hong was already sent a request 14 days ago — Google policy recommends 60-day spacing, so she'll be excluded automatically.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTION BAR -->
+    <div class="action-bar">
+      <div class="action-bar-left">
+        <strong>11</strong> of <strong>12</strong> customers ready to send · <strong>1</strong> auto-excluded
+      </div>
+      <div class="action-bar-right">
+        <button class="btn">Save as draft</button>
+        <a href="17-admin-list-presend.html" class="btn btn-primary">
+          Continue to review
+          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
