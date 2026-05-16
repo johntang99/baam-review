@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   Mail,
   MessageSquare,
@@ -11,7 +12,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { formatPhone } from "@/lib/lists/normalize";
-import { updateListCustomer, saveListAsDraft } from "../../actions";
+import { updateListCustomer, saveListAsDraft, sendList } from "../../actions";
 
 export interface PresendCustomer {
   id: string;
@@ -42,11 +43,13 @@ export function PresendTable({
   listId: string;
   initialRows: PresendCustomer[];
 }) {
+  const router = useRouter();
   const [rows, setRows] = useState(initialRows);
   const [filter, setFilter] = useState<Filter>("all");
   const [, startTransition] = useTransition();
   const [sendNotice, setSendNotice] = useState<string | null>(null);
   const [savingDraft, setSavingDraft] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const counts = useMemo(
     () => ({
@@ -387,12 +390,35 @@ export function PresendTable({
           </button>
           <button
             type="button"
-            onClick={() =>
-              setSendNotice("Send not yet implemented — coming in Session 14.")
-            }
-            className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-5 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark"
+            disabled={sending || selectedCount === 0}
+            onClick={() => {
+              setSendNotice(null);
+              setSending(true);
+              startTransition(async () => {
+                const res = await sendList(listId);
+                if (res.ok) {
+                  const msg =
+                    res.failed > 0
+                      ? `Sent to ${res.sent} · ${res.failed} failed`
+                      : `Sent to ${res.sent} customer${res.sent === 1 ? "" : "s"}`;
+                  router.push(
+                    `/app/lists/${listId}?flash=${encodeURIComponent(msg)}`,
+                  );
+                } else {
+                  setSending(false);
+                  setSendNotice(
+                    res.error ??
+                      (res.errors && res.errors[0]) ??
+                      "Send failed.",
+                  );
+                }
+              });
+            }}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-5 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark disabled:opacity-50"
           >
-            Send to {selectedCount} customer{selectedCount === 1 ? "" : "s"}
+            {sending
+              ? "Sending…"
+              : `Send to ${selectedCount} customer${selectedCount === 1 ? "" : "s"}`}
           </button>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase/service";
+import { recordListLifecycle } from "@/lib/lists/track";
 import { isLanguage, type Language } from "@/lib/i18n/review";
 import type { Database } from "@/lib/database.types";
 
@@ -72,6 +73,10 @@ export async function submitPrivateFeedback(formData: FormData) {
       })
       .eq("id", request_id)
       .is("completed_at", null);
+
+    // PG2: a private-feedback leaver has acted on the ask — mark the linked
+    // list_customer reviewed so it drops out of resend eligibility.
+    await recordListLifecycle(supabase, request_id, "reviewed");
   }
 
   redirect(`/r/${slug}/thank-you?via=private&lang=${language}`);

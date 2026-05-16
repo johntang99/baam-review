@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { recordListLifecycle } from "@/lib/lists/track";
 import type { Database } from "@/lib/database.types";
 
 type EventType = Database["public"]["Tables"]["landing_events"]["Insert"]["event_type"];
@@ -81,6 +82,11 @@ export async function POST(request: NextRequest) {
         .update(update)
         .eq("id", body.request_id)
         .is("completed_at", null);
+
+      // PG2: mirror completion onto the linked list_customer (if this
+      // request came from a batch list). Any completion platform counts as
+      // "reviewed" for the list funnel — it stops resend eligibility.
+      await recordListLifecycle(supabase, body.request_id, "reviewed");
 
       // Attribute the conversion back to the reviewer who referred this
       // customer (Phase B4). The /s/<advocate> page → /r/<slug>?ref=<advocate>

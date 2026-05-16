@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { recordListLifecycle } from "@/lib/lists/track";
 import type { Database } from "@/lib/database.types";
 
 type RRUpdate = Database["public"]["Tables"]["review_requests"]["Update"];
@@ -29,20 +30,43 @@ export async function POST(request: NextRequest) {
   const supabase = createServiceClient();
 
   const updates: RRUpdate = {};
+  // SMS has no 'opened'/'clicked' tracking (plan §5). Delivery is the only
+  // lifecycle signal Twilio's status callback gives us. Undelivered/failed
+  // are treated as a bounce equivalent for the list (suppress + mark).
+  let lifecycle: "delivered" | "bounced" | null = null;
   if (status === "delivered") {
     updates.delivered_at = new Date().toISOString();
+    lifecycle = "delivered";
+  } else if (status === "undelivered" || status === "failed") {
+    updates.delivered_at = null;
+    lifecycle = "bounced";
   }
-  if (Object.keys(updates).length === 0) {
+
+  if (Object.keys(updates).length === 0 && !lifecycle) {
     return NextResponse.json({ ok: true, sid: messageSid, status });
   }
 
-  await supabase
+  const { data: rr } = await supabase
     .from("review_requests")
-    .update(updates)
+    .select("id")
     .eq("recipient_phone", to)
-    .is("delivered_at", null)
     .order("created_at", { ascending: false })
-    .limit(1);
+    .limit(1)
+    .maybeSingle();
 
-  return NextResponse.json({ ok: true });
+  if (rr) {
+    if (Object.keys(updates).length > 0) {
+      await supabase
+        .from("review_requests")
+        .update(updates)
+        .eq("id", rr.id);
+    }
+    if (lifecycle) {
+      await recordListLifecycle(supabase, rr.id, lifecycle, {
+        channel: "sms",
+      });
+    }
+  }
+
+  return NextResponse.json({ ok: true, sid: messageSid, status });
 }

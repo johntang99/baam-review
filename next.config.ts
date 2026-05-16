@@ -5,22 +5,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
-  /**
-   * Serve the static marketing prototype at "/" instead of the older
-   * app/page.tsx. `beforeFiles` runs before the file-system router so the
-   * static HTML in public/marketing-home.html wins. When we eventually
-   * convert the prototype to JSX, delete this rewrite and the new page.tsx
-   * will take over.
-   */
-  async rewrites() {
-    return {
-      beforeFiles: [
-        { source: "/", destination: "/marketing-home.html" },
-      ],
-      afterFiles: [],
-      fallback: [],
-    };
-  },
+  // Marketing home + pricing are now real Next routes (app/page.tsx,
+  // app/pricing, app/pricing/zh) that read the approved HTML from /public
+  // and render it server-side. The old "/" → static-file rewrite is gone.
 };
 
 export default nextConfig;

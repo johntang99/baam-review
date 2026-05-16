@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BAAM Review — Turn happy customers into reviews, referrals, and revenue</title>
-<meta name="description" content="The Review-to-Revenue Engine for local businesses. Collect Google reviews in 60 seconds, display them on your website, distribute to Xiaohongshu and social, and turn happy customers into referrals. From $49/month.">
+<meta name="description" content="The Review-to-Revenue Engine for local businesses. Collect Google reviews in 60 seconds, display them on your website, distribute to Xiaohongshu and social, and turn happy customers into referrals. From $89/month founding pricing.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -154,9 +154,9 @@ nav.scrolled { border-color: var(--border); }
 .hero h1 {
   font-family: 'Fraunces', serif;
   font-weight: 400;
-  font-size: clamp(44px, 5.6vw, 76px);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+  font-size: clamp(36px, 4.5vw, 58px);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
   color: var(--ink);
   margin-bottom: 28px;
 }
@@ -180,7 +180,73 @@ nav.scrolled { border-color: var(--border); }
   max-width: 540px;
   margin-bottom: 36px;
 }
-.hero-ctas { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.hero-ctas { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.hero-ctas .btn-large { padding: 14px 22px; font-size: 14.5px; gap: 6px; }
+@media (max-width: 1100px) {
+  .hero-ctas .btn-large { padding: 13px 18px; font-size: 13.5px; }
+}
+
+/* ============ HERO PROOF BAR (ad-traffic anchor) ============ */
+.hero-proof-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 20px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 26px;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+.hero-proof-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  color: var(--text);
+}
+.hero-proof-stars {
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+.hero-proof-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.hero-proof-text strong { color: var(--ink); font-weight: 600; }
+.hero-proof-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+}
+
+/* Secondary CTA row - text links, visually subordinate */
+.hero-ctas-secondary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.hero-secondary-link {
+  font-size: 14px;
+  color: var(--text-soft);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.hero-secondary-link:hover { color: var(--forest); }
+.hero-secondary-divider {
+  width: 4px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 50%;
+}
 .hero-trust {
   margin-top: 38px;
   display: flex;
@@ -228,6 +294,627 @@ nav.scrolled { border-color: var(--border); }
   color: var(--ink);
 }
 .phone-status-bar .icons { display: flex; gap: 5px; align-items: center; }
+.phone-content { padding: 16px 22px 0; flex: 1; }
+
+/* ============ 4-STAGE HERO ANIMATION ============ */
+
+/* Stage wrapper - holds all 4 stages stacked */
+.phone-stage-wrapper {
+  position: relative;
+  flex: 1;
+  padding: 16px 22px 0;
+  overflow: hidden;
+}
+
+.phone-stage {
+  position: absolute;
+  inset: 0;
+  padding: 16px 22px 0;
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each stage cycles in for ~4s out of the 20s total */
+.phone-stage.stage-1 { animation: stage1-cycle 20s infinite; opacity: 1; }
+.phone-stage.stage-2 { animation: stage2-cycle 20s infinite; }
+.phone-stage.stage-3 { animation: stage3-cycle 20s infinite; }
+.phone-stage.stage-4 { animation: stage4-cycle 20s infinite; }
+
+@keyframes stage1-cycle {
+  0%, 18% { opacity: 1; transform: translateY(0); }
+  21%, 100% { opacity: 0; transform: translateY(-12px); }
+}
+@keyframes stage2-cycle {
+  0%, 19% { opacity: 0; transform: translateY(12px); }
+  22%, 43% { opacity: 1; transform: translateY(0); }
+  46%, 100% { opacity: 0; transform: translateY(-12px); }
+}
+@keyframes stage3-cycle {
+  0%, 44% { opacity: 0; transform: translateY(12px); }
+  47%, 63% { opacity: 1; transform: translateY(0); }
+  66%, 100% { opacity: 0; transform: translateY(-12px); }
+}
+@keyframes stage4-cycle {
+  0%, 64% { opacity: 0; transform: translateY(12px); }
+  67%, 96% { opacity: 1; transform: translateY(0); }
+  99%, 100% { opacity: 0; transform: translateY(-12px); }
+}
+
+/* Shared stage chrome */
+.stage-clinic-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.stage-clinic-header .clinic-logo {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, #C0392B, #962D22);
+  color: white;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 17px;
+}
+.stage-clinic-header .clinic-info-name { font-weight: 600; font-size: 13.5px; color: var(--ink); }
+.stage-clinic-header .clinic-info-sub { font-size: 11.5px; color: var(--text-muted); }
+
+.stage-label {
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  font-weight: 600;
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.stage-headline {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 24px;
+  letter-spacing: -0.015em;
+}
+.stage-headline em { font-style: italic; color: var(--forest); }
+
+/* === STAGE 1: STARS === */
+.stage-stars-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  position: relative;
+  margin: 20px 0 14px;
+}
+.stage-star {
+  width: 36px; height: 36px;
+  color: var(--border);
+  transition: all 0.2s;
+  animation-duration: 20s;
+  animation-iteration-count: infinite;
+}
+.stage-star svg { width: 100%; height: 100%; }
+
+/* Sequential star fill - all 5 light up as the tap lands */
+.stage-star.s1 { animation-name: star-fill-1; }
+.stage-star.s2 { animation-name: star-fill-2; }
+.stage-star.s3 { animation-name: star-fill-3; }
+.stage-star.s4 { animation-name: star-fill-4; }
+.stage-star.s5 { animation-name: star-fill-5; }
+
+@keyframes star-fill-1 {
+  0%, 13% { color: var(--border); transform: scale(1); }
+  14%, 20% { color: var(--gold); transform: scale(1.15); }
+  21%, 100% { color: var(--gold); transform: scale(1); }
+}
+@keyframes star-fill-2 {
+  0%, 14% { color: var(--border); transform: scale(1); }
+  15%, 20% { color: var(--gold); transform: scale(1.15); }
+  21%, 100% { color: var(--gold); transform: scale(1); }
+}
+@keyframes star-fill-3 {
+  0%, 15% { color: var(--border); transform: scale(1); }
+  16%, 20% { color: var(--gold); transform: scale(1.15); }
+  21%, 100% { color: var(--gold); transform: scale(1); }
+}
+@keyframes star-fill-4 {
+  0%, 16% { color: var(--border); transform: scale(1); }
+  17%, 20% { color: var(--gold); transform: scale(1.15); }
+  21%, 100% { color: var(--gold); transform: scale(1); }
+}
+@keyframes star-fill-5 {
+  0%, 17% { color: var(--border); transform: scale(1); }
+  18%, 20% { color: var(--gold); transform: scale(1.2); }
+  21%, 100% { color: var(--gold); transform: scale(1); }
+}
+
+/* Tap indicator - finger/cursor hits the 5th star */
+.stage-tap-indicator {
+  position: absolute;
+  left: 50%;
+  margin-left: 56px; /* offset to 5th star */
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  animation: tap-indicator 20s infinite;
+}
+.tap-ring {
+  width: 50px; height: 50px;
+  border: 2.5px solid var(--gold);
+  border-radius: 50%;
+  position: absolute;
+  inset: -7px;
+  animation: tap-ring-pulse 20s infinite;
+  opacity: 0;
+}
+.tap-dot {
+  width: 14px; height: 14px;
+  background: var(--gold-dark);
+  border-radius: 50%;
+  border: 3px solid var(--cream);
+  position: absolute;
+  inset: 11px;
+  box-shadow: 0 2px 6px rgba(168, 136, 71, 0.4);
+}
+
+@keyframes tap-indicator {
+  0%, 10% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  12%, 14% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  17% { opacity: 1; transform: translate(-50%, -50%) scale(0.85); }
+  18%, 20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  22%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+@keyframes tap-ring-pulse {
+  0%, 12% { opacity: 0; transform: scale(1); }
+  14% { opacity: 0.9; transform: scale(1); }
+  20% { opacity: 0; transform: scale(2); }
+  100% { opacity: 0; }
+}
+
+.stage-tap-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+/* === STAGE 2: AI DRAFT TYPING === */
+.stage-draft-card {
+  background: linear-gradient(135deg, #FAF7F2 0%, #F4EFE3 100%);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+.stage-draft-label {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ai-dot {
+  width: 7px; height: 7px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: inline-block;
+  animation: ai-pulse 1.5s infinite ease-in-out;
+}
+@keyframes ai-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+.stage-draft-typing {
+  font-family: 'Newsreader', serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  position: relative;
+  min-height: 70px;
+}
+.draft-text {
+  display: inline;
+  position: relative;
+  background: linear-gradient(90deg, var(--ink) 100%, transparent 100%);
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: draft-reveal 20s infinite;
+}
+.draft-text::after {
+  content: '|';
+  -webkit-text-fill-color: var(--gold-dark);
+  color: var(--gold-dark);
+  font-weight: 300;
+  margin-left: 2px;
+  animation: cursor-blink 0.8s infinite, draft-cursor-show 20s infinite;
+}
+@keyframes draft-reveal {
+  0%, 19% { background-size: 0% 100%; }
+  22% { background-size: 5% 100%; }
+  30% { background-size: 35% 100%; }
+  38% { background-size: 70% 100%; }
+  43%, 100% { background-size: 100% 100%; }
+}
+@keyframes cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes draft-cursor-show {
+  0%, 19% { opacity: 0; }
+  22%, 43% { opacity: 1; }
+  46%, 100% { opacity: 0; }
+}
+
+.stage-language-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+.stage-lang-pill {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-soft);
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+}
+.stage-lang-pill.active {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+
+/* === STAGE 3: POSTED TO GOOGLE === */
+.stage-success-anchor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding-bottom: 40px;
+  text-align: center;
+}
+.stage-success-circle {
+  width: 78px; height: 78px;
+  background: linear-gradient(135deg, var(--success), var(--forest));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom: 22px;
+  animation: success-pop 20s infinite;
+  box-shadow: 0 6px 24px rgba(45, 122, 95, 0.3);
+}
+.stage-success-check {
+  width: 44px; height: 44px;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: check-draw 20s infinite;
+}
+@keyframes success-pop {
+  0%, 44% { transform: scale(0); opacity: 0; }
+  47% { transform: scale(1.15); opacity: 1; }
+  50%, 63% { transform: scale(1); opacity: 1; }
+  66%, 100% { transform: scale(0.95); opacity: 0; }
+}
+@keyframes check-draw {
+  0%, 45% { stroke-dashoffset: 60; }
+  50%, 63% { stroke-dashoffset: 0; }
+  66%, 100% { stroke-dashoffset: 60; }
+}
+.stage-success-h {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  margin-bottom: 8px;
+}
+.stage-success-stars {
+  color: var(--gold);
+  font-size: 16px;
+  letter-spacing: 3px;
+  margin-bottom: 14px;
+}
+.stage-success-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-soft);
+  background: var(--cream-deep);
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* === STAGE 4: REVENUE DASHBOARD === */
+.stage-revenue-card {
+  background: linear-gradient(160deg, var(--ink) 0%, #1B2E27 100%);
+  border-radius: 16px;
+  padding: 22px 22px 20px;
+  color: var(--cream);
+  position: relative;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.stage-revenue-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 20%, rgba(201, 169, 97, 0.2), transparent 55%);
+}
+.stage-revenue-card > * { position: relative; z-index: 1; }
+.stage-rev-label {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stage-rev-number-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+.rev-prefix {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 28px;
+  color: var(--gold);
+  letter-spacing: -0.02em;
+}
+.rev-number {
+  position: relative;
+  display: inline-block;
+  min-width: 110px;
+  height: 48px;
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 42px;
+  letter-spacing: -0.025em;
+  color: var(--cream);
+}
+.rev-tick {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+/* Each tick shows for ~400ms during stage 4, giving counting illusion */
+.rev-tick-1 { animation: rev-tick-1-anim 20s infinite; }
+.rev-tick-2 { animation: rev-tick-2-anim 20s infinite; }
+.rev-tick-3 { animation: rev-tick-3-anim 20s infinite; }
+.rev-tick-4 { animation: rev-tick-4-anim 20s infinite; }
+.rev-tick-5 { animation: rev-tick-5-anim 20s infinite; }
+
+@keyframes rev-tick-1-anim {
+  0%, 66% { opacity: 0; }
+  68%, 73% { opacity: 1; }
+  74%, 100% { opacity: 0; }
+}
+@keyframes rev-tick-2-anim {
+  0%, 73% { opacity: 0; }
+  74%, 78% { opacity: 1; }
+  79%, 100% { opacity: 0; }
+}
+@keyframes rev-tick-3-anim {
+  0%, 78% { opacity: 0; }
+  79%, 83% { opacity: 1; }
+  84%, 100% { opacity: 0; }
+}
+@keyframes rev-tick-4-anim {
+  0%, 83% { opacity: 0; }
+  84%, 87% { opacity: 1; }
+  88%, 100% { opacity: 0; }
+}
+@keyframes rev-tick-5-anim {
+  0%, 87% { opacity: 0; }
+  88%, 96% { opacity: 1; }
+  99%, 100% { opacity: 0; }
+}
+
+.stage-rev-sub {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 11.5px;
+  color: rgba(250, 247, 242, 0.65);
+  margin-bottom: 16px;
+}
+
+.stage-rev-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(250, 247, 242, 0.1);
+}
+.rev-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rev-bar-label {
+  font-size: 10.5px;
+  color: rgba(250, 247, 242, 0.75);
+  flex: 1;
+  white-space: nowrap;
+}
+.rev-bar-track {
+  flex: 0 0 60px;
+  height: 4px;
+  background: rgba(250, 247, 242, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.rev-bar-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 999px;
+  width: 0;
+  animation-duration: 20s;
+  animation-iteration-count: infinite;
+}
+.rev-fill-1 { animation-name: bar-fill-1; }
+.rev-fill-2 { animation-name: bar-fill-2; }
+.rev-fill-3 { animation-name: bar-fill-3; }
+@keyframes bar-fill-1 {
+  0%, 70% { width: 0; }
+  76%, 96% { width: 75%; }
+  99%, 100% { width: 0; }
+}
+@keyframes bar-fill-2 {
+  0%, 73% { width: 0; }
+  79%, 96% { width: 45%; }
+  99%, 100% { width: 0; }
+}
+@keyframes bar-fill-3 {
+  0%, 76% { width: 0; }
+  82%, 96% { width: 85%; }
+  99%, 100% { width: 0; }
+}
+.rev-bar-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--gold);
+  font-weight: 600;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* === STAGE PROGRESS BAR (bottom of phone) === */
+.stage-progress-bar {
+  display: flex;
+  gap: 6px;
+  padding: 14px 22px 22px;
+  justify-content: center;
+}
+.stage-dot {
+  width: 22px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 999px;
+  animation-duration: 20s;
+  animation-iteration-count: infinite;
+}
+.stage-dot.d1 { animation-name: dot1; }
+.stage-dot.d2 { animation-name: dot2; }
+.stage-dot.d3 { animation-name: dot3; }
+.stage-dot.d4 { animation-name: dot4; }
+@keyframes dot1 {
+  0%, 20% { background: var(--forest); width: 32px; }
+  21%, 100% { background: var(--border); width: 22px; }
+}
+@keyframes dot2 {
+  0%, 21% { background: var(--border); width: 22px; }
+  22%, 45% { background: var(--forest); width: 32px; }
+  46%, 100% { background: var(--border); width: 22px; }
+}
+@keyframes dot3 {
+  0%, 46% { background: var(--border); width: 22px; }
+  47%, 65% { background: var(--forest); width: 32px; }
+  66%, 100% { background: var(--border); width: 22px; }
+}
+@keyframes dot4 {
+  0%, 66% { background: var(--border); width: 22px; }
+  67%, 96% { background: var(--gold); width: 32px; }
+  99%, 100% { background: var(--border); width: 22px; }
+}
+
+/* === FLOATING AMBIENT ELEMENTS === */
+.floating-star, .floating-dollar {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+.floating-star { width: 18px; height: 18px; color: var(--gold); }
+.floating-star svg { width: 100%; height: 100%; }
+.floating-dollar {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--gold-dark);
+}
+
+.f-star-1 { top: 12%; left: -8%; animation: float-star-1 20s infinite; }
+.f-star-2 { top: 38%; right: -6%; animation: float-star-2 20s infinite; }
+.f-dollar-1 { bottom: 28%; right: -4%; animation: float-dollar-1 20s infinite; }
+.f-dollar-2 { bottom: 15%; left: -6%; animation: float-dollar-2 20s infinite; }
+
+@keyframes float-star-1 {
+  0%, 12% { opacity: 0; transform: translateY(10px); }
+  16%, 20% { opacity: 0.6; transform: translateY(0); }
+  24%, 100% { opacity: 0; transform: translateY(-10px); }
+}
+@keyframes float-star-2 {
+  0%, 14% { opacity: 0; transform: translateY(10px); }
+  18%, 20% { opacity: 0.45; transform: translateY(0); }
+  24%, 100% { opacity: 0; transform: translateY(-10px); }
+}
+@keyframes float-dollar-1 {
+  0%, 67% { opacity: 0; transform: translateY(10px); }
+  72%, 92% { opacity: 0.7; transform: translateY(0); }
+  96%, 100% { opacity: 0; transform: translateY(-10px); }
+}
+@keyframes float-dollar-2 {
+  0%, 70% { opacity: 0; transform: translateY(10px); }
+  75%, 92% { opacity: 0.55; transform: translateY(-4px); }
+  96%, 100% { opacity: 0; transform: translateY(-14px); }
+}
+
+/* === REDUCED MOTION: show static stage 4 (most informative state) === */
+@media (prefers-reduced-motion: reduce) {
+  .phone-stage,
+  .phone-stage *,
+  .floating-star,
+  .floating-dollar,
+  .stage-dot,
+  .rev-tick,
+  .rev-bar-fill,
+  .draft-text,
+  .draft-text::after,
+  .stage-star,
+  .stage-tap-indicator,
+  .stage-success-circle,
+  .stage-success-check,
+  .ai-dot {
+    animation: none !important;
+  }
+  .phone-stage.stage-1,
+  .phone-stage.stage-2,
+  .phone-stage.stage-3 { display: none; }
+  .phone-stage.stage-4 { opacity: 1; position: relative; }
+  .floating-dollar.f-dollar-1,
+  .floating-dollar.f-dollar-2 { opacity: 0.5; }
+  .stage-dot.d4 { background: var(--gold); width: 32px; }
+  .rev-tick-5 { opacity: 1; }
+  .rev-fill-1 { width: 75%; }
+  .rev-fill-2 { width: 45%; }
+  .rev-fill-3 { width: 85%; }
+  .draft-text { background-size: 100% 100% !important; }
+}
+
 .phone-content { padding: 16px 22px 0; flex: 1; }
 .phone-clinic-header {
   display: flex;
@@ -813,10 +1500,72 @@ section { padding: 100px 0; position: relative; }
 
 .tier-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
   margin: 50px 0 38px;
 }
+.tier-mini-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(250, 247, 242, 0.5);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.tier-mini.featured .tier-mini-eyebrow { color: var(--gold); }
+.tier-mini-price-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.tier-mini-price-pre {
+  font-size: 14px;
+  color: rgba(250, 247, 242, 0.55);
+  font-weight: 500;
+}
+.tier-mini-founding {
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 8px;
+  font-family: 'Onest', sans-serif;
+}
+.tier-mini-founding strong { font-family: 'Fraunces', serif; font-weight: 500; }
+.tier-mini-feature-list {
+  list-style: none;
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.tier-mini-feature-list li {
+  font-size: 13px;
+  color: rgba(250, 247, 242, 0.78);
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.4;
+}
+.tier-mini-feature-list li svg {
+  width: 13px; height: 13px;
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.tier-mini.featured .tier-mini-feature-list li { color: rgba(250, 247, 242, 0.9); }
+.tier-mini-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 9px 16px;
+  background: rgba(250, 247, 242, 0.1);
+  border: 1px solid rgba(250, 247, 242, 0.2);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cream);
+}
+.tier-mini-cta:hover { background: rgba(250, 247, 242, 0.18); }
+.tier-mini.featured .tier-mini-cta { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.tier-mini.featured .tier-mini-cta:hover { background: var(--cream); }
+.tier-mini-cta svg { width: 12px; height: 12px; }
 .tier-mini {
   background: rgba(250, 247, 242, 0.06);
   border: 1px solid rgba(250, 247, 242, 0.14);
@@ -871,7 +1620,6 @@ section { padding: 100px 0; position: relative; }
   color: rgba(250, 247, 242, 0.7);
 }
 .tier-mini.featured .tier-mini-feature { color: rgba(250, 247, 242, 0.85); }
-.tier-mini-feature::before { content: '↳ '; opacity: 0.5; margin-right: 2px; }
 
 .pricing-cta-row {
   display: flex;
@@ -1109,8 +1857,9 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   opacity: 0.5;
 }
 .research-eyebrow {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
@@ -1134,7 +1883,8 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   letter-spacing: -0.025em;
   color: var(--ink);
   max-width: 760px;
-  margin-bottom: 22px;
+  margin: 0 auto 22px;
+  text-align: center;
 }
 .research-title em { font-style: italic; color: var(--forest); }
 .research-deck {
@@ -1144,7 +1894,8 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   line-height: 1.55;
   color: var(--text-soft);
   max-width: 660px;
-  margin-bottom: 50px;
+  margin: 0 auto 50px;
+  text-align: center;
 }
 .research-stats {
   display: grid;
@@ -1458,6 +2209,263 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   grid-template-columns: repeat(2, 1fr);
   gap: 28px;
 }
+.engine-streams.three-paths {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+/* === Real review card (Sofia's review) === */
+.engine-real-review {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px 34px 30px;
+  margin: 8px auto 0;
+  max-width: 780px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+.engine-review-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.engine-review-avatar {
+  width: 42px; height: 42px;
+  background: #E97B3C;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.engine-review-meta { flex: 1; min-width: 0; }
+.engine-review-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.engine-review-source svg { color: var(--gold-dark); }
+.engine-review-name {
+  font-family: 'Onest', sans-serif;
+  font-weight: 600;
+  font-size: 15.5px;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.engine-review-business {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+.engine-review-business .zh { font-family: 'Noto Sans SC', sans-serif; }
+.engine-review-rating { text-align: right; flex-shrink: 0; }
+.engine-review-stars {
+  color: var(--gold);
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.engine-review-time { font-size: 12px; color: var(--text-muted); }
+.engine-review-text {
+  font-family: 'Newsreader', serif;
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+/* === Trace arrow between review and big number === */
+.engine-trace-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 28px 0 0;
+  color: var(--gold-dark);
+}
+.trace-arrow-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  font-weight: 600;
+}
+
+/* === Single big number variant of engine-revenue === */
+.engine-revenue-single {
+  text-align: center;
+  margin-top: 18px;
+}
+.engine-revenue-single .engine-revenue-eyebrow {
+  text-align: center;
+  margin-bottom: 4px;
+}
+.engine-revenue-single .engine-revenue-num {
+  font-size: clamp(60px, 8vw, 96px);
+  margin: 0 0 8px;
+}
+.engine-revenue-single .engine-revenue-meta {
+  text-align: center;
+  margin: 0 auto;
+  max-width: 480px;
+}
+
+/* === Discovery mini-mock (Path 1) === */
+.discovery-mock {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: 'Onest', sans-serif;
+}
+.discovery-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  background: var(--cream);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
+.discovery-search svg { color: var(--text-muted); flex-shrink: 0; }
+.discovery-results { display: flex; flex-direction: column; gap: 1px; }
+.discovery-result {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--text-soft);
+  border-radius: 5px;
+  align-items: center;
+}
+.discovery-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.discovery-name { color: var(--text); }
+.discovery-rating {
+  color: var(--gold-dark);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+.discovery-result.highlight {
+  background: rgba(201, 169, 97, 0.12);
+  border: 1px solid rgba(201, 169, 97, 0.35);
+}
+.discovery-result.highlight .discovery-rank { color: var(--gold-dark); font-weight: 700; }
+.discovery-result.highlight .discovery-name { color: var(--ink); font-weight: 600; }
+.discovery-arrow { color: var(--success); font-weight: 700; }
+
+/* === Trust mini-mock (Path 2) === */
+.trust-mock {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.trust-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 10px;
+  background: var(--cream-deep);
+  border-bottom: 1px solid var(--border);
+}
+.trust-browser-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+}
+.trust-browser-url {
+  margin-left: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+.trust-page { padding: 12px 14px 14px; }
+.trust-page-h {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 9px;
+  letter-spacing: -0.01em;
+}
+.trust-review-widget {
+  background: var(--cream);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 10px 11px;
+  margin-bottom: 10px;
+}
+.trust-stars {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+.trust-snippet {
+  font-family: 'Newsreader', serif;
+  font-size: 11.5px;
+  color: var(--ink);
+  line-height: 1.45;
+  margin-bottom: 6px;
+}
+.trust-attr {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.trust-cta {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* === Offer hero placeholder (replaces image) === */
+.engine-offer-hero-mock {
+  width: 100%;
+  height: 80px;
+  border-radius: 7px;
+  background:
+    radial-gradient(ellipse 30% 50% at 25% 65%, rgba(80, 40, 30, 0.4), transparent 70%),
+    radial-gradient(ellipse 22% 45% at 55% 60%, rgba(60, 80, 110, 0.45), transparent 70%),
+    radial-gradient(ellipse 18% 40% at 78% 60%, rgba(140, 80, 70, 0.4), transparent 70%),
+    radial-gradient(circle at 30% 30%, rgba(201, 169, 97, 0.5), transparent 30%),
+    radial-gradient(circle at 70% 28%, rgba(201, 169, 97, 0.4), transparent 25%),
+    linear-gradient(135deg, #E8D9B5 0%, #C5D2CB 50%, #87A899 100%);
+  margin-bottom: 10px;
+}
+
+/* === Three-path responsive override === */
+@media (max-width: 1024px) {
+  .engine-streams.three-paths { grid-template-columns: 1fr; gap: 22px; }
+  .engine-real-review { padding: 22px 22px 24px; }
+  .engine-review-header { flex-wrap: wrap; gap: 12px; }
+  .engine-review-rating { text-align: left; }
+}
+@media (max-width: 760px) {
+  .engine-real-review { padding: 18px 18px 20px; }
+  .engine-review-text { font-size: 15px; }
+  .engine-revenue-single .engine-revenue-num { font-size: 56px; }
+}
+
 .engine-stream {
   background: var(--paper);
   border: 1px solid var(--border);
@@ -1861,6 +2869,1109 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 .hero-ctas { animation: fadeUp 0.7s ease-out backwards; animation-delay: 0.4s; }
 .hero-trust { animation: fadeUp 0.7s ease-out backwards; animation-delay: 0.5s; }
 .phone-frame { animation: fadeUp 1s ease-out backwards; animation-delay: 0.5s; }
+
+/* ============ PROCESS WALKTHROUGH: SIX REAL SCREENS ============ */
+.process-section { padding: 80px 0; background: var(--cream); }
+.process-section .section-header-center { margin-bottom: 48px; }
+
+.process-frame {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.process-step {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+  padding: 40px 56px;
+  position: relative;
+}
+.process-step:nth-child(even) {
+  background: var(--cream-deep);
+}
+.process-step.reverse .process-step-content { order: 2; }
+.process-step.reverse .process-step-visual { order: 1; }
+
+.process-step-content { max-width: 460px; }
+.process-step-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  font-weight: 600;
+  margin-bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.process-step-label::before {
+  content: '';
+  width: 22px; height: 1px;
+  background: var(--gold);
+  opacity: 0.6;
+}
+.process-step-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3.5vw, 40px);
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+}
+.process-step-title em { font-style: italic; color: var(--forest); }
+.process-step-desc {
+  font-family: 'Newsreader', serif;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  margin-bottom: 22px;
+}
+.process-step-pills {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+.process-step-pills li {
+  padding: 6px 12px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.process-step-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === STEP 1: GBP Connection Card === */
+.gbp-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px 26px;
+  box-shadow: var(--shadow-sm);
+}
+.gbp-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.gbp-card-eyebrow {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.gbp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  background: rgba(45, 122, 95, 0.1);
+  color: var(--success);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.gbp-status-dot {
+  width: 6px; height: 6px;
+  background: var(--success);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(45, 122, 95, 0.18);
+}
+.gbp-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.gbp-google-logo {
+  width: 36px; height: 36px;
+  background: var(--cream);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.gbp-google-logo svg { width: 20px; height: 20px; }
+.gbp-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--ink);
+}
+.gbp-card-tag { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+.gbp-business {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.gbp-business-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 10px;
+}
+.gbp-business-avatar {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, #C0392B, #962D22);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.gbp-business-info { flex: 1; min-width: 0; }
+.gbp-business-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.35;
+}
+.gbp-business-name .zh { font-family: 'Noto Sans SC', sans-serif; font-weight: 500; }
+.gbp-business-addr { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.gbp-business-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-soft);
+}
+.gbp-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text);
+}
+.gbp-rating-star { color: var(--gold); }
+.gbp-rating strong { font-weight: 600; }
+.gbp-rating-count { color: var(--text-muted); }
+.gbp-business-divider { color: var(--text-muted); }
+.gbp-hours { color: var(--success); font-weight: 500; }
+
+.gbp-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+}
+.gbp-card-sync { color: var(--text-muted); }
+.gbp-disconnect { color: var(--text-muted); text-decoration: underline; }
+.gbp-disconnect:hover { color: var(--ink); }
+
+/* === STEP 2: Send Request + Lists === */
+.send-stack {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.send-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+}
+.send-card-eyebrow {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.send-row {
+  display: grid;
+  grid-template-columns: 75px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+}
+.send-row + .send-row { border-top: 1px solid var(--border-soft); }
+.send-label { color: var(--text-muted); font-weight: 500; }
+.send-input {
+  color: var(--ink);
+  font-weight: 500;
+}
+.send-input-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+.send-langs { display: flex; gap: 5px; }
+.send-lang-pill {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--cream);
+  border: 1px solid var(--border-soft);
+}
+.send-lang-pill.active {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+.send-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+.send-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 4px;
+}
+.send-divider-line { flex: 1; height: 1px; background: var(--border); }
+.send-divider-or {
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.lists-card { padding: 18px 22px; }
+.lists-row {
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 0;
+}
+.lists-row + .lists-row { border-top: 1px solid var(--border-soft); }
+.lists-icon {
+  width: 30px; height: 30px;
+  background: var(--cream);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--forest);
+}
+.lists-name { font-weight: 600; font-size: 13px; color: var(--ink); }
+.lists-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+.lists-badge {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  background: rgba(45, 122, 95, 0.12);
+  color: var(--success);
+}
+.lists-badge.sending { background: rgba(201, 169, 97, 0.18); color: var(--gold-dark); }
+.lists-badge.done { background: var(--cream-deep); color: var(--text-muted); }
+
+/* === STEPS 3, 4, 6: Mini phone frame (shared) === */
+.mini-phone {
+  width: 100%;
+  max-width: 320px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 22px 22px 22px;
+  box-shadow: var(--shadow-sm);
+}
+.mini-phone-header {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.mini-phone-header.compact { padding-bottom: 10px; margin-bottom: 12px; }
+.mini-phone-avatar {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, #C0392B, #962D22);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.mini-phone-clinic-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink);
+}
+.mini-phone-clinic-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+.mini-phone-q {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--ink);
+  margin-bottom: 14px;
+  line-height: 1.3;
+}
+
+.mini-phone-section-label {
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 8px;
+  margin-top: 14px;
+}
+.mini-phone-section-label:first-of-type { margin-top: 0; }
+
+.mini-phone-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.mini-chip {
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--text);
+  background: var(--paper);
+  font-weight: 500;
+}
+.mini-chip.selected {
+  background: #962D22;
+  border-color: #962D22;
+  color: white;
+}
+
+.mini-phone-stars {
+  display: flex;
+  gap: 4px;
+  color: var(--gold);
+  font-size: 22px;
+  letter-spacing: 1px;
+  margin: 2px 0 4px;
+}
+
+.mini-phone-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  margin-top: 16px;
+}
+.mini-phone-cta.forest-dark { background: var(--forest-dark, #163A30); }
+
+/* === STEP 4: AI Draft cards === */
+.draft-h {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.draft-sub { font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px; }
+.draft-card {
+  background: var(--cream);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 10px 12px 11px;
+  margin-bottom: 8px;
+}
+.draft-card.selected {
+  background: rgba(31, 77, 63, 0.04);
+  border-color: var(--forest);
+}
+.draft-card-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+.draft-check {
+  width: 16px; height: 16px;
+  background: var(--forest);
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.draft-check.empty {
+  background: transparent;
+  border: 1.5px solid var(--border);
+}
+.draft-label {
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.draft-status {
+  margin-left: auto;
+  font-size: 9px;
+  color: var(--success);
+  font-weight: 600;
+  background: rgba(45, 122, 95, 0.1);
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+.draft-text {
+  font-family: 'Newsreader', serif;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* === STEP 5: Google's Real Review Dialog === */
+.google-dialog {
+  width: 100%;
+  max-width: 440px;
+  background: white;
+  border-radius: 8px;
+  padding: 22px 24px 18px;
+  box-shadow: 0 4px 24px rgba(60, 64, 67, 0.18), 0 1px 2px rgba(60, 64, 67, 0.12);
+  font-family: 'Roboto', 'Arial', sans-serif;
+}
+.google-dialog-clinic {
+  font-size: 14px;
+  color: #202124;
+  text-align: center;
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+.google-dialog-clinic .zh { font-family: 'Noto Sans SC', sans-serif; }
+.google-dialog-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.google-user-avatar {
+  width: 44px; height: 44px;
+  background: #4CAF50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.google-user-name { font-size: 16px; color: #202124; font-weight: 400; }
+.google-user-public {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: #5F6368;
+  margin-top: 2px;
+}
+.google-user-public svg { opacity: 0.6; }
+
+.google-stars {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  color: #FFB400;
+  font-size: 28px;
+  margin: 6px 0 14px;
+  letter-spacing: 4px;
+}
+
+.google-textbox {
+  border: 2px solid #1A73E8;
+  border-radius: 4px;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  color: #202124;
+  line-height: 1.55;
+  margin-bottom: 12px;
+  min-height: 90px;
+  position: relative;
+}
+.google-cursor {
+  color: #1A73E8;
+  font-weight: 300;
+  animation: g-cursor-blink 1s infinite;
+}
+@keyframes g-cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.google-photos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: #E8F0FE;
+  border-radius: 4px;
+  color: #1A73E8;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+.google-price-block {
+  background: #F1F3F4;
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.google-price-q { font-size: 12.5px; color: #202124; margin-bottom: 9px; font-weight: 500; }
+.google-beta { color: #5F6368; font-size: 11px; font-weight: 400; }
+.google-price-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.google-price-chip {
+  padding: 5px 11px;
+  border: 1px solid #DADCE0;
+  border-radius: 999px;
+  font-size: 11.5px;
+  color: #1A73E8;
+  background: white;
+  font-weight: 500;
+}
+
+.google-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.google-cancel {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #1A73E8;
+  font-weight: 500;
+}
+.google-post {
+  padding: 8px 24px;
+  background: #1A73E8;
+  color: white;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* === STEP 6: Thank You + Share Card === */
+.ty-header {
+  background: linear-gradient(180deg, #1F4D3F 0%, #163A30 100%);
+  color: var(--cream);
+  border-radius: 14px;
+  padding: 20px 22px 18px;
+  text-align: center;
+  margin: -22px -22px 14px;
+  position: relative;
+}
+.ty-check {
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.ty-eyebrow {
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.ty-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--cream);
+  margin-bottom: 5px;
+}
+.ty-title em { font-style: italic; color: var(--gold); }
+.ty-sub {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: rgba(250, 247, 242, 0.72);
+  line-height: 1.45;
+}
+
+.ty-clinic-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  background: var(--cream-deep);
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.ty-clinic-avatar {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #C0392B, #962D22);
+  color: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.ty-clinic-meta { flex: 1; min-width: 0; }
+.ty-clinic-name { font-weight: 600; font-size: 11.5px; color: var(--ink); }
+.ty-clinic-addr { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+.ty-clinic-stars { color: var(--gold); font-size: 10.5px; letter-spacing: 1px; }
+
+.ty-share-section { margin-top: 4px; }
+.ty-share-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: var(--gold-dark);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.ty-share-dot {
+  width: 5px; height: 5px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+.ty-share-h {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 11px;
+  line-height: 1.3;
+}
+.ty-share-h em { font-style: italic; color: #962D22; }
+
+.ty-offer {
+  background: linear-gradient(180deg, #962D22 0%, #7A2419 100%);
+  border-radius: 9px;
+  padding: 7px;
+  margin-bottom: 12px;
+}
+.ty-offer-pill {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--cream);
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  margin: 6px 0 6px 8px;
+}
+.ty-offer-inner {
+  background: var(--paper);
+  border-radius: 6px;
+  padding: 9px 11px 10px;
+}
+.ty-offer-hero {
+  width: 100%;
+  height: 50px;
+  border-radius: 4px;
+  background:
+    radial-gradient(ellipse 30% 50% at 25% 65%, rgba(80, 40, 30, 0.4), transparent 70%),
+    radial-gradient(ellipse 22% 45% at 55% 60%, rgba(60, 80, 110, 0.45), transparent 70%),
+    radial-gradient(circle at 30% 30%, rgba(201, 169, 97, 0.5), transparent 30%),
+    linear-gradient(135deg, #E8D9B5 0%, #C5D2CB 50%, #87A899 100%);
+  margin-bottom: 7px;
+}
+.ty-offer-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.ty-offer-code-row { display: flex; gap: 5px; }
+.ty-offer-code {
+  padding: 3px 8px;
+  border: 1.2px dashed #962D22;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #962D22;
+  letter-spacing: 0.06em;
+}
+
+.ty-share-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.ty-share-btn {
+  background: var(--cream);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 9px 4px 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.ty-share-btn-icon {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.ty-share-btn-icon.fb { background: #1877F2; }
+.ty-share-btn-icon.sms { background: #34A853; }
+.ty-share-btn-icon.copy { background: var(--ink); }
+.ty-share-btn-icon.more { background: var(--text-soft); }
+.ty-share-btn-label { font-size: 9.5px; color: var(--text-soft); font-weight: 500; }
+
+/* === Process walkthrough responsive === */
+@media (max-width: 1024px) {
+  .process-step { grid-template-columns: 1fr; gap: 36px; padding: 36px 40px; }
+  .process-step.reverse .process-step-content { order: 2; }
+  .process-step.reverse .process-step-visual { order: 1; }
+  .process-step .process-step-content { order: 2; max-width: 100%; }
+  .process-step .process-step-visual { order: 1; }
+}
+@media (max-width: 760px) {
+  .process-section { padding: 60px 0; }
+  .process-section .section-header-center { margin-bottom: 36px; }
+  .process-frame { border-radius: 18px; }
+  .process-step { padding: 28px 22px; gap: 28px; }
+  .process-step-title { font-size: 26px; }
+  .process-step-desc { font-size: 16px; }
+  .gbp-card { padding: 18px 20px; }
+  .gbp-business-name { font-size: 12.5px; }
+  .google-dialog { padding: 18px 18px 14px; }
+  .google-textbox { font-size: 12.5px; }
+  .mini-phone { padding: 18px; max-width: 300px; }
+}
+
+/* ============ COMPARISON TABLE ============ */
+.compare-home { background: var(--cream); padding: 90px 0; }
+.compare-home .section-header-center { margin-bottom: 56px; }
+
+.compare-table-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Onest', sans-serif;
+}
+.compare-table thead th {
+  padding: 24px 16px 20px;
+  text-align: center;
+  vertical-align: top;
+  background: var(--cream-deep);
+  border-bottom: 1px solid var(--border);
+}
+.compare-th-feature {
+  width: 32%;
+  text-align: left !important;
+}
+.compare-th { width: 17%; }
+.compare-th-baam {
+  background: var(--forest) !important;
+  color: var(--cream) !important;
+  position: relative;
+}
+.compare-th-baam::after {
+  content: 'YOU ARE HERE';
+  position: absolute;
+  top: 8px; right: 10px;
+  font-size: 8.5px;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  font-weight: 700;
+}
+.compare-th-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.compare-th-baam .compare-th-name { color: var(--cream); }
+.compare-th-price {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.compare-th-baam .compare-th-price { color: rgba(250, 247, 242, 0.85); }
+.compare-th-baam .compare-th-price strong { color: var(--gold); font-weight: 600; }
+
+.compare-table tbody td {
+  padding: 14px 16px;
+  font-size: 13.5px;
+  color: var(--text);
+  text-align: center;
+  border-bottom: 1px solid var(--border-soft);
+}
+.compare-feat {
+  text-align: left !important;
+  color: var(--ink) !important;
+  font-weight: 500;
+}
+.compare-cell.baam {
+  background: rgba(31, 77, 63, 0.04);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.compare-section-row td {
+  padding: 16px 16px 8px !important;
+  background: var(--cream) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dark) !important;
+  font-weight: 700;
+  text-align: left !important;
+  border-bottom: none !important;
+}
+
+.compare-yes {
+  display: inline-block;
+  width: 22px; height: 22px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 50%;
+  line-height: 22px;
+  font-weight: 700;
+  font-size: 12px;
+}
+.compare-cell.baam .compare-yes { background: var(--gold); color: var(--ink); }
+.compare-no { color: var(--text-muted); font-size: 13px; }
+.compare-partial {
+  display: inline-block;
+  padding: 2px 9px;
+  background: var(--cream-deep);
+  border-radius: 999px;
+  font-size: 11.5px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.compare-final-row td {
+  padding-top: 18px !important;
+  padding-bottom: 18px !important;
+  background: var(--cream-deep);
+  border-bottom: none !important;
+}
+.compare-feat-final {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 15px !important;
+}
+.compare-total {
+  font-family: 'Fraunces', serif;
+  font-size: 17px !important;
+  letter-spacing: -0.01em;
+}
+.compare-cell.baam.compare-total {
+  color: var(--gold-dark);
+}
+.compare-cell.baam.compare-total strong { color: var(--gold-dark); font-weight: 600; }
+
+.compare-footnote {
+  padding: 20px 24px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.55;
+  background: var(--cream);
+  border-top: 1px solid var(--border-soft);
+}
+
+@media (max-width: 960px) {
+  .compare-home { padding: 60px 0; }
+  .compare-table-card { overflow-x: auto; }
+  .compare-table { min-width: 720px; }
+  .compare-th-feature { width: auto; }
+}
+
+/* ============ FAQ ============ */
+.faq-section { background: var(--paper); padding: 90px 0; }
+.faq-section .section-header-center { margin-bottom: 48px; }
+.faq-list {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.faq-item {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: background 0.2s ease;
+}
+.faq-item[open] {
+  background: var(--paper);
+  border-color: var(--forest);
+  box-shadow: var(--shadow-sm);
+}
+.faq-q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.faq-q::-webkit-details-marker { display: none; }
+.faq-chevron {
+  width: 30px; height: 30px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Onest', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--text-soft);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+.faq-item[open] .faq-chevron {
+  transform: rotate(45deg);
+  background: var(--forest);
+  color: var(--cream);
+  border-color: var(--forest);
+}
+.faq-a {
+  padding: 0 24px 22px;
+  font-family: 'Newsreader', serif;
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--text);
+}
+.faq-a a {
+  color: var(--forest);
+  text-decoration: underline;
+  text-decoration-color: rgba(31, 77, 63, 0.3);
+}
+.faq-a a:hover { text-decoration-color: var(--forest); }
+.faq-a strong { color: var(--ink); font-weight: 600; }
+
+@media (max-width: 760px) {
+  .faq-section { padding: 60px 0; }
+  .faq-q { padding: 16px 18px; font-size: 15px; gap: 10px; }
+  .faq-a { padding: 0 18px 18px; font-size: 15.5px; }
+  .faq-chevron { width: 26px; height: 26px; font-size: 18px; }
+}
+
+/* ============ STICKY MOBILE CTA BAR ============ */
+.mobile-sticky-cta {
+  display: none;
+}
+@media (max-width: 760px) {
+  .mobile-sticky-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--paper);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 18px rgba(20, 22, 27, 0.06);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.96);
+  }
+  .mobile-sticky-cta-text {
+    flex: 1;
+    min-width: 0;
+  }
+  .mobile-sticky-cta-title {
+    font-family: 'Fraunces', serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .mobile-sticky-cta-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .mobile-sticky-cta-btn {
+    padding: 11px 18px;
+    background: var(--forest);
+    color: var(--cream);
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  /* Add bottom padding to body to prevent content from hiding behind sticky bar */
+  body { padding-bottom: 76px; }
+}
 </style>
 </head>
 <body>
@@ -1872,20 +3983,21 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
       BAAM Review
     </a>
     <div class="nav-links">
-      <a href="#loop">How it works</a>
       <a href="/pricing">Pricing</a>
-      <a href="#engine">Review Revenue</a>
+      <a href="/#engine">Review Revenue</a>
       <a href="/review-value.html#top">Review Value</a>
-      <a href="#languages">Languages</a>
+      <a href="/#compare">Comparison</a>
+      <a href="/#how">How it works</a>
+      <a href="/pricing/zh">中文</a>
     </div>
     <div class="nav-cta">
-      <a href="/login" class="btn btn-ghost">Log in</a>
-      <a href="/signup" class="btn btn-primary">Start free trial</a>
+      <a href="/login" class="btn btn-ghost">Sign in</a>
+      <a href="/pricing#self-serve" class="btn btn-primary">Start free</a>
     </div>
   </div>
 </nav>
 
-<!-- ============ HERO ============ -->
+<!-- ============ HERO (4-stage animated, 20s cycle) ============ -->
 <section class="hero">
   <div class="container">
     <div class="hero-grid">
@@ -1895,25 +4007,44 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="hero-eyebrow-dot"></span>
         </div>
         <h1>
-          Reviews are the <em>raw material.</em><br>
-          <span class="gold-em">Review Revenue</span><br>
-          is the output.
+          Reviews made <em>easy.</em><br>
+          Reviews generate <span class="gold-em">Referrals &amp; Revenue,</span> <em>Measurable.</em>
         </h1>
         <p class="hero-sub">
-          Other tools stop at collection. BAAM Review turns every 5★ review into share cards that travel, referral cards that convert, and a dashboard that puts a dollar number on the loop. Three languages, from $49 a month — and an honest measure of what your reviews are actually worth.
+          Most happy customers want to review you — they just don't know what to write. We help them in 60 seconds, in 3 languages. Then we show you what each review is actually worth in dollars.
         </p>
+
+        <!-- Social proof bar - ad traffic anchor -->
+        <div class="hero-proof-bar">
+          <div class="hero-proof-item">
+            <span class="hero-proof-stars">★★★★★</span>
+            <span class="hero-proof-text"><strong>4.8</strong> from 23 NY-metro clinics</span>
+          </div>
+          <span class="hero-proof-sep"></span>
+          <div class="hero-proof-item">
+            <span class="hero-proof-num">$1.2M</span>
+            <span class="hero-proof-text">tracked Review Revenue</span>
+          </div>
+          <span class="hero-proof-sep"></span>
+          <div class="hero-proof-item">
+            <span class="hero-proof-num">18</span>
+            <span class="hero-proof-text">new reviews/mo average</span>
+          </div>
+        </div>
+
         <div class="hero-ctas">
-          <a href="/signup" class="btn btn-primary btn-large">Start free trial →</a>
-          <a href="#engine" class="btn btn-ghost btn-large">See the math</a>
+          <a href="/pricing#self-serve" class="btn btn-primary btn-large">Start free trial →</a>
+          <a href="/pricing#full-service" class="btn btn-gold btn-large">Full Service →</a>
+          <a href="#engine" class="btn btn-outline btn-large">See the $1,728 math →</a>
         </div>
         <div class="hero-trust">
-          <span>14-day trial</span>
-          <span class="hero-trust-line"></span>
-          <span>No credit card</span>
+          <span>30-day trial</span>
           <span class="hero-trust-line"></span>
           <span>EN / 中文 / ES</span>
           <span class="hero-trust-line"></span>
           <span>Five-minute setup</span>
+          <span class="hero-trust-line"></span>
+          <span>Reviews easy</span>
         </div>
         <a href="/review-value.html#top" class="hero-research-badge">
           <span class="hero-research-badge-tag">Research</span>
@@ -1933,32 +4064,138 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
                 <svg width="22" height="11" viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="20" height="10" rx="2"/><rect x="22.5" y="4" width="1" height="4" fill="currentColor"/><rect x="3" y="3" width="16" height="6" rx="1" fill="currentColor"/></svg>
               </div>
             </div>
-            <div class="phone-content">
-              <div class="phone-clinic-header">
-                <div class="clinic-logo">黄</div>
-                <div>
-                  <div class="clinic-info-name">Dr. Huang Acupuncture</div>
-                  <div class="clinic-info-sub">Flushing, NY</div>
+
+            <div class="phone-stage-wrapper">
+
+              <!-- STAGE 1: TAP STARS (0–2s) -->
+              <div class="phone-stage stage-1">
+                <div class="stage-clinic-header">
+                  <div class="clinic-logo">黄</div>
+                  <div>
+                    <div class="clinic-info-name">Dr. Huang Acupuncture</div>
+                    <div class="clinic-info-sub">Flushing, NY</div>
+                  </div>
+                </div>
+                <div class="stage-label">Stage 1 · Rate your visit</div>
+                <h2 class="stage-headline">How was your<br><em>visit today?</em></h2>
+                <div class="stage-stars-row">
+                  <span class="stage-star s1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+                  <span class="stage-star s2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+                  <span class="stage-star s3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+                  <span class="stage-star s4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+                  <span class="stage-star s5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+                  <!-- Tap indicator hits the 5th star -->
+                  <div class="stage-tap-indicator">
+                    <div class="tap-ring"></div>
+                    <div class="tap-dot"></div>
+                  </div>
+                </div>
+                <div class="stage-tap-hint">tap a star to begin</div>
+              </div>
+
+              <!-- STAGE 2: AI DRAFT WITH TYPING (2–4.5s) -->
+              <div class="phone-stage stage-2">
+                <div class="stage-clinic-header">
+                  <div class="clinic-logo">黄</div>
+                  <div>
+                    <div class="clinic-info-name">Dr. Huang Acupuncture</div>
+                    <div class="clinic-info-sub">5 ★ · Drafting…</div>
+                  </div>
+                </div>
+                <div class="stage-label">Stage 2 · AI drafts the review</div>
+                <div class="stage-draft-card">
+                  <div class="stage-draft-label">
+                    <span class="ai-dot"></span>
+                    Suggested review · edit anything
+                  </div>
+                  <div class="stage-draft-typing">
+                    <span class="draft-text">After 3 sessions with Dr. Huang, my chronic migraines are finally under control. Patient, thorough, fluent in Mandarin — could not recommend more.</span>
+                  </div>
+                </div>
+                <div class="stage-language-row">
+                  <span class="stage-lang-pill active">English</span>
+                  <span class="stage-lang-pill">中文</span>
+                  <span class="stage-lang-pill">Español</span>
                 </div>
               </div>
-              <h2 class="phone-greeting">Thanks for visiting,<br><em>Sarah.</em></h2>
-              <div class="phone-q-label">Question 1 of 3</div>
-              <div class="phone-q-text">What did we help you with today?</div>
-              <div class="phone-chips">
-                <div class="phone-chip">Back pain</div>
-                <div class="phone-chip selected">Migraines</div>
-                <div class="phone-chip">Stress</div>
-                <div class="phone-chip">Insomnia</div>
-                <div class="phone-chip">Allergies</div>
-                <div class="phone-chip">Other…</div>
+
+              <!-- STAGE 3: POSTED TO GOOGLE (4.5–6.5s) -->
+              <div class="phone-stage stage-3">
+                <div class="stage-success-anchor">
+                  <div class="stage-success-circle">
+                    <svg class="stage-success-check" viewBox="0 0 52 52" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="14 27 23 36 39 18"/>
+                    </svg>
+                  </div>
+                  <div class="stage-success-h">Posted to Google.</div>
+                  <div class="stage-success-stars">★ ★ ★ ★ ★</div>
+                  <div class="stage-success-meta">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    Live now on your Google Business Profile
+                  </div>
+                </div>
               </div>
+
+              <!-- STAGE 4: REVENUE DASHBOARD (6.5–8.5s) -->
+              <div class="phone-stage stage-4">
+                <div class="stage-revenue-card">
+                  <div class="stage-rev-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 19v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6m-7 0h7m-7 0H4m11 0h5M3 9l9-6 9 6"/></svg>
+                    Review Revenue · estimated impact
+                  </div>
+                  <div class="stage-rev-number-wrap">
+                    <span class="rev-prefix">+$</span>
+                    <span class="rev-number">
+                      <span class="rev-tick rev-tick-1">428</span>
+                      <span class="rev-tick rev-tick-2">912</span>
+                      <span class="rev-tick rev-tick-3">1,347</span>
+                      <span class="rev-tick rev-tick-4">1,612</span>
+                      <span class="rev-tick rev-tick-5">1,728</span>
+                    </span>
+                  </div>
+                  <div class="stage-rev-sub">from this single review · 24-month horizon</div>
+
+                  <div class="stage-rev-bars">
+                    <div class="rev-bar-row">
+                      <span class="rev-bar-label">Booking conversion lift</span>
+                      <div class="rev-bar-track"><div class="rev-bar-fill rev-fill-1"></div></div>
+                      <span class="rev-bar-val">+15%</span>
+                    </div>
+                    <div class="rev-bar-row">
+                      <span class="rev-bar-label">Search ranking boost</span>
+                      <div class="rev-bar-track"><div class="rev-bar-fill rev-fill-2"></div></div>
+                      <span class="rev-bar-val">+0.02★</span>
+                    </div>
+                    <div class="rev-bar-row">
+                      <span class="rev-bar-label">Referral attribution</span>
+                      <div class="rev-bar-track"><div class="rev-bar-fill rev-fill-3"></div></div>
+                      <span class="rev-bar-val">1.3×</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
-            <div class="phone-bottom-cta">
-              <div class="phone-progress"><div class="phone-progress-fill"></div></div>
-              <button class="phone-continue">Continue →</button>
+
+            <!-- Stage progress indicator at bottom -->
+            <div class="stage-progress-bar">
+              <div class="stage-dot d1"></div>
+              <div class="stage-dot d2"></div>
+              <div class="stage-dot d3"></div>
+              <div class="stage-dot d4"></div>
             </div>
           </div>
         </div>
+
+        <!-- Floating ambient elements around the phone -->
+        <div class="floating-star f-star-1">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        </div>
+        <div class="floating-star f-star-2">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        </div>
+        <div class="floating-dollar f-dollar-1">$</div>
+        <div class="floating-dollar f-dollar-2">$</div>
       </div>
     </div>
   </div>
@@ -1973,281 +4210,6 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
     </div>
   </div>
 </div>
-
-<!-- ============ THE SEVEN-STAGE LOOP ============ -->
-<section class="loop-section" id="loop">
-  <div class="container">
-    <div class="section-header-center">
-      <div class="section-eyebrow">The Review-to-Revenue Loop</div>
-      <h2 class="section-title">Seven stages. <em>One product.</em></h2>
-      <p class="section-sub">Most review tools do one or two of these. We do all seven, in three languages, in one place. That's the difference between a $39 review collection tool and a $99 customer growth engine.</p>
-    </div>
-
-    <div class="loop-visual">
-      <div class="loop-grid">
-        <div class="stage-card">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
-          </span>
-          <div class="stage-num">i.</div>
-          <h3 class="stage-name">Collect</h3>
-          <p class="stage-desc">Three taps, an AI-assisted draft, a Google review in 60 seconds. In any of three languages.</p>
-          <span class="stage-tier-badge">Starter</span>
-        </div>
-        <div class="stage-card">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/></svg>
-          </span>
-          <div class="stage-num">ii.</div>
-          <h3 class="stage-name">Publish</h3>
-          <p class="stage-desc">To Google, Yelp, or as a first-party testimonial. Always a private feedback path. Never gated.</p>
-          <span class="stage-tier-badge">Starter</span>
-        </div>
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
-          </span>
-          <div class="stage-num">iii.</div>
-          <h3 class="stage-name">Display</h3>
-          <p class="stage-desc">Reviews on your website as conversion-driving widgets with schema markup. Book/Call CTAs baked in.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/></svg>
-          </span>
-          <div class="stage-num">iv.</div>
-          <h3 class="stage-name">Distribute</h3>
-          <p class="stage-desc">Auto-generate branded social cards for Xiaohongshu, Instagram, Facebook. AI-drafted GBP posts. No US competitor touches this.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-      </div>
-
-      <div class="loop-arrow-down">
-        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
-      </div>
-
-      <div class="loop-grid-bottom">
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
-          </span>
-          <div class="stage-num">v.</div>
-          <h3 class="stage-name">Convert</h3>
-          <p class="stage-desc">Review-themed landing pages and review-grounded ad copy in your customers' real language. Reviews become bookings.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-          </span>
-          <div class="stage-num">vi.</div>
-          <h3 class="stage-name">Refer</h3>
-          <p class="stage-desc">After every great review, a "Share with a Friend" link with QR card. Track every referral back to its source.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/></svg>
-          </span>
-          <div class="stage-num">vii.</div>
-          <h3 class="stage-name">Compound</h3>
-          <p class="stage-desc">Review theme mining. Best advocates surfacing. Auto-published testimonial SEO pages. Reviews become ongoing assets.</p>
-          <span class="stage-tier-badge agency">Growth + Agency</span>
-        </div>
-      </div>
-
-      <p class="loop-summary">
-        Starter unlocks stages <strong>i &amp; ii</strong>. Growth unlocks <strong>iii through vi</strong>. Agency adds <strong>vii at scale</strong> across many client accounts. Every stage compounds the last.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- ============ REVIEW REVENUE ENGINE ============ -->
-<section class="engine-section" id="engine">
-  <div class="container">
-    <div class="section-header-center">
-      <div class="engine-eyebrow">Review Revenue</div>
-      <h2 class="section-title">Reviews are the <em>raw material.</em><br>Revenue is the output.</h2>
-      <p class="section-sub">
-        Other tools stop at collecting reviews. We turn each review into three
-        revenue-generating artifacts — share cards that travel, referral cards
-        that convert, and a dashboard that puts a dollar number on it. We call
-        the dollar number <strong>Review Revenue</strong>.
-      </p>
-    </div>
-
-    <!-- Visual flow above the three artifacts -->
-    <div class="engine-flow-bar">
-      <span class="engine-flow-pill">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg>
-        Collect great reviews
-      </span>
-      <span class="engine-flow-arrow">→</span>
-      <span class="engine-flow-pill">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0-12.814a2.25 2.25 0 1 0 3.935-2.186 2.25 2.25 0 0 0-3.935 2.186Zm0 12.814a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Z"/></svg>
-        Share &amp; refer
-      </span>
-      <span class="engine-flow-arrow">→</span>
-      <span class="engine-flow-pill terminal">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-2.485 0-4.5-1.343-4.5-3s2.015-3 4.5-3c1.11 0 2.122.268 2.9.718"/></svg>
-        Earn measurable revenue
-      </span>
-    </div>
-
-    <!-- HERO — two big numbers, mirrors Analytics > Estimated Revenue -->
-    <div class="engine-revenue">
-      <div class="engine-revenue-row">
-        <div>
-          <div class="engine-revenue-eyebrow">Review Revenue · last 30 days</div>
-          <div class="engine-revenue-num">$1,763</div>
-          <div class="engine-revenue-meta">Conservative $1,540 · Optimistic $1,985</div>
-        </div>
-        <div class="engine-revenue-col-divider"></div>
-        <div>
-          <div class="engine-revenue-eyebrow">Lifetime value of these customers</div>
-          <div class="engine-revenue-num gold">$11,760</div>
-          <div class="engine-revenue-meta">12 new customers × $980 LTV</div>
-        </div>
-      </div>
-      <div class="engine-revenue-bars" aria-hidden="true">
-        <div class="engine-revenue-bar" style="height: 40%"></div>
-        <div class="engine-revenue-bar" style="height: 56%"></div>
-        <div class="engine-revenue-bar" style="height: 70%"></div>
-        <div class="engine-revenue-bar" style="height: 100%"></div>
-      </div>
-    </div>
-
-    <!-- Lead-in to the two streams -->
-    <div class="engine-streams-intro">
-      <h3>Built from <em>two streams</em>, one engine.</h3>
-      <p>
-        One stream is fully tracked. The other is grounded in your Google
-        Business Profile data. Both feed the same total — no fairy-dust math.
-      </p>
-    </div>
-
-    <!-- TWO BUCKETS — mirror Analytics > Estimated Revenue page -->
-    <div class="engine-streams">
-
-      <!-- STREAM 1: Referral revenue (Direct) -->
-      <article class="engine-stream">
-        <div class="engine-stream-head">
-          <div class="engine-stream-name">
-            <span class="engine-stream-icon">👥</span>
-            Referral revenue
-          </div>
-          <span class="engine-tag direct">Direct</span>
-        </div>
-
-        <!-- Visual: referral offer card -->
-        <div class="engine-preview">
-          <div class="engine-offer">
-            <span class="engine-offer-pill">LIMITED OFFER</span>
-            <div class="engine-offer-inner">
-              <img class="engine-offer-hero" src="assets/offer-sample.webp" alt="Acupuncture treatment session" />
-              <div class="engine-offer-title">$20 Off your first visit</div>
-              <div class="engine-offer-sub">Use this coupon code</div>
-              <div class="engine-offer-code-row">
-                <span class="engine-offer-code">FRIEND20</span>
-                <button class="engine-offer-btn" type="button">Copy</button>
-              </div>
-              <button class="engine-offer-book" type="button">Book with this offer →</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="engine-section-label">Data this period</div>
-        <div class="engine-data-block">
-          <div class="engine-data-row"><span>Reviewers who saw a share prompt</span><b>54</b></div>
-          <div class="engine-data-row"><span>Sent a recommendation card</span><b>31</b></div>
-          <div class="engine-data-row"><span>Friends who clicked "Book"</span><b>15</b></div>
-          <div class="engine-data-row"><span>Estimated to convert (50% close rate)</span><b>≈ 8</b></div>
-        </div>
-
-        <div class="engine-section-label">Calculation</div>
-        <div class="engine-calc-block">
-          <p class="engine-calc-formula">
-            <b>15 book clicks</b> × <b>50% close rate</b> × <b>$150 ticket</b>
-          </p>
-          <div class="engine-calc-result">
-            <span class="label">Referral revenue</span>
-            <span class="amount">$1,125</span>
-            <span class="note">tracked, no modeling</span>
-          </div>
-        </div>
-
-        <div class="engine-ltv-footer">
-          <span class="arrow">↳</span>
-          <span class="text"><b>≈ 8</b> new customers × <b>$980</b> LTV</span>
-          <span class="ltv-amount">$7,840</span>
-        </div>
-      </article>
-
-      <!-- STREAM 2: New review revenue (Modeled) -->
-      <article class="engine-stream">
-        <div class="engine-stream-head">
-          <div class="engine-stream-name">
-            <span class="engine-stream-icon">⭐</span>
-            New review revenue
-          </div>
-          <span class="engine-tag modeled">Modeled</span>
-        </div>
-
-        <!-- Visual: share card square -->
-        <div class="engine-preview">
-          <div class="engine-share">
-            <span class="engine-share-pill">RECOMMENDED BY A CUSTOMER</span>
-            <div class="engine-share-stars">★★★★★</div>
-            <p class="engine-share-quote">
-              "黃醫師醫術高明，下針又快又準。我常年久坐，舊傷骨盆錯位致使
-              右髖筋膜沾黏，幾年走路一瘸一拐。經友人推薦求診於黃醫師，
-              每一次針灸都有明顯的改善。"
-            </p>
-            <div class="engine-share-attr">
-              <span class="engine-share-avatar">SC</span>
-              <span>— Shuhua Chang, satisfied customer</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="engine-section-label">Data this period (from GBP Insights)</div>
-        <div class="engine-data-block">
-          <div class="engine-data-row"><span>New 4★+ reviews</span><b>21</b></div>
-          <div class="engine-data-row"><span>Profile views — prior period</span><b>2,400</b></div>
-          <div class="engine-data-row"><span>Profile views — this period</span><b>3,250</b></div>
-          <div class="engine-data-row"><span>View lift vs prior period</span><b>+850</b></div>
-          <div class="engine-data-row"><span>Attributed to new reviews (50%)</span><b>425 views</b></div>
-        </div>
-
-        <div class="engine-section-label">Calculation</div>
-        <div class="engine-calc-block">
-          <p class="engine-calc-formula">
-            <b>425 attributed views</b> × <b>1% profile→booking</b> × <b>$150 ticket</b>
-          </p>
-          <div class="engine-calc-result">
-            <span class="label">New review revenue</span>
-            <span class="amount">$638</span>
-            <span class="note">range $415 – $861 (±35%)</span>
-          </div>
-        </div>
-
-        <div class="engine-ltv-footer">
-          <span class="arrow">↳</span>
-          <span class="text"><b>≈ 4</b> new customers × <b>$980</b> LTV</span>
-          <span class="ltv-amount">$3,920</span>
-        </div>
-      </article>
-    </div>
-
-    <p class="engine-summary">
-      Two streams. One engine. <strong>One number</strong> you can show your accountant.
-      That's the <strong>Review Revenue Engine</strong> — and it's the difference
-      between a review tool and a growth tool.
-    </p>
-  </div>
-</section>
 
 <!-- ============ THE RESEARCH ============ -->
 <section class="research-section" id="research">
@@ -2373,6 +4335,256 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   </div>
 </section>
 
+<!-- ============ REVIEW REVENUE — TRACE ONE REAL REVIEW ============ -->
+<section class="engine-section" id="engine">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="engine-eyebrow">Review Revenue, traced</div>
+      <h2 class="section-title">One review. <em>$1,728 in revenue.</em></h2>
+      <p class="section-sub">
+        Here's a real 5-star review from Dr. Huang's clinic. We'll show you what
+        that one review is actually worth — over 24 months, through
+        <strong>three measurable channels</strong>.
+      </p>
+    </div>
+
+    <!-- THE REAL REVIEW CARD -->
+    <div class="engine-real-review">
+      <div class="engine-review-header">
+        <div class="engine-review-avatar"></div>
+        <div class="engine-review-meta">
+          <div class="engine-review-source">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+            GOOGLE REVIEW
+          </div>
+          <div class="engine-review-name">Sofia Degtyar</div>
+          <div class="engine-review-business">DR. Huang Acupuncture and Green Eastern Beauty <span class="zh">中醫針灸 美容</span></div>
+        </div>
+        <div class="engine-review-rating">
+          <div class="engine-review-stars">★★★★★</div>
+          <div class="engine-review-time">4w ago</div>
+        </div>
+      </div>
+      <p class="engine-review-text">
+        Amazing experience! My back gave out unexpectedly to a point where I couldn't
+        straighten it, making it extremely painful to walk, sit, or stand. Dr. Huang's
+        office made time for a same day appointment and after a consultation and a
+        30min acupuncture session, I was able to stand straight up and walk with little
+        to no pain! Dr. Huang is extremely knowledgeable and her staff is delightful
+        and accommodating.
+      </p>
+    </div>
+
+    <!-- TRANSITION ARROW -->
+    <div class="engine-trace-arrow" aria-hidden="true">
+      <span class="trace-arrow-label">This one review generates</span>
+      <svg width="20" height="36" viewBox="0 0 20 36" fill="none" stroke="currentColor" stroke-width="1.5">
+        <line x1="10" y1="0" x2="10" y2="28"/>
+        <polyline points="3 22 10 32 17 22"/>
+      </svg>
+    </div>
+
+    <!-- BIG NUMBER -->
+    <div class="engine-revenue engine-revenue-single">
+      <div class="engine-revenue-eyebrow">Estimated value over 24 months</div>
+      <div class="engine-revenue-num gold">$1,728</div>
+      <div class="engine-revenue-meta">across three measurable channels — modeled on industry data, not magic</div>
+      <div class="engine-revenue-bars" aria-hidden="true">
+        <div class="engine-revenue-bar" style="height: 38%"></div>
+        <div class="engine-revenue-bar" style="height: 56%"></div>
+        <div class="engine-revenue-bar" style="height: 78%"></div>
+        <div class="engine-revenue-bar" style="height: 100%"></div>
+      </div>
+    </div>
+
+    <!-- INTRO -->
+    <div class="engine-streams-intro">
+      <h3>Three paths from one review to <em>real revenue.</em></h3>
+      <p>
+        Every BAAM-tracked review generates revenue through Google search ranking,
+        on-site trust, and friend-to-friend referral. We model and report all three.
+        Numbers below use industry-validated conversion rates and Dr. Huang's actual ticket sizes.
+      </p>
+    </div>
+
+    <!-- THREE PATH CARDS -->
+    <div class="engine-streams three-paths">
+
+      <!-- PATH 1 — DISCOVERY -->
+      <article class="engine-stream">
+        <div class="engine-stream-head">
+          <div class="engine-stream-name">
+            <span class="engine-stream-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            Discovery
+          </div>
+          <span class="engine-tag direct">Google ranking</span>
+        </div>
+
+        <div class="engine-preview">
+          <div class="discovery-mock">
+            <div class="discovery-search">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              acupuncture flushing
+            </div>
+            <div class="discovery-results">
+              <div class="discovery-result">
+                <span class="discovery-rank">1</span>
+                <span class="discovery-name">Wei Lin Acupuncture</span>
+                <span class="discovery-rating">4.8 ★</span>
+              </div>
+              <div class="discovery-result highlight">
+                <span class="discovery-rank">2</span>
+                <span class="discovery-name">Dr. Huang Acupuncture</span>
+                <span class="discovery-rating">4.9 ★ <span class="discovery-arrow">↑</span></span>
+              </div>
+              <div class="discovery-result">
+                <span class="discovery-rank">3</span>
+                <span class="discovery-name">Modern TCM</span>
+                <span class="discovery-rating">4.7 ★</span>
+              </div>
+              <div class="discovery-result">
+                <span class="discovery-rank">4</span>
+                <span class="discovery-name">Flushing Acupuncture</span>
+                <span class="discovery-rating">4.6 ★</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="engine-section-label">What this review does</div>
+        <div class="engine-data-block">
+          <div class="engine-data-row"><span>New average rating</span><b>4.91 ★</b></div>
+          <div class="engine-data-row"><span>Maps ranking improvement</span><b>+0.5 positions</b></div>
+          <div class="engine-data-row"><span>Additional profile views (24mo)</span><b>+180</b></div>
+          <div class="engine-data-row"><span>Profile → booking conversion</span><b>1.5%</b></div>
+        </div>
+
+        <div class="engine-section-label">Calculation</div>
+        <div class="engine-calc-block">
+          <p class="engine-calc-formula">
+            <b>180 views</b> × <b>1.5%</b> × <b>$215 ticket</b>
+          </p>
+          <div class="engine-calc-result">
+            <span class="label">Discovery revenue</span>
+            <span class="amount">$580</span>
+            <span class="note">over 24 months</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- PATH 2 — TRUST -->
+      <article class="engine-stream">
+        <div class="engine-stream-head">
+          <div class="engine-stream-name">
+            <span class="engine-stream-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+            </span>
+            Trust
+          </div>
+          <span class="engine-tag direct">On-site widget</span>
+        </div>
+
+        <div class="engine-preview">
+          <div class="trust-mock">
+            <div class="trust-browser-bar">
+              <span class="trust-browser-dot"></span>
+              <span class="trust-browser-dot"></span>
+              <span class="trust-browser-dot"></span>
+              <span class="trust-browser-url">drhuangacu.com</span>
+            </div>
+            <div class="trust-page">
+              <div class="trust-page-h">Dr. Huang Acupuncture</div>
+              <div class="trust-review-widget">
+                <div class="trust-stars">★★★★★</div>
+                <p class="trust-snippet">"Amazing experience! My back gave out... after a 30min session, I was able to stand straight up and walk with little to no pain!"</p>
+                <div class="trust-attr">— Sofia D.</div>
+              </div>
+              <div class="trust-cta">Book Now →</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="engine-section-label">What this review does</div>
+        <div class="engine-data-block">
+          <div class="engine-data-row"><span>Featured on website widget</span><b>Yes</b></div>
+          <div class="engine-data-row"><span>Visitors who read it (24mo)</span><b>~600</b></div>
+          <div class="engine-data-row"><span>Conversion lift attributable</span><b>+1.2%</b></div>
+          <div class="engine-data-row"><span>Estimated additional bookings</span><b>~7</b></div>
+        </div>
+
+        <div class="engine-section-label">Calculation</div>
+        <div class="engine-calc-block">
+          <p class="engine-calc-formula">
+            <b>600 readers</b> × <b>1.2%</b> × <b>$100 first-visit margin</b>
+          </p>
+          <div class="engine-calc-result">
+            <span class="label">Trust revenue</span>
+            <span class="amount">$720</span>
+            <span class="note">over 24 months</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- PATH 3 — REFERRAL -->
+      <article class="engine-stream">
+        <div class="engine-stream-head">
+          <div class="engine-stream-name">
+            <span class="engine-stream-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><line x1="8.7" y1="10.7" x2="15.3" y2="7.3"/><line x1="8.7" y1="13.3" x2="15.3" y2="16.7"/></svg>
+            </span>
+            Referral
+          </div>
+          <span class="engine-tag direct">Friend share</span>
+        </div>
+
+        <div class="engine-preview">
+          <div class="engine-offer">
+            <span class="engine-offer-pill">LIMITED OFFER</span>
+            <div class="engine-offer-inner">
+              <div class="engine-offer-hero-mock"></div>
+              <div class="engine-offer-title">$20 off your first visit</div>
+              <div class="engine-offer-sub">Sofia recommends Dr. Huang</div>
+              <div class="engine-offer-code-row">
+                <span class="engine-offer-code">FRIEND20</span>
+                <span class="engine-offer-btn">Copy</span>
+              </div>
+              <div class="engine-offer-book">Book with this offer →</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="engine-section-label">What this review does</div>
+        <div class="engine-data-block">
+          <div class="engine-data-row"><span>Sofia shown share prompt</span><b>Yes</b></div>
+          <div class="engine-data-row"><span>Industry share rate</span><b>~35%</b></div>
+          <div class="engine-data-row"><span>Friends reached (modeled)</span><b>~2</b></div>
+          <div class="engine-data-row"><span>Friend → booking conversion</span><b>~22%</b></div>
+        </div>
+
+        <div class="engine-section-label">Calculation</div>
+        <div class="engine-calc-block">
+          <p class="engine-calc-formula">
+            <b>2 friends</b> × <b>22%</b> × <b>$980 LTV</b>
+          </p>
+          <div class="engine-calc-result">
+            <span class="label">Referral revenue</span>
+            <span class="amount">$428</span>
+            <span class="note">over 24 months</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <p class="engine-summary">
+      <strong>$580 + $720 + $428 = $1,728</strong> from one 5-star review, over 24 months.
+      Multiply that by 18 new reviews a month and you get <strong>$31,104 in monthly Review Revenue</strong>.
+      That's the difference between a review tool and a growth tool.
+    </p>
+  </div>
+</section>
+
 <!-- ============ THE PROBLEM/SOLUTION CONTRAST ============ -->
 <div class="contrast">
   <div class="container">
@@ -2425,164 +4637,412 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         </div>
         <div class="compare-item">
           <span class="check"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-          <span>Three languages, self-serve signup, $49–99/mo, no sales calls</span>
+          <span>Three languages, self-serve signup, $89–99/mo, no sales calls</span>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ============ WEDGE FEATURE: COMPLETION RATE ============ -->
-<section class="wedge-section">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <div class="section-eyebrow">The wedge feature</div>
-        <h2 class="section-title">Customers <em>actually finish</em> the review.</h2>
-        <p class="section-sub">Three chip questions. AI generates a natural draft in their language. They edit, tap once, and post to Google. Sixty seconds. The result is a completion rate the rest of the category cannot match.</p>
-      </div>
-      <div class="wedge-stats">
-        <div class="wedge-stat-row">
-          <div class="wedge-stat-num">~10%</div>
-          <div class="wedge-stat-text">Of customers who click a typical "leave a review" link actually finish writing one. The category-wide reality.</div>
-        </div>
-        <div class="wedge-stat-row">
-          <div class="wedge-stat-num gold">38%</div>
-          <div class="wedge-stat-text">Average completion rate on BAAM Review's AI-assisted flow. Roughly 3.8× the category average.</div>
-        </div>
-        <div class="wedge-stat-row">
-          <div class="wedge-stat-num gold">60s</div>
-          <div class="wedge-stat-text">Average time from receiving SMS to a posted Google review.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ LANGUAGES ============ -->
-<section id="languages">
-  <div class="container">
-    <div class="section-eyebrow">First-class multilingual</div>
-    <h2 class="section-title">Three languages. <em>Same loop.</em></h2>
-    <p class="section-sub">A natural-sounding review draft from the same three inputs — what we helped you with, how it went, one word for us — rendered fluently in the language your customer chooses. Every stage of the loop is multilingual. No major US competitor does this.</p>
-    <div class="languages-grid">
-      <div class="language-card">
-        <div class="language-flag">English</div>
-        <p class="language-quote">"Came in for chronic migraines and after three sessions I'm sleeping through the night again. Dr. Huang takes her time, explains everything, and genuinely listens. The clinic is calm and clean. Worth the trip from Manhattan."</p>
-        <div class="language-meta">
-          <span class="stars">★★★★★</span>
-          <span>· Posted to Google</span>
-        </div>
-      </div>
-      <div class="language-card zh">
-        <div class="language-flag">中文</div>
-        <p class="language-quote">"因为偏头痛来的，三次治疗后晚上终于能睡整觉了。黄医生很耐心，会仔细听你说，解释也很清楚。诊所环境安静干净。从曼哈顿过来值得。"</p>
-        <div class="language-meta">
-          <span class="stars">★★★★★</span>
-          <span>· 已发布到 Google</span>
-        </div>
-      </div>
-      <div class="language-card es">
-        <div class="language-flag">Español</div>
-        <p class="language-quote">"Vine por migrañas crónicas y después de tres sesiones vuelvo a dormir toda la noche. La Dra. Huang se toma su tiempo, explica todo y realmente escucha. El consultorio es tranquilo y limpio. Vale el viaje desde Manhattan."</p>
-        <div class="language-meta">
-          <span class="stars">★★★★★</span>
-          <span>· Publicado en Google</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ FEATURES BY STAGE ============ -->
-<section class="features-section">
+<!-- ============ PROCESS WALKTHROUGH: SIX REAL SCREENS ============ -->
+<section class="process-section" id="how">
   <div class="container">
     <div class="section-header-center">
-      <div class="section-eyebrow">A small set of well-considered features</div>
-      <h2 class="section-title">Each one closes a <em>different gap</em>.</h2>
+      <div class="section-eyebrow">From setup to share</div>
+      <h2 class="section-title">Watch the loop <em>in action.</em></h2>
+      <p class="section-sub">Six real screens from the BAAM Review product, showing how one happy customer becomes a Google review, a referral, and measurable revenue.</p>
     </div>
-    <div class="features-grid">
-      <div class="feature">
-        <div class="feature-tier-row">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
-          </div>
-          <span class="stage-tier-badge">Starter</span>
-        </div>
-        <h3 class="feature-title">AI-assisted review writing</h3>
-        <p class="feature-text">Three taps from the customer become a natural-sounding draft they edit and post. Three languages. Customer is always the author of record.</p>
+
+    <div class="process-frame">
+
+    <!-- STEP 1: Connect Google Business Profile -->
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="process-step-label">Step 1 · Setup</div>
+        <h3 class="process-step-title">Connect your <em>Google Business Profile.</em></h3>
+        <p class="process-step-desc">One OAuth click. BAAM pulls in your business name, address, hours, and existing reviews — so every new review is attributed back to your real Google profile, not a third-party page.</p>
+        <ul class="process-step-pills">
+          <li>One-click OAuth</li>
+          <li>~30 seconds</li>
+          <li>Required to start</li>
+        </ul>
       </div>
-      <div class="feature">
-        <div class="feature-tier-row">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918"/></svg>
+      <div class="process-step-visual">
+        <div class="gbp-card">
+          <div class="gbp-card-head">
+            <div class="gbp-card-eyebrow">INTEGRATION</div>
+            <span class="gbp-status">
+              <span class="gbp-status-dot"></span>
+              Connected
+            </span>
           </div>
-          <span class="stage-tier-badge">Starter</span>
-        </div>
-        <h3 class="feature-title">English, Chinese, Spanish</h3>
-        <p class="feature-text">Your customers leave reviews in the language they actually speak. Three languages first-class from day one — not a translated UI bolt-on. Every stage of the loop is multilingual.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-tier-row">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5ZM13.5 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5Z"/></svg>
+          <div class="gbp-card-title-row">
+            <div class="gbp-google-logo">
+              <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            </div>
+            <div>
+              <div class="gbp-card-title">Google Business Profile</div>
+              <div class="gbp-card-tag">Verified business owner</div>
+            </div>
           </div>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <h3 class="feature-title">Website widgets with CTAs</h3>
-        <p class="feature-text">Reviews on the homepage, on service pages, as a floating badge — each one carrying a "Book Now" or "Call" CTA, all with Review schema markup baked in for SEO and AI engine citations.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-tier-row">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/></svg>
+          <div class="gbp-business">
+            <div class="gbp-business-row">
+              <div class="gbp-business-avatar">D</div>
+              <div class="gbp-business-info">
+                <div class="gbp-business-name">DR. Huang Acupuncture and Green Eastern Beauty <span class="zh">中醫針灸 美容</span></div>
+                <div class="gbp-business-addr">71 East Main Street, Middletown, NY 10940</div>
+              </div>
+            </div>
+            <div class="gbp-business-meta">
+              <span class="gbp-rating">
+                <span class="gbp-rating-star">★</span>
+                <strong>4.8</strong>
+                <span class="gbp-rating-count">· 47 reviews</span>
+              </span>
+              <span class="gbp-business-divider">·</span>
+              <span class="gbp-hours">Open · closes 7 PM</span>
+            </div>
           </div>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <h3 class="feature-title">Xiaohongshu &amp; social distribution</h3>
-        <p class="feature-text">Top reviews auto-rendered as branded social graphics for Xiaohongshu, Instagram, Facebook — sized correctly per platform, with AI-drafted captions in the right voice for each network.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-tier-row">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>
+          <div class="gbp-card-foot">
+            <span class="gbp-card-sync">Last synced 2 min ago</span>
+            <a href="#" class="gbp-disconnect">Disconnect</a>
           </div>
-          <span class="stage-tier-badge growth">Growth</span>
         </div>
-        <h3 class="feature-title">AI Reply Assistant</h3>
-        <p class="feature-text">When a Google review lands, BAAM drafts 2–3 reply options in the reviewer's language. Owner taps approve, reply posts to Google. Multilingual reply quality nothing else in the category matches.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-tier-row">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-          </div>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <h3 class="feature-title">Share-with-a-friend referrals</h3>
-        <p class="feature-text">After every great review, an optional share card with a tracked referral link. Customer sends via WeChat, SMS, or Xiaohongshu. Every new customer attributable to a specific reviewer.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-tier-row">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
-          </div>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <h3 class="feature-title">Revenue attribution dashboard</h3>
-        <p class="feature-text">See exactly what BAAM Review is doing for your business in dollars: reviews, widget views, CTA clicks, referrals, and an estimated revenue impact updated daily. The anti-churn surface.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-tier-row">
-          <div class="feature-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/></svg>
-          </div>
-          <span class="stage-tier-badge">Starter</span>
-        </div>
-        <h3 class="feature-title">Compliance, on rails</h3>
-        <p class="feature-text">No review gating, no incentive features that violate Google's policies, TCPA-compliant SMS templates with opt-out built in, FTC-aligned consent layer for testimonial reuse. We sweat the rules so you don't.</p>
       </div>
     </div>
+
+    <!-- STEP 2: Send a review request (single + bulk) -->
+    <div class="process-step reverse">
+      <div class="process-step-content">
+        <div class="process-step-label">Step 2 · Outreach</div>
+        <h3 class="process-step-title">Send a request, or <em>a list of them.</em></h3>
+        <p class="process-step-desc">One customer at a time, or a CSV of last week's patients. BAAM sends the right link in the right language, with TCPA-compliant SMS templates and 60-day dedup built in.</p>
+        <ul class="process-step-pills">
+          <li>Email or SMS</li>
+          <li>EN / 中文 / Español</li>
+          <li>Bulk Lists</li>
+        </ul>
+      </div>
+      <div class="process-step-visual">
+        <div class="send-stack">
+
+          <!-- Single send card -->
+          <div class="send-card">
+            <div class="send-card-eyebrow">Send a single request</div>
+            <div class="send-row">
+              <span class="send-label">Customer</span>
+              <span class="send-input">Sofia Degtyar</span>
+            </div>
+            <div class="send-row">
+              <span class="send-label">Email</span>
+              <span class="send-input send-input-mono">sofia.d@example.com</span>
+            </div>
+            <div class="send-row">
+              <span class="send-label">Language</span>
+              <span class="send-langs">
+                <span class="send-lang-pill active">English</span>
+                <span class="send-lang-pill">中文</span>
+                <span class="send-lang-pill">Español</span>
+              </span>
+            </div>
+            <div class="send-cta">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.27 3.13a.5.5 0 01.65-.65L20.87 11.13a1 1 0 010 1.74L3.92 21.52a.5.5 0 01-.65-.65L6 12zm0 0h6"/></svg>
+              Send via email
+            </div>
+          </div>
+
+          <!-- Divider with OR -->
+          <div class="send-divider">
+            <span class="send-divider-line"></span>
+            <span class="send-divider-or">or send to many at once</span>
+            <span class="send-divider-line"></span>
+          </div>
+
+          <!-- Lists card -->
+          <div class="send-card lists-card">
+            <div class="send-card-eyebrow">Lists</div>
+            <div class="lists-row">
+              <div class="lists-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              </div>
+              <div class="lists-meta">
+                <div class="lists-name">Last week's patients</div>
+                <div class="lists-sub">24 contacts · ready to send</div>
+              </div>
+              <span class="lists-badge">Ready</span>
+            </div>
+            <div class="lists-row">
+              <div class="lists-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              </div>
+              <div class="lists-meta">
+                <div class="lists-name">Migraine VIPs · Q1</div>
+                <div class="lists-sub">8 contacts · 3 already sent</div>
+              </div>
+              <span class="lists-badge sending">Sending</span>
+            </div>
+            <div class="lists-row">
+              <div class="lists-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              </div>
+              <div class="lists-meta">
+                <div class="lists-name">Acupuncture · January</div>
+                <div class="lists-sub">31 contacts · all sent</div>
+              </div>
+              <span class="lists-badge done">Done</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Customer receives + 3-question form -->
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="process-step-label">Step 3 · 60-second flow</div>
+        <h3 class="process-step-title">Three taps. <em>No blank box.</em></h3>
+        <p class="process-step-desc">Your customer taps the link in their email. They see one screen with three quick questions — service, stars, one word. No essay-writing required. Most happy customers freeze at a blank text field; we never give them one.</p>
+        <ul class="process-step-pills">
+          <li>One screen, three taps</li>
+          <li>Mobile-first</li>
+          <li>Customer's language</li>
+        </ul>
+      </div>
+      <div class="process-step-visual">
+        <div class="mini-phone">
+          <div class="mini-phone-header">
+            <div class="mini-phone-avatar">D</div>
+            <div class="mini-phone-clinic">
+              <div class="mini-phone-clinic-name">DR. Huang Acupuncture</div>
+              <div class="mini-phone-clinic-sub">Thanks for visiting</div>
+            </div>
+          </div>
+          <div class="mini-phone-q">How was your experience?</div>
+
+          <div class="mini-phone-section-label">SERVICE YOU RECEIVED</div>
+          <div class="mini-phone-chips">
+            <span class="mini-chip selected">Acupuncture</span>
+            <span class="mini-chip">Massage</span>
+            <span class="mini-chip">Cupping</span>
+            <span class="mini-chip">Herbs</span>
+            <span class="mini-chip">Consultation</span>
+          </div>
+
+          <div class="mini-phone-section-label">YOUR RATING</div>
+          <div class="mini-phone-stars">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+
+          <div class="mini-phone-section-label">IN ONE WORD</div>
+          <div class="mini-phone-chips">
+            <span class="mini-chip">Professional</span>
+            <span class="mini-chip selected">Warm</span>
+            <span class="mini-chip">Knowledgeable</span>
+            <span class="mini-chip">Skilled</span>
+            <span class="mini-chip">Patient</span>
+          </div>
+
+          <div class="mini-phone-cta">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+            Help me write a review →
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: AI drafts three options -->
+    <div class="process-step reverse">
+      <div class="process-step-content">
+        <div class="process-step-label">Step 4 · AI assistance</div>
+        <h3 class="process-step-title">AI writes <em>three drafts.</em> They pick one.</h3>
+        <p class="process-step-desc">Based on their three taps, the AI generates Warm, Specific, and Brief drafts in their language. Customer picks the one that sounds like them, edits if they want, and moves on. The author of record is always the customer.</p>
+        <ul class="process-step-pills">
+          <li>Three voice options</li>
+          <li>Edit anything</li>
+          <li>Customer authored</li>
+        </ul>
+      </div>
+      <div class="process-step-visual">
+        <div class="mini-phone">
+          <div class="mini-phone-header compact">
+            <div class="mini-phone-avatar">D</div>
+            <div class="mini-phone-clinic">
+              <div class="mini-phone-clinic-name">DR. Huang Acupuncture</div>
+              <div class="mini-phone-clinic-sub">5 ★ · Warm</div>
+            </div>
+          </div>
+          <div class="draft-h">Pick the one that fits best</div>
+          <div class="draft-sub">Tap a draft, then edit if you want.</div>
+
+          <div class="draft-card selected">
+            <div class="draft-card-top">
+              <span class="draft-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span class="draft-label">WARM</span>
+              <span class="draft-status">Copied</span>
+            </div>
+            <p class="draft-text">I've been coming to DR. Huang Acupuncture for a few months now and I honestly feel so much better. The staff is genuinely caring and takes time to listen. Highly recommend.</p>
+          </div>
+
+          <div class="draft-card">
+            <div class="draft-card-top">
+              <span class="draft-check empty"></span>
+              <span class="draft-label">SPECIFIC</span>
+            </div>
+            <p class="draft-text">Great experience at DR. Huang Acupuncture. Practitioners are knowledgeable, clinic is clean, appointment process was straightforward. Definitely coming back.</p>
+          </div>
+
+          <div class="draft-card">
+            <div class="draft-card-top">
+              <span class="draft-check empty"></span>
+              <span class="draft-label">BRIEF</span>
+            </div>
+            <p class="draft-text">Five stars for DR. Huang Acupuncture. Professional, attentive, exactly what I needed.</p>
+          </div>
+
+          <div class="mini-phone-cta forest-dark">
+            Looks good — post to Google →
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Posts to Google (Google's real review composer) -->
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="process-step-label">Step 5 · Public review</div>
+        <h3 class="process-step-title">Posted on the <em>real Google.</em></h3>
+        <p class="process-step-desc">Customer is dropped into Google's actual review composer with their draft already pasted. They tap Post. The review lands on your Google Business Profile, where Google's ranking algorithm and customers searching for "acupuncture near me" actually see it.</p>
+        <ul class="process-step-pills">
+          <li>Google's own UI</li>
+          <li>One tap to post</li>
+          <li>No third-party page</li>
+        </ul>
+      </div>
+      <div class="process-step-visual">
+        <div class="google-dialog">
+          <div class="google-dialog-clinic">DR. Huang Acupuncture and Green Eastern Beauty <span class="zh">中醫針灸 美容</span></div>
+          <div class="google-dialog-user">
+            <div class="google-user-avatar">J</div>
+            <div class="google-user-meta">
+              <div class="google-user-name">John</div>
+              <div class="google-user-public">Posting publicly across Google
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="google-stars">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <div class="google-textbox">
+            I've been coming to DR. Huang Acupuncture for a few months now and I honestly feel so much better. The staff is genuinely caring and takes time to listen. Highly recommend.<span class="google-cursor">|</span>
+          </div>
+          <div class="google-photos">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Add photos &amp; videos
+          </div>
+          <div class="google-price-block">
+            <div class="google-price-q">How would you describe the price you paid? <span class="google-beta">(Beta)</span></div>
+            <div class="google-price-chips">
+              <span class="google-price-chip">Great price</span>
+              <span class="google-price-chip">Reasonable price</span>
+              <span class="google-price-chip">Overpriced</span>
+              <span class="google-price-chip">Not sure</span>
+            </div>
+          </div>
+          <div class="google-actions">
+            <span class="google-cancel">Cancel</span>
+            <span class="google-post">Post</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6: Share & referral -->
+    <div class="process-step reverse">
+      <div class="process-step-content">
+        <div class="process-step-label">Step 6 · Compound</div>
+        <h3 class="process-step-title">Then turn it into <em>a referral.</em></h3>
+        <p class="process-step-desc">Right after posting, your customer sees a thank-you page with a branded share card. One tap sends a $20-off referral to their friend, via Facebook, SMS, or copied link — every click attributable back to this specific reviewer.</p>
+        <ul class="process-step-pills">
+          <li>FRIEND20 coupon</li>
+          <li>Tracked referrals</li>
+          <li>Multi-channel share</li>
+        </ul>
+      </div>
+      <div class="process-step-visual">
+        <div class="mini-phone">
+          <div class="ty-header">
+            <div class="ty-check">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="ty-eyebrow">OFF TO GOOGLE</div>
+            <div class="ty-title">Thank you, <em>John.</em></div>
+            <div class="ty-sub">Your feedback helps more local families find trusted care.</div>
+          </div>
+
+          <div class="ty-clinic-row">
+            <div class="ty-clinic-avatar">D</div>
+            <div class="ty-clinic-meta">
+              <div class="ty-clinic-name">DR. Huang Acupuncture</div>
+              <div class="ty-clinic-addr">71 East Main Street, Middletown, NY</div>
+            </div>
+            <div class="ty-clinic-stars">★★★★★</div>
+          </div>
+
+          <div class="ty-share-section">
+            <div class="ty-share-eyebrow">
+              <span class="ty-share-dot"></span>
+              YOUR SHARE CARD
+            </div>
+            <div class="ty-share-h">Send this — they get <em>$20 off.</em></div>
+
+            <div class="ty-offer">
+              <div class="ty-offer-pill">LIMITED OFFER</div>
+              <div class="ty-offer-inner">
+                <div class="ty-offer-hero"></div>
+                <div class="ty-offer-title">$20 off your first visit</div>
+                <div class="ty-offer-code-row">
+                  <span class="ty-offer-code">FRIEND20</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ty-share-buttons">
+              <div class="ty-share-btn">
+                <div class="ty-share-btn-icon fb">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </div>
+                <span class="ty-share-btn-label">Facebook</span>
+              </div>
+              <div class="ty-share-btn">
+                <div class="ty-share-btn-icon sms">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                </div>
+                <span class="ty-share-btn-label">SMS</span>
+              </div>
+              <div class="ty-share-btn">
+                <div class="ty-share-btn-icon copy">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                </div>
+                <span class="ty-share-btn-label">Copy</span>
+              </div>
+              <div class="ty-share-btn">
+                <div class="ty-share-btn-icon more">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                </div>
+                <span class="ty-share-btn-label">More</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+
   </div>
 </section>
 
@@ -2623,52 +5083,387 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   </div>
 </section>
 
+<!-- ============ COMPARISON TABLE: BAAM vs BIRDEYE vs PODIUM vs DIY ============ -->
+<section class="compare-home" id="compare">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="section-eyebrow">Honest comparison</div>
+      <h2 class="section-title">Why BAAM Review costs <em>67% less</em> than the alternatives.</h2>
+      <p class="section-sub">Side-by-side with the two biggest review-management SaaS platforms and the DIY route most clinics actually take. Pricing verified from public sources, January 2026.</p>
+    </div>
+
+    <div class="compare-table-card">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="compare-th-feature"></th>
+            <th class="compare-th compare-th-baam">
+              <div class="compare-th-name">BAAM Review</div>
+              <div class="compare-th-price"><strong>$89</strong>/mo founding</div>
+            </th>
+            <th class="compare-th">
+              <div class="compare-th-name">Birdeye</div>
+              <div class="compare-th-price">$299/mo + $5k setup</div>
+            </th>
+            <th class="compare-th">
+              <div class="compare-th-name">Podium</div>
+              <div class="compare-th-price">$399/mo + onboarding</div>
+            </th>
+            <th class="compare-th">
+              <div class="compare-th-name">DIY</div>
+              <div class="compare-th-price">$0 + your time</div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="compare-section-row"><td colspan="5">Core product</td></tr>
+          <tr>
+            <td class="compare-feat">AI-assisted review drafting</td>
+            <td class="compare-cell baam"><span class="compare-yes">✓</span></td>
+            <td class="compare-cell"><span class="compare-partial">Partial</span></td>
+            <td class="compare-cell"><span class="compare-no">—</span></td>
+            <td class="compare-cell"><span class="compare-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="compare-feat">Three languages first-class (EN / 中文 / ES)</td>
+            <td class="compare-cell baam"><span class="compare-yes">✓</span></td>
+            <td class="compare-cell"><span class="compare-no">EN only</span></td>
+            <td class="compare-cell"><span class="compare-no">EN only</span></td>
+            <td class="compare-cell"><span class="compare-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="compare-feat">Posts directly to Google (no third-party page)</td>
+            <td class="compare-cell baam"><span class="compare-yes">✓</span></td>
+            <td class="compare-cell"><span class="compare-yes">✓</span></td>
+            <td class="compare-cell"><span class="compare-yes">✓</span></td>
+            <td class="compare-cell"><span class="compare-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td class="compare-feat">Revenue attribution dashboard ($-per-review)</td>
+            <td class="compare-cell baam"><span class="compare-yes">✓</span></td>
+            <td class="compare-cell"><span class="compare-partial">Add-on</span></td>
+            <td class="compare-cell"><span class="compare-no">—</span></td>
+            <td class="compare-cell"><span class="compare-no">—</span></td>
+          </tr>
+          <tr>
+            <td class="compare-feat">Built-in referral cards</td>
+            <td class="compare-cell baam"><span class="compare-yes">✓</span></td>
+            <td class="compare-cell"><span class="compare-no">—</span></td>
+            <td class="compare-cell"><span class="compare-no">—</span></td>
+            <td class="compare-cell"><span class="compare-no">—</span></td>
+          </tr>
+
+          <tr class="compare-section-row"><td colspan="5">Onboarding &amp; commitment</td></tr>
+          <tr>
+            <td class="compare-feat">Setup fee</td>
+            <td class="compare-cell baam"><strong>$0</strong></td>
+            <td class="compare-cell">$5,000–$15,000</td>
+            <td class="compare-cell">$2,500+</td>
+            <td class="compare-cell">$0</td>
+          </tr>
+          <tr>
+            <td class="compare-feat">First-month price</td>
+            <td class="compare-cell baam"><strong>$0 (free)</strong></td>
+            <td class="compare-cell">$299</td>
+            <td class="compare-cell">$399</td>
+            <td class="compare-cell">$0 (but 0 reviews)</td>
+          </tr>
+          <tr>
+            <td class="compare-feat">Contract length</td>
+            <td class="compare-cell baam"><strong>Month-to-month</strong></td>
+            <td class="compare-cell">Annual</td>
+            <td class="compare-cell">Annual</td>
+            <td class="compare-cell">—</td>
+          </tr>
+          <tr>
+            <td class="compare-feat">Time to first review</td>
+            <td class="compare-cell baam"><strong>~7 days</strong></td>
+            <td class="compare-cell">30–60 days</td>
+            <td class="compare-cell">30–45 days</td>
+            <td class="compare-cell">Unknown</td>
+          </tr>
+
+          <tr class="compare-section-row"><td colspan="5">Cost over 12 months</td></tr>
+          <tr class="compare-final-row">
+            <td class="compare-feat compare-feat-final">Total Year-1 cost (single location)</td>
+            <td class="compare-cell baam compare-total"><strong>$979</strong></td>
+            <td class="compare-cell compare-total">~$8,500</td>
+            <td class="compare-cell compare-total">~$7,300</td>
+            <td class="compare-cell compare-total">$0 + ~120h time</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div class="compare-footnote">
+        Birdeye and Podium pricing verified from their public pricing pages, January 2026. Setup costs reflect typical enterprise onboarding contracts. DIY time estimate based on 10h/month of manual outreach × 12 months for one full-time staff member at minimum wage.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="section-eyebrow">Questions before you start</div>
+      <h2 class="section-title">The things <em>everyone asks</em> us.</h2>
+    </div>
+
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>What if I don't get any reviews during my free trial?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Then BAAM Review didn't earn its keep, and you don't pay. The 30-day trial is genuinely free — no card required, no auto-charge. If by day 30 you haven't seen reviews come in, we either need to fix something or you should leave. Most clinics see their first new review within 7 days of sending their first request batch.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Do you spam my customers?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          No. You upload a list of customers you've actually served, we send one email or SMS per customer with a 60-second review form. Every message is TCPA-compliant with one-click unsubscribe. We never email anyone twice within 60 days (deduplication is built-in). Most clinics send 20-50 review requests per week — far below any threshold that would feel like spam to your customers.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Is this compliant with Google's review policies?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Yes. We never gate reviews (you can't filter out low-star reviews before they hit Google), we never write reviews on behalf of customers (the AI drafts a starting point, but the customer is always the author and editor of record), and we never offer financial incentives in exchange for positive reviews. The platform is built explicitly around <a href="https://support.google.com/contributionpolicy" target="_blank" rel="noopener">Google's contribution policies</a>. We sweat the rules so your profile doesn't get suspended.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>What if I want to cancel?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Cancel anytime, no questions asked. Month-to-month billing means you can leave at the end of any billing cycle with zero cancellation fee. Full Service requires 30 days notice (so we can do clean handover), but no minimum commitment. We don't believe in trapping customers — if BAAM Review isn't generating revenue for you, leaving is the right call.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>What makes BAAM different from Birdeye or Podium?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Three things. <strong>Price</strong>: we're roughly 67–82% cheaper than Birdeye/Podium, with no setup fee. <strong>Multilingual</strong>: we're the only major US platform with first-class support for English, Mandarin, and Spanish — built in from day one, not a translated UI bolt-on. <strong>Revenue attribution</strong>: we put a dollar number on every review (modeled but defensible). Birdeye and Podium tell you how many reviews you got. We tell you what they were worth. See the <a href="#compare">comparison table above</a>.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>What does the $1,728 per review actually mean?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          It's the modeled value of one new 5-star Google review for a clinic like Dr. Huang's, over 24 months, across three measurable channels: Google search ranking (+$580), on-site widget trust (+$720), and friend-to-friend referrals (+$428). The underlying conversion rates come from industry research (Harvard Business School, BrightLocal, Whitespark), and the ticket/LTV values come from Dr. Huang's actual books. It's a model, not a measurement — but it's defensible math, not magic. <a href="#engine">See the full breakdown →</a>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Do I need a Google Business Profile already?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Yes. Google Business Profile is free to create and required for any business that wants to show up in local Google searches. If you don't have one yet, we'll walk you through creating one as part of your first setup call — usually takes 15-20 minutes including Google's verification step. After that, BAAM Review connects via OAuth in about 30 seconds.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Can I use this for multiple locations?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Yes. Each additional location is +$49/month (or +$39 if you're a founding customer). Each location gets its own dashboard, brand settings, and review attribution. The pricing scales linearly with no surprise jumps — 5 locations is $295/mo (or $245 founding), 10 locations is $540/mo (or $440 founding). Birdeye and Podium charge $200-400 per location at this volume.
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
 <!-- ============ PRICING TEASER ============ -->
 <div class="pricing-teaser">
   <div class="pricing-teaser-content">
-    <div class="section-eyebrow">Three tiers, one engine</div>
-    <h2 class="section-title">Pricing that respects <em>where you are.</em></h2>
+    <div class="section-eyebrow">Two paths, one product</div>
+    <h2 class="section-title">Pricing that respects <em>how you want to work.</em></h2>
     <p style="font-family: 'Newsreader', serif; font-size: 19px; color: rgba(250, 247, 242, 0.78); max-width: 660px; margin-top: 8px;">
-      Self-serve. Transparent. No sales calls. From $0 to $499, with an explicit founding-customer program for the first 50 paid signups.
+      Run it yourself with our platform, or let us run it for you. Founding-customer pricing locked forever for the first 50 self-serve and first 20 Full Service signups.
     </p>
 
     <div class="tier-strip">
+
+      <!-- PATH A: SELF-SERVE -->
       <div class="tier-mini">
-        <div class="tier-mini-name">Starter</div>
-        <div class="tier-mini-tag">Get more Google reviews.</div>
-        <div class="tier-mini-price">$49<span class="tier-mini-price-period">/mo</span></div>
-        <div class="tier-mini-feature">1 location, 150 requests/mo, AI writing, QR + embed</div>
+        <div class="tier-mini-eyebrow">Path A · Self-serve</div>
+        <div class="tier-mini-name">Run it yourself</div>
+        <div class="tier-mini-tag">Log in, send review requests, reply to reviews. You drive it.</div>
+        <div class="tier-mini-price-row">
+          <span class="tier-mini-price-pre">From</span>
+          <span class="tier-mini-price">$99<span class="tier-mini-price-period">/mo</span></span>
+        </div>
+        <div class="tier-mini-founding"><strong>$89/mo</strong> founding · first month free</div>
+
+        <ul class="tier-mini-feature-list">
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Single location, unlimited review requests</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI drafting in EN / 中文 / Español</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Lists, batch sends, private feedback path</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Add locations at +$49/mo each</li>
+        </ul>
+
+        <a href="/pricing#self-serve" class="tier-mini-cta">
+          See self-serve pricing
+          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
       </div>
+
+      <!-- PATH B: FULL SERVICE -->
       <div class="tier-mini featured">
-        <div class="tier-mini-name">Growth</div>
-        <div class="tier-mini-tag">Turn reviews into revenue.</div>
-        <div class="tier-mini-price">$99<span class="tier-mini-price-period">/mo</span></div>
-        <div class="tier-mini-feature">5 locations, unlimited, full loop, attribution dashboard</div>
+        <div class="tier-mini-eyebrow">Path B · Full Service</div>
+        <div class="tier-mini-name">We run it for you</div>
+        <div class="tier-mini-tag">Send us your customer list each week. We handle everything else.</div>
+        <div class="tier-mini-price-row">
+          <span class="tier-mini-price-pre" style="color: rgba(232, 217, 181, 0.7);">From</span>
+          <span class="tier-mini-price">$399<span class="tier-mini-price-period">/mo</span></span>
+        </div>
+        <div class="tier-mini-founding"><strong>$299/mo</strong> founding · setup waived</div>
+
+        <ul class="tier-mini-feature-list">
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We send all review requests, weekly batches</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We reply to every review in your voice</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We catch private feedback before it goes public</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Monthly written report · Full Service Plus at $599</li>
+        </ul>
+
+        <a href="/pricing#full-service" class="tier-mini-cta">
+          See Full Service pricing
+          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
       </div>
-      <div class="tier-mini">
-        <div class="tier-mini-name">Agency</div>
-        <div class="tier-mini-tag">Reputation at scale.</div>
-        <div class="tier-mini-price">$499<span class="tier-mini-price-period">/mo</span></div>
-        <div class="tier-mini-feature">25 locations, white label, partner referrals, multi-client view</div>
-      </div>
+
     </div>
 
     <div class="pricing-cta-row">
       <a href="/pricing" class="btn btn-gold btn-large">See full pricing →</a>
       <span class="founding-note">
         <span class="founding-dot"></span>
-        23 founding-customer spots left at $39 / $89 / $249 — locked forever.
+        23 self-serve · 17 Full Service founding spots left — locked forever.
       </span>
     </div>
   </div>
 </div>
+
+<!-- ============ THE SEVEN-STAGE LOOP ============ -->
+<section class="loop-section" id="loop">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="section-eyebrow">The Review-to-Revenue Loop</div>
+      <h2 class="section-title">Seven stages. <em>One product.</em></h2>
+      <p class="section-sub">Most review tools do one or two of these. We do all seven, in three languages, in one place. That's the difference between a $39 review collection tool and a $99 customer growth engine.</p>
+    </div>
+
+    <div class="loop-visual">
+      <div class="loop-grid">
+        <div class="stage-card">
+          <span class="stage-icon">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+          </span>
+          <div class="stage-num">i.</div>
+          <h3 class="stage-name">Collect</h3>
+          <p class="stage-desc">Three taps, an AI-assisted draft, a Google review in 60 seconds. In any of three languages.</p>
+          <span class="stage-tier-badge growth">Growth</span>
+        </div>
+        <div class="stage-card">
+          <span class="stage-icon">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/></svg>
+          </span>
+          <div class="stage-num">ii.</div>
+          <h3 class="stage-name">Publish</h3>
+          <p class="stage-desc">To Google, Yelp, or as a first-party testimonial. Always a private feedback path. Never gated.</p>
+          <span class="stage-tier-badge growth">Growth</span>
+        </div>
+        <div class="stage-card gold-highlight">
+          <span class="stage-icon">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
+          </span>
+          <div class="stage-num">iii.</div>
+          <h3 class="stage-name">Display</h3>
+          <p class="stage-desc">Reviews on your website as conversion-driving widgets with schema markup. Book/Call CTAs baked in.</p>
+          <span class="stage-tier-badge growth">Growth</span>
+        </div>
+        <div class="stage-card gold-highlight">
+          <span class="stage-icon">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/></svg>
+          </span>
+          <div class="stage-num">iv.</div>
+          <h3 class="stage-name">Distribute</h3>
+          <p class="stage-desc">Auto-generate branded social cards for Xiaohongshu, Instagram, Facebook. AI-drafted GBP posts. No US competitor touches this.</p>
+          <span class="stage-tier-badge growth">Growth</span>
+        </div>
+      </div>
+
+      <div class="loop-arrow-down">
+        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+      </div>
+
+      <div class="loop-grid-bottom">
+        <div class="stage-card gold-highlight">
+          <span class="stage-icon">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
+          </span>
+          <div class="stage-num">v.</div>
+          <h3 class="stage-name">Convert</h3>
+          <p class="stage-desc">Review-themed landing pages and review-grounded ad copy in your customers' real language. Reviews become bookings.</p>
+          <span class="stage-tier-badge growth">Growth</span>
+        </div>
+        <div class="stage-card gold-highlight">
+          <span class="stage-icon">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+          </span>
+          <div class="stage-num">vi.</div>
+          <h3 class="stage-name">Refer</h3>
+          <p class="stage-desc">After every great review, a "Share with a Friend" link with QR card. Track every referral back to its source.</p>
+          <span class="stage-tier-badge growth">Growth</span>
+        </div>
+        <div class="stage-card gold-highlight">
+          <span class="stage-icon">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/></svg>
+          </span>
+          <div class="stage-num">vii.</div>
+          <h3 class="stage-name">Compound</h3>
+          <p class="stage-desc">Review theme mining. Best advocates surfacing. Auto-published testimonial SEO pages. Reviews become ongoing assets.</p>
+          <span class="stage-tier-badge agency">Growth + Agency</span>
+        </div>
+      </div>
+
+      <p class="loop-summary">
+        <strong>Growth</strong> unlocks stages <strong>i through vi</strong>. <strong>Full Service</strong> means we run all six for you. <strong>Agency</strong> adds <strong>vii at scale</strong> across many client accounts. Every stage compounds the last.
+      </p>
+    </div>
+  </div>
+</section>
 
 <!-- ============ FOOTER ============ -->
 <footer>
   <div class="container">
     <div class="footer-grid">
       <div>
-        <a href="#" class="logo">
+        <a href="/" class="logo">
           <span class="logo-mark">B</span>
           BAAM Review
         </a>
@@ -2677,11 +5472,11 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
       <div class="footer-col">
         <div class="footer-col-title">Product</div>
         <ul>
-          <li><a href="#loop">How it works</a></li>
           <li><a href="/pricing">Pricing</a></li>
           <li><a href="#engine">Review Revenue</a></li>
           <li><a href="/review-value.html#top">Review Value</a></li>
-          <li><a href="#languages">Languages</a></li>
+          <li><a href="#compare">Comparison</a></li>
+          <li><a href="#how">How it works</a></li>
           <li><a href="#">Integrations</a></li>
         </ul>
       </div>
@@ -2753,6 +5548,15 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   liftSlider.addEventListener('input', recalc);
   recalc();
 </script>
+
+<!-- ============ STICKY MOBILE CTA (mobile only) ============ -->
+<div class="mobile-sticky-cta">
+  <div class="mobile-sticky-cta-text">
+    <div class="mobile-sticky-cta-title">Start free trial</div>
+    <div class="mobile-sticky-cta-sub">30 days · No credit card · Cancel anytime</div>
+  </div>
+  <a href="/pricing#self-serve" class="mobile-sticky-cta-btn">$0 today →</a>
+</div>
 
 </body>
 </html>

@@ -421,6 +421,34 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["opt_outs"]["Insert"]>;
         Relationships: [];
       };
+      booking_requests: {
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          business: string | null;
+          preferred_time: string | null;
+          notes: string | null;
+          source: string | null;
+          user_agent: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          email: string;
+          business?: string | null;
+          preferred_time?: string | null;
+          notes?: string | null;
+          source?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["booking_requests"]["Insert"]
+        >;
+        Relationships: [];
+      };
       lists: {
         Row: {
           id: string;
@@ -484,6 +512,7 @@ export interface Database {
             | "opted_out"
             | "no_contact"
             | "manual"
+            | "bounced"
             | null;
           send_request_id: string | null;
           review_id: string | null;
@@ -518,6 +547,7 @@ export interface Database {
             | "opted_out"
             | "no_contact"
             | "manual"
+            | "bounced"
             | null;
           send_request_id?: string | null;
           review_id?: string | null;

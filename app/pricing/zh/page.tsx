@@ -3,13 +3,13 @@ import { readMarketingDoc } from "@/lib/marketing/render";
 import { MarketingScripts } from "@/components/marketing/marketing-scripts";
 
 export const metadata: Metadata = {
-  title: "Pricing — BAAM Review",
+  title: "定价 — BAAM Review",
   description:
-    "Transparent pricing for BAAM Review. Run it yourself from $99/mo. Or let us run it for you from $399/mo. Founding-customer pricing locked forever for the first 50 self-serve and first 20 Full Service signups.",
+    "BAAM Review 透明定价。自助使用 $89/月起。全方位服务 $299/月起。前 50 位自助用户和前 20 位全方位服务用户享创始客户终身锁定价。",
 };
 
-export default function PricingPage() {
-  const { css, bodyHtml } = readMarketingDoc("marketing-pricing.html");
+export default function PricingZhPage() {
+  const { css, bodyHtml } = readMarketingDoc("marketing-pricing-zh.html");
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
