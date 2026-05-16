@@ -82,5 +82,40 @@ export async function submitBookingRequest(
     // swallow — the row is saved; you'll still see it in Supabase.
   }
 
+  // Best-effort confirmation to the requester. Independent try/catch so a
+  // failure here never affects the saved row or the team notification.
+  try {
+    const from = process.env.RESEND_FROM;
+    if (from) {
+      const greeting = name.split(/\s+/)[0] || "there";
+      const text = [
+        `Hi ${greeting},`,
+        "",
+        "Thanks for requesting a 15-minute intro call with BAAM Review — we've got it.",
+        "We'll email you shortly to lock in a time" +
+          (preferredTime ? ` around your preferred window (${preferredTime})` : "") +
+          ". Usually within one business day.",
+        "",
+        "Just reply to this email if anything changes.",
+        "",
+        "— The BAAM Review team",
+      ].join("\n");
+      await sendEmailViaResend({
+        to: email,
+        subject: "Thanks — we'll be in touch to schedule your call",
+        text,
+        html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.6;color:#1A1F1C">${text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\n/g, "<br>")}</div>`,
+        replyTo: BOOKING_NOTIFY_EMAIL,
+        from,
+      });
+    }
+  } catch {
+    // swallow — confirmation is a courtesy; the request is already recorded.
+  }
+
   return { ok: true };
 }
