@@ -15,6 +15,10 @@ export interface TemplateVars {
   name: string;
   businessName: string;
   link: string;
+  /** One-click unsubscribe URL. When set, the email footer shows a real
+   *  opt-out link instead of "just ignore this email" (CAN-SPAM + Gmail
+   *  / Yahoo bulk-sender requirements). */
+  unsubscribeUrl?: string;
 }
 
 interface MessageOutput {
@@ -57,8 +61,11 @@ export function buildEmail(lang: Language, vars: TemplateVars): EmailOutput {
         greeting: `${first}，您好：`,
         body: `感谢您今天来到${vars.businessName}。如果方便，能花一分钟跟我们说说您的体验吗？以下链接里有几个快速选项：`,
         sign: `${vars.businessName} 团队`,
-        footer: "如不想收到此类邮件，可直接忽略。",
+        footer: "如不想收到此类邮件，可点击下方退订。",
         link: vars.link,
+        unsubscribe: vars.unsubscribeUrl
+          ? { label: "退订", url: vars.unsubscribeUrl }
+          : undefined,
       });
     case "es":
       return emailHtml({
@@ -66,8 +73,11 @@ export function buildEmail(lang: Language, vars: TemplateVars): EmailOutput {
         greeting: `Hola ${first},`,
         body: `Gracias por su visita a ${vars.businessName}. Si tiene un minuto, ¿podría contarnos cómo le fue? Le dejamos un enlace con algunas opciones rápidas:`,
         sign: `El equipo de ${vars.businessName}`,
-        footer: "Si prefiere no recibir más, simplemente ignore este mensaje.",
+        footer: "Si prefiere no recibir más, puede cancelar la suscripción:",
         link: vars.link,
+        unsubscribe: vars.unsubscribeUrl
+          ? { label: "Cancelar suscripción", url: vars.unsubscribeUrl }
+          : undefined,
       });
     case "en":
     default:
@@ -76,8 +86,11 @@ export function buildEmail(lang: Language, vars: TemplateVars): EmailOutput {
         greeting: `Hi ${first},`,
         body: `Thanks for stopping by ${vars.businessName} today. If you have a minute, we'd love to hear how it went — there are a few quick options at this link:`,
         sign: `The team at ${vars.businessName}`,
-        footer: "If you'd rather not, just ignore this email — no worries.",
+        footer: "If you'd rather not hear from us, you can unsubscribe:",
         link: vars.link,
+        unsubscribe: vars.unsubscribeUrl
+          ? { label: "Unsubscribe", url: vars.unsubscribeUrl }
+          : undefined,
       });
   }
 }
@@ -89,7 +102,12 @@ function emailHtml(parts: {
   sign: string;
   footer: string;
   link: string;
+  unsubscribe?: { label: string; url: string };
 }): EmailOutput {
+  const footerText = parts.unsubscribe
+    ? `${parts.footer} ${parts.unsubscribe.url}`
+    : parts.footer;
+
   // Plain-text first. Gmail Promotions classifier strongly weights HTML-heavy
   // marketing-style emails. Keep this looking like a personal note.
   const text = `${parts.greeting}
@@ -101,7 +119,7 @@ ${parts.link}
 ${parts.sign}
 
 —
-${parts.footer}`;
+${footerText}`;
 
   // Minimal HTML: same content, system font, single sentence link. No
   // buttons, no card chrome, no images. Reads like a normal email.
@@ -112,7 +130,11 @@ ${parts.footer}`;
     <p style="margin: 0 0 14px 0;">${escapeHtml(parts.body)}</p>
     <p style="margin: 0 0 14px 0;"><a href="${parts.link}" style="color: #1F4D3F;">${escapeHtml(parts.link)}</a></p>
     <p style="margin: 0 0 22px 0;">${escapeHtml(parts.sign)}</p>
-    <p style="font-size: 12px; color: #8A938E; margin: 0;">${escapeHtml(parts.footer)}</p>
+    <p style="font-size: 12px; color: #8A938E; margin: 0;">${escapeHtml(parts.footer)}${
+      parts.unsubscribe
+        ? ` <a href="${parts.unsubscribe.url}" style="color: #8A938E;">${escapeHtml(parts.unsubscribe.label)}</a>`
+        : ""
+    }</p>
   </body>
 </html>`;
 

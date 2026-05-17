@@ -11,6 +11,8 @@ export interface SendEmailOpts {
   from?: string;
   /** Stable tags for tracking. */
   tags?: Array<{ name: string; value: string }>;
+  /** Extra MIME headers (e.g. List-Unsubscribe for bulk deliverability). */
+  headers?: Record<string, string>;
 }
 
 export interface SendResult {
@@ -44,6 +46,7 @@ export async function sendEmailViaResend(
       html: opts.html,
       replyTo: opts.replyTo,
       tags: opts.tags,
+      headers: opts.headers,
     });
     if (result.error) {
       return {

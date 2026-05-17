@@ -82,6 +82,30 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     .maybeSingle();
   if (!location) return { ok: false, error: "Location not found." };
 
+  // Suppression check: never send to a contact that has unsubscribed or
+  // previously bounced/complained. track.ts + the resend webhook write
+  // these into opt_outs; without this gate the send path keeps emailing
+  // addresses Resend already knows bounce (silent non-delivery).
+  const suppressionClient = createServiceClient();
+  const suppressionContact =
+    channel === "sms" ? recipientPhone : recipientEmail;
+  if (suppressionContact) {
+    const { data: suppressed } = await suppressionClient
+      .from("opt_outs")
+      .select("id")
+      .eq("location_id", location.id)
+      .eq("contact", suppressionContact)
+      .eq("channel", channel)
+      .maybeSingle();
+    if (suppressed) {
+      return {
+        ok: false,
+        error:
+          "This contact has unsubscribed or previously bounced — not sending.",
+      };
+    }
+  }
+
   const velocity = await checkVelocity(location.id);
   if (velocity.kind === "block") {
     return {
@@ -93,6 +117,7 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
   const token = generateTrackingToken();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:4001";
   const trackingUrl = `${appUrl}/r/${location.slug}?t=${token}`;
+  const unsubscribeUrl = `${appUrl}/api/unsubscribe?t=${token}`;
 
   // The form sends user-editable subject + body. Variables in the preview
   // were the rendered values for a placeholder URL — at send time we
@@ -110,6 +135,7 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     name: recipientName,
     businessName: location.display_name,
     link: trackingUrl,
+    unsubscribeUrl,
   };
 
   let messageBody: string;
@@ -147,7 +173,14 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
       const senderName = location.sender_name || location.display_name;
       from = formatFromHeader(senderName, location.sender_email);
     } else {
-      const senderName = location.sender_name || location.display_name;
+      // No verified per-location sender: we're sending from the shared
+      // baamplatform.com domain. Putting the bare client name in From while
+      // DKIM-signing as baamplatform.com is a name/domain mismatch that
+      // trips spam heuristics. "<Business> via BAAM Review" is the honest,
+      // standard pattern (cf. "X via Substack") — keeps recognizability
+      // without the mismatch.
+      const baseName = location.sender_name || location.display_name;
+      const senderName = `${baseName} via BAAM Review`;
       const defaultAddr =
         extractEmail(process.env.RESEND_FROM ?? "") || process.env.RESEND_FROM;
       if (defaultAddr) from = formatFromHeader(senderName, defaultAddr);
@@ -155,6 +188,14 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
 
     // Reply-To set to the sending user's address so customer can reply to a
     // real person, not no-reply@. Helps Gmail classify as personal, not bulk.
+    // List-Unsubscribe + one-click (RFC 8058). Required by Gmail/Yahoo
+    // bulk-sender rules; its absence is a strong spam signal for
+    // solicitation mail. https URL is our /api/unsubscribe endpoint;
+    // mailto is the monitored support inbox.
+    const supportAddr =
+      extractEmail(process.env.RESEND_FROM ?? "") ||
+      process.env.RESEND_FROM ||
+      "support@baamplatform.com";
     const r = await sendEmailViaResend({
       to: recipientEmail!,
       subject: subjectText,
@@ -162,6 +203,10 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
       html,
       replyTo: user.email ?? undefined,
       from,
+      headers: {
+        "List-Unsubscribe": `<mailto:${supportAddr}?subject=unsubscribe>, <${unsubscribeUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
     providerId = r.providerId;
     sendError = r.error;
