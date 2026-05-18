@@ -1805,9 +1805,49 @@ footer {
 
 
 @media print {
-  .topbar, .final-cta-buttons, .hero-cta { display: none; }
-  section { padding: 60px 0; page-break-inside: avoid; }
-  body { background: white; }
+  /* Print the brand palette exactly; freeze all motion. */
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  @page { size: Letter; margin: 14mm 12mm; }
+
+  /* Web-only chrome — useless on paper. */
+  .topbar, .menu-toggle { display: none !important; }
+
+  /* Scroll-reveal never fires without scrolling in headless print —
+     force the final visible state so no section prints blank. */
+  .reveal { opacity: 1 !important; transform: none !important; }
+
+  /* Looping phone demo: freeze to its first scene, drop the rest. */
+  .anim-phone .scene { animation: none !important; }
+  .anim-phone .scene-1 { opacity: 1 !important; position: relative !important; }
+  .anim-phone .scene-2,
+  .anim-phone .scene-3,
+  .anim-phone .scene-4,
+  .anim-phone .scene-5 { display: none !important; }
+
+  /* Expand every FAQ answer for a self-contained handout. */
+  .faq-a {
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 0 28px !important;
+  }
+
+  /* Tighten generous web spacing; no near-empty pages. */
+  section { padding: 30px 0 !important; }
+  .hero, .hero-visual { min-height: auto !important; }
+
+  /* Slide-like pagination: each section on a fresh page; small
+     repeating blocks never split across a page boundary. */
+  section + section { break-before: page; }
+  .faq-item, .hero-stats > div, table, tr, blockquote, figure,
+  [class*="card"], [class*="stat"], [class*="industry"] { break-inside: avoid; }
+
+  a { text-decoration: none !important; }
 }
 </style>
 </head>
@@ -1827,6 +1867,7 @@ footer {
       <a href="#solution">解决方案</a>
       <a href="#pricing">价格</a>
       <a href="#faq">常见问题</a>
+      <a href="/">English</a>
     </nav>
     <a href="#pricing" class="cta-mini">免费试用 30 天</a>
     <button class="menu-toggle" aria-label="菜单" aria-expanded="false">
