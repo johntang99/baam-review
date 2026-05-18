@@ -3972,6 +3972,514 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   /* Add bottom padding to body to prevent content from hiding behind sticky bar */
   body { padding-bottom: 76px; }
 }
+
+/* ============ DEFINE GOLD-DARK (referenced but not previously defined) ============ */
+:root {
+  --gold-dark: #836A30;
+}
+
+/* ============ THE SILENCE PROBLEM (Why 90% don't review) ============ */
+.silence-section {
+  padding: 120px 0;
+  background: var(--cream);
+  position: relative;
+}
+.silence-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 72px;
+  align-items: center;
+  max-width: 1080px;
+  margin: 60px auto 0;
+}
+.silence-viz {
+  position: relative;
+  aspect-ratio: 1;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.silence-viz svg { width: 100%; height: 100%; }
+.silence-stat {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.silence-stat .big {
+  font-family: 'Fraunces', serif;
+  font-size: 104px;
+  font-weight: 300;
+  color: var(--forest);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.silence-stat .big .pct { font-size: 60px; color: var(--forest-light); }
+.silence-stat .label {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  color: var(--ink);
+  margin-top: 14px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.silence-stat .sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+  font-family: 'Newsreader', serif;
+}
+
+.silence-barriers {
+  display: flex;
+  flex-direction: column;
+}
+.silence-barrier {
+  display: flex;
+  gap: 22px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+.silence-barrier:first-child { padding-top: 0; }
+.silence-barrier:last-child { padding-bottom: 0; border-bottom: none; }
+.silence-barrier-num {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-style: italic;
+  color: var(--gold-dark);
+  font-weight: 400;
+  min-width: 36px;
+  padding-top: 2px;
+  letter-spacing: -0.02em;
+}
+.silence-barrier-text h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+}
+.silence-barrier-text p {
+  font-family: 'Newsreader', serif;
+  font-size: 15px;
+  color: var(--text-soft);
+  line-height: 1.75;
+}
+
+@media (max-width: 900px) {
+  .silence-grid { grid-template-columns: 1fr; gap: 48px; }
+}
+@media (max-width: 760px) {
+  .silence-section { padding: 80px 0; }
+  .silence-stat .big { font-size: 80px; }
+  .silence-stat .big .pct { font-size: 46px; }
+}
+
+/* ============ 4-STEP SIMPLE FLOW (above 6-screen process walkthrough) ============ */
+.process-tldr {
+  margin: 56px auto 88px;
+  max-width: 1000px;
+  position: relative;
+}
+.process-tldr-label {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 32px;
+  position: relative;
+  font-weight: 600;
+}
+.process-tldr-label span {
+  background: var(--cream);
+  padding: 0 18px;
+  position: relative;
+  z-index: 1;
+}
+.process-tldr-label::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px;
+  background: var(--border);
+}
+.process-tldr-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+}
+.process-tldr-steps::before {
+  content: '';
+  position: absolute;
+  top: 36px; left: 12.5%; right: 12.5%;
+  height: 1px;
+  background: var(--border);
+  z-index: 0;
+}
+.process-tldr-step {
+  text-align: center;
+  padding: 0 18px;
+  position: relative;
+}
+.process-tldr-dot {
+  width: 72px; height: 72px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  margin: 0 auto 22px;
+  display: grid; place-items: center;
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--forest);
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1),
+              box-shadow 0.35s ease,
+              border-color 0.35s ease;
+}
+.process-tldr-step:hover .process-tldr-dot {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--gold-soft);
+}
+.process-tldr-step h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+  letter-spacing: -0.005em;
+}
+.process-tldr-step p {
+  font-family: 'Newsreader', serif;
+  font-size: 13.5px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+.process-detail-divider {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin: 0 0 44px;
+  font-weight: 600;
+  position: relative;
+}
+.process-detail-divider span {
+  background: var(--cream);
+  padding: 0 18px;
+  position: relative;
+  z-index: 1;
+}
+.process-detail-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px;
+  background: var(--border);
+}
+
+@media (max-width: 760px) {
+  .process-tldr-steps { grid-template-columns: 1fr 1fr; gap: 36px 0; }
+  .process-tldr-steps::before { display: none; }
+}
+
+/* ============ 10× CERTAINTY BANNER (before pricing) ============ */
+.certainty-section {
+  padding: 80px 0 0;
+  background: var(--cream);
+}
+.certainty-banner {
+  max-width: 1080px;
+  margin: 0 auto;
+  background: var(--forest);
+  color: var(--cream);
+  padding: 44px 56px;
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 48px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+.certainty-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 30%, rgba(201, 169, 97, 0.18), transparent 60%);
+  pointer-events: none;
+}
+.certainty-seal {
+  font-family: 'Fraunces', serif;
+  font-size: 76px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--gold-soft);
+  letter-spacing: -0.04em;
+  position: relative;
+}
+.certainty-seal .x { font-size: 96px; color: var(--gold); }
+.certainty-text {
+  border-left: 1px solid rgba(232, 217, 181, 0.28);
+  padding-left: 44px;
+  position: relative;
+}
+.certainty-text h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--cream);
+  letter-spacing: -0.015em;
+}
+.certainty-text p {
+  font-family: 'Newsreader', serif;
+  font-size: 16px;
+  color: rgba(250, 247, 242, 0.86);
+  line-height: 1.7;
+}
+.certainty-text p strong { color: var(--gold-soft); font-weight: 500; }
+.certainty-stamp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--gold-soft);
+  text-align: center;
+  border: 1px solid rgba(232, 217, 181, 0.42);
+  padding: 14px;
+  border-radius: 50%;
+  width: 124px; height: 124px;
+  display: grid; place-items: center;
+  line-height: 1.8;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  font-weight: 600;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .certainty-banner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    text-align: center;
+    padding: 36px 32px;
+  }
+  .certainty-text {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(232, 217, 181, 0.28);
+    padding-top: 28px;
+  }
+  .certainty-stamp { margin: 0 auto; }
+  .certainty-seal { font-size: 60px; }
+  .certainty-seal .x { font-size: 76px; }
+}
+
+/* ============ RESEARCH STAT ICONS + ENHANCED HOVER ============ */
+.research-stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(31, 77, 63, 0.08);
+  display: grid;
+  place-items: center;
+  color: var(--forest);
+  margin-bottom: 20px;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1),
+              background 0.35s ease;
+}
+.research-stat-icon.gold {
+  background: rgba(201, 169, 97, 0.14);
+  color: var(--gold-dark);
+}
+.research-stat-icon svg {
+  width: 23px;
+  height: 23px;
+}
+.research-stat {
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
+              border-color 0.4s ease;
+}
+.research-stat:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--gold-soft);
+}
+.research-stat:hover .research-stat-icon {
+  background: rgba(31, 77, 63, 0.15);
+  transform: scale(1.08) rotate(-4deg);
+}
+.research-stat:hover .research-stat-icon.gold {
+  background: rgba(201, 169, 97, 0.24);
+}
+
+/* ============ INDUSTRY VALUE SOURCES STRIP ============ */
+.value-sources-strip {
+  max-width: 980px;
+  margin: 28px auto 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.value-sources-strip .vs-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  white-space: nowrap;
+  position: relative;
+  padding-right: 28px;
+}
+.value-sources-strip .vs-label::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 50%;
+  width: 1px; height: 14px;
+  background: var(--border);
+  transform: translateY(-50%);
+}
+.value-sources-strip .vs-list {
+  font-family: 'Fraunces', serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  line-height: 1.7;
+}
+.value-sources-strip .vs-list .sep {
+  color: var(--gold);
+  margin: 0 10px;
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .value-sources-strip { flex-direction: column; gap: 12px; padding: 16px; }
+  .value-sources-strip .vs-label { padding-right: 0; }
+  .value-sources-strip .vs-label::after { display: none; }
+  .value-sources-strip .vs-list { font-size: 12px; }
+}
+
+/* ============ TESTIMONIALS (after process walkthrough) ============ */
+.testimonials-section {
+  padding: 110px 0;
+  background: var(--cream);
+}
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  max-width: 1100px;
+  margin: 56px auto 0;
+}
+.testimonial-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 32px 30px;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
+              border-color 0.4s ease;
+}
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--gold-soft);
+}
+.testimonial-card::before {
+  content: '\201C';
+  position: absolute;
+  top: 12px; left: 22px;
+  font-family: 'Fraunces', serif;
+  font-size: 64px;
+  font-weight: 400;
+  color: var(--forest);
+  opacity: 0.12;
+  line-height: 1;
+}
+.testimonial-stars {
+  color: var(--gold);
+  font-size: 14px;
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.testimonial-quote {
+  font-family: 'Newsreader', serif;
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--ink);
+  margin-bottom: 24px;
+  position: relative;
+  font-weight: 400;
+}
+.testimonial-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-soft);
+}
+.testimonial-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--cream);
+  display: grid; place-items: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.testimonial-name {
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.testimonial-role {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.testimonial-role .zh {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  margin-left: 4px;
+  color: var(--gold-dark);
+  font-size: 11.5px;
+}
+
+@media (max-width: 960px) {
+  .testimonials-grid { grid-template-columns: 1fr; max-width: 600px; }
+}
+@media (max-width: 760px) {
+  .testimonials-section { padding: 72px 0; }
+  .testimonial-card { padding: 28px 24px; }
+}
 </style>
 </head>
 <body>
@@ -3988,7 +4496,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
       <a href="/review-value.html#top">Review Value</a>
       <a href="/#compare">Comparison</a>
       <a href="/#how">How it works</a>
-      <a href="/pricing/zh">中文</a>
+      <a href="/baam-review-zh.html">中文</a>
     </div>
     <div class="nav-cta">
       <a href="/login" class="btn btn-ghost">Sign in</a>
@@ -4033,8 +4541,8 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         </div>
 
         <div class="hero-ctas">
-          <a href="02-marketing-pricing.html#self-serve" class="btn btn-primary btn-large">Start free trial →</a>
-          <a href="02-marketing-pricing.html#full-service" class="btn btn-gold btn-large">Full Service →</a>
+          <a href="/pricing#self-serve" class="btn btn-primary btn-large">Start free trial →</a>
+          <a href="/pricing#full-service" class="btn btn-gold btn-large">Full Service →</a>
           <a href="#engine" class="btn btn-outline btn-large">See the $1,728 math →</a>
         </div>
         <div class="hero-trust">
@@ -4046,7 +4554,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="hero-trust-line"></span>
           <span>Reviews easy</span>
         </div>
-        <a href="14-report-google-review-value.html#top" class="hero-research-badge">
+        <a href="/review-value.html#top" class="hero-research-badge">
           <span class="hero-research-badge-tag">Research</span>
           Backed by independent evidence — Harvard Business School · BrightLocal · Whitespark · FTC
           <span class="hero-research-badge-arrow">→</span>
@@ -4224,6 +4732,14 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 
     <div class="research-stats">
       <div class="research-stat">
+        <div class="research-stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="21" x2="21" y2="21"/>
+            <rect x="4.5" y="13" width="3.5" height="8" rx="0.5"/>
+            <rect x="10.25" y="9" width="3.5" height="12" rx="0.5"/>
+            <rect x="16" y="5" width="3.5" height="16" rx="0.5"/>
+          </svg>
+        </div>
         <div class="research-stat-num">16–20%</div>
         <div class="research-stat-label">
           of Google&rsquo;s Local Pack ranking weight comes from <b>review signals</b> — up from ~11% five years ago.
@@ -4231,6 +4747,12 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         <div class="research-stat-source">Whitespark · 2026</div>
       </div>
       <div class="research-stat">
+        <div class="research-stat-icon gold">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="2" x2="12" y2="22"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
         <div class="research-stat-num gold">5–9%</div>
         <div class="research-stat-label">
           revenue increase per <b>1-star Yelp rating bump</b>, established with regression-discontinuity causal inference.
@@ -4238,6 +4760,12 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         <div class="research-stat-source">M. Luca · HBS 2016</div>
       </div>
       <div class="research-stat">
+        <div class="research-stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 17 9 11 13 15 21 7"/>
+            <polyline points="14 7 21 7 21 14"/>
+          </svg>
+        </div>
         <div class="research-stat-num">25%</div>
         <div class="research-stat-label">
           conversion lift for brick-and-mortar businesses from a single <b>0.1-star rating increase</b>.
@@ -4245,6 +4773,12 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         <div class="research-stat-source">Uberall · BrightLocal</div>
       </div>
       <div class="research-stat">
+        <div class="research-stat-icon gold">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
         <div class="research-stat-num gold">240M</div>
         <div class="research-stat-label">
           policy-violating reviews <b>removed by Google in 2024 alone</b> — real reviews are now scarcer and worth more.
@@ -4257,7 +4791,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
     <div class="research-verticals">
       <div class="research-verticals-head">
         <h3 class="research-verticals-title">What&rsquo;s your industry's <em>per-review value?</em></h3>
-        <p class="research-verticals-sub">Same formula, applied to seven common local-business types. Higher LTV → higher per-review value.</p>
+        <p class="research-verticals-sub">Same formula, applied to eleven common local-business types. Higher LTV → higher per-review value.</p>
       </div>
 
       <div class="vchart-row">
@@ -4271,6 +4805,16 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         <div class="vchart-value">$120 – $600</div>
       </div>
       <div class="vchart-row">
+        <div class="vchart-label">Apparel / Boutique</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 0.7%; width: 5%;"></div></div>
+        <div class="vchart-value">$80 – $700</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label">Health Food / Supplements</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 1.25%; width: 9%;"></div></div>
+        <div class="vchart-value">$150 – $1,200</div>
+      </div>
+      <div class="vchart-row">
         <div class="vchart-label">Insurance Agent</div>
         <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 2.5%; width: 15%;"></div></div>
         <div class="vchart-value">$300 – $1,800</div>
@@ -4279,6 +4823,16 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         <div class="vchart-label">Acupuncture / Clinic</div>
         <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 3.3%; width: 20%;"></div></div>
         <div class="vchart-value">$400 – $2,400</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label">Hotel / Resort</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 2.5%; width: 21%;"></div></div>
+        <div class="vchart-value">$300 – $2,800</div>
+      </div>
+      <div class="vchart-row">
+        <div class="vchart-label">Auto Dealer / Repair</div>
+        <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 4.2%; width: 42%;"></div></div>
+        <div class="vchart-value">$500 – $5,000+</div>
       </div>
       <div class="vchart-row">
         <div class="vchart-label">Contractor / Roofing</div>
@@ -4309,8 +4863,15 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
       </div>
 
       <p class="vchart-foot">
-        Ranges modeled over 24 months. Low end = conservative LTV and conversion lift; high end = well-performing businesses. <a href="14-report-google-review-value.html#by-vertical">See the per-vertical assumptions in the research brief →</a>
+        Ranges modeled over 24 months. Low end = conservative LTV and conversion lift; high end = well-performing businesses. <a href="/review-value.html#by-vertical">See the per-vertical assumptions in the research brief →</a>
       </p>
+    </div>
+
+    <div class="value-sources-strip">
+      <span class="vs-label">Cited Research</span>
+      <span class="vs-list">
+        Harvard Business School<span class="sep">·</span>BrightLocal<span class="sep">·</span>Whitespark<span class="sep">·</span>Berkeley / Economic Journal<span class="sep">·</span>NYU Stern<span class="sep">·</span>Federal Trade Commission<span class="sep">·</span>Google Transparency Report
+      </span>
     </div>
 
     <div class="research-cta-row">
@@ -4321,12 +4882,12 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           models the per-review value for your specific business.
         </p>
       </div>
-      <a href="14-report-google-review-value.html#top" class="research-cta-btn">
+      <a href="/review-value.html#top" class="research-cta-btn">
         Read the research →
       </a>
     </div>
 
-    <p class="research-sources-line">
+    <p class="research-sources-line" style="display: none;">
       Sources cited:
       <b>Harvard Business School</b> · <b>BrightLocal</b> · <b>Whitespark</b> ·
       <b>Berkeley / Economic Journal</b> · <b>NYU Stern</b> ·
@@ -4585,73 +5146,118 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   </div>
 </section>
 
-<!-- ============ THE PROBLEM/SOLUTION CONTRAST ============ -->
-<div class="contrast">
+<!-- ============ THE SILENCE PROBLEM (Why 90% of happy customers don't review) ============ -->
+<section class="silence-section" id="silence">
   <div class="container">
-    <div class="section-eyebrow">The category problem</div>
-    <h2 class="section-title">Other tools collect reviews.<br><em>We turn them into revenue.</em></h2>
-    <p class="section-sub" style="font-size: 20px;">
-      Birdeye costs $299+ and stops at "monitor your reviews." Podium is sales-led and English-only. NiceJob is solid but ends where we begin. None of them close the loop into referrals, distribution, and compound growth.
-    </p>
-    <div class="compare-grid">
-      <div class="compare-col them">
-        <h3>What other tools do</h3>
-        <div class="compare-item">
-          <span class="x">—</span>
-          <span>Send review requests and hope customers complete them</span>
-        </div>
-        <div class="compare-item">
-          <span class="x">—</span>
-          <span>Aggregate reviews from many platforms into a dashboard</span>
-        </div>
-        <div class="compare-item">
-          <span class="x">—</span>
-          <span>Stop there. The reviews sit. Customers don't refer. Nothing compounds.</span>
-        </div>
-        <div class="compare-item">
-          <span class="x">—</span>
-          <span>English-only or English-first. Spanish translated. Chinese rarely supported.</span>
-        </div>
-        <div class="compare-item">
-          <span class="x">—</span>
-          <span>$299–$599 per month, plus $500–$1,500 setup fees, sales-led</span>
+    <div class="section-header-center">
+      <div class="section-eyebrow">The silence problem</div>
+      <h2 class="section-title">Your happy customers aren't quiet because<br>they're unhappy. <em>They're quiet because reviewing is hard.</em></h2>
+      <p class="section-sub">
+        We've tracked clinics and shops across the NY metro — even when satisfaction averages 4.8 stars and customers thank you at the counter, only 1–10% leave a Google review. The other 90% of goodwill never compounds into trust, ranking, or revenue.
+      </p>
+    </div>
+
+    <div class="silence-grid">
+      <div class="silence-viz">
+        <svg viewBox="0 0 400 400">
+          <!-- Background circle (full = all happy customers) -->
+          <circle cx="200" cy="200" r="180" fill="none" stroke="#E8E2D5" stroke-width="1"/>
+          <!-- 10% reviewing — forest accent -->
+          <circle cx="200" cy="200" r="180"
+                  fill="none" stroke="#1F4D3F" stroke-width="36"
+                  stroke-dasharray="113 1018" stroke-dashoffset="0"
+                  transform="rotate(-90 200 200)"/>
+          <!-- 90% silent — cream-deep -->
+          <circle cx="200" cy="200" r="180"
+                  fill="none" stroke="#F0EBE0" stroke-width="36"
+                  stroke-dasharray="1018 113" stroke-dashoffset="-113"
+                  transform="rotate(-90 200 200)"/>
+          <!-- Labels around the ring -->
+          <text x="200" y="32" text-anchor="middle" fill="#1F4D3F"
+                font-family="Fraunces, serif" font-size="13" font-weight="600" letter-spacing="0.05em">10% LEAVE A REVIEW</text>
+          <text x="384" y="200" text-anchor="end" fill="#5A6660"
+                font-family="Fraunces, serif" font-size="13" font-style="italic">silent customers</text>
+        </svg>
+        <div class="silence-stat">
+          <div class="big">90<span class="pct">%</span></div>
+          <div class="label">stay silent</div>
+          <div class="sub">despite being happy</div>
         </div>
       </div>
-      <div class="compare-col us">
-        <h3>What BAAM Review does</h3>
-        <div class="compare-item">
-          <span class="check"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-          <span>AI-assisted writing flow gets 3× the completion rate vs. blank Google forms</span>
+
+      <div class="silence-barriers">
+        <div class="silence-barrier">
+          <div class="silence-barrier-num">01</div>
+          <div class="silence-barrier-text">
+            <h4>They don't know <em>where</em> to leave it.</h4>
+            <p>Most customers don't have Google Maps top of mind. Even when they intend to review, finding the right form on mobile takes more taps than they'll make. About 30% give up before they start.</p>
+          </div>
         </div>
-        <div class="compare-item">
-          <span class="check"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-          <span>Display widget with conversion CTAs and schema markup, on every website</span>
+        <div class="silence-barrier">
+          <div class="silence-barrier-num">02</div>
+          <div class="silence-barrier-text">
+            <h4>They don't know <em>what</em> to write.</h4>
+            <p>A blank text box freezes people. "It was good" — but how do they phrase that without sounding flat? The blank-box freeze kills more reviews than any other friction in the funnel.</p>
+          </div>
         </div>
-        <div class="compare-item">
-          <span class="check"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-          <span>Auto-distributes top reviews to Xiaohongshu, Instagram, Facebook, GBP</span>
+        <div class="silence-barrier">
+          <div class="silence-barrier-num">03</div>
+          <div class="silence-barrier-text">
+            <h4>They forget — goodwill <em>evaporates</em>.</h4>
+            <p>A customer's intent to review drops about 70% three days after the visit. After a week, it's nearly zero. Without timely, well-timed prompting, the moment passes.</p>
+          </div>
         </div>
-        <div class="compare-item">
-          <span class="check"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-          <span>"Share with a Friend" referral link after every successful review</span>
-        </div>
-        <div class="compare-item">
-          <span class="check"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-          <span>Three languages, self-serve signup, $89–99/mo, no sales calls</span>
+        <div class="silence-barrier">
+          <div class="silence-barrier-num">04</div>
+          <div class="silence-barrier-text">
+            <h4>It feels like <em>a chore</em>.</h4>
+            <p>Even a one-minute task gets filed mentally under "I'll do that later" — and "later" never comes. The mental cost of starting is the real obstacle, not the actual minute it would take.</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- ============ PROCESS WALKTHROUGH: SIX REAL SCREENS ============ -->
 <section class="process-section" id="how">
   <div class="container">
     <div class="section-header-center">
-      <div class="section-eyebrow">From setup to share</div>
-      <h2 class="section-title">Watch the loop <em>in action.</em></h2>
-      <p class="section-sub">Six real screens from the BAAM Review product, showing how one happy customer becomes a Google review, a referral, and measurable revenue.</p>
+      <div class="section-eyebrow">Chapter 4 · The Solution</div>
+      <h2 class="section-title">From four barriers to <em>three taps.</em><br>All under 60 seconds, in their language.</h2>
+      <p class="section-sub">
+        BAAM dismantles those four barriers, one at a time. Your customer opens an email, picks three tags, lets the AI draft a review — then taps once to send it to Google. The whole flow runs in under 60 seconds, in their language. No blank box. No friction. Nothing to figure out.
+      </p>
     </div>
+
+    <!-- 4-step simple flow (TL;DR view) -->
+    <div class="process-tldr">
+      <div class="process-tldr-label"><span>The 30-second version</span></div>
+      <div class="process-tldr-steps">
+        <div class="process-tldr-step">
+          <div class="process-tldr-dot">i</div>
+          <h4>Send the request</h4>
+          <p>Email or SMS, one customer or a list, in their language. We pick the right time.</p>
+        </div>
+        <div class="process-tldr-step">
+          <div class="process-tldr-dot">ii</div>
+          <h4>Open in one tap</h4>
+          <p>Customer lands on a 60-second form. Pick service, pick stars, pick a word. No blank box.</p>
+        </div>
+        <div class="process-tldr-step">
+          <div class="process-tldr-dot">iii</div>
+          <h4>AI drafts the review</h4>
+          <p>Three voice options — warm, specific, brief. Customer picks one and edits if they want.</p>
+        </div>
+        <div class="process-tldr-step">
+          <div class="process-tldr-dot">iv</div>
+          <h4>Posts to Google</h4>
+          <p>One tap. Lives on your real Google Business Profile. Plus a share-with-friend card.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="process-detail-divider"><span>The detailed walkthrough · six real screens</span></div>
 
     <div class="process-frame">
 
@@ -5046,6 +5652,63 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   </div>
 </section>
 
+<!-- ============ TESTIMONIALS — FOUNDING CUSTOMERS ============ -->
+<section class="testimonials-section" id="testimonials">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="section-eyebrow">What founding customers are seeing</div>
+      <h2 class="section-title">From clinics to brokers — NY-metro shops are<br><em>turning customers into revenue.</em></h2>
+      <p class="section-sub">
+        From TCM clinics to insurance brokers to real-estate teams — same product, same loop, different industries. Where the goodwill used to stay silent, BAAM lets it compound.
+      </p>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-quote">
+          We'd been asking patients to write Google reviews for six months — barely worked. The month after switching to BAAM, we got <strong>17 new 5-star reviews</strong>. Our ranking for "acupuncture Flushing" moved from #5 to #2. Weekends are now fully booked.
+        </div>
+        <div class="testimonial-meta">
+          <div class="testimonial-avatar">H</div>
+          <div>
+            <div class="testimonial-name">Dr. Huang</div>
+            <div class="testimonial-role">Acupuncture &amp; TCM Clinic, Flushing <span class="zh">黄医生针灸</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-quote">
+          We'd been on Birdeye at $299/month — completion rate was only 8%. The <strong>Chinese AI drafting</strong> was the unlock: most of our clients speak Cantonese or Mandarin and weren't going to write English reviews. Completion is now over 30%.
+        </div>
+        <div class="testimonial-meta">
+          <div class="testimonial-avatar">C</div>
+          <div>
+            <div class="testimonial-name">Lisa Chen</div>
+            <div class="testimonial-role">Insurance Broker, Brooklyn <span class="zh">华诚保险</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-quote">
+          In real estate, every referral matters. BAAM doesn't just collect reviews — the <strong>share-with-a-friend</strong> card after every 5-star has actually closed deals. Three of last month's listings came from the friend-share link.
+        </div>
+        <div class="testimonial-meta">
+          <div class="testimonial-avatar">W</div>
+          <div>
+            <div class="testimonial-name">David Wang</div>
+            <div class="testimonial-role">Real Estate Team, Long Island <span class="zh">东方地产</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ FOR BAAM STUDIO CLIENTS ============ -->
 <section class="baam-clients">
   <div class="container">
@@ -5297,6 +5960,24 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   </div>
 </section>
 
+<!-- ============ 10× CERTAINTY BANNER (transition into pricing) ============ -->
+<section class="certainty-section">
+  <div class="container">
+    <div class="certainty-banner">
+      <div class="certainty-seal">10<span class="x">×</span></div>
+      <div class="certainty-text">
+        <h3>Our 10× value promise.</h3>
+        <p>
+          Measured against the <strong>median</strong> per-review value for your industry — not the high end, not the low end — we're confident the Review Revenue we generate will be <strong>at least 10× what you pay us</strong>. The only precondition: you keep sending us real customer lists each month. We don't conjure customers from thin air — we translate the goodwill you've already earned into reviews Google can see.
+        </p>
+      </div>
+      <div class="certainty-stamp">
+        BAAM × You<br>10× Value<br>Together
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ PRICING TEASER ============ -->
 <div class="pricing-teaser">
   <div class="pricing-teaser-content">
@@ -5326,7 +6007,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Add locations at +$49/mo each</li>
         </ul>
 
-        <a href="02-marketing-pricing.html#self-serve" class="tier-mini-cta">
+        <a href="/pricing#self-serve" class="tier-mini-cta">
           See self-serve pricing
           <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
@@ -5350,7 +6031,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Monthly written report · Full Service Plus at $599</li>
         </ul>
 
-        <a href="02-marketing-pricing.html#full-service" class="tier-mini-cta">
+        <a href="/pricing#full-service" class="tier-mini-cta">
           See Full Service pricing
           <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
@@ -5359,7 +6040,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
     </div>
 
     <div class="pricing-cta-row">
-      <a href="02-marketing-pricing.html" class="btn btn-gold btn-large">See full pricing →</a>
+      <a href="/pricing" class="btn btn-gold btn-large">See full pricing →</a>
       <span class="founding-note">
         <span class="founding-dot"></span>
         23 self-serve · 17 Full Service founding spots left — locked forever.
@@ -5463,7 +6144,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   <div class="container">
     <div class="footer-grid">
       <div>
-        <a href="#" class="logo">
+        <a href="/" class="logo">
           <span class="logo-mark">B</span>
           BAAM Review
         </a>
@@ -5472,9 +6153,9 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
       <div class="footer-col">
         <div class="footer-col-title">Product</div>
         <ul>
-          <li><a href="02-marketing-pricing.html">Pricing</a></li>
+          <li><a href="/pricing">Pricing</a></li>
           <li><a href="#engine">Review Revenue</a></li>
-          <li><a href="14-report-google-review-value.html#top">Review Value</a></li>
+          <li><a href="/review-value.html#top">Review Value</a></li>
           <li><a href="#compare">Comparison</a></li>
           <li><a href="#how">How it works</a></li>
           <li><a href="#">Integrations</a></li>
@@ -5555,7 +6236,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
     <div class="mobile-sticky-cta-title">Start free trial</div>
     <div class="mobile-sticky-cta-sub">30 days · No credit card · Cancel anytime</div>
   </div>
-  <a href="02-marketing-pricing.html#self-serve" class="mobile-sticky-cta-btn">$0 today →</a>
+  <a href="/pricing#self-serve" class="mobile-sticky-cta-btn">$0 today →</a>
 </div>
 
 </body>
