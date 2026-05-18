@@ -18,6 +18,7 @@ const MARKETING_HOST_WWW = "www.baamreview.com";
 
 const MARKETING_ONLY_PATHS = new Set([
   "/",
+  "/zh",
   "/pricing",
   "/review-value.html",
 ]);
