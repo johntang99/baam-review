@@ -449,6 +449,50 @@ export interface Database {
         >;
         Relationships: [];
       };
+      review_videos: {
+        Row: {
+          id: string;
+          location_id: string;
+          review_id: string | null;
+          template: string;
+          reviewer_name: string | null;
+          rating: number | null;
+          review_text: string | null;
+          brand: Record<string, string> | null;
+          has_music: boolean;
+          has_voiceover: boolean;
+          vertical_path: string | null;
+          landscape_path: string | null;
+          vertical_bytes: number | null;
+          landscape_bytes: number | null;
+          duration_seconds: number | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          review_id?: string | null;
+          template?: string;
+          reviewer_name?: string | null;
+          rating?: number | null;
+          review_text?: string | null;
+          brand?: Record<string, string> | null;
+          has_music?: boolean;
+          has_voiceover?: boolean;
+          vertical_path?: string | null;
+          landscape_path?: string | null;
+          vertical_bytes?: number | null;
+          landscape_bytes?: number | null;
+          duration_seconds?: number | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["review_videos"]["Insert"]
+        >;
+        Relationships: [];
+      };
       lists: {
         Row: {
           id: string;

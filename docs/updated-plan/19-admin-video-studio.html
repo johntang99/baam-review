@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Studio — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F1F1A;--forest:#1F4D3F;--forest-dark:#163A30;--sage:#87A899;
+  --cream:#FAF7F2;--cream-deep:#F0EBE0;--paper:#FFFFFF;
+  --gold:#C9A961;--gold-dark:#A88847;--gold-soft:#E8D9B5;
+  --text:#1A1F1C;--text-soft:#5A6660;--text-muted:#8A938E;
+  --border:#E8E2D5;--border-soft:#F0ECE1;--success:#2D7A5F;
+  --shadow-sm:0 1px 2px rgba(15,31,26,.04);--shadow-md:0 4px 14px rgba(15,31,26,.06);--shadow-lg:0 12px 28px rgba(15,31,26,.08);
+  /* live, driven by the Primary color picker */
+  --brand:#962D22;--brand-dark:#6F1F18;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Onest','Noto Sans SC',system-ui,sans-serif;color:var(--text);background:var(--cream);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.topbar{height:56px;background:var(--paper);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--ink)}
+.brand .mk{width:26px;height:26px;background:var(--forest);color:var(--cream);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.crumb{font-size:12.5px;color:var(--text-muted)}
+.crumb b{color:var(--text-soft);font-weight:500}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--sage);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+
+.wrap{display:grid;grid-template-columns:1fr 460px;gap:0;height:calc(100vh - 56px)}
+.left{overflow-y:auto;padding:28px 32px 120px}
+.right{border-left:1px solid var(--border);background:var(--cream-deep);padding:28px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+
+.page-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:6px}
+.page-title{font-size:26px;margin-bottom:4px}
+.page-sub{font-family:'Newsreader',serif;font-style:italic;font-size:16px;color:var(--text-soft);margin-bottom:26px}
+
+.card{background:var(--paper);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.sec-num{width:24px;height:24px;border-radius:50%;background:var(--forest);color:var(--cream);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-title{font-size:16px;font-family:'Fraunces',serif;font-weight:600;color:var(--ink)}
+.sec-hint{font-size:12px;color:var(--text-muted);margin-left:auto;font-family:'Newsreader',serif;font-style:italic}
+
+.field{margin-bottom:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:5px;letter-spacing:.01em}
+label .auto{display:none;margin-left:6px;font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--success);background:rgba(45,122,95,.1);padding:1px 6px;border-radius:6px;text-transform:uppercase}
+.field.filled label .auto{display:inline-block}
+input[type=text],input[type=url],textarea,select{width:100%;border:1px solid var(--border);background:var(--cream);border-radius:9px;padding:9px 11px;font:inherit;font-size:13.5px;color:var(--text);outline:none;transition:.15s}
+input:focus,textarea:focus,select:focus{border-color:var(--forest);background:var(--paper);box-shadow:0 0 0 3px rgba(31,77,63,.08)}
+textarea{resize:vertical;min-height:64px;line-height:1.55}
+.hintline{font-size:11.5px;color:var(--text-muted);margin-top:4px}
+
+.fetch-row{display:flex;gap:10px;align-items:flex-end}
+.fetch-row .field{flex:1;margin-bottom:0}
+.btn{border:0;border-radius:9px;font:inherit;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-fetch{background:var(--forest);color:var(--cream);padding:10px 16px;font-size:13px;white-space:nowrap}
+.btn-fetch:hover{background:var(--forest-dark)}
+.btn-fetch[disabled]{opacity:.6;cursor:default}
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:none;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.is-fetching .spin{display:inline-block}
+
+.color-field{display:flex;align-items:center;gap:10px}
+.swatch{width:38px;height:38px;border-radius:9px;border:1px solid var(--border);padding:0;cursor:pointer;overflow:hidden}
+.swatch::-webkit-color-swatch{border:0;border-radius:7px}
+.color-hex{width:110px}
+
+.stat-row{display:grid;grid-template-columns:1fr 1.6fr auto;gap:8px;margin-bottom:8px}
+.stat-row input{font-size:12.5px;padding:7px 9px}
+.x{background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:7px;width:32px;cursor:pointer}
+.x:hover{border-color:#c0392b;color:#c0392b}
+.addrow{font-size:12px;color:var(--forest);font-weight:600;background:none;border:1px dashed var(--border);padding:7px 12px;border-radius:8px;cursor:pointer;margin-top:2px}
+.addrow:hover{border-color:var(--forest);background:var(--cream-deep)}
+
+.seg{display:flex;background:var(--cream-deep);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:16px;width:fit-content}
+.seg button{border:0;background:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--text-soft);padding:7px 16px;border-radius:7px;cursor:pointer}
+.seg button.on{background:var(--paper);color:var(--ink);box-shadow:var(--shadow-sm)}
+
+.rev-list{display:flex;flex-direction:column;gap:10px}
+.rev{border:1px solid var(--border);border-radius:11px;padding:13px 15px;cursor:pointer;transition:.15s;background:var(--cream)}
+.rev:hover{border-color:var(--forest)}
+.rev.sel{border-color:var(--forest);background:var(--cream-deep);box-shadow:var(--shadow-sm)}
+.rev-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.rev-ava{width:30px;height:30px;border-radius:50%;background:#e97b3c;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.rev-name{font-weight:600;font-size:13px}
+.rev-meta{font-size:11px;color:var(--text-muted);margin-left:auto;font-family:'JetBrains Mono',monospace}
+.stars{color:var(--gold);font-size:13px;letter-spacing:1px}
+.rev-text{font-family:'Newsreader',serif;font-size:13px;color:var(--text-soft);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#manualPane{display:none}
+
+.adv{margin-top:14px;border-top:1px solid var(--border-soft);padding-top:12px}
+.adv-toggle{font-size:12.5px;font-weight:600;color:var(--forest);cursor:pointer;background:none;border:0;display:flex;align-items:center;gap:6px}
+.adv-body{display:none;margin-top:12px}
+.adv.open .adv-body{display:block}
+.adv.open .adv-toggle .chev{transform:rotate(90deg)}
+.chev{transition:.15s;font-size:10px}
+
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.tpl{border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;background:var(--cream);transition:.15s;position:relative}
+.tpl:hover{border-color:var(--forest);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.tpl.sel{border-color:var(--forest);box-shadow:0 0 0 2px rgba(31,77,63,.25)}
+.tpl-thumb{aspect-ratio:9/16;background:linear-gradient(160deg,var(--brand) 0%,var(--brand-dark) 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#fff;position:relative}
+.tpl-thumb .qt{font-family:'Fraunces',serif;font-size:30px;opacity:.5}
+.tpl-thumb .ln{width:62%;height:6px;border-radius:3px;background:rgba(255,255,255,.5)}
+.tpl-thumb .ln.s{width:40%}
+.tpl-thumb .play{position:absolute;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;color:var(--brand);font-size:12px}
+.tpl.soon .tpl-thumb{filter:grayscale(.7);opacity:.55}
+.tpl-meta{padding:10px 12px}
+.tpl-name{font-size:13px;font-weight:600;color:var(--ink)}
+.tpl-desc{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.4}
+.badge-soon{position:absolute;top:8px;right:8px;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:rgba(0,0,0,.55);color:#fff;padding:2px 7px;border-radius:6px}
+
+.orient{display:flex;gap:10px;margin-top:16px}
+.orient .seg{margin:0}
+
+/* audio */
+.aud-block{border:1px solid var(--border);border-radius:11px;padding:14px 16px;margin-bottom:12px;background:var(--cream)}
+.aud-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.aud-name{font-size:13.5px;font-weight:600;color:var(--ink)}
+.aud-sub{font-size:11.5px;color:var(--text-muted);margin-top:1px}
+.aud-body{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border-soft)}
+.aud-block.on .aud-body{display:block}
+.switch{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0;cursor:pointer}
+.switch input{opacity:0;width:0;height:0}
+.switch span{position:absolute;inset:0;background:var(--border);border-radius:24px;transition:.2s}
+.switch span::before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:var(--shadow-sm)}
+.switch input:checked+span{background:var(--forest)}
+.switch input:checked+span::before{transform:translateX(18px)}
+.vol{width:100%;accent-color:var(--forest)}
+
+/* ===== right preview ===== */
+.pv-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:14px}
+.pv-stage{display:flex;align-items:center;justify-content:center;min-height:520px}
+.phone{width:248px;aspect-ratio:9/16;border-radius:30px;background:#000;padding:9px;box-shadow:var(--shadow-lg);transition:.3s}
+.phone.land{width:380px;aspect-ratio:16/9}
+.screen{width:100%;height:100%;border-radius:22px;overflow:hidden;background:var(--cream);position:relative;display:flex;align-items:center;justify-content:center}
+.phone.land .screen{border-radius:14px}
+.mock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px;background:radial-gradient(120% 90% at 50% 0%, #fff7ee 0%, #faf0dd 70%, #f4e6c6 100%)}
+.mock .eb{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--brand-dark);font-weight:700;margin-bottom:10px}
+.mock .qz{font-family:'Fraunces',serif;font-size:46px;color:var(--gold);line-height:.3;margin-bottom:14px}
+.mock .qt{font-family:'Newsreader',serif;font-size:14px;color:var(--brand-dark);line-height:1.5}
+.mock .rule{width:42px;height:2px;background:var(--gold);margin:14px 0}
+.mock .nm{font-family:'Fraunces',serif;font-weight:600;font-size:14px;color:var(--ink)}
+.mock .bz{font-size:10px;color:var(--gold-dark);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.mock .frame{position:absolute;inset:14px;border:1px solid var(--gold);border-radius:6px;opacity:.4;pointer-events:none}
+
+.pv-idle,.pv-gen,.pv-done,.pv-saved{display:none;flex-direction:column;align-items:center;text-align:center;gap:14px}
+.pv-state.idle .pv-idle{display:flex}
+.pv-state.gen .pv-gen{display:flex}
+.pv-state.done .pv-done{display:flex}
+.pv-state.saved .pv-saved{display:flex}
+.draft-flag{font-size:11.5px;font-weight:600;color:var(--gold-dark);background:var(--gold-soft);padding:5px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:6px}
+.draft-flag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold-dark)}
+.draft-note{font-size:11.5px;color:var(--text-muted);max-width:250px;line-height:1.45}
+.saved-ic{width:60px;height:60px;border-radius:50%;background:rgba(45,122,95,.12);color:var(--success);display:flex;align-items:center;justify-content:center;font-size:26px}
+.saved-t{font-family:'Fraunces',serif;font-size:17px;color:var(--ink)}
+.saved-loc{font-size:12px;color:var(--text-soft);font-family:'JetBrains Mono',monospace;background:var(--cream-deep);border:1px solid var(--border);padding:7px 12px;border-radius:8px}
+.idle-ic{width:64px;height:64px;border-radius:16px;background:var(--cream-deep);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--text-muted)}
+.pv-idle .t{font-family:'Fraunces',serif;font-size:16px;color:var(--text-soft)}
+.pv-idle .s{font-size:12px;color:var(--text-muted);max-width:240px}
+.bar{width:240px;height:7px;background:var(--cream-deep);border:1px solid var(--border);border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--forest),var(--sage));transition:width .3s}
+.gen-stage{font-size:12px;color:var(--text-soft);font-family:'JetBrains Mono',monospace}
+.done-meta{font-size:11.5px;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+.done-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn-sm{font-size:12px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--paper);color:var(--text);cursor:pointer;font-weight:600}
+.btn-sm.primary{background:var(--forest);color:var(--cream);border-color:var(--forest)}
+.btn-sm:hover{border-color:var(--forest)}
+
+.actionbar{position:fixed;bottom:0;left:0;right:460px;background:var(--paper);border-top:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;gap:16px;z-index:15}
+.ab-info{font-size:12px;color:var(--text-muted)}
+.ab-info b{color:var(--text-soft)}
+.btn-gen{margin-left:auto;background:var(--forest);color:var(--cream);font-size:14.5px;padding:12px 28px;border-radius:10px;font-weight:600}
+.btn-gen:hover{background:var(--forest-dark)}
+.toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--cream);font-size:12.5px;padding:10px 18px;border-radius:10px;opacity:0;transition:.3s;pointer-events:none;z-index:30}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.proto-tag{position:fixed;top:64px;right:18px;background:var(--gold-soft);color:var(--gold-dark);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:6px;z-index:25}
+</style>
+</head>
+<body>
+
+<div class="proto-tag">Prototype · for discussion</div>
+
+<div class="topbar">
+  <div class="brand"><span class="mk">B</span> BAAM Review</div>
+  <div class="crumb">Admin · Reviews · <b>Video Studio</b></div>
+  <div class="avatar">JT</div>
+</div>
+
+<div class="wrap">
+  <!-- ============ LEFT: form ============ -->
+  <div class="left">
+    <div class="page-eyebrow">Review → Revenue</div>
+    <h1 class="page-title">Video Studio</h1>
+    <p class="page-sub">Turn one great review into a branded video — for ads, social, and the website.</p>
+
+    <!-- 1. BUSINESS -->
+    <div class="card">
+      <div class="sec-head">
+        <span class="sec-num">1</span>
+        <span class="sec-title">Business</span>
+        <span class="sec-hint">paste the site — we auto-fill what we can</span>
+      </div>
+
+      <div class="fetch-row" style="margin-bottom:16px">
+        <div class="field">
+          <label>Business website</label>
+          <input type="url" id="site" placeholder="https://drhuangclinic.com" value="https://drhuangclinic.com">
+        </div>
+        <button class="btn btn-fetch" id="fetchBtn" onclick="autofetch()">
+          <span class="spin"></span><span class="lbl">Auto-fetch ↻</span>
+        </button>
+      </div>
+
+      <div class="row2">
+        <div class="field" id="f-name"><label>Business name <span class="auto">auto</span></label><input type="text" id="bizName" placeholder="Dr. Huang Clinic" oninput="sync()"></div>
+        <div class="field" id="f-color"><label>Primary color <span class="auto">auto</span></label>
+          <div class="color-field">
+            <input type="color" class="swatch" id="brandColor" value="#962D22" oninput="setColor(this.value)">
+            <input type="text" class="color-hex" id="brandHex" value="#962D22" oninput="setColor(this.value)">
+          </div>
+        </div>
+      </div>
+      <div class="field" id="f-tag"><label>Hero title / tagline <span class="auto">auto</span></label><input type="text" id="tagline" placeholder="Holistic Acupuncture & Traditional Chinese Medicine" oninput="sync()"></div>
+      <div class="row2">
+        <div class="field" id="f-loc"><label>Location <span class="auto">auto</span></label><input type="text" id="loc" placeholder="Middletown, NY"></div>
+        <div class="field" id="f-phone"><label>Phone <span class="auto">auto</span></label><input type="text" id="phone" placeholder="(845) 381-1106"></div>
+      </div>
+      <div class="row2">
+        <div class="field" id="f-domain"><label>CTA domain <span class="auto">auto</span></label><input type="text" id="domain" placeholder="drhuangclinic.com"></div>
+        <div class="field" id="f-hero"><label>Hero image <span class="auto">auto</span></label><input type="text" id="hero" placeholder="drhuang-hero.jpg or https://…"></div>
+      </div>
+      <div class="field" id="f-services"><label>Services line <span class="auto">auto</span></label><input type="text" id="services" placeholder="Acupuncture · Herbal Medicine · Cupping · Moxibustion"></div>
+
+      <label style="margin-top:6px">Trust info <span class="hintline" style="display:inline">— the closing stat bar</span></label>
+      <div id="stats">
+        <div class="stat-row"><input placeholder="20+" type="text"><input placeholder="Years of practice" type="text"><button class="x" onclick="this.parentElement.remove()">×</button></div>
+        <div class="stat-row"><input placeholder="10,000+" type="text"><input placeholder="Patients helped" type="text"><button class="x" onclick="this.parentElement.remove()">×</button></div>
+        <div class="stat-row"><input placeholder="95%" type="text"><input placeholder="Satisfaction rate" type="text"><button class="x" onclick="this.parentElement.remove()">×</button></div>
+      </div>
+      <button class="addrow" onclick="addStat()">+ Add stat</button>
+    </div>
+
+    <!-- 2. REVIEW -->
+    <div class="card">
+      <div class="sec-head">
+        <span class="sec-num">2</span>
+        <span class="sec-title">The review</span>
+        <span class="sec-hint">one review — the star of the video</span>
+      </div>
+      <div class="seg">
+        <button class="on" id="segSynced" onclick="revMode('synced')">Pick a synced review</button>
+        <button id="segManual" onclick="revMode('manual')">Enter manually</button>
+      </div>
+
+      <div id="syncedPane" class="rev-list">
+        <div class="rev sel" onclick="pickRev(this,'Sofia Degtyar','S','★★★★★','Amazing experience! My back gave out unexpectedly… after a 30-minute acupuncture session I could stand and walk pain-free.')">
+          <div class="rev-top"><span class="rev-ava">S</span><span class="rev-name">Sofia Degtyar</span><span class="rev-meta">4w ago</span></div>
+          <div class="stars">★★★★★</div>
+          <div class="rev-text">Amazing experience! My back gave out unexpectedly to a point where I couldn't straighten it… after a consultation and a 30min acupuncture session, I was able to stand straight up and walk with little to no pain!</div>
+        </div>
+        <div class="rev" onclick="pickRev(this,'Eileen Wang','E','★★★★★','The visit was smooth. Dr. Huang explained everything clearly. The clinic is clean and organized — professional yet welcoming.')">
+          <div class="rev-top"><span class="rev-ava">E</span><span class="rev-name">Eileen Wang</span><span class="rev-meta">1d ago</span></div>
+          <div class="stars">★★★★★</div>
+          <div class="rev-text">The visit was smooth. Dr. Huang explained everything clearly before treatment. The clinic is clean and organized, staff greeted me warmly — professional yet welcoming.</div>
+        </div>
+        <div class="rev" onclick="pickRev(this,'Marcus Lee','M','★★★★★','Came in for chronic shoulder pain. Three sessions and it is night and day. Highly recommend.')">
+          <div class="rev-top"><span class="rev-ava">M</span><span class="rev-name">Marcus Lee</span><span class="rev-meta">2w ago</span></div>
+          <div class="stars">★★★★★</div>
+          <div class="rev-text">Came in for chronic shoulder pain. Three sessions and it's night and day. Highly recommend Dr. Huang.</div>
+        </div>
+      </div>
+
+      <div id="manualPane">
+        <div class="row2">
+          <div class="field"><label>Reviewer name</label><input type="text" id="mName" placeholder="Sofia Degtyar" oninput="sync()"></div>
+          <div class="field"><label>Rating</label>
+            <select id="mRating"><option>★★★★★ (5)</option><option>★★★★☆ (4)</option><option>★★★☆☆ (3)</option></select>
+          </div>
+        </div>
+        <div class="field"><label>Review text</label><textarea id="mText" placeholder="Paste the customer's review…" oninput="sync()"></textarea></div>
+      </div>
+
+      <div class="adv" id="adv">
+        <button class="adv-toggle" onclick="document.getElementById('adv').classList.toggle('open')">
+          <span class="chev">▶</span> Advanced — ad hooks &amp; phrasing <span style="color:var(--text-muted);font-weight:400;font-family:'Newsreader',serif;font-style:italic">(recommended for paid traffic)</span>
+        </button>
+        <div class="adv-body">
+          <div class="field"><label>Hook line <span style="font-weight:400;color:var(--text-muted)">— the first 1.5s; biggest conversion lever</span></label><input type="text" placeholder="I couldn't walk. 30 minutes later, I could."></div>
+          <div class="field"><label>Phrases <span style="font-weight:400;color:var(--text-muted)">— kinetic lines, one per row; mark the punchline as hero</span></label>
+            <textarea placeholder="My back gave out unexpectedly.&#10;Same-day appointment. [hero]&#10;I could stand straight and walk pain-free. [hero]"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. TEMPLATE -->
+    <div class="card">
+      <div class="sec-head">
+        <span class="sec-num">3</span>
+        <span class="sec-title">Template</span>
+        <span class="sec-hint">structure &amp; pacing — colors come from §1</span>
+      </div>
+      <div class="tpl-grid">
+        <div class="tpl sel" onclick="pickTpl(this)">
+          <div class="tpl-thumb"><div class="ln"></div><div class="ln s"></div><span class="play">▶</span></div>
+          <div class="tpl-meta"><div class="tpl-name">Spotlight</div><div class="tpl-desc">Hook → brand → testimonial → CTA. 22s. Best for ads.</div></div>
+        </div>
+        <div class="tpl soon">
+          <span class="badge-soon">Soon</span>
+          <div class="tpl-thumb"><div class="qt">"</div></div>
+          <div class="tpl-meta"><div class="tpl-name">Quote Card</div><div class="tpl-desc">Single quote, slow zoom. 12s. Social-friendly.</div></div>
+        </div>
+        <div class="tpl soon">
+          <span class="badge-soon">Soon</span>
+          <div class="tpl-thumb"><div class="ln"></div></div>
+          <div class="tpl-meta"><div class="tpl-name">Minimal</div><div class="tpl-desc">Text-only, no photo. 15s. Fast to produce.</div></div>
+        </div>
+      </div>
+      <div class="orient">
+        <div class="seg">
+          <button class="on" onclick="setOrient(this,'v')">Vertical 9:16</button>
+          <button onclick="setOrient(this,'l')">Landscape 16:9</button>
+          <button onclick="setOrient(this,'both')">Both</button>
+        </div>
+        <span class="hintline" style="align-self:center">Vertical = Reels/TikTok · Landscape = web/YouTube · Both = one click, 2 files</span>
+      </div>
+    </div>
+
+    <!-- 4. AUDIO -->
+    <div class="card">
+      <div class="sec-head">
+        <span class="sec-num">4</span>
+        <span class="sec-title">Audio</span>
+        <span class="sec-hint">optional — both lift retention; either, both, or none</span>
+      </div>
+
+      <div class="aud-block" id="musicBlock">
+        <div class="aud-top">
+          <div><div class="aud-name">Background music</div><div class="aud-sub">Subtle bed under the video</div></div>
+          <label class="switch"><input type="checkbox" id="musicOn" onchange="audSync()"><span></span></label>
+        </div>
+        <div class="aud-body">
+          <div class="row2">
+            <div class="field"><label>Track</label><select>
+              <option>Calm · wellness (default)</option><option>Warm · acoustic</option><option>Uplifting · hopeful</option><option>Cinematic · soft</option><option>Upload my own…</option>
+            </select></div>
+            <div class="field"><label>Volume <span style="font-weight:400;color:var(--text-muted)">— auto-ducks under voice</span></label>
+              <input type="range" min="0" max="100" value="22" class="vol"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aud-block" id="voBlock">
+        <div class="aud-top">
+          <div><div class="aud-name">Voiceover</div><div class="aud-sub">Reads the hook + review aloud</div></div>
+          <label class="switch"><input type="checkbox" id="voOn" onchange="audSync()"><span></span></label>
+        </div>
+        <div class="aud-body">
+          <div class="row2">
+            <div class="field"><label>Voice</label><select>
+              <option>AI · Warm female (EN)</option><option>AI · Calm male (EN)</option><option>AI · 中文 female</option><option>Upload my own MP3…</option>
+            </select></div>
+            <div class="field"><label>Script source</label><select>
+              <option>Hook + review (auto)</option><option>Review text only</option><option>Custom script…</option>
+            </select></div>
+          </div>
+          <button class="btn-sm" type="button" onclick="toast('▶ Voice sample (mock) — ElevenLabs in production')" style="margin-top:2px">▶ Preview voice</button>
+        </div>
+      </div>
+
+      <p class="hintline" style="margin-top:10px">Leave both off for a silent video. When both are on they're mixed at render — the voice automatically ducks the music.</p>
+    </div>
+  </div>
+
+  <!-- ============ RIGHT: preview ============ -->
+  <div class="right">
+    <div class="pv-eyebrow">Live preview</div>
+    <div class="pv-stage pv-state idle" id="pvState">
+
+      <div class="pv-idle">
+        <div class="idle-ic">▶</div>
+        <div class="t">Your video, here</div>
+        <div class="s">Fill in the business and review, choose a template, then Generate. The frame below previews your brand colors live.</div>
+        <div class="phone" id="phone">
+          <div class="screen"><div class="mock">
+            <div class="frame"></div>
+            <div class="eb">A patient's words</div>
+            <div class="qz">"</div>
+            <div class="qt" id="mkText">Pick a review to see it here…</div>
+            <div class="rule"></div>
+            <div class="nm" id="mkName">Reviewer</div>
+            <div class="bz" id="mkBiz">Your business</div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="pv-gen">
+        <div class="phone"><div class="screen"><div class="mock"><div class="frame"></div><div style="opacity:.3;font-family:'Fraunces',serif;font-size:40px;color:var(--brand)">"</div></div></div></div>
+        <div class="bar"><i id="barFill"></i></div>
+        <div class="gen-stage" id="genStage">Bundling…</div>
+      </div>
+
+      <div class="pv-done">
+        <div class="phone" id="phoneDone">
+          <div class="screen"><div class="mock">
+            <div class="frame"></div>
+            <div class="eb">A patient's words</div>
+            <div class="qz">"</div>
+            <div class="qt" id="dText">…</div>
+            <div class="rule"></div>
+            <div class="nm" id="dName">…</div>
+            <div class="bz" id="dBiz">…</div>
+            <div style="position:absolute;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;color:var(--brand);font-size:14px">▶</div>
+          </div></div>
+        </div>
+        <div class="draft-flag">Draft preview — not saved yet</div>
+        <div class="done-meta" id="doneMeta">1080×1920 · 22.0s · 3.4 MB · h264</div>
+        <div class="done-actions">
+          <button class="btn-sm primary" onclick="accept()">✓ Accept &amp; save</button>
+          <button class="btn-sm">↓ Download</button>
+          <button class="btn-sm" onclick="resetPv()">↻ Discard &amp; edit</button>
+        </div>
+        <div class="draft-note">Not stored until you accept. Discarding lets you change the inputs and regenerate — nothing is kept until you're satisfied.</div>
+      </div>
+
+      <div class="pv-saved">
+        <div class="saved-ic">✓</div>
+        <div class="saved-t">Saved to the Video Library</div>
+        <div class="saved-loc" id="savedLoc">Dr. Huang Clinic › Sofia Degtyar · 1 file</div>
+        <div class="done-actions">
+          <button class="btn-sm primary">Use in campaign</button>
+          <button class="btn-sm">Open Library</button>
+          <button class="btn-sm" onclick="resetPv()">+ New video</button>
+        </div>
+        <div class="draft-note">Only accepted videos live in the Library. Drafts you discarded were never stored.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="actionbar">
+  <div class="ab-info">Template <b>Spotlight</b> · <b id="abOrient">Vertical 9:16</b> · est. render <b>~30s</b></div>
+  <button class="btn btn-gen" onclick="generate()">Generate Video →</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SAMPLE={name:'Dr. Huang Clinic',color:'#962D22',tag:'Holistic Acupuncture & Traditional Chinese Medicine',loc:'Middletown, NY',phone:'(845) 381-1106',domain:'drhuangclinic.com',hero:'drhuang-hero.jpg',services:'Acupuncture · Herbal Medicine · Cupping · Moxibustion · Tui Na · Gua Sha'};
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
+function setColor(v){if(!/^#[0-9a-fA-F]{6}$/.test(v))return;document.documentElement.style.setProperty('--brand',v);
+  // simple darken for --brand-dark
+  const n=parseInt(v.slice(1),16);const d=(c)=>Math.max(0,Math.round(c*.72));
+  const dk='#'+[d(n>>16&255),d(n>>8&255),d(n&255)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  document.documentElement.style.setProperty('--brand-dark',dk);
+  document.getElementById('brandColor').value=v;document.getElementById('brandHex').value=v;}
+function autofetch(){const b=document.getElementById('fetchBtn');b.classList.add('is-fetching');b.querySelector('.lbl').textContent='Fetching…';b.disabled=true;
+  setTimeout(()=>{
+    document.getElementById('bizName').value=SAMPLE.name;
+    document.getElementById('tagline').value=SAMPLE.tag;
+    document.getElementById('loc').value=SAMPLE.loc;
+    document.getElementById('phone').value=SAMPLE.phone;
+    document.getElementById('domain').value=SAMPLE.domain;
+    document.getElementById('hero').value=SAMPLE.hero;
+    document.getElementById('services').value=SAMPLE.services;
+    setColor(SAMPLE.color);
+    ['f-name','f-color','f-tag','f-loc','f-phone','f-domain','f-hero','f-services'].forEach(id=>document.getElementById(id).classList.add('filled'));
+    b.classList.remove('is-fetching');b.querySelector('.lbl').textContent='Re-fetch ↻';b.disabled=false;
+    sync();toast('Auto-filled 8 fields from drhuangclinic.com');
+  },1300);}
+let rev={name:'Sofia Degtyar',text:'Amazing experience! My back gave out unexpectedly… after a 30-minute acupuncture session I could stand and walk pain-free.'};
+function pickRev(el,n,i,s,t){document.querySelectorAll('.rev').forEach(r=>r.classList.remove('sel'));el.classList.add('sel');rev={name:n,text:t};sync();}
+function revMode(m){const sy=m==='synced';document.getElementById('segSynced').classList.toggle('on',sy);document.getElementById('segManual').classList.toggle('on',!sy);document.getElementById('syncedPane').style.display=sy?'flex':'none';document.getElementById('manualPane').style.display=sy?'none':'block';sync();}
+function sync(){
+  const biz=document.getElementById('bizName').value||'Your business';
+  let rn=rev.name,rt=rev.text;
+  if(document.getElementById('segManual').classList.contains('on')){rn=document.getElementById('mName').value||'Reviewer';rt=document.getElementById('mText').value||'Your review text appears here…';}
+  document.getElementById('mkText').textContent='"'+rt.slice(0,120)+(rt.length>120?'…':'')+'"';
+  document.getElementById('mkName').textContent=rn;
+  document.getElementById('mkBiz').textContent=biz;
+}
+function pickTpl(el){document.querySelectorAll('.tpl').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');}
+let ORIENT='v',MUSIC=false,VO=false;
+function refreshMeta(){
+  const oLbl=ORIENT==='v'?'Vertical 9:16':ORIENT==='l'?'Landscape 16:9':'Both (2 files)';
+  const aud=(MUSIC?' · ♪ music':'')+(VO?' · 🎙 voiceover':'');
+  document.getElementById('abOrient').textContent=oLbl+aud;
+  let res=ORIENT==='both'?'1080×1920 + 1920×1080 (2 files)':ORIENT==='l'?'1920×1080':'1080×1920';
+  document.getElementById('doneMeta').textContent=res+' · 22.0s'+(MUSIC?' · ♪':'')+(VO?' · 🎙':'')+' · h264';
+}
+function setOrient(el,o){el.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));el.classList.add('on');ORIENT=o;
+  const land=o==='l'; // 'both' previews as vertical (representative)
+  document.getElementById('phone').classList.toggle('land',land);document.getElementById('phoneDone').classList.toggle('land',land);
+  refreshMeta();}
+function audSync(){
+  MUSIC=document.getElementById('musicOn').checked;VO=document.getElementById('voOn').checked;
+  document.getElementById('musicBlock').classList.toggle('on',MUSIC);
+  document.getElementById('voBlock').classList.toggle('on',VO);
+  refreshMeta();}
+function generate(){
+  const st=document.getElementById('pvState');st.className='pv-stage pv-state gen';
+  const stages=['Bundling…'];
+  if(ORIENT==='both'){stages.push('Rendering vertical 1080×1920…','Rendering landscape 1920×1080…');}
+  else{stages.push('Rendering frames 0–330…','Rendering frames 330–660…');}
+  if(MUSIC||VO)stages.push('Mixing audio'+(VO?' · voiceover':'')+(MUSIC?' · music bed':'')+'…');
+  stages.push('Encoding h264…','Finalizing…');
+  let p=0,si=0;const fill=document.getElementById('barFill'),sg=document.getElementById('genStage');
+  const iv=setInterval(()=>{p+=Math.random()*16+6;if(p>100)p=100;fill.style.width=p+'%';
+    sg.textContent=stages[Math.min(stages.length-1,Math.floor(p/100*stages.length))];
+    if(p>=100){clearInterval(iv);setTimeout(()=>{
+      document.getElementById('dText').textContent=document.getElementById('mkText').textContent;
+      document.getElementById('dName').textContent=document.getElementById('mkName').textContent;
+      document.getElementById('dBiz').textContent=document.getElementById('mkBiz').textContent;
+      st.className='pv-stage pv-state done';toast((ORIENT==='both'?'2 videos generated':'Video generated')+(VO||MUSIC?' (with audio)':'')+' · ready to preview & download');
+    },450);}
+  },360);}
+function accept(){
+  const biz=document.getElementById('dBiz').textContent||'Business';
+  const nm=document.getElementById('dName').textContent||'Reviewer';
+  document.getElementById('savedLoc').textContent=biz+' › '+nm+' · '+(ORIENT==='both'?'2 files':'1 file');
+  document.getElementById('pvState').className='pv-stage pv-state saved';
+  toast('Accepted · saved to Video Library'+(ORIENT==='both'?' (2 files)':''));
+}
+function resetPv(){document.getElementById('pvState').className='pv-stage pv-state idle';}
+function addStat(){const d=document.createElement('div');d.className='stat-row';d.innerHTML='<input type="text" placeholder="value"><input type="text" placeholder="label"><button class="x" onclick="this.parentElement.remove()">×</button>';document.getElementById('stats').appendChild(d);}
+sync();refreshMeta();
+</script>
+</body>
+</html>

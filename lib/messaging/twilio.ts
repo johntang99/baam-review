@@ -14,28 +14,48 @@ export interface SendSmsResult {
 }
 
 /**
+ * Auth resolution. The REST URL always needs the Account SID (AC…). For the
+ * Basic-auth credentials we prefer a scoped API Key (SK… + Secret) — Twilio's
+ * recommended model: independently revocable, least-privilege — and fall back
+ * to the account Auth Token if no API key is set (zero-downtime migration).
+ */
+function resolveTwilioAuth(): { user: string; pass: string } | null {
+  const keySid = process.env.TWILIO_API_KEY_SID;
+  const keySecret = process.env.TWILIO_API_KEY_SECRET;
+  if (keySid && keySecret) return { user: keySid, pass: keySecret };
+
+  const token = process.env.TWILIO_AUTH_TOKEN;
+  const sid = process.env.TWILIO_ACCOUNT_SID;
+  if (sid && token) return { user: sid, pass: token };
+
+  return null;
+}
+
+/**
  * Configured? Returns true if Twilio env vars are present. UI can check this
  * to hide/show the SMS channel option until A2P registration is complete.
+ * Needs the Account SID (for the URL), a sending number, and *either* an
+ * API key pair *or* the Auth Token.
  */
 export function isTwilioConfigured(): boolean {
   return !!(
     process.env.TWILIO_ACCOUNT_SID &&
-    process.env.TWILIO_AUTH_TOKEN &&
-    process.env.TWILIO_FROM_NUMBER
+    process.env.TWILIO_FROM_NUMBER &&
+    resolveTwilioAuth()
   );
 }
 
 export async function sendSmsViaTwilio(opts: SendSmsOpts): Promise<SendSmsResult> {
   const sid = process.env.TWILIO_ACCOUNT_SID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
   const from = process.env.TWILIO_FROM_NUMBER;
+  const creds = resolveTwilioAuth();
 
-  if (!sid || !token || !from) {
+  if (!sid || !from || !creds) {
     return {
       ok: false,
       providerId: null,
       error:
-        "Twilio not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER in your environment.",
+        "Twilio not configured. Set TWILIO_ACCOUNT_SID, TWILIO_FROM_NUMBER, and either TWILIO_API_KEY_SID + TWILIO_API_KEY_SECRET (preferred) or TWILIO_AUTH_TOKEN.",
     };
   }
 
@@ -47,7 +67,7 @@ export async function sendSmsViaTwilio(opts: SendSmsOpts): Promise<SendSmsResult
   });
   if (opts.statusCallback) form.set("StatusCallback", opts.statusCallback);
 
-  const auth = Buffer.from(`${sid}:${token}`).toString("base64");
+  const auth = Buffer.from(`${creds.user}:${creds.pass}`).toString("base64");
 
   try {
     const res = await fetch(url, {
