@@ -209,9 +209,13 @@ export async function createLocationCheckoutSession(
       { price: resolvePriceId(ref.plan, ref.component, interval), quantity: 1 },
     ],
     payment_method_collection: "always",
+    // If staff pre-applied a code in admin, use it. Otherwise let the
+    // customer enter one on the Stripe Checkout page (Stripe shows an
+    // "Add promotion code" field). discounts and allow_promotion_codes
+    // are mutually exclusive — one or the other.
     ...(discount.promotionCodeId
       ? { discounts: [{ promotion_code: discount.promotionCodeId }] }
-      : {}),
+      : { allow_promotion_codes: true }),
     subscription_data: {
       ...(PLAN_HAS_TRIAL[plan] ? { trial_period_days: TRIAL_DAYS } : {}),
       metadata: {
