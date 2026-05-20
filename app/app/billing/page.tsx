@@ -40,6 +40,16 @@ export default async function BillingPage({
   searchParams: Promise<{ status?: string; session_id?: string }>;
 }) {
   const { status, session_id } = await searchParams;
+  console.log(
+    "[billing-page] HIT",
+    new Date().toISOString(),
+    "stripeConfigured=",
+    isStripeConfigured(),
+    "status=",
+    status,
+    "session_id=",
+    session_id ? "present" : "none",
+  );
 
   // Reconcile straight from Stripe on the success redirect so the UI is
   // correct immediately even if the webhook is delayed/missed.
