@@ -148,14 +148,23 @@ export async function reconcileAccountSubscriptions(
     ...(locSubs ?? []).map((s) => s.stripe_subscription_id),
   ].filter((id): id is string => !!id);
 
+  console.log(
+    `[reconcile] account=${accountId} subs=${subIds.length} (${subIds.join(",")})`,
+  );
+
   await Promise.all(
     subIds.map(async (id) => {
       try {
-        await applyStripeSubscription(
-          await stripe.subscriptions.retrieve(id),
+        const sub = await stripe.subscriptions.retrieve(id);
+        console.log(
+          `[reconcile] ${id} status=${sub.status} cap=${sub.cancel_at_period_end}`,
         );
-      } catch {
-        // skip ids Stripe no longer knows; webhook deleted-handler covers it
+        await applyStripeSubscription(sub);
+      } catch (e) {
+        console.error(
+          `[reconcile] ${id} FAILED:`,
+          e instanceof Error ? e.message : e,
+        );
       }
     }),
   );

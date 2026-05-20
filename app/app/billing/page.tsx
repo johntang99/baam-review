@@ -17,6 +17,13 @@ import {
 
 export const metadata = { title: "Billing — BAAM Review" };
 
+// This page MUST execute its Stripe reconcile + Supabase reads on every
+// request. Force-dynamic prevents Next.js 16's auto-static / RSC payload
+// caching from serving a stale render after portal-driven changes
+// (cancel, card update, plan switch) that happen outside our app.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function fmtDate(s: string | null) {
   return s
     ? new Date(s).toLocaleDateString("en-US", {
