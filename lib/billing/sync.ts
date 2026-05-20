@@ -57,7 +57,13 @@ export async function applyStripeSubscription(sub: Stripe.Subscription) {
     typeof sub.customer === "string" ? sub.customer : sub.customer.id;
   const status = mapStatus(sub.status);
   const periodEnd = isoFromUnix(sub.items.data[0]?.current_period_end);
-  const cancelAtPeriodEnd = sub.cancel_at_period_end === true;
+  // Stripe schedules cancellation via EITHER `cancel_at_period_end: true`
+  // (boolean, cancels at period end) OR `cancel_at: <timestamp>` (explicit
+  // future date). The Customer Portal uses the latter, so we treat either
+  // as "scheduled to cancel" for the admin UI. Without this, portal-driven
+  // cancellations silently fail to surface in BAAM admin.
+  const cancelAtPeriodEnd =
+    sub.cancel_at_period_end === true || sub.cancel_at != null;
   const service = createServiceClient();
 
   if (locationId) {
