@@ -2,20 +2,24 @@
  * Canonical BAAM Review pricing model (pure data — no Stripe/env import;
  * safe in server actions and UI).
  *
- * Two subscription kinds:
- *   • Account base — Self-service ONLY: $89/mo ($890/yr), the owner's own
- *     business, owner's card, 30-day trial (card upfront).
- *   • Per-location — its own independent subscription, own card, own
- *     interval, NO proration:
- *        Self-service added location: $79/mo ($790/yr), 30-day trial.
- *        Full-service location:       $299/mo ($2990/yr), 30-day trial.
+ * Both plans bill PER LOCATION as independent subscriptions (own card, own
+ * interval, no proration, 30-day free trial). There is NO account-level
+ * base subscription.
  *
- * Full-service has NO account base. Every plan gets a 30-day (first month)
- * free trial — self-service base + locations, and full-service locations
- * (card AND invoice/check). Annual = 10×
- * monthly, paid once. Stripe Price IDs live in env (STRIPE_PRICE_ENV).
- * The full-service per-location price reuses the FULL "base" price slot;
- * the old FULL "location" ($199) prices are retired.
+ *   Self-service tier (the owner runs it themselves):
+ *     • First location:        $89/mo ($890/yr)   ← promotional rate
+ *     • Each additional:       $79/mo ($790/yr)
+ *
+ *   Full-service tier (BAAM runs it for the customer):
+ *     • Every location:        $299/mo ($2990/yr) flat
+ *
+ * Annual = 10 × monthly, paid once. Every plan gets a 30-day free trial
+ * (card on file collected upfront for card flow; no charge until day 30).
+ * Stripe Price IDs live in env (STRIPE_PRICE_ENV).
+ *
+ * Stripe price-slot naming is legacy — `base` = "first" tier ($89 self /
+ * $299 full); `location` = "additional" tier ($79 self / unused full,
+ * FULL_LOC archived).
  */
 
 export type ReviewPlan = "self_service" | "full_service";
@@ -25,25 +29,20 @@ export type PriceComponent = "base" | "location";
 
 /** Monthly price in cents per Stripe slot. Annual = × ANNUAL_MONTHS. */
 const MONTHLY_CENTS: Record<ReviewPlan, Record<PriceComponent, number>> = {
+  // base = first self-service location ($89), location = additional ($79).
   self_service: { base: 8900, location: 7900 },
-  // full_service.base ($299) is the per-location price; .location ($199)
-  // is retired (unused).
+  // base = every full-service location ($299); FULL "location" ($199) retired.
   full_service: { base: 29900, location: 19900 },
 };
 
 export const ANNUAL_MONTHS = 10;
 export const TRIAL_DAYS = 30;
 
-/** First month free: 30-day trial on every plan (base + locations). */
+/** First month free: 30-day trial on every per-location subscription. */
 export const PLAN_HAS_TRIAL: Record<ReviewPlan, boolean> = {
   self_service: true,
   full_service: true,
 };
-
-/** Only Self-service has an account-level base subscription. */
-export function accountHasBase(plan: ReviewPlan): boolean {
-  return plan === "self_service";
-}
 
 function amount(
   plan: ReviewPlan,
@@ -54,31 +53,44 @@ function amount(
   return interval === "year" ? m * ANNUAL_MONTHS : m;
 }
 
-/** Account-base price (Self-service only): $89/mo, $890/yr. */
-export function accountBaseCents(interval: BillingInterval): number {
-  return amount("self_service", "base", interval);
-}
-
 /**
- * Which Stripe price slot a per-location subscription uses:
- *   self_service → SELF "location" ($79)
- *   full_service → FULL "base"     ($299)  (FULL "location" is retired)
+ * Which Stripe price slot a per-location subscription uses.
+ *
+ *   self_service + isFirst=true  → "base"     ($89)  promo rate
+ *   self_service + isFirst=false → "location" ($79)  additional
+ *   full_service (any)           → "base"     ($299) flat
  */
-export function locationPriceRef(plan: ReviewPlan): {
-  plan: ReviewPlan;
-  component: PriceComponent;
-} {
-  return plan === "self_service"
-    ? { plan: "self_service", component: "location" }
-    : { plan: "full_service", component: "base" };
+export function locationPriceRef(
+  plan: ReviewPlan,
+  isFirst: boolean,
+): { plan: ReviewPlan; component: PriceComponent } {
+  if (plan === "self_service") {
+    return {
+      plan: "self_service",
+      component: isFirst ? "base" : "location",
+    };
+  }
+  return { plan: "full_service", component: "base" };
 }
 
-/** Per-location price for an account on `plan`. */
-export function locationCents(
+/** Per-location price an account would be charged for its FIRST location. */
+export function firstLocationCents(
   plan: ReviewPlan,
   interval: BillingInterval,
 ): number {
-  const r = locationPriceRef(plan);
+  const r = locationPriceRef(plan, true);
+  return amount(r.plan, r.component, interval);
+}
+
+/**
+ * Per-location price for an ADDITIONAL location. For full_service this is
+ * the same as the first (flat $299); for self_service it's the lower $79.
+ */
+export function additionalLocationCents(
+  plan: ReviewPlan,
+  interval: BillingInterval,
+): number {
+  const r = locationPriceRef(plan, false);
   return amount(r.plan, r.component, interval);
 }
 

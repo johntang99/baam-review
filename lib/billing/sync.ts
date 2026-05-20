@@ -154,21 +154,18 @@ export async function reconcileAccountSubscriptions(
     ...(locSubs ?? []).map((s) => s.stripe_subscription_id),
   ].filter((id): id is string => !!id);
 
-  console.log(
-    `[reconcile] account=${accountId} subs=${subIds.length} (${subIds.join(",")})`,
-  );
-
   await Promise.all(
     subIds.map(async (id) => {
       try {
-        const sub = await stripe.subscriptions.retrieve(id);
-        console.log(
-          `[reconcile] ${id} status=${sub.status} cap=${sub.cancel_at_period_end}`,
+        await applyStripeSubscription(
+          await stripe.subscriptions.retrieve(id),
         );
-        await applyStripeSubscription(sub);
       } catch (e) {
+        // Keep an error log so genuine reconcile failures surface in Vercel
+        // logs — Stripe deleted subs, network blips, etc. Idempotent so a
+        // single missed sync isn't fatal.
         console.error(
-          `[reconcile] ${id} FAILED:`,
+          `[reconcile] ${id} failed:`,
           e instanceof Error ? e.message : e,
         );
       }

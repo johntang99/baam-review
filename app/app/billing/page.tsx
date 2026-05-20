@@ -8,12 +8,7 @@ import {
   reconcileCheckoutSession,
   reconcileAccountSubscriptions,
 } from "@/lib/billing/sync";
-import {
-  PlanChooser,
-  StartBaseButton,
-  ManageBillingButton,
-  LocationActions,
-} from "./billing-client";
+import { PlanChooser, LocationActions } from "./billing-client";
 
 export const metadata = { title: "Billing — BAAM Review" };
 
@@ -40,16 +35,6 @@ export default async function BillingPage({
   searchParams: Promise<{ status?: string; session_id?: string }>;
 }) {
   const { status, session_id } = await searchParams;
-  console.log(
-    "[billing-page] HIT",
-    new Date().toISOString(),
-    "stripeConfigured=",
-    isStripeConfigured(),
-    "status=",
-    status,
-    "session_id=",
-    session_id ? "present" : "none",
-  );
 
   // Reconcile straight from Stripe on the success redirect so the UI is
   // correct immediately even if the webhook is delayed/missed.
@@ -72,18 +57,15 @@ export default async function BillingPage({
 
   // Always re-sync all of the account's Stripe subscriptions on load.
   // Stripe is the source of truth; the webhook can be delayed/undelivered
-  // (esp. locally) and portal changes (cancel, card swap, plan change)
-  // happen out of band — so the billing page self-heals every visit
-  // rather than only on the portal-return redirect.
+  // and portal changes (cancel, card swap, plan change) happen out of
+  // band — so the billing page self-heals every visit.
   if (isStripeConfigured()) {
     await reconcileAccountSubscriptions(getStripe(), profile.account_id);
   }
 
   const { data: account } = await supabase
     .from("accounts")
-    .select(
-      "review_plan, billing_interval, subscription_status, current_period_end, cancel_at_period_end, stripe_subscription_id",
-    )
+    .select("review_plan")
     .eq("id", profile.account_id)
     .maybeSingle();
 
@@ -104,7 +86,6 @@ export default async function BillingPage({
   );
 
   const plan = (account?.review_plan as ReviewPlan | null) ?? null;
-  const hasBase = Boolean(account?.stripe_subscription_id);
 
   return (
     <main className="px-10 py-10">
@@ -136,72 +117,15 @@ export default async function BillingPage({
             </Section>
           )}
 
-          {plan === "self_service" && (
-            <Section
-              title="Account subscription"
-              description="Your own business — base plan."
-            >
-              {hasBase ? (
-                <>
-                  <dl className="grid grid-cols-[170px_1fr] gap-y-3 text-[13.5px]">
-                    <dt className="text-text-soft">Plan</dt>
-                    <dd className="text-ink">
-                      Self-service{" "}
-                      <span className="text-text-soft">
-                        ({account?.billing_interval === "year"
-                          ? "annual"
-                          : "monthly"}
-                        )
-                      </span>
-                    </dd>
-                    <dt className="text-text-soft">Status</dt>
-                    <dd className="capitalize">
-                      {account?.cancel_at_period_end ? (
-                        <span className="text-alert">
-                          {account?.subscription_status ?? "—"} · canceling
-                        </span>
-                      ) : (
-                        <span className="text-ink">
-                          {account?.subscription_status ?? "—"}
-                        </span>
-                      )}
-                    </dd>
-                    <dt className="text-text-soft">
-                      {account?.cancel_at_period_end
-                        ? "Cancels on"
-                        : "Next charge"}
-                    </dt>
-                    <dd
-                      className={
-                        account?.cancel_at_period_end
-                          ? "text-alert"
-                          : "text-ink"
-                      }
-                    >
-                      {fmtDate(account?.current_period_end ?? null)}
-                    </dd>
-                  </dl>
-                  <div className="pt-5">
-                    <ManageBillingButton />
-                  </div>
-                </>
-              ) : (
-                <StartBaseButton />
-              )}
-            </Section>
-          )}
-
           {(plan === "self_service" || plan === "full_service") && (
             <Section
               title={
-                plan === "full_service"
-                  ? "Client businesses"
-                  : "Additional locations"
+                plan === "full_service" ? "Client businesses" : "Locations"
               }
               description={
                 plan === "full_service"
                   ? "Each business is billed separately (its own card or pay-by-check)."
-                  : "Each added location is its own subscription with its own card."
+                  : "First location $89/mo · each additional $79/mo. Each location is its own subscription with its own card."
               }
             >
               {(locations ?? []).length === 0 ? (

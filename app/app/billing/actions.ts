@@ -90,63 +90,16 @@ async function resolveDiscount(
   return { ok: true, promotionCodeId: pc.id };
 }
 
-/** Self-service ACCOUNT base ($89/mo, $890/yr): 30-day trial, card upfront. */
-export async function startSelfServiceBase(
-  fd: FormData,
-): Promise<ActionResult> {
-  if (!isStripeConfigured())
-    return { ok: false, error: "Billing is not configured." };
+/** Designate the account Self-service (no account base; per-location billing). */
+export async function setSelfServiceAccount(): Promise<ActionResult> {
   const account = await currentAccount();
   if (!account) return { ok: false, error: "No account." };
-  if (await accountHasLiveBase(account.id))
-    return {
-      ok: false,
-      error:
-        "Account already has an active base subscription — use Manage to change it.",
-    };
-
-  const interval = readInterval(fd);
-  const stripe = getStripe();
-  const service = createServiceClient();
-
-  let customerId = account.stripe_customer_id;
-  if (!customerId) {
-    const c = await stripe.customers.create({
-      email: account.primary_email,
-      name: account.name,
-      metadata: { account_id: account.id },
-    });
-    customerId = c.id;
-    await service
-      .from("accounts")
-      .update({ stripe_customer_id: customerId, review_plan: "self_service" })
-      .eq("id", account.id);
-  } else {
-    await service
-      .from("accounts")
-      .update({ review_plan: "self_service" })
-      .eq("id", account.id);
-  }
-
-  const base = await appUrl();
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    customer: customerId,
-    line_items: [
-      { price: resolvePriceId("self_service", "base", interval), quantity: 1 },
-    ],
-    payment_method_collection: "always",
-    subscription_data: {
-      trial_period_days: TRIAL_DAYS,
-      metadata: { account_id: account.id, interval, kind: "account_base" },
-    },
-    metadata: { account_id: account.id, interval, kind: "account_base" },
-    success_url: `${base}/app/billing?status=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${base}/app/billing?status=cancelled`,
-  });
-  return session.url
-    ? { ok: true, url: session.url }
-    : { ok: false, error: "Could not start checkout." };
+  await createServiceClient()
+    .from("accounts")
+    .update({ review_plan: "self_service" })
+    .eq("id", account.id);
+  revalidatePath("/app/billing");
+  return { ok: true };
 }
 
 /** Designate the account Full-service (no account base; per-location billing). */
@@ -171,14 +124,14 @@ async function locationForAccount(locationId: string, accountId: string) {
   return data && data.account_id === accountId ? data : null;
 }
 
+const LIVE_SUB_STATUSES = ["trialing", "active", "past_due"];
+
 /**
  * Guard against creating a SECOND Stripe subscription for a location that
  * already has a live one (which would double-bill — each setup also makes
  * its own Stripe customer). Staff should use "Manage" (Customer Portal)
  * instead. A canceled/absent row is fine to set up again.
  */
-const LIVE_SUB_STATUSES = ["trialing", "active", "past_due"];
-
 async function locationHasLiveSub(locationId: string): Promise<boolean> {
   const { data } = await createServiceClient()
     .from("location_subscriptions")
@@ -189,21 +142,28 @@ async function locationHasLiveSub(locationId: string): Promise<boolean> {
   return LIVE_SUB_STATUSES.includes(data.subscription_status ?? "");
 }
 
-/** Same guard for the Self-service account base. */
-async function accountHasLiveBase(accountId: string): Promise<boolean> {
-  const { data } = await createServiceClient()
-    .from("accounts")
-    .select("subscription_status, stripe_subscription_id")
-    .eq("id", accountId)
-    .maybeSingle();
-  if (!data?.stripe_subscription_id) return false;
-  return LIVE_SUB_STATUSES.includes(data.subscription_status ?? "");
+/**
+ * Count of active/trialing/past_due location subs on the account. Used to
+ * decide whether a new location is the FIRST (promotional $89 for
+ * self-service) or an ADDITIONAL ($79 for self-service). Full-service is
+ * flat $299 regardless, but we still count to keep the logic uniform.
+ */
+async function activeLocationSubCount(accountId: string): Promise<number> {
+  const { count } = await createServiceClient()
+    .from("location_subscriptions")
+    .select("*", { count: "exact", head: true })
+    .eq("account_id", accountId)
+    .in("subscription_status", LIVE_SUB_STATUSES);
+  return count ?? 0;
 }
 
 /**
  * Per-location CARD subscription via Checkout (its own customer/card).
- * Price from the account's plan (self_service → $79, full_service → $299);
- * both get a 30-day (first month) free trial. No proration (independent sub).
+ * Price tier depends on the account plan:
+ *   self_service: first location $89/mo · additional $79/mo
+ *   full_service: every location $299/mo (flat)
+ * Every location gets a 30-day trial with card on file (no proration —
+ * independent sub).
  */
 export async function createLocationCheckoutSession(
   fd: FormData,
@@ -232,13 +192,15 @@ export async function createLocationCheckoutSession(
         "This location already has an active subscription — use Manage to change it.",
     };
 
+  const isFirst = (await activeLocationSubCount(account.id)) === 0;
+  const ref = locationPriceRef(plan, isFirst);
+
   // This location's OWN Stripe customer (its own card).
   const customer = await stripe.customers.create({
     name: loc.display_name ?? undefined,
     metadata: { account_id: account.id, location_id: loc.id },
   });
 
-  const ref = locationPriceRef(plan);
   const base = await appUrl();
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -273,8 +235,8 @@ export async function createLocationCheckoutSession(
 
   // No pre-create: the webhook creates location_subscriptions on
   // checkout.session.completed / customer.subscription.created (metadata
-  // carries location_id) — same as the account-base flow. Avoids a stale
-  // "set up" row if the user abandons checkout.
+  // carries location_id). Avoids a stale "set up" row if the user
+  // abandons checkout.
   return session.url
     ? { ok: true, url: session.url }
     : { ok: false, error: "Could not start checkout." };
@@ -327,7 +289,8 @@ export async function createLocationInvoiceSubscription(
     email: account.primary_email,
     metadata: { account_id: account.id, location_id: loc.id },
   });
-  const ref = locationPriceRef("full_service");
+  // Full-service is flat per-location regardless of count; isFirst ignored.
+  const ref = locationPriceRef("full_service", true);
   const sub = await stripe.subscriptions.create({
     customer: customer.id,
     items: [{ price: resolvePriceId(ref.plan, ref.component, interval) }],
@@ -378,20 +341,6 @@ export async function createLocationInvoiceSubscription(
   );
   revalidatePath("/app/billing");
   return { ok: true };
-}
-
-/** Stripe Customer Portal for the Self-service account base. */
-export async function createPortalSession(): Promise<ActionResult> {
-  if (!isStripeConfigured())
-    return { ok: false, error: "Billing is not configured." };
-  const account = await currentAccount();
-  if (!account?.stripe_customer_id)
-    return { ok: false, error: "No billing account yet." };
-  const session = await getStripe().billingPortal.sessions.create({
-    customer: account.stripe_customer_id,
-    return_url: `${await appUrl()}/app/billing?status=portal`,
-  });
-  return { ok: true, url: session.url };
 }
 
 /** Stripe Customer Portal for a single location's own customer. */

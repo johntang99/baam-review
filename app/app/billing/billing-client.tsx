@@ -2,18 +2,17 @@
 
 import { useState, useTransition } from "react";
 import {
-  accountBaseCents,
-  locationCents,
+  firstLocationCents,
+  additionalLocationCents,
   formatUsd,
   type BillingInterval,
   type ReviewPlan,
 } from "@/lib/billing/plans";
 import {
-  startSelfServiceBase,
+  setSelfServiceAccount,
   setFullServiceAccount,
   createLocationCheckoutSession,
   createLocationInvoiceSubscription,
-  createPortalSession,
   createLocationPortalSession,
   type ActionResult,
 } from "./actions";
@@ -63,10 +62,13 @@ const btn =
 const btnGhost =
   "rounded-lg border border-border-base bg-white px-4 py-2 text-[13px] font-medium text-ink hover:border-forest disabled:opacity-50";
 
-/** No plan chosen yet → pick Self-service (base checkout) or Full-service. */
+/** No plan chosen yet → pick Self-service or Full-service. Neither creates
+ *  a Stripe subscription; both just designate the plan. Locations are
+ *  subscribed individually after. */
 export function PlanChooser() {
   const [interval, setInterval] = useState<BillingInterval>("month");
   const { pending, error, run } = useRun();
+  const suffix = interval === "year" ? "/yr" : "/mo";
   return (
     <div className="space-y-5">
       <IntervalToggle value={interval} onChange={setInterval} />
@@ -74,28 +76,25 @@ export function PlanChooser() {
         <div className="rounded-xl border border-border-base bg-white p-5">
           <div className="font-display text-[18px] text-ink">Self-service</div>
           <p className="mt-1 text-[13px] text-text-soft">
-            You run it. {formatUsd(accountBaseCents(interval))}
-            {interval === "year" ? "/yr" : "/mo"} base · 30-day free trial
-            (card required). Extra locations{" "}
-            {formatUsd(locationCents("self_service", interval))} each.
+            You run it. First location{" "}
+            {formatUsd(firstLocationCents("self_service", interval))}
+            {suffix} · each additional{" "}
+            {formatUsd(additionalLocationCents("self_service", interval))}
+            {suffix} · 30-day free trial (card required).
           </p>
           <button
             disabled={pending}
-            onClick={() => {
-              const fd = new FormData();
-              fd.set("interval", interval);
-              run(() => startSelfServiceBase(fd));
-            }}
+            onClick={() => run(() => setSelfServiceAccount())}
             className={`mt-4 w-full ${btn}`}
           >
-            {pending ? "Starting…" : "Start Self-service →"}
+            {pending ? "…" : "Use Self-service →"}
           </button>
         </div>
         <div className="rounded-xl border border-border-base bg-white p-5">
           <div className="font-display text-[18px] text-ink">Full-service</div>
           <p className="mt-1 text-[13px] text-text-soft">
-            We run it for your clients. No account base — each business is
-            its own {formatUsd(locationCents("full_service", "month"))}/mo
+            We run it for your clients. Each business is its own{" "}
+            {formatUsd(firstLocationCents("full_service", "month"))}/mo
             subscription · 30-day free trial (card or pay-by-check).
           </p>
           <button
@@ -108,44 +107,6 @@ export function PlanChooser() {
         </div>
       </div>
       {error && <p className="text-[13px] text-red-600">{error}</p>}
-    </div>
-  );
-}
-
-export function StartBaseButton() {
-  const [interval, setInterval] = useState<BillingInterval>("month");
-  const { pending, error, run } = useRun();
-  return (
-    <div className="flex flex-wrap items-center gap-3">
-      <IntervalToggle value={interval} onChange={setInterval} />
-      <button
-        disabled={pending}
-        onClick={() => {
-          const fd = new FormData();
-          fd.set("interval", interval);
-          run(() => startSelfServiceBase(fd));
-        }}
-        className={btn}
-      >
-        {pending ? "Starting…" : "Start subscription →"}
-      </button>
-      {error && <p className="text-[13px] text-red-600">{error}</p>}
-    </div>
-  );
-}
-
-export function ManageBillingButton() {
-  const { pending, error, run } = useRun();
-  return (
-    <div>
-      <button
-        disabled={pending}
-        onClick={() => run(() => createPortalSession())}
-        className={btnGhost}
-      >
-        {pending ? "Opening…" : "Manage billing →"}
-      </button>
-      {error && <p className="mt-2 text-[13px] text-red-600">{error}</p>}
     </div>
   );
 }
