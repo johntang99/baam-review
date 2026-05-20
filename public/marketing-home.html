@@ -5882,7 +5882,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="faq-chevron">+</span>
         </summary>
         <div class="faq-a">
-          Then BAAM Review didn't earn its keep, and you don't pay. The 30-day trial is genuinely free — no card required, no auto-charge. If by day 30 you haven't seen reviews come in, we either need to fix something or you should leave. Most clinics see their first new review within 7 days of sending their first request batch.
+          Then BAAM Review didn't earn its keep. You're never charged during the 30-day trial — we collect a card upfront for a smooth transition into month 2, but you can cancel anytime in your dashboard before day 30 and we charge $0. If you haven't seen reviews by day 30, either we need to fix something or you should leave. Most clinics see their first new review within 7 days of sending their first request batch.
         </div>
       </details>
 
@@ -5952,10 +5952,107 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="faq-chevron">+</span>
         </summary>
         <div class="faq-a">
-          Yes. Each additional location is +$49/month (or +$39 if you're a founding customer). Each location gets its own dashboard, brand settings, and review attribution. The pricing scales linearly with no surprise jumps — 5 locations is $295/mo (or $245 founding), 10 locations is $540/mo (or $440 founding). Birdeye and Podium charge $200-400 per location at this volume.
+          Yes. Self-serve: your first location is $89/mo (founding), each additional location is $79/mo. So 5 locations = $89 + 4×$79 = $405/mo; 10 locations = $89 + 9×$79 = $800/mo. Each location is its own subscription with its own card, dashboard, brand settings, and review attribution — cancel one without touching the others. Full Service: every location is a flat $299/mo (founding), card or pay-by-check. Every location includes a 30-day free trial. Birdeye and Podium charge $200–400 per location at this volume.
         </div>
       </details>
 
+    </div>
+  </div>
+</section>
+
+<!-- ============ USER JOURNEY (signup → trial → keep using) ============ -->
+<style>
+  .journey-section { background: var(--cream); padding: 100px 0 90px; }
+  .journey-section .section-eyebrow { color: var(--forest); }
+  .journey-section .section-title em { color: var(--gold); font-style: italic; }
+  .journey-steps {
+    list-style: none; padding: 0; margin: 56px 0 0;
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px;
+    counter-reset: journey;
+  }
+  .journey-step {
+    background: var(--paper); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px 18px 20px; position: relative;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .journey-step:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .journey-step-num {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--gold); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Newsreader', 'Times New Roman', serif;
+    font-size: 17px; font-weight: 600; margin-bottom: 14px;
+  }
+  .journey-step-title {
+    font-family: 'Newsreader', 'Times New Roman', serif;
+    font-size: 17px; font-weight: 500; color: var(--ink);
+    margin: 0 0 8px; line-height: 1.3;
+  }
+  .journey-step-body {
+    font-size: 13.5px; line-height: 1.55; color: var(--text-soft); margin: 0;
+  }
+  .journey-step-body strong { color: var(--ink); font-weight: 600; }
+  .journey-cta {
+    margin-top: 48px; display: flex; flex-direction: column; align-items: center; gap: 14px;
+  }
+  .journey-cta-note { font-size: 13px; color: var(--text-soft); }
+  @media (max-width: 1100px) {
+    .journey-steps { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .journey-steps { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 460px) {
+    .journey-steps { grid-template-columns: 1fr; }
+  }
+</style>
+<section class="journey-section" id="how-to-start">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="section-eyebrow">Getting started</div>
+      <h2 class="section-title">From visit to first review, <em>in six steps.</em></h2>
+      <p class="section-sub">
+        Sign up → confirm email → pick plan (free) → connect Google → pay per location with 30-day free trial → keep using. No surprises, no setup fees, cancel any single location anytime.
+      </p>
+    </div>
+
+    <ol class="journey-steps">
+      <li class="journey-step">
+        <div class="journey-step-num">1</div>
+        <h4 class="journey-step-title">Sign up</h4>
+        <p class="journey-step-body">Name, email, password. About 30 seconds. <strong>No card asked.</strong></p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">2</div>
+        <h4 class="journey-step-title">Confirm your email</h4>
+        <p class="journey-step-body">Click the link we email you to activate your account.</p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">3</div>
+        <h4 class="journey-step-title">Pick your plan</h4>
+        <p class="journey-step-body">Self-service or Full-service. Still free — <strong>no card yet</strong>.</p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">4</div>
+        <h4 class="journey-step-title">Connect Google</h4>
+        <p class="journey-step-body">One-click Google Business Profile login. Add every location you own.</p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">5</div>
+        <h4 class="journey-step-title">Set up billing</h4>
+        <p class="journey-step-body">Per-location subscription with a <strong>30-day free trial</strong>. Card saved for after day 30.</p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">6</div>
+        <h4 class="journey-step-title">Send your first request</h4>
+        <p class="journey-step-body">Use the product free for 30 days. Cancel any location anytime — independently.</p>
+      </li>
+    </ol>
+
+    <div class="journey-cta">
+      <a href="https://review.baamplatform.com/signup" class="btn btn-primary btn-large">Start free trial →</a>
+      <span class="journey-cta-note">30 days free · cancel anytime before day 30 and pay nothing.</span>
     </div>
   </div>
 </section>
@@ -5998,13 +6095,13 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="tier-mini-price-pre">From</span>
           <span class="tier-mini-price">$99<span class="tier-mini-price-period">/mo</span></span>
         </div>
-        <div class="tier-mini-founding"><strong>$89/mo</strong> founding · first month free</div>
+        <div class="tier-mini-founding"><strong>$89/mo</strong> founding · 30-day free trial</div>
 
         <ul class="tier-mini-feature-list">
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Single location, unlimited review requests</li>
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI drafting in EN / 中文 / Español</li>
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Lists, batch sends, private feedback path</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Add locations at +$49/mo each</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Add locations at +$79/mo each</li>
         </ul>
 
         <a href="/pricing#self-serve" class="tier-mini-cta">
@@ -6022,13 +6119,13 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="tier-mini-price-pre" style="color: rgba(232, 217, 181, 0.7);">From</span>
           <span class="tier-mini-price">$399<span class="tier-mini-price-period">/mo</span></span>
         </div>
-        <div class="tier-mini-founding"><strong>$299/mo</strong> founding · setup waived</div>
+        <div class="tier-mini-founding"><strong>$299/mo</strong> per location founding · 30-day free trial · setup waived</div>
 
         <ul class="tier-mini-feature-list">
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We send all review requests, weekly batches</li>
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We reply to every review in your voice</li>
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We catch private feedback before it goes public</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Monthly written report · Full Service Plus at $599</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Every additional location at the same $299/mo (no $199 tier — flat)</li>
         </ul>
 
         <a href="/pricing#full-service" class="tier-mini-cta">
