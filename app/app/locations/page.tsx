@@ -3,6 +3,10 @@ import { MapPin, Plus, AlertCircle, Settings, Star, QrCode } from "lucide-react"
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
+import {
+  getLocationBillingMap,
+  type LocationBillingSummary,
+} from "@/lib/billing/access";
 
 export const metadata = {
   title: "Locations — BAAM Review",
@@ -28,6 +32,10 @@ export default async function LocationsPage({
     .from("locations")
     .select("id, slug, display_name, address, business_type, brand_color, logo_url")
     .order("created_at", { ascending: false });
+
+  const billing = await getLocationBillingMap(
+    (locations ?? []).map((l) => l.id),
+  );
 
   const errorMessage = params.error ? ERRORS[params.error] ?? params.error : null;
 
@@ -101,6 +109,9 @@ export default async function LocationsPage({
                   <p className="text-[12.5px] text-text-muted pt-1">
                     /r/{loc.slug}
                   </p>
+                  <div className="pt-1.5">
+                    <BillingBadge summary={billing.get(loc.id)} />
+                  </div>
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5 pt-3 border-t border-border-soft">
@@ -119,6 +130,60 @@ export default async function LocationsPage({
         </ul>
       )}
     </main>
+  );
+}
+
+function BillingBadge({
+  summary,
+}: {
+  summary: LocationBillingSummary | undefined;
+}) {
+  const base =
+    "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11.5px] font-medium";
+  if (!summary || !summary.accountPlan) {
+    return (
+      <span className={`${base} bg-hover text-text-muted`}>
+        No plan chosen
+      </span>
+    );
+  }
+  const planLabel =
+    summary.accountPlan === "self_service" ? "Self-service" : "Full-service";
+  if (!summary.locStatus) {
+    return (
+      <span className={`${base} bg-gold/15 text-ink`}>
+        {planLabel} · Billing required
+      </span>
+    );
+  }
+  const method = summary.locMethod === "invoice" ? " · check" : "";
+  if (summary.canceling) {
+    return (
+      <span className={`${base} bg-alert/10 text-alert`}>
+        {planLabel} · {summary.locStatus} · canceling{method}
+      </span>
+    );
+  }
+  if (summary.locStatus === "past_due") {
+    return (
+      <span className={`${base} bg-gold/15 text-ink`}>
+        {planLabel} · past due (retrying){method}
+      </span>
+    );
+  }
+  if (summary.allowed) {
+    return (
+      <span className={`${base} bg-forest/10 text-forest`}>
+        {planLabel} · {summary.locStatus}
+        {method}
+      </span>
+    );
+  }
+  return (
+    <span className={`${base} bg-alert/10 text-alert`}>
+      {planLabel} · {summary.locStatus}
+      {method}
+    </span>
   );
 }
 

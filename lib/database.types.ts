@@ -105,8 +105,14 @@ export interface Database {
           name: string;
           primary_email: string;
           stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
           subscription_tier: SubscriptionTier;
           subscription_status: SubscriptionStatus;
+          review_plan: "self_service" | "full_service" | null;
+          billing_interval: "month" | "year" | null;
+          current_period_end: string | null;
+          cancel_at_period_end: boolean;
+          included_locations: number;
           trial_ends_at: string | null;
           suspended_at: string | null;
           suspension_reason: string | null;
@@ -118,8 +124,14 @@ export interface Database {
           name: string;
           primary_email: string;
           stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
           subscription_tier?: SubscriptionTier;
           subscription_status?: SubscriptionStatus;
+          review_plan?: "self_service" | "full_service" | null;
+          billing_interval?: "month" | "year" | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+          included_locations?: number;
           trial_ends_at?: string | null;
           suspended_at?: string | null;
           suspension_reason?: string | null;
@@ -490,6 +502,42 @@ export interface Database {
         };
         Update: Partial<
           Database["public"]["Tables"]["review_videos"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      location_subscriptions: {
+        Row: {
+          id: string;
+          location_id: string;
+          account_id: string;
+          plan: "self_service" | "full_service";
+          collection_method: "card" | "invoice";
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          billing_interval: "month" | "year" | null;
+          subscription_status: string | null;
+          current_period_end: string | null;
+          cancel_at_period_end: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          account_id: string;
+          plan: "self_service" | "full_service";
+          collection_method?: "card" | "invoice";
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          billing_interval?: "month" | "year" | null;
+          subscription_status?: string | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["location_subscriptions"]["Insert"]
         >;
         Relationships: [];
       };

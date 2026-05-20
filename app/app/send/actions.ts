@@ -9,6 +9,7 @@ import { buildSmsBody, buildEmail } from "@/lib/messaging/templates";
 import { sendSmsViaTwilio, isTwilioConfigured } from "@/lib/messaging/twilio";
 import { sendEmailViaResend } from "@/lib/messaging/resend";
 import { checkVelocity } from "@/lib/messaging/velocity";
+import { getLocationBillingState } from "@/lib/billing/access";
 import { isLanguage, type Language } from "@/lib/i18n/review";
 
 export interface SendResult {
@@ -81,6 +82,14 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     .eq("id", locationId)
     .maybeSingle();
   if (!location) return { ok: false, error: "Location not found." };
+
+  const gate = await getLocationBillingState(location.id);
+  if (!gate.allowed)
+    return {
+      ok: false,
+      error:
+        "Billing required — set up billing for this location to send review requests.",
+    };
 
   // Suppression check: never send to a contact that has unsubscribed or
   // previously bounced/complained. track.ts + the resend webhook write

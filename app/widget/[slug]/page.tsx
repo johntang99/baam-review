@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { createServiceClient } from "@/lib/supabase/service";
 import { resolveWidgetConfig } from "@/lib/widget/config";
+import { getLocationBillingState } from "@/lib/billing/access";
 import type { WidgetConfig } from "@/lib/database.types";
 import {
   ReviewCard,
@@ -103,6 +104,13 @@ export default async function WidgetPage({
     .eq("slug", slug)
     .maybeSingle();
   if (!location) {
+    return <WidgetMissing slug={slug} lang={lang} />;
+  }
+
+  // Billing gate: an unbilled location's widget shows the same neutral
+  // missing state (no alarming message on the embedding site).
+  const gate = await getLocationBillingState(location.id);
+  if (!gate.allowed) {
     return <WidgetMissing slug={slug} lang={lang} />;
   }
 

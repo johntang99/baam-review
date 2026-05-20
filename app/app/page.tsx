@@ -22,6 +22,8 @@ import {
 } from "@/lib/analytics/aggregate";
 import { Funnel } from "@/components/admin/funnel";
 import { computeRevenue, fmtUSD } from "@/lib/analytics/revenue";
+import { getLocationBillingState } from "@/lib/billing/access";
+import { BillingRequiredBanner } from "@/components/admin/billing-required-banner";
 import type { ReferralConfig } from "@/lib/database.types";
 
 export const metadata = {
@@ -72,6 +74,10 @@ export default async function DashboardPage() {
   );
   const selectedLocation = selectedLocationId
     ? (locations ?? []).find((l) => l.id === selectedLocationId) ?? null
+    : null;
+
+  const billingGate = selectedLocation
+    ? await getLocationBillingState(selectedLocation.id)
     : null;
 
   // Pick the location we'll preview the referral offer / share card for: the
@@ -329,6 +335,9 @@ export default async function DashboardPage() {
 
   return (
     <main className="px-10 py-10 space-y-7">
+      {selectedLocation && billingGate && !billingGate.allowed && (
+        <BillingRequiredBanner locationName={selectedLocation.display_name} />
+      )}
       {/* TOP BAR */}
       <header className="flex items-end justify-between gap-6 flex-wrap">
         <div className="space-y-1">

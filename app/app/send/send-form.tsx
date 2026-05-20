@@ -31,6 +31,7 @@ interface SendFormProps {
   locations: LocationOption[];
   smsEnabled: boolean;
   initialLocationId?: string | null;
+  blockedLocationIds: string[];
 }
 
 const ALL_LANGS = ["en", "zh", "es"] as const;
@@ -48,6 +49,7 @@ export function SendForm({
   locations,
   smsEnabled,
   initialLocationId,
+  blockedLocationIds,
 }: SendFormProps) {
   const initialLocation =
     locations.find((l) => l.id === initialLocationId) ?? locations[0];
@@ -66,6 +68,7 @@ export function SendForm({
   const [result, setResult] = useState<SendResult | null>(null);
 
   const currentLocation = locations.find((l) => l.id === locationId);
+  const billingBlocked = blockedLocationIds.includes(locationId);
   const supported = currentLocation?.supported_languages ?? ["en"];
   const missingLangs = ALL_LANGS.filter((l) => !supported.includes(l));
 
@@ -174,6 +177,25 @@ export function SendForm({
           violation and can get your reviews removed or your profile suspended.
         </p>
       </div>
+
+      {billingBlocked && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gold/50 bg-gold/10 px-4 py-3.5">
+          <p className="text-[13px] text-ink">
+            <span className="font-medium">Billing required</span> — set up
+            billing for{" "}
+            <span className="font-medium">
+              {currentLocation?.display_name ?? "this location"}
+            </span>{" "}
+            before sending review requests.
+          </p>
+          <Link
+            href="/app/billing"
+            className="shrink-0 rounded-lg bg-forest px-4 py-2 text-[13px] font-medium text-white hover:bg-forest-dark"
+          >
+            Set up billing →
+          </Link>
+        </div>
+      )}
 
       <form onSubmit={onSubmit} className="space-y-5 rounded-2xl border border-border-base bg-paper p-5 sm:p-6 shadow-sm">
         {locations.length > 1 && (
@@ -373,7 +395,7 @@ export function SendForm({
         )}
 
         <div className="flex items-center justify-end gap-3 border-t border-border-base pt-5">
-          <Button type="submit" size="lg" disabled={pending}>
+          <Button type="submit" size="lg" disabled={pending || billingBlocked}>
             <Send className="h-4 w-4" />
             {pending ? "Sending…" : `Send via ${channel === "sms" ? "SMS" : "email"}`}
           </Button>

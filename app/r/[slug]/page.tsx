@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { createServiceClient } from "@/lib/supabase/service";
+import { getLocationBillingState } from "@/lib/billing/access";
 import {
   STRINGS,
   pickLanguage,
@@ -89,6 +90,11 @@ export default async function ReviewLandingPage({
 
   if (!location) notFound();
   const loc = location as Loc;
+
+  // Billing gate: an unbilled location's public review page is treated as
+  // not found (neutral, no billing-status leak to visitors).
+  const gate = await getLocationBillingState(loc.id);
+  if (!gate.allowed) notFound();
 
   let request:
     | { id: string; language: string | null }

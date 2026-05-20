@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isTwilioConfigured } from "@/lib/messaging/twilio";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import { PageHeader } from "@/components/admin/page-header";
+import { getLocationBillingMap } from "@/lib/billing/access";
 import { SendForm } from "./send-form";
 
 export const metadata = {
@@ -20,6 +21,13 @@ export default async function SendPage() {
     .from("locations")
     .select("id, display_name, default_language, supported_languages")
     .order("created_at", { ascending: false });
+
+  const billing = await getLocationBillingMap(
+    (locations ?? []).map((l) => l.id),
+  );
+  const blockedLocationIds = (locations ?? [])
+    .filter((l) => !billing.get(l.id)?.allowed)
+    .map((l) => l.id);
 
   const smsEnabled = isTwilioConfigured();
   const selectedLocationId = await getSelectedLocationId();
@@ -41,6 +49,7 @@ export default async function SendPage() {
         locations={locations ?? []}
         smsEnabled={smsEnabled}
         initialLocationId={initialLocationId}
+        blockedLocationIds={blockedLocationIds}
       />
     </main>
   );
