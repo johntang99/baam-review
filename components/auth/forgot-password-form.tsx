@@ -7,12 +7,9 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PasswordInput } from "./password-input";
 
-export function SignupForm() {
-  const [fullName, setFullName] = useState("");
+export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -24,13 +21,10 @@ export function SignupForm() {
 
     const supabase = createClient();
     const origin = window.location.origin;
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-        emailRedirectTo: `${origin}/auth/callback?next=/app`,
-      },
+    // Always tell Supabase where to redirect after the user clicks the
+    // recovery link in their email. That page handles updating the password.
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin}/auth/callback?next=/reset-password`,
     });
 
     if (error) {
@@ -39,6 +33,7 @@ export function SignupForm() {
       return;
     }
 
+    // Always show success — never leak whether the email exists.
     setSubmitted(true);
     setPending(false);
   }
@@ -52,22 +47,18 @@ export function SignupForm() {
           </span>
         </div>
         <div className="text-center space-y-1.5">
-          <h2 className="font-display text-xl text-ink">
-            Confirm your email to log in
-          </h2>
+          <h2 className="font-display text-xl text-ink">Check your inbox</h2>
           <p className="text-sm text-text-soft leading-relaxed">
-            We sent a confirmation link to{" "}
-            <strong className="text-ink">{email}</strong>.
-            <br />
-            Open it and click the link to activate your account, then log in.
+            If an account exists for{" "}
+            <strong className="text-ink">{email}</strong>, we just sent a
+            password-reset link there. Open it and click the link to set a
+            new password.
           </p>
         </div>
         <ul className="space-y-1.5 text-[12.5px] text-text-muted">
           <li>• The email may take a minute to arrive.</li>
-          <li>
-            • Check your spam / Promotions folder if you don&apos;t see it.
-          </li>
-          <li>• The link expires after 24 hours.</li>
+          <li>• Check your spam / Promotions folder if you don&apos;t see it.</li>
+          <li>• The link expires after 1 hour.</li>
         </ul>
         <div className="pt-2 text-center text-sm">
           <Link
@@ -84,17 +75,6 @@ export function SignupForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="fullName">Full name</Label>
-        <Input
-          id="fullName"
-          autoComplete="name"
-          required
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-        />
-      </div>
-
-      <div className="space-y-1.5">
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
@@ -106,19 +86,6 @@ export function SignupForm() {
         />
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="password">Password</Label>
-        <PasswordInput
-          id="password"
-          autoComplete="new-password"
-          required
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <p className="text-xs text-text-muted">At least 8 characters.</p>
-      </div>
-
       {error && (
         <p className="text-sm text-alert" role="alert">
           {error}
@@ -126,16 +93,16 @@ export function SignupForm() {
       )}
 
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
-        {pending ? "Creating account…" : "Create account"}
+        {pending ? "Sending…" : "Send reset link"}
       </Button>
 
       <p className="text-center text-sm text-text-soft">
-        Already have an account?{" "}
+        Remembered it?{" "}
         <Link
           href="/login"
           className="font-medium text-forest hover:underline"
         >
-          Log in
+          Back to log in
         </Link>
       </p>
     </form>
