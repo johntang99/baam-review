@@ -77,12 +77,13 @@ export async function POST(request: NextRequest) {
             })
             .eq("location_id", locationId);
         } else {
+          // Don't null review_plan: per-location subs remain independent
+          // (A1 model) and need the plan context to keep operating.
           await service
             .from("accounts")
             .update({
               subscription_status: "canceled",
               stripe_subscription_id: null,
-              review_plan: null,
               cancel_at_period_end: false,
             })
             .eq("id", accountId);

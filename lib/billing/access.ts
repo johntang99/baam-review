@@ -18,7 +18,6 @@ import { createServiceClient } from "@/lib/supabase/service";
 export type BillingGateReason =
   | "ok"
   | "no_plan"
-  | "account_base_inactive"
   | "location_unbilled"
   | "location_inactive";
 
@@ -47,18 +46,16 @@ export async function getLocationBillingState(
 
   const { data: account } = await svc
     .from("accounts")
-    .select("review_plan, subscription_status")
+    .select("review_plan")
     .eq("id", loc.account_id)
     .maybeSingle();
   if (!account?.review_plan)
     return { allowed: false, reason: "no_plan" };
 
-  if (
-    account.review_plan === "self_service" &&
-    !ACTIVE.has(account.subscription_status ?? "")
-  ) {
-    return { allowed: false, reason: "account_base_inactive" };
-  }
+  // Truly independent: a location is gated only on its OWN subscription.
+  // The Self-service account base ($89/mo) is the owner's own business
+  // sub, not a platform fee — canceling it doesn't disable other
+  // locations on the account. Same rule applies to Full-service.
 
   const { data: sub } = await svc
     .from("location_subscriptions")
@@ -102,7 +99,7 @@ export async function getLocationBillingMap(
 
   const { data: accounts } = await svc
     .from("accounts")
-    .select("id, review_plan, subscription_status")
+    .select("id, review_plan")
     .in("id", accountIds.length ? accountIds : ["00000000-0000-0000-0000-000000000000"]);
   const acctById = new Map((accounts ?? []).map((a) => [a.id, a]));
 
@@ -130,14 +127,10 @@ export async function getLocationBillingMap(
           ? "card"
           : null;
 
-    let allowed = false;
-    if (plan) {
-      const accountBaseOk =
-        plan === "full_service" ||
-        ACTIVE.has(acct?.subscription_status ?? "");
-      allowed =
-        accountBaseOk && !!locStatus && ACTIVE.has(locStatus);
-    }
+    // Each location's gate depends only on its OWN sub status (A1
+    // model — truly independent). Account base no longer cross-gates.
+    const allowed =
+      !!plan && !!locStatus && ACTIVE.has(locStatus);
     out.set(l.id, {
       allowed,
       accountPlan: plan,
