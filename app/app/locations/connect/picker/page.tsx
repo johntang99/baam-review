@@ -10,6 +10,8 @@ import {
 } from "@/lib/google/business-profile";
 import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
+import { classifyByGoogleCategory } from "@/lib/review/google-category-mapping";
+import { CATEGORY_LABELS } from "@/lib/review/industry-presets";
 import { createLocationFromGoogle } from "./actions";
 
 export const metadata = {
@@ -137,6 +139,15 @@ export default async function PickerPage() {
                         {loc.primaryCategory}
                       </p>
                     )}
+                    {loc.primaryCategory && (() => {
+                      const cat = classifyByGoogleCategory(loc.primaryCategory);
+                      return (
+                        <p className="text-[12px] text-text-soft">
+                          Will be set as <strong className="text-ink">{CATEGORY_LABELS[cat].en}</strong>
+                          <span className="text-text-muted"> · change anytime in location settings</span>
+                        </p>
+                      );
+                    })()}
                     {loc.formattedAddress && (
                       <p className="text-[13.5px] text-text-soft">
                         {loc.formattedAddress}

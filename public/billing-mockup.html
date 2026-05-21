@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Billing page — table mockup</title>
+<style>
+  :root {
+    --ink: #1E2A24;
+    --forest: #1F4D3F;
+    --forest-dark: #163A30;
+    --cream: #FAF7EE;
+    --cream-deep: #F3EFE2;
+    --paper: #FFFFFF;
+    --row-alt: #FBF8EF;
+    --border: #E8E1D0;
+    --border-soft: #F0ECE1;
+    --text-soft: #5A6660;
+    --text-muted: #8A938E;
+    --gold: #C8A85C;
+    --gold-soft: #E8D9B5;
+    --alert: #B73225;
+    --alert-soft: #FBE8E5;
+    --warn: #A17A3A;
+    --warn-soft: #F5ECD8;
+    --ok: #2A6B57;
+    --ok-soft: rgba(42,107,87,0.10);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--cream);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink); -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+  }
+  .page { max-width: 1180px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .page-header { margin-bottom: 24px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; }
+  .h1 { font-family: 'Newsreader', Georgia, serif; font-size: 32px; font-weight: 400; margin: 6px 0 4px; }
+  .sub { color: var(--text-soft); font-size: 14px; }
+
+  /* Toolbar above the table */
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    margin: 28px 0 16px;
+  }
+  .filters {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--paper); border: 1px solid var(--border);
+    border-radius: 10px; padding: 3px;
+  }
+  .filter-tab {
+    border: none; background: transparent; cursor: pointer;
+    font: inherit; font-size: 13px; font-weight: 500;
+    padding: 7px 12px; border-radius: 7px;
+    color: var(--text-soft);
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .filter-tab .count {
+    background: var(--cream-deep); color: var(--text-soft);
+    padding: 1px 7px; border-radius: 999px; font-size: 11px;
+    line-height: 1.4;
+  }
+  .filter-tab.active { background: var(--ink); color: #fff; }
+  .filter-tab.active .count { background: rgba(255,255,255,0.15); color: #fff; }
+  .filter-tab:hover:not(.active) { background: var(--cream-deep); }
+
+  .search { flex: 1; max-width: 260px; position: relative; }
+  .search input {
+    width: 100%; height: 36px;
+    border: 1px solid var(--border); background: var(--paper);
+    border-radius: 9px; padding: 0 12px 0 34px;
+    font: inherit; font-size: 13px; color: var(--ink); outline: none;
+  }
+  .search input:focus { border-color: var(--forest); box-shadow: 0 0 0 3px rgba(31,77,63,0.12); }
+  .search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+  .sort-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 36px; padding: 0 12px; border-radius: 9px;
+    background: var(--paper); border: 1px solid var(--border);
+    font: inherit; font-size: 13px; color: var(--text-soft);
+    cursor: pointer;
+  }
+  .sort-pill strong { color: var(--ink); font-weight: 500; }
+
+  .bulk-cta {
+    margin-left: auto;
+    background: var(--forest); color: #fff; border: none;
+    height: 36px; padding: 0 14px; border-radius: 9px;
+    font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .bulk-cta:hover { background: var(--forest-dark); }
+
+  /* ===== Table ===== */
+  .table-wrap {
+    background: var(--paper); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--cream-deep); }
+  thead th {
+    text-align: left; font-size: 11.5px; font-weight: 600;
+    color: var(--text-soft); text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 13px 18px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap; user-select: none;
+  }
+  thead th.sortable { cursor: pointer; }
+  thead th.sortable:hover { color: var(--ink); }
+  thead th.sortable .arrow { opacity: 0.4; margin-left: 4px; display: inline-block; transform: translateY(1px); }
+  thead th.sorted { color: var(--ink); }
+  thead th.sorted .arrow { opacity: 1; color: var(--forest); }
+  thead th.col-action { text-align: right; }
+
+  tbody td {
+    padding: 14px 18px; vertical-align: middle;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  tbody tr:nth-child(even) td { background: var(--row-alt); }
+  tbody tr:hover td { background: rgba(31,77,63,0.04); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .col-name {
+    font-size: 14.5px; font-weight: 500; color: var(--ink);
+    max-width: 320px;
+  }
+  .col-name .truncate {
+    display: block; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .col-meta { color: var(--text-soft); font-size: 13px; }
+
+  /* Status badges */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor; flex-shrink: 0;
+  }
+  .badge-trialing { color: var(--ok); background: var(--ok-soft); }
+  .badge-paying   { color: var(--forest); background: rgba(31,77,63,0.08); }
+  .badge-canceling{ color: var(--alert); background: var(--alert-soft); }
+  .badge-past-due { color: var(--warn); background: var(--warn-soft); }
+  .badge-no-bill  { color: var(--warn); background: var(--warn-soft); }
+  .badge-canceled { color: var(--text-muted); background: var(--cream-deep); }
+
+  /* Type tags (subtle inline pills, no dot) */
+  .type-tag {
+    display: inline-flex; align-items: center;
+    padding: 3px 9px; border-radius: 6px;
+    font-size: 12px; font-weight: 500;
+    background: var(--cream-deep); color: var(--text-soft);
+    border: 1px solid var(--border-soft);
+  }
+
+  /* Action column */
+  td.col-action { text-align: right; white-space: nowrap; }
+  .btn {
+    border: none; border-radius: 8px;
+    font: inherit; font-size: 12.5px; font-weight: 500;
+    height: 32px; padding: 0 12px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    margin-left: 6px;
+  }
+  .btn:first-child { margin-left: 0; }
+  .btn-ghost { background: var(--paper); color: var(--ink); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--forest); color: var(--forest); }
+  .btn-primary { background: var(--forest); color: #fff; }
+  .btn-primary:hover { background: var(--forest-dark); }
+  .btn-warn { background: var(--gold); color: var(--ink); }
+  .btn-warn:hover { background: #b8983f; }
+
+  tbody tr:nth-child(even) .btn-ghost { background: var(--paper); }
+
+  /* Footer */
+  .summary {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    justify-content: space-between; align-items: center;
+    padding: 14px 22px;
+    background: var(--cream-deep);
+    border-top: 1px solid var(--border);
+    font-size: 12.5px; color: var(--text-soft);
+  }
+  .summary strong { color: var(--ink); font-weight: 500; }
+  .summary .show-canceled {
+    border: none; background: transparent; color: var(--forest);
+    font: inherit; font-size: 12.5px; cursor: pointer; padding: 0;
+  }
+  .summary .show-canceled:hover { text-decoration: underline; }
+
+  /* Modal preview (for the setup flow) */
+  .modal-preview {
+    margin-top: 60px;
+    background: var(--paper); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+  }
+  .modal-preview-label {
+    padding: 12px 22px; font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-muted);
+    background: var(--cream-deep); border-bottom: 1px solid var(--border);
+  }
+  .modal-card {
+    max-width: 440px; margin: 28px auto; padding: 24px 26px;
+    background: var(--paper); border: 1px solid var(--border);
+    border-radius: 14px; box-shadow: 0 24px 40px rgba(15,31,26,0.06);
+  }
+  .modal-h { font-family: 'Newsreader', Georgia, serif; font-size: 20px; font-weight: 400; margin: 0 0 4px; }
+  .modal-sub { color: var(--text-soft); font-size: 13px; margin-bottom: 18px; }
+  .modal-field { margin-bottom: 14px; }
+  .modal-field-label { font-size: 11.5px; font-weight: 500; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .interval-toggle { display: inline-flex; padding: 3px; background: var(--cream-deep); border-radius: 10px; font-size: 13px; }
+  .interval-toggle button { border: none; background: transparent; cursor: pointer; padding: 7px 14px; border-radius: 7px; font: inherit; color: var(--text-soft); font-weight: 500; }
+  .interval-toggle button.on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  .interval-price { margin-left: 12px; font-size: 13px; color: var(--text-soft); }
+  .interval-price strong { color: var(--ink); font-weight: 500; }
+  .input { width: 100%; height: 38px; border: 1px solid var(--border); background: var(--paper); border-radius: 9px; padding: 0 12px; font: inherit; font-size: 13.5px; color: var(--ink); outline: none; }
+  .input:focus { border-color: var(--forest); box-shadow: 0 0 0 3px rgba(31,77,63,0.12); }
+  .modal-cta-row { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-cta-row .btn { flex: 1; justify-content: center; height: 42px; font-size: 13.5px; }
+  .modal-foot { margin-top: 14px; font-size: 12px; color: var(--text-muted); text-align: center; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-header">
+      <div class="eyebrow">Billing</div>
+      <h1 class="h1">Plan & billing</h1>
+      <p class="sub">Each location is its own subscription — independent card, independent trial, independent cancel.</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="filters" role="tablist">
+        <button class="filter-tab active">All <span class="count">6</span></button>
+        <button class="filter-tab">Paying <span class="count">3</span></button>
+        <button class="filter-tab">Needs setup <span class="count">2</span></button>
+        <button class="filter-tab">Canceling <span class="count">1</span></button>
+      </div>
+
+      <label class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input placeholder="Search locations…" />
+      </label>
+
+      <button class="sort-pill" title="Default sort: needs action first, then alphabetical">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+        Sort: <strong>Status &middot; needs action first</strong>
+      </button>
+
+      <button class="bulk-cta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+        Connect Google
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable">Business name <span class="arrow">▾</span></th>
+            <th class="sortable sorted">Status <span class="arrow">▾</span></th>
+            <th class="sortable">Payment plan <span class="arrow">▴▾</span></th>
+            <th class="sortable">Type <span class="arrow">▴▾</span></th>
+            <th class="sortable">Next charge <span class="arrow">▴▾</span></th>
+            <th class="col-action">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Needs setup (priority — listed first by default sort) -->
+          <tr>
+            <td class="col-name"><span class="truncate">全美華人理髮店</span></td>
+            <td><span class="badge badge-no-bill">Billing required</span></td>
+            <td class="col-meta">—</td>
+            <td class="col-meta">—</td>
+            <td class="col-meta">—</td>
+            <td class="col-action">
+              <button class="btn btn-primary">Set up billing →</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-name"><span class="truncate">杰出补习班 Citiwide Master</span></td>
+            <td><span class="badge badge-no-bill">Billing required</span></td>
+            <td class="col-meta">—</td>
+            <td class="col-meta">—</td>
+            <td class="col-meta">—</td>
+            <td class="col-action">
+              <button class="btn btn-primary">Set up billing →</button>
+            </td>
+          </tr>
+
+          <!-- Canceling -->
+          <tr>
+            <td class="col-name"><span class="truncate">Oishi sushi express</span></td>
+            <td><span class="badge badge-canceling">Canceling</span></td>
+            <td class="col-meta">Annual</td>
+            <td><span class="type-tag">Check</span></td>
+            <td class="col-meta">Ends Jun 19, 2026</td>
+            <td class="col-action">
+              <button class="btn btn-warn">Don't cancel</button>
+              <button class="btn btn-ghost">Manage</button>
+            </td>
+          </tr>
+
+          <!-- Trialing -->
+          <tr>
+            <td class="col-name"><span class="truncate">American Education &amp; Translation Services 美域留学与翻译公司</span></td>
+            <td><span class="badge badge-trialing">Trialing</span></td>
+            <td class="col-meta">Monthly</td>
+            <td><span class="type-tag">Card</span></td>
+            <td class="col-meta">Jun 19, 2026</td>
+            <td class="col-action">
+              <button class="btn btn-ghost">Manage</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-name"><span class="truncate">Baam Platform</span></td>
+            <td><span class="badge badge-trialing">Trialing</span></td>
+            <td class="col-meta">Monthly</td>
+            <td><span class="type-tag">Card</span></td>
+            <td class="col-meta">Jun 19, 2026</td>
+            <td class="col-action">
+              <button class="btn btn-ghost">Manage</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-name"><span class="truncate">DR. Huang Acupuncture and Green Eastern Beauty 中醫針灸 美容</span></td>
+            <td><span class="badge badge-trialing">Trialing</span></td>
+            <td class="col-meta">Monthly</td>
+            <td><span class="type-tag">Card</span></td>
+            <td class="col-meta">Jun 19, 2026</td>
+            <td class="col-action">
+              <button class="btn btn-ghost">Manage</button>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <!-- Footer summary -->
+      <div class="summary">
+        <div><strong>6 locations</strong> · 3 paying · 1 canceling · 2 need setup</div>
+        <div>
+          Monthly revenue (after trials): <strong>$247</strong>
+          &nbsp;·&nbsp;
+          <button class="show-canceled">Show canceled (2)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reference: other states -->
+    <div class="modal-preview" style="margin-top: 32px;">
+      <div class="modal-preview-label">Other states (shown for reference — not in current view)</div>
+      <table>
+        <tbody>
+          <tr>
+            <td class="col-name" style="width: 28%;"><span class="truncate">Vein Clinic of New York</span></td>
+            <td style="width: 15%;"><span class="badge badge-past-due">Past due</span></td>
+            <td class="col-meta" style="width: 12%;">Monthly</td>
+            <td style="width: 10%;"><span class="type-tag">Card</span></td>
+            <td class="col-meta" style="width: 15%;">Retry · Jun 22</td>
+            <td class="col-action">
+              <button class="btn btn-warn">Update card</button>
+              <button class="btn btn-ghost">Manage</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-name"><span class="truncate">Empire Chinese Restaurant</span></td>
+            <td><span class="badge badge-paying">Paying</span></td>
+            <td class="col-meta">Annual</td>
+            <td><span class="type-tag">Card</span></td>
+            <td class="col-meta">Apr 12, 2027</td>
+            <td class="col-action">
+              <button class="btn btn-ghost">Manage</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-name"><span class="truncate">Old Clinic (closed)</span></td>
+            <td><span class="badge badge-canceled">Canceled</span></td>
+            <td class="col-meta">—</td>
+            <td class="col-meta">—</td>
+            <td class="col-meta">Ended May 4</td>
+            <td class="col-action">
+              <button class="btn btn-primary">Re-subscribe →</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal that opens for "Set up billing" -->
+    <div class="modal-preview">
+      <div class="modal-preview-label">Modal that opens when "Set up billing →" is clicked</div>
+      <div class="modal-card">
+        <h3 class="modal-h">Set up billing</h3>
+        <p class="modal-sub">For <strong style="color: var(--ink);">全美華人理髮店</strong> · Self-service plan</p>
+
+        <div class="modal-field">
+          <div class="modal-field-label">Billing interval</div>
+          <div style="display:flex; align-items:center;">
+            <div class="interval-toggle">
+              <button class="on">Monthly</button>
+              <button>Annual (2 mo free)</button>
+            </div>
+            <span class="interval-price"><strong>$79</strong> / month · 30-day free trial</span>
+          </div>
+        </div>
+
+        <div class="modal-field">
+          <div class="modal-field-label">Discount code (optional)</div>
+          <input class="input" placeholder="e.g. STUDIO100" />
+        </div>
+
+        <div class="modal-cta-row">
+          <button class="btn btn-primary">Pay by card →</button>
+          <button class="btn btn-ghost" disabled title="Full-service only">Pay by check</button>
+        </div>
+        <p class="modal-foot">
+          Card is collected for after the 30-day trial. Cancel anytime in your dashboard before then and pay nothing.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+</parameter>
+</invoke>

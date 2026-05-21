@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { googleReviewUrl } from "@/lib/google/business-profile";
 import { buildLocationSlug } from "@/lib/slug";
+import { classifyByGoogleCategory } from "@/lib/review/google-category-mapping";
 
 export async function createLocationFromGoogle(formData: FormData) {
   const placeId = formData.get("place_id");
@@ -48,6 +49,12 @@ export async function createLocationFromGoogle(formData: FormData) {
       typeof primaryCategory === "string" && primaryCategory
         ? primaryCategory.toLowerCase()
         : null,
+    // Auto-classify into a BAAM Review category bucket from Google's
+    // primary-category string. Drives the trilingual service / quality
+    // chip presets on /r/[slug]. Admin can override in location settings.
+    review_category: classifyByGoogleCategory(
+      typeof primaryCategory === "string" ? primaryCategory : null,
+    ),
     // Save GBP's website URI to the dedicated `website_url` column — used
     // by /s/<advocate_id> as the "learn more" target for friends who land
     // on a recommendation card. `custom_url` stays free for owners to point

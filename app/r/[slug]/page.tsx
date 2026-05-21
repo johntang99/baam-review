@@ -28,6 +28,7 @@ type Loc = {
   brand_color: string | null;
   logo_url: string | null;
   business_type: string | null;
+  review_category: string;
   default_language: Language;
   supported_languages: string[];
   welcome_message: Record<string, string> | null;
@@ -83,7 +84,7 @@ export default async function ReviewLandingPage({
   const { data: location } = await supabase
     .from("locations")
     .select(
-      "id, account_id, slug, display_name, brand_color, logo_url, business_type, default_language, supported_languages, welcome_message, prompt_questions, google_review_url, yelp_url, custom_url, custom_url_label, consent_display_enabled",
+      "id, account_id, slug, display_name, brand_color, logo_url, business_type, review_category, default_language, supported_languages, welcome_message, prompt_questions, google_review_url, yelp_url, custom_url, custom_url_label, consent_display_enabled",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -129,8 +130,12 @@ export default async function ReviewLandingPage({
   const customLabel = loc.custom_url_label?.[lang] || null;
 
   const overrides = parsePromptQuestions(loc.prompt_questions);
-  const serviceChips = getServiceChips(loc.business_type, lang, overrides);
-  const descriptorChips = getDescriptorChips(lang, overrides);
+  const serviceChips = getServiceChips(loc.review_category, lang, overrides);
+  const descriptorChips = getDescriptorChips(
+    loc.review_category,
+    lang,
+    overrides,
+  );
 
   const supportedLangs = loc.supported_languages.filter(isLanguage);
   const wechat = isWeChatBrowser(userAgent);
@@ -185,14 +190,18 @@ export default async function ReviewLandingPage({
   return (
     <main className="min-h-screen bg-cream py-6 px-4 sm:py-10">
       <div className="mx-auto max-w-md space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="space-y-3">
           <Brand
             displayName={loc.display_name}
             logoUrl={loc.logo_url}
             brandColor={brandColor}
             initial={initialLetter}
           />
-          <LanguageSwitcher current={lang} available={supportedLangs} />
+          {supportedLangs.length > 1 && (
+            <div className="border-t border-border-soft pt-3">
+              <LanguageSwitcher current={lang} available={supportedLangs} />
+            </div>
+          )}
         </div>
 
         <p className="text-[15px] text-text leading-relaxed">{welcome}</p>
@@ -236,27 +245,25 @@ function Brand({
   initial: string;
 }) {
   return (
-    <div className="flex items-center gap-2.5">
+    <div className="flex items-start gap-3">
       {logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={logoUrl}
           alt=""
-          className="h-9 w-9 rounded-md object-cover"
+          className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
         />
       ) : (
         <span
-          className="flex h-9 w-9 items-center justify-center rounded-md text-cream font-display text-[15px]"
+          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md text-cream font-display text-[16px]"
           style={{ backgroundColor: brandColor }}
         >
           {initial}
         </span>
       )}
-      <div className="min-w-0">
-        <p className="font-display text-[15px] text-ink leading-tight truncate">
-          {displayName}
-        </p>
-      </div>
+      <p className="font-display text-[17px] text-ink leading-snug">
+        {displayName}
+      </p>
     </div>
   );
 }

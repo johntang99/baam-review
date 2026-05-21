@@ -9,12 +9,31 @@ export const maxDuration = 30;
 interface DraftRequest {
   location_id?: string;
   request_id?: string | null;
-  service?: string | null;
+  /**
+   * Selected service chips. Array of selected presets + free-text "Other"
+   * entries (in the order the customer picked them). Backward-compatible
+   * with the legacy single-string form.
+   */
+  service?: string | string[] | null;
   rating?: number;
-  descriptor?: string | null;
+  /** Selected quality chips. Same shape as `service`. */
+  descriptor?: string | string[] | null;
   note?: string | null;
   language?: string;
   regenerate?: boolean;
+}
+
+/** Coerce a single value or array into a comma-joined string for the AI prompt. */
+function joinChips(v: string | string[] | null | undefined): string | null {
+  if (!v) return null;
+  if (Array.isArray(v)) {
+    const cleaned = v
+      .map((s) => (typeof s === "string" ? s.trim() : ""))
+      .filter(Boolean);
+    return cleaned.length ? cleaned.join(", ") : null;
+  }
+  const trimmed = v.trim();
+  return trimmed.length ? trimmed : null;
 }
 
 export async function POST(request: NextRequest) {
@@ -73,6 +92,9 @@ export async function POST(request: NextRequest) {
     if (r && r.location_id === location.id) requestId = r.id;
   }
 
+  const serviceJoined = joinChips(body.service ?? null);
+  const descriptorJoined = joinChips(body.descriptor ?? null);
+
   let drafts;
   try {
     drafts = await generateDrafts({
@@ -82,9 +104,9 @@ export async function POST(request: NextRequest) {
       },
       language,
       inputs: {
-        service: body.service ?? null,
+        service: serviceJoined,
         rating,
-        descriptor: body.descriptor ?? null,
+        descriptor: descriptorJoined,
         note: body.note ?? null,
       },
     });
@@ -104,9 +126,13 @@ export async function POST(request: NextRequest) {
     event_type: eventType,
     language,
     metadata: {
+      // Persist the original array shape in landing_events so analytics
+      // can later analyse multi-select patterns.
       service: body.service ?? null,
-      rating,
       descriptor: body.descriptor ?? null,
+      service_joined: serviceJoined,
+      descriptor_joined: descriptorJoined,
+      rating,
       draft_count: drafts.length,
     },
   });

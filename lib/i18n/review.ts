@@ -22,7 +22,7 @@ export const STRINGS = {
     // Step labels
     step_service: "Service you received",
     step_rating: "Your rating",
-    step_descriptor: "In one word",
+    step_descriptor: "How would you describe it",
 
     // Helpers
     optional: "Optional",
@@ -47,7 +47,6 @@ export const STRINGS = {
     // Draft picker
     drafts_heading: "Pick the one that fits best",
     drafts_subtitle: "Tap a draft, then edit if you want.",
-    drafts_helper: "We'll copy it to your clipboard before opening Google.",
     drafts_tone_warm: "Warm",
     drafts_tone_specific: "Specific",
     drafts_tone_brief: "Brief",
@@ -56,6 +55,10 @@ export const STRINGS = {
     drafts_skip: "Skip and go straight to Google",
     drafts_copied: "Copied to clipboard",
     drafts_copy_failed: "Tap to copy",
+    copied_banner_heading: "Your review is already copied!",
+    copied_banner_body: "On the next Google page, just tap the text box and paste it in.",
+    copied_banner_paste_label: "Paste with:",
+    copied_banner_or: "or",
 
     // Private feedback
     private_link: "Or share privately with us",
@@ -135,10 +138,6 @@ export const STRINGS = {
     wechat_body:
       "WeChat blocks Google sign-in. Tap the ⋯ menu in the top right and choose “Open in browser”, then return to this page.",
 
-    // Disclosure
-    ai_disclosure:
-      "This draft is generated from your inputs to help you get started. Please edit it to make it your own.",
-
     // Errors
     error_message_required: "Please write a short message.",
     error_generic: "Something went wrong. Please try again.",
@@ -162,7 +161,7 @@ export const STRINGS = {
 
     step_service: "您接受的服务",
     step_rating: "您的评分",
-    step_descriptor: "用一个词形容",
+    step_descriptor: "如何形容",
 
     optional: "可选",
     other_chip: "其他",
@@ -184,7 +183,6 @@ export const STRINGS = {
 
     drafts_heading: "选一条最合适的",
     drafts_subtitle: "点击一条草稿，然后可以编辑。",
-    drafts_helper: "我们会先将文字复制到剪贴板，然后跳转到 Google。",
     drafts_tone_warm: "温暖",
     drafts_tone_specific: "具体",
     drafts_tone_brief: "简短",
@@ -193,6 +191,10 @@ export const STRINGS = {
     drafts_skip: "跳过，直接去 Google",
     drafts_copied: "已复制到剪贴板",
     drafts_copy_failed: "点击复制",
+    copied_banner_heading: "您的评价已复制！",
+    copied_banner_body: "在下一个 Google 页面中，点击文本框并粘贴即可。",
+    copied_banner_paste_label: "粘贴方式：",
+    copied_banner_or: "或",
 
     private_link: "或私下告诉我们",
     private_title: "发送私信",
@@ -258,9 +260,6 @@ export const STRINGS = {
     wechat_body:
       "微信会拦截 Google 登录。请点击右上角 ⋯ 菜单，选择「在浏览器中打开」，然后返回此页面。",
 
-    ai_disclosure:
-      "此草稿是根据您的输入生成，仅供参考。请按需修改成您自己的话。",
-
     error_message_required: "请输入一条简短的留言。",
     error_generic: "出错了，请稍后再试。",
 
@@ -282,7 +281,7 @@ export const STRINGS = {
 
     step_service: "Servicio recibido",
     step_rating: "Su calificación",
-    step_descriptor: "En una palabra",
+    step_descriptor: "Cómo lo describirías",
 
     optional: "Opcional",
     other_chip: "Otro",
@@ -304,7 +303,6 @@ export const STRINGS = {
 
     drafts_heading: "Elija el que mejor le quede",
     drafts_subtitle: "Toque un borrador y edítelo si quiere.",
-    drafts_helper: "Lo copiaremos al portapapeles antes de abrir Google.",
     drafts_tone_warm: "Cálido",
     drafts_tone_specific: "Específico",
     drafts_tone_brief: "Breve",
@@ -313,6 +311,10 @@ export const STRINGS = {
     drafts_skip: "Saltar e ir a Google",
     drafts_copied: "Copiado al portapapeles",
     drafts_copy_failed: "Toque para copiar",
+    copied_banner_heading: "¡Su reseña ya está copiada!",
+    copied_banner_body: "En la siguiente página de Google, solo toque el cuadro de texto y péguela.",
+    copied_banner_paste_label: "Pegar con:",
+    copied_banner_or: "o",
 
     private_link: "O envíenos un mensaje privado",
     private_title: "Enviar un mensaje privado",
@@ -382,9 +384,6 @@ export const STRINGS = {
     wechat_title: "Abra esta página en su navegador para dejar una reseña en Google",
     wechat_body:
       "WeChat bloquea el inicio de sesión de Google. Toque el menú ⋯ en la esquina superior derecha y elija «Abrir en navegador», luego vuelva a esta página.",
-
-    ai_disclosure:
-      "Este borrador se genera a partir de sus respuestas para ayudarle a empezar. Por favor edítelo para hacerlo suyo.",
 
     error_message_required: "Por favor escriba un mensaje corto.",
     error_generic: "Algo salió mal. Inténtelo de nuevo.",

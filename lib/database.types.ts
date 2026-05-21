@@ -169,6 +169,7 @@ export interface Database {
           display_name: string;
           address: string | null;
           business_type: string | null;
+          review_category: string;
           brand_color: string | null;
           logo_url: string | null;
           default_language: Language;
@@ -206,6 +207,7 @@ export interface Database {
           display_name: string;
           address?: string | null;
           business_type?: string | null;
+          review_category?: string;
           brand_color?: string | null;
           logo_url?: string | null;
           default_language?: Language;

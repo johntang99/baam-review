@@ -83,6 +83,7 @@ export async function updateLocation(locationId: string, formData: FormData) {
     display_name: getString(formData, "display_name") ?? "Untitled",
     address: getString(formData, "address"),
     business_type: getString(formData, "business_type"),
+    review_category: getString(formData, "review_category") ?? "other",
     brand_color: getString(formData, "brand_color") ?? "#1F4D3F",
     logo_url: getString(formData, "logo_url"),
     default_language: defaultLang,

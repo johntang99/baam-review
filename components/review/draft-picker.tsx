@@ -29,9 +29,9 @@ interface DraftPickerProps {
   googleReviewUrl: string | null;
   drafts: Draft[];
   inputsSummary: {
-    service: string | null;
+    service: readonly string[];
     rating: number;
-    descriptor: string | null;
+    descriptor: readonly string[];
   };
   onRegenerate: () => Promise<void>;
   onBack: () => void;
@@ -192,8 +192,8 @@ export function DraftPicker({
                         {toneLabel}
                       </p>
                       {isSelected && copyState === "copied" && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[10.5px] font-medium text-success">
-                          <ClipboardCheck className="h-3 w-3" />
+                        <span className="inline-flex items-center gap-1 rounded-full bg-success/20 px-2.5 py-0.5 text-[11.5px] font-bold uppercase tracking-wide text-success animate-pulse">
+                          <ClipboardCheck className="h-3.5 w-3.5 stroke-[2.5]" />
                           {s.drafts_copied}
                         </span>
                       )}
@@ -243,9 +243,41 @@ export function DraftPicker({
         </div>
       )}
 
-      <p className="text-[13px] text-text italic leading-relaxed">
-        {s.ai_disclosure}
-      </p>
+      {copyState === "copied" && googleReviewUrl && !editing && (
+        <div
+          role="status"
+          className="flex gap-4 rounded-2xl border-2 border-gold/50 bg-gold/10 p-5"
+        >
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gold shadow-sm">
+            <ClipboardCheck
+              className="h-6 w-6 text-paper"
+              strokeWidth={2.25}
+            />
+          </div>
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <p className="font-display text-[17px] font-semibold text-ink leading-tight">
+              {s.copied_banner_heading}
+            </p>
+            <p className="text-[14px] text-text leading-relaxed">
+              {s.copied_banner_body}
+            </p>
+            <div className="flex flex-wrap items-center gap-2 pt-1.5">
+              <span className="text-[13px] font-semibold text-ink">
+                {s.copied_banner_paste_label}
+              </span>
+              <kbd className="inline-flex items-center rounded-md border border-gold/50 bg-paper px-2.5 py-1 font-mono text-[12.5px] text-ink shadow-sm">
+                ⌘ Cmd + V
+              </kbd>
+              <span className="text-[13px] text-text-soft">
+                {s.copied_banner_or}
+              </span>
+              <kbd className="inline-flex items-center rounded-md border border-gold/50 bg-paper px-2.5 py-1 font-mono text-[12.5px] text-ink shadow-sm">
+                Ctrl + V
+              </kbd>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-2">
         {consentDisplayEnabled && googleReviewUrl && (
@@ -301,10 +333,6 @@ export function DraftPicker({
             {isRegenerating ? s.cta_generating : s.cta_regenerate}
           </button>
         </div>
-
-        <p className="text-[13px] text-text text-center pt-1">
-          {s.drafts_helper}
-        </p>
       </div>
     </div>
   );
@@ -318,14 +346,16 @@ function InputsSummary({
   onBack,
 }: {
   lang: Language;
-  service: string | null;
+  service: readonly string[];
   rating: number;
-  descriptor: string | null;
+  descriptor: readonly string[];
   onBack: () => void;
 }) {
   const s = STRINGS[lang];
   const ratingLabel = s.drafts_summary_rating.replace("{n}", String(rating));
-  const parts = [service, ratingLabel, descriptor].filter(
+  const serviceLabel = service.length ? service.join(", ") : "";
+  const descriptorLabel = descriptor.length ? descriptor.join(", ") : "";
+  const parts = [serviceLabel, ratingLabel, descriptorLabel].filter(
     (p): p is string => !!p && p.length > 0,
   );
 

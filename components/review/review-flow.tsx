@@ -52,9 +52,9 @@ export function ReviewFlow({
 }: ReviewFlowProps) {
   const s = STRINGS[lang];
 
-  const [service, setService] = useState<string | null>(null);
+  const [service, setService] = useState<string[]>([]);
   const [rating, setRating] = useState<number>(5);
-  const [descriptor, setDescriptor] = useState<string | null>(null);
+  const [descriptor, setDescriptor] = useState<string[]>([]);
   // Default to opted-in (Option A): most customers skip the checkbox when it
   // defaults off, killing the share moment. They can still uncheck to opt out;
   // a per-request consent_display=true row is recorded on Google handoff so we
@@ -156,7 +156,7 @@ export function ReviewFlow({
           value={service}
           onChange={(v) => {
             setService(v);
-            if (v) commit("service", v);
+            if (v.length) commit("service", v);
           }}
           otherLabel={s.other_chip}
           otherPlaceholder={s.other_placeholder}
@@ -179,7 +179,7 @@ export function ReviewFlow({
           value={descriptor}
           onChange={(v) => {
             setDescriptor(v);
-            if (v) commit("descriptor", v);
+            if (v.length) commit("descriptor", v);
           }}
           otherLabel={s.other_chip}
           otherPlaceholder={s.other_placeholder}

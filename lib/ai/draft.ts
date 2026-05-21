@@ -78,6 +78,10 @@ export function buildSystemPrompt(loc: DraftLocation, lang: Language): string {
 }
 
 export function buildUserMessage(inputs: DraftInputs, lang: Language): string {
+  // Service + descriptor may be comma-joined lists from the multi-select
+  // chips on /r/[slug] (e.g. "Cleaning, Filling" / "Gentle, Painless,
+  // Professional"). Tell the model so it weaves ALL the selections into
+  // the draft rather than picking one.
   const service = inputs.service?.trim() || "(not specified)";
   const descriptor = inputs.descriptor?.trim() || "(not specified)";
   const note = inputs.note?.trim();
@@ -85,9 +89,11 @@ export function buildUserMessage(inputs: DraftInputs, lang: Language): string {
 
   const lines = [
     `Customer inputs (language: ${lang}):`,
-    `- Service received: ${service}`,
+    `- Services received (one or more, comma-separated): ${service}`,
     `- Rating: ${rating}/5`,
-    `- One-word descriptor: ${descriptor}`,
+    `- How the customer described it (one or more qualities, comma-separated): ${descriptor}`,
+    "",
+    "Important: if multiple services or qualities are listed, naturally incorporate ALL of them into the draft. Don't drop any. Don't list them mechanically — weave them into normal sentences.",
   ];
   if (note) lines.push(`- Free-text note: ${note}`);
 

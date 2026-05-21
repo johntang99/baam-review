@@ -13,6 +13,11 @@ import { LanguageFields } from "@/components/locations/language-fields";
 import { LocalizedField } from "@/components/locations/localized-textarea";
 import { SenderFields } from "@/components/locations/sender-fields";
 import { parsePromptQuestions } from "@/lib/business-prompts";
+import {
+  CATEGORY_LABELS,
+  REVIEW_CATEGORIES,
+  type ReviewCategory,
+} from "@/lib/review/industry-presets";
 import { updateLocation, deleteLocation } from "./actions";
 
 type Location = Database["public"]["Tables"]["locations"]["Row"];
@@ -113,11 +118,22 @@ export function SettingsForm({
           />
         </Field>
 
-        <Field label="Business type" htmlFor="business_type" hint="Drives the default review-prompt chips. e.g., clinic, restaurant, law_office.">
+        <Field label="Business type" htmlFor="business_type" hint="Raw Google Business Profile category (auto-filled). Read-only label — change the review category below to affect the public review page.">
           <Input
             id="business_type"
             name="business_type"
             defaultValue={location.business_type ?? ""}
+          />
+        </Field>
+
+        <Field
+          label="Review category"
+          htmlFor="review_category"
+          hint="Drives the service + quality chips on the public review page (/r/...). Auto-classified from Google; override here if it picked wrong."
+        >
+          <ReviewCategorySelect
+            name="review_category"
+            value={location.review_category ?? "other"}
           />
         </Field>
 
@@ -380,5 +396,45 @@ function CustomLabelField({
         variant="input"
       />
     </Field>
+  );
+}
+
+/**
+ * Dropdown of the 46 review_category values, grouped by audit parent
+ * (Food & Beverage, Medical & Health, …). The category drives the
+ * trilingual service + quality chip presets on /r/[slug].
+ */
+function ReviewCategorySelect({
+  name,
+  value,
+}: {
+  name: string;
+  value: string;
+}) {
+  // Bucket the 46 categories by their `parent` for <optgroup>.
+  const byParent = new Map<string, ReviewCategory[]>();
+  for (const key of REVIEW_CATEGORIES) {
+    const parent = CATEGORY_LABELS[key].parent;
+    const bucket = byParent.get(parent) ?? [];
+    bucket.push(key);
+    byParent.set(parent, bucket);
+  }
+  return (
+    <select
+      id={name}
+      name={name}
+      defaultValue={value}
+      className="flex h-10 w-full rounded-lg border border-border-base bg-paper px-3 py-2 text-sm text-text focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15"
+    >
+      {[...byParent.entries()].map(([parent, keys]) => (
+        <optgroup key={parent} label={parent}>
+          {keys.map((k) => (
+            <option key={k} value={k}>
+              {CATEGORY_LABELS[k].en}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </select>
   );
 }
