@@ -1142,6 +1142,182 @@ section h2 em {
   .problem-feature { grid-template-columns: 1fr; gap: 48px; }
 }
 
+/* ===== Section: Review Velocity ===== */
+.velocity-gap {
+  max-width: 880px;
+  margin: 0 auto 26px;
+  background: var(--paper-light);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 42px 46px;
+  box-shadow: 0 1px 2px rgba(26, 22, 18, 0.03);
+}
+.vgap-top {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-bottom: 30px;
+  margin-bottom: 26px;
+  border-bottom: 1px solid var(--rule);
+}
+.vgap-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 92px;
+  line-height: 0.82;
+  color: var(--vermilion);
+  letter-spacing: -0.03em;
+  flex-shrink: 0;
+}
+.vgap-num .pct { font-size: 44px; }
+.vgap-top-text {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.vgap-top-text span { color: var(--vermilion); }
+.vtier {
+  display: grid;
+  grid-template-columns: 172px 1fr 52px;
+  gap: 20px;
+  align-items: center;
+  padding: 11px 0;
+}
+.vtier-label {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.vtier-label .sub {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  margin-top: 1px;
+}
+.vtier-track {
+  height: 12px;
+  background: var(--paper-deep);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.vtier-fill { height: 100%; border-radius: 6px; }
+.vtier-fill.dim  { background: var(--rule); }
+.vtier-fill.mid  { background: var(--gold-soft); }
+.vtier-fill.hot  { background: var(--vermilion); }
+.vtier-fill.peak { background: var(--vermilion-deep); }
+.vtier-pct {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: right;
+}
+.vtier.is-target .vtier-label,
+.vtier.is-target .vtier-pct { color: var(--vermilion); }
+.vgap-caption {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rule);
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--muted);
+}
+.vgap-caption strong { color: var(--ink); font-weight: 500; }
+
+/* Per-industry velocity reference table */
+.velocity-table {
+  max-width: 880px;
+  margin: 0 auto;
+  background: var(--paper-light);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 4px 36px;
+  box-shadow: 0 1px 2px rgba(26, 22, 18, 0.03);
+}
+.vt-row {
+  display: grid;
+  grid-template-columns: 1fr 88px 128px 88px;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px dotted var(--rule);
+}
+.vt-row:last-child { border-bottom: none; }
+.vt-row.vt-head {
+  border-bottom: 1px solid var(--rule);
+  padding: 16px 0 11px;
+}
+.vt-head > div {
+  font-family: 'Fraunces', serif;
+  font-size: 11px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+}
+.vt-head > div:first-child { text-align: left; }
+.vt-head > div.vt-h-opt { color: var(--vermilion); }
+.vt-name {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.vt-name .en {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-top: 1px;
+  letter-spacing: 0.02em;
+}
+.vt-cell {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+.vt-cell.vt-opt {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--vermilion);
+}
+.velocity-table-note {
+  max-width: 880px;
+  margin: 22px auto 0;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--muted);
+  text-align: center;
+}
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1080px;
+  margin: 54px auto 0;
+}
+@media (max-width: 900px) { .insight-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) {
+  .velocity-gap { padding: 30px 24px; }
+  .vgap-top { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .vgap-num { font-size: 76px; }
+  .vtier { grid-template-columns: 116px 1fr 44px; gap: 12px; }
+  .velocity-table { padding: 4px 18px; }
+  .vt-row { grid-template-columns: 1fr 50px 84px 50px; gap: 8px; }
+  .vt-name { font-size: 13.5px; }
+  .vt-cell { font-size: 13px; }
+  .vt-cell.vt-opt { font-size: 15px; }
+}
+
 /* ===== Section 4: How BAAM solves it ===== */
 .solution-bg { background: var(--paper-light); }
 .flow-steps {
@@ -1863,6 +2039,7 @@ footer {
     <nav class="nav-links">
       <a href="#why">为何重要</a>
       <a href="#value">行业价值</a>
+      <a href="#velocity">评价节奏</a>
       <a href="#problem">沉默顾客</a>
       <a href="#solution">解决方案</a>
       <a href="#pricing">价格</a>
@@ -2011,7 +2188,7 @@ footer {
                 <div class="value-amt">$300–1.8k</div>
               </div>
               <div class="value-row">
-                <div class="value-name">针灸 · 中医</div>
+                <div class="value-name">医疗 · 针灸</div>
                 <div class="value-bar"><div class="value-bar-fill" style="--w: 40%;"></div></div>
                 <div class="value-amt">$400–2.4k</div>
               </div>
@@ -2217,7 +2394,7 @@ footer {
         <div class="industry-value">$300 – $1,800 <span class="range">/ 条</span></div>
       </div>
       <div class="industry-row">
-        <div class="industry-name">针灸 · 中医诊所 <span class="en">TCM / Acupuncture</span></div>
+        <div class="industry-name">医疗诊所 · 针灸 <span class="en">Medical Clinic / Acupuncture</span></div>
         <div class="industry-bar"><div class="industry-bar-fill" style="width: 22%;"></div></div>
         <div class="industry-value">$400 – $2,400 <span class="range">/ 条</span></div>
       </div>
@@ -2267,11 +2444,193 @@ footer {
   </div>
 </section>
 
+<!-- ============ 3 · REVIEW VELOCITY ============ -->
+<section id="velocity">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">第三章 · 评价的节奏</div>
+      <h2>评价不是一次性的奖杯 —— <br>而是一种 <em>停不下来的节奏</em></h2>
+      <p class="section-lede">
+        一条评价值多少钱,上一章已经算过。但真正决定排名的,不只是"您有多少条",
+        更是"多久来一条"。2025 年起,Google 把评价的"新鲜度"看得几乎和"数量"一样重 ——
+        而能跟上这个节奏的商家,不到十分之一。
+      </p>
+    </div>
+
+    <div class="velocity-gap">
+      <div class="vgap-top">
+        <div class="vgap-num">9<span class="pct">%</span></div>
+        <div class="vgap-top-text">
+          只有约 <span>9% 的商家</span>,能长期维持 Google 真正奖励的评价节奏。<br>
+          其余九成,要么几乎沉默,要么断断续续 —— 而排名,只奖励持续的那一种。
+        </div>
+      </div>
+
+      <div class="vtier">
+        <div class="vtier-label">沉默<span class="sub">Silent · 0–1 条 / 月</span></div>
+        <div class="vtier-track"><div class="vtier-fill dim" style="width: 65%;"></div></div>
+        <div class="vtier-pct">65%</div>
+      </div>
+      <div class="vtier">
+        <div class="vtier-label">偶尔<span class="sub">Minimum · 2–3 条 / 月</span></div>
+        <div class="vtier-track"><div class="vtier-fill mid" style="width: 22%;"></div></div>
+        <div class="vtier-pct">22%</div>
+      </div>
+      <div class="vtier is-target">
+        <div class="vtier-label">理想<span class="sub">Optimal · 5–12 条 / 月</span></div>
+        <div class="vtier-track"><div class="vtier-fill hot" style="width: 9%;"></div></div>
+        <div class="vtier-pct">9%</div>
+      </div>
+      <div class="vtier is-target">
+        <div class="vtier-label">极速<span class="sub">Aggressive · 12+ 条 / 月</span></div>
+        <div class="vtier-track"><div class="vtier-fill peak" style="width: 4%;"></div></div>
+        <div class="vtier-pct">4%</div>
+      </div>
+
+      <div class="vgap-caption">
+        <strong>怎么读这张图?</strong>「理想」与「极速」是 Google 本地排名真正奖励的区间 ——
+        稳定、持续、自然增长。绝大多数商家停在「沉默」与「偶尔」,不是因为顾客不满意,
+        而是因为没有一套持续运作的系统。占比为综合 BrightLocal、Sterling Sky 等
+        2025–2026 年公开研究得出的估算。
+      </div>
+    </div>
+
+    <div class="velocity-table">
+      <div class="vt-row vt-head">
+        <div>行业 · Industry</div>
+        <div>最低</div>
+        <div class="vt-h-opt">理想 · 条/月</div>
+        <div>极速</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">咖啡 · 餐厅 <span class="en">Cafe / Restaurant</span></div>
+        <div class="vt-cell">4</div>
+        <div class="vt-cell vt-opt">10–15</div>
+        <div class="vt-cell">20+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">美甲 · 美容 · Spa <span class="en">Salon / Spa</span></div>
+        <div class="vt-cell">3</div>
+        <div class="vt-cell vt-opt">8–12</div>
+        <div class="vt-cell">15+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">服饰 · 精品店 <span class="en">Apparel / Boutique</span></div>
+        <div class="vt-cell">3</div>
+        <div class="vt-cell vt-opt">6–10</div>
+        <div class="vt-cell">12+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">保健品 · 营养品 <span class="en">Health Food / Supplements</span></div>
+        <div class="vt-cell">2</div>
+        <div class="vt-cell vt-opt">4–7</div>
+        <div class="vt-cell">8+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">保险经纪 <span class="en">Insurance Agent</span></div>
+        <div class="vt-cell">1</div>
+        <div class="vt-cell vt-opt">3–5</div>
+        <div class="vt-cell">6+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">医疗诊所 · 针灸 <span class="en">Medical Clinic / Acupuncture</span></div>
+        <div class="vt-cell">2</div>
+        <div class="vt-cell vt-opt">4–8</div>
+        <div class="vt-cell">10+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">酒店 · 度假村 <span class="en">Hotel / Resort</span></div>
+        <div class="vt-cell">6</div>
+        <div class="vt-cell vt-opt">12–20</div>
+        <div class="vt-cell">25+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">汽车销售 · 维修 <span class="en">Auto Dealer / Repair</span></div>
+        <div class="vt-cell">3</div>
+        <div class="vt-cell vt-opt">6–10</div>
+        <div class="vt-cell">12+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">装修 · 工程承包 <span class="en">Contractor / Roofing</span></div>
+        <div class="vt-cell">2</div>
+        <div class="vt-cell vt-opt">5–8</div>
+        <div class="vt-cell">10+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">房产经纪 <span class="en">Real Estate Agent</span></div>
+        <div class="vt-cell">1</div>
+        <div class="vt-cell vt-opt">3–5</div>
+        <div class="vt-cell">6+</div>
+      </div>
+      <div class="vt-row">
+        <div class="vt-name">移民律师 · 法律服务 <span class="en">Immigration Lawyer</span></div>
+        <div class="vt-cell">1</div>
+        <div class="vt-cell vt-opt">3–5</div>
+        <div class="vt-cell">6+</div>
+      </div>
+    </div>
+
+    <p class="velocity-table-note">
+      高客流的行业(餐厅、酒店)需要更高的速度才能保持竞争力;低频高单价的行业(律师、地产)
+      则不必追求数量 —— 关键永远是 <strong style="color: var(--ink); font-weight: 500;">稳定,而不是冲量</strong>。
+    </p>
+
+    <div class="insight-grid">
+      <div class="why-card">
+        <div class="why-card-head">
+          <div class="why-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 9 12 13 8 21 16"/>
+              <polyline points="21 10 21 16 15 16"/>
+            </svg>
+          </div>
+        </div>
+        <h3>停下三周,排名可能"跳水"</h3>
+        <p>Sterling Sky 的实测发现:商家一旦停止收集评价,本地排名会明显下滑;评价流"断"了约三周,排名就可能突然跳水。重新开始收集后,排名才会慢慢恢复 —— 您过去攒下的总数,保护不了您。</p>
+        <cite>Sterling Sky · Local SEO Case Study</cite>
+      </div>
+      <div class="why-card">
+        <div class="why-card-head">
+          <div class="why-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2 12 7 12 10 5 14 19 17 12 22 12"/>
+            </svg>
+          </div>
+        </div>
+        <h3>73% 的顾客,只信最近 30 天的评价</h3>
+        <p>Google 把"评价新鲜度"当作心跳来监测。研究显示,7 天内的新评价,排名权重比 30 天前的高 40%。两年前那些五星好评?在今天,几乎只是背景墙。</p>
+        <cite>Moz · BrightLocal · 2025</cite>
+      </div>
+      <div class="why-card">
+        <div class="why-card-head">
+          <div class="why-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3.5 22 20.5 2 20.5 Z"/>
+              <line x1="12" y1="10" x2="12" y2="14.5"/>
+              <line x1="12" y1="17.4" x2="12" y2="17.5"/>
+            </svg>
+          </div>
+        </div>
+        <h3>想"突击"补回来?反而被判定造假</h3>
+        <p>平时每月一两条评价的店,突然一周冒出五十条 —— Google 的反作弊系统会判定为刷评,可能隐藏评价、甚至处罚。落后了,不能靠冲刺补回来,只能稳稳重建。</p>
+        <cite>Google · Review Content Policy</cite>
+      </div>
+    </div>
+
+    <div class="industry-note">
+      <strong>这对您意味着什么?</strong> 评价营销不是一次性的项目,而是一套需要长期维护的系统。
+      这正是 BAAM Review 按月持续运作的原因 —— 我们不做一阵风的"评价活动",
+      而是替您守住那个每个月都不能停的节奏:<strong>稳定、自然、可持续</strong>。
+      节奏在,排名就在;节奏断,排名就跟着断。
+    </div>
+  </div>
+</section>
+
 <!-- ============ 3 · THE 90% PROBLEM ============ -->
 <section id="problem">
   <div class="container">
     <div class="section-head">
-      <div class="section-num">第三章 · 沉默的好顾客</div>
+      <div class="section-num">第四章 · 沉默的好顾客</div>
       <h2>商家不是没有满意顾客 —— <br>而是 <em>90% 的他们,不知道怎么留评价</em></h2>
       <p class="section-lede">
         我们持续追踪纽约都市区的诊所与门店,结论一致:即使顾客评分平均 4.8 星、
@@ -2353,7 +2712,7 @@ footer {
 <section id="solution" class="solution-bg">
   <div class="container">
     <div class="section-head">
-      <div class="section-num">第四章 · 解决方案</div>
+      <div class="section-num">第五章 · 解决方案</div>
       <h2>把所有的麻烦,变成 <em>三次点击</em>,不到 60 秒!</h2>
       <p class="section-lede">
         BAAM Review 把上面四道障碍,一道一道拆掉。顾客只需点开一封邮件、选三个标签、
@@ -2435,7 +2794,7 @@ footer {
 <section id="testimonials">
   <div class="container">
     <div class="section-head">
-      <div class="section-num">第五章 · 客户见证</div>
+      <div class="section-num">第六章 · 客户见证</div>
       <h2>纽约都市区已经有多家诊所与门店,<br>正在用 BAAM Review <em>把好顾客变成好评</em></h2>
       <p class="section-lede">
         从中医诊所到美容沙龙、从保险经纪到房产团队 —— 不同行业、相同结果:
@@ -2597,7 +2956,7 @@ footer {
 <section id="pricing" class="pricing-bg">
   <div class="container">
     <div class="section-head">
-      <div class="section-num">第六章 · 价格与承诺</div>
+      <div class="section-num">第七章 · 价格与承诺</div>
       <h2>两种合作方式,<em>同一份承诺</em></h2>
       <p class="section-lede">
         您可以自己来用我们的平台,也可以让我们替您打理 —— 把客户名单发给我们,
@@ -2675,7 +3034,7 @@ footer {
 <section id="faq">
   <div class="container narrow">
     <div class="section-head">
-      <div class="section-num">第七章 · 常见问题</div>
+      <div class="section-num">第八章 · 常见问题</div>
       <h2>开始之前,<em>您可能想问的</em></h2>
     </div>
 
