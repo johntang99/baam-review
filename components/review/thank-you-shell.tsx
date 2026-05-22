@@ -237,7 +237,6 @@ export function ThankYouShell(props: ThankYouShellProps) {
   const nameLine = recipientFirstName
     ? s.thanks_title_named.replace("{name}", recipientFirstName)
     : s.thanks_title;
-  const subText = isPrivate ? s.thanks_private : s.thanks_sub;
   const eyebrow = isPrivate ? s.thanks_private : s.thanks_eyebrow;
 
   const hasSocial = Object.values(location.socialHandles ?? {}).some(
@@ -255,70 +254,44 @@ export function ThankYouShell(props: ThankYouShellProps) {
         <LanguageSwitcher current={lang} available={supportedLangs} />
       </div>
 
-      {/* Confirmation card — compact when a reward card follows (to avoid
-          double "thank-you" messaging). Reward card carries the longer
-          gratitude copy; here we keep just the checkmark + name. */}
+      {/* Confirmation card — always compact horizontal strip.
+          Checkmark + "OFF TO GOOGLE" eyebrow + "Thank you, John."
+          The longer gratitude copy lives on the share / reward cards below. */}
       <section className="overflow-hidden rounded-3xl border border-border-base bg-paper shadow-sm">
-        <div
-          className={cn(
-            "relative overflow-hidden bg-gradient-to-br from-forest to-forest-dark text-center text-cream",
-            reward ? "px-[24px] pt-6 pb-6" : "px-[30px] pt-9 pb-8",
-          )}
-        >
+        <div className="relative overflow-hidden bg-gradient-to-br from-forest to-forest-dark px-5 py-4 text-cream">
           <div className="pointer-events-none absolute inset-0 opacity-[0.18]">
             <div className="absolute right-[-20%] top-[-30%] h-[280px] w-[280px] rounded-full bg-gold/30 blur-3xl" />
             <div className="absolute bottom-[-30%] left-[-15%] h-[240px] w-[240px] rounded-full bg-sage/40 blur-3xl" />
           </div>
-          <div className="relative">
+          <div className="relative flex items-center gap-4">
             <span
               className={cn(
-                "mx-auto flex items-center justify-center rounded-full border border-gold bg-gold/20 text-gold",
-                reward ? "mb-3 h-10 w-10" : "mb-[18px] h-14 w-14",
+                "flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-gold bg-gold/20 text-gold",
                 "animate-[checkmark-pop_0.5s_cubic-bezier(0.34,1.56,0.64,1)_backwards]",
               )}
             >
-              <Check
-                className={cn(
-                  "stroke-[2.5]",
-                  reward ? "h-5 w-5" : "h-7 w-7",
-                )}
-              />
+              <Check className="h-5 w-5 stroke-[2.5]" />
             </span>
-            <p
-              className={cn(
-                "text-[11.5px] font-medium uppercase tracking-[0.16em] text-gold",
-                reward ? "mb-1.5" : "mb-2.5",
-              )}
-            >
-              {eyebrow}
-            </p>
-            <h1
-              className={cn(
-                "font-display font-normal leading-[1.1] tracking-[-0.025em] text-cream",
-                reward ? "text-[24px]" : "text-[32px]",
-              )}
-            >
-              {nameLine.split("\n").map((line, i, arr) =>
-                i === arr.length - 1 ? (
-                  <em key={i} className="not-italic text-gold italic">
-                    {line}
-                  </em>
-                ) : (
-                  <span key={i}>
-                    {line}
-                    <br />
-                  </span>
-                ),
-              )}
-            </h1>
-            {/* Drop the long gratitude paragraph when a reward card follows —
-                the reward card already conveys the "thank you for sharing"
-                message and we don't want to repeat it. */}
-            {!reward && (
-              <p className="mx-auto mt-3 max-w-[360px] font-display text-[16px] italic leading-[1.5] text-cream/80">
-                {subText}
+            <div className="min-w-0 flex-1">
+              <p className="text-[10.5px] font-medium uppercase tracking-[0.18em] text-gold/85">
+                {eyebrow}
               </p>
-            )}
+              <h1 className="font-display text-[22px] font-normal leading-tight tracking-[-0.02em] text-cream">
+                {nameLine.split("\n").map((line, i, arr) => {
+                  const trailing = i < arr.length - 1 ? " " : "";
+                  return i === arr.length - 1 ? (
+                    <em key={i} className="not-italic italic text-gold">
+                      {line}
+                    </em>
+                  ) : (
+                    <span key={i}>
+                      {line.replace(/\n+$/, "")}
+                      {trailing}
+                    </span>
+                  );
+                })}
+              </h1>
+            </div>
           </div>
         </div>
 
@@ -418,14 +391,26 @@ export function ThankYouShell(props: ThankYouShellProps) {
             {offer ? (
               <>
                 <h3 className="mb-1 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.015em] text-ink">
-                  Send this — they get{" "}
-                  <em className="not-italic italic" style={{ color: accent }}>
-                    {summarizeOffer(offer.title)}
-                  </em>
+                  {s.share_card_title}
                 </h3>
-                <p className="font-display text-[14.5px] italic leading-snug text-text-soft">
-                  {offer.subtitle ?? s.share_sub}
-                </p>
+                {(() => {
+                  // Split "They will get {offer}" on the placeholder so the
+                  // offer fragment can be highlighted with the accent color
+                  // regardless of word order in zh/es.
+                  const parts = s.share_card_sub_offer.split("{offer}");
+                  return (
+                    <p className="font-display text-[14.5px] italic leading-snug text-text-soft">
+                      {parts[0]}
+                      <em
+                        className="not-italic italic font-medium"
+                        style={{ color: accent }}
+                      >
+                        {summarizeOffer(offer.title)}
+                      </em>
+                      {parts[1] ?? ""}
+                    </p>
+                  );
+                })()}
               </>
             ) : (
               <>

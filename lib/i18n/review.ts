@@ -119,6 +119,11 @@ export const STRINGS = {
     share_title_em: "friend.",
     share_sub:
       "They'll see your review, the business's contact info, and a way to book.",
+    // With-offer variant — replaces the title + offer.subtitle when a
+    // referral offer is configured. {offer} is substituted with the
+    // resolved offer title and rendered in the accent color.
+    share_card_title: "Share this card to your friends",
+    share_card_sub_offer: "They will get {offer}",
     share_preview_mark: "★ Recommended by a customer",
     share_preview_attribution: "— {name}, satisfied customer",
     dest_fb: "Facebook",
@@ -254,6 +259,8 @@ export const STRINGS = {
     share_title: "把这张卡发给朋友。",
     share_title_em: "朋友。",
     share_sub: "他们会看到您的评论、商家的联系方式和预约方式。",
+    share_card_title: "把这张卡分享给朋友",
+    share_card_sub_offer: "他们将获得 {offer}",
     share_preview_mark: "★ 顾客推荐",
     share_preview_attribution: "—— {name}，就诊顾客",
     dest_fb: "Facebook",
@@ -387,6 +394,8 @@ export const STRINGS = {
     share_title_em: "amigo.",
     share_sub:
       "Verán su reseña, la información de contacto del negocio y una forma de reservar.",
+    share_card_title: "Comparta esta tarjeta con sus amigos",
+    share_card_sub_offer: "Ellos obtendrán {offer}",
     share_preview_mark: "★ Recomendado por un cliente",
     share_preview_attribution: "— {name}, cliente satisfecho",
     dest_fb: "Facebook",
