@@ -1743,14 +1743,16 @@ section h2 em {
   border-radius: 2px;
   transition: all 0.2s;
 }
+/* "dark" CTA = dark button (visible on the cream featured plan card).
+   "light" CTA = cream button (visible on the dark self-serve plan card). */
 .plan-cta.dark {
-  background: var(--paper); color: var(--ink);
+  background: var(--ink); color: var(--paper);
 }
 .plan-cta.dark:hover { background: var(--vermilion); color: var(--paper); }
 .plan-cta.light {
-  background: var(--ink); color: var(--paper);
+  background: var(--paper); color: var(--ink);
 }
-.plan-cta.light:hover { background: var(--vermilion); }
+.plan-cta.light:hover { background: var(--vermilion); color: var(--paper); }
 
 @media (max-width: 768px) { .plans { grid-template-columns: 1fr; } }
 
@@ -3020,7 +3022,7 @@ footer {
           <li>30 天免费试用 · 免设置费 · 月结、可随时取消</li>
           <li>多店面统一 $299/月/店(创始价,锁定终身)</li>
         </ul>
-        <a href="https://review.baamplatform.com/signup" class="plan-cta dark">预约免费咨询</a>
+        <a href="/book/zh" class="plan-cta dark">预约免费咨询</a>
       </div>
     </div>
 

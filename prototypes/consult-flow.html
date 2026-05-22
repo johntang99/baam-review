@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Free consultation booking flow — BAAM Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              paper: "#FAF6EE",
+              cream: "#F5F0E4",
+              "cream-deep": "#EFE7D4",
+              ink: "#2A2520",
+              text: "#3D3530",
+              "text-soft": "#6B5F55",
+              "text-muted": "#8B7F73",
+              "border-base": "#E5D9C5",
+              forest: "#1F4D3F",
+              "forest-dark": "#143329",
+              brick: "#962D22",
+              gold: "#C9A961",
+              "gold-dark": "#A88847",
+              "gold-soft": "#E8D9B2",
+              sage: "#7FA68F",
+              success: "#2F7D54",
+            },
+            fontFamily: {
+              display: ['"Cormorant Garamond"', "serif"],
+              cn: ['"Noto Serif SC"', "serif"],
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body { font-family: "Inter", system-ui, sans-serif; background: #ebe2d2; }
+      .font-display { font-family: "Cormorant Garamond", serif; letter-spacing: -0.01em; }
+      .font-cn { font-family: "Noto Serif SC", serif; }
+      .stage-label { letter-spacing: 0.18em; }
+    </style>
+  </head>
+  <body class="text-ink">
+    <div class="mx-auto max-w-6xl px-6 py-10 space-y-12">
+
+      <!-- Cover -->
+      <header class="text-center max-w-3xl mx-auto">
+        <p class="text-[11px] font-semibold uppercase stage-label text-gold-dark">Design prototype · BAAM Review</p>
+        <h1 class="font-display text-[40px] text-ink leading-tight mt-2">
+          Free consultation booking flow
+        </h1>
+        <p class="text-[14px] text-text-soft mt-3 leading-relaxed">
+          End-to-end design for the "<span class="font-cn">预约免费咨询</span> / Book a free consultation" CTA on the Full Service plan card. Five stages: form → confirmation → three emails. Reply with feedback before implementation.
+        </p>
+      </header>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 1 — Consult form page                                    -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper font-bold">1</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 1 · Public page · <code>/consult</code></p>
+            <h2 class="font-display text-[26px] text-ink">User opens the form</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">Reached from the <span class="font-cn">预约免费咨询</span> button on the Chinese marketing page and a "Book a free consultation" link on the English version.</p>
+
+        <div class="grid lg:grid-cols-2 gap-4">
+          <!-- English form -->
+          <div class="rounded-2xl border border-border-base bg-paper p-6 shadow-sm">
+            <div class="flex items-center justify-between text-[11px] text-text-muted mb-4">
+              <span>EN · review.baamplatform.com/consult</span>
+              <span class="rounded bg-cream-deep px-2 py-0.5 font-mono">English</span>
+            </div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-gold-dark mb-2">A free 30-min call</p>
+            <h3 class="font-display text-[26px] leading-tight text-ink">Tell us about your business.</h3>
+            <p class="text-[13px] italic text-text-soft mt-1.5">No sales script. Real conversation about reviews, referrals, and revenue.</p>
+
+            <form class="mt-5 space-y-4 text-[13px]">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[12px] font-semibold text-ink mb-1">Your name *</label>
+                  <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="Jane Doe" />
+                </div>
+                <div>
+                  <label class="block text-[12px] font-semibold text-ink mb-1">Email *</label>
+                  <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="you@business.com" />
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[12px] font-semibold text-ink mb-1">Phone</label>
+                  <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="(555) 555-1234" />
+                  <p class="text-[10.5px] text-text-muted mt-0.5">Optional — for SMS confirmation only.</p>
+                </div>
+                <div>
+                  <label class="block text-[12px] font-semibold text-ink mb-1">Website</label>
+                  <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="https://yourbusiness.com" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-[12px] font-semibold text-ink mb-1">Business address</label>
+                <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="123 Main St, City, ST" />
+                <p class="text-[10.5px] text-text-muted mt-0.5">So we can pull your Google Business Profile before the call.</p>
+              </div>
+              <div>
+                <label class="block text-[12px] font-semibold text-ink mb-1.5">Preferred meeting time</label>
+                <div class="flex gap-2">
+                  <label class="flex-1 flex items-center gap-2 cursor-pointer rounded-md border-2 border-forest bg-forest/[0.04] px-3 py-2">
+                    <input type="radio" name="when_en" checked />
+                    <span class="font-medium">Morning <span class="text-text-muted">(9 am – 12 pm ET)</span></span>
+                  </label>
+                  <label class="flex-1 flex items-center gap-2 cursor-pointer rounded-md border border-border-base px-3 py-2">
+                    <input type="radio" name="when_en" />
+                    <span>Afternoon <span class="text-text-muted">(1 – 5 pm ET)</span></span>
+                  </label>
+                </div>
+                <p class="text-[10.5px] text-text-muted mt-1">We'll reply with 2 specific time slots based on your preference.</p>
+              </div>
+              <div>
+                <label class="block text-[12px] font-semibold text-ink mb-1">Anything to know? <span class="text-text-muted font-normal">(optional)</span></label>
+                <textarea rows="3" class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="Industry, biggest review problem, languages you serve…"></textarea>
+              </div>
+              <button type="button" class="w-full rounded-md bg-forest px-4 py-3 text-paper font-semibold hover:bg-forest-dark">
+                Request my consultation
+              </button>
+              <p class="text-[11px] text-center text-text-muted">
+                We reply within 1 business day with 2 time slots.
+                <br />No spam, no automated sales calls.
+              </p>
+            </form>
+          </div>
+
+          <!-- Chinese form -->
+          <div class="rounded-2xl border border-border-base bg-paper p-6 shadow-sm">
+            <div class="flex items-center justify-between text-[11px] text-text-muted mb-4">
+              <span>ZH · review.baamplatform.com/consult?lang=zh</span>
+              <span class="rounded bg-cream-deep px-2 py-0.5 font-mono">中文</span>
+            </div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-gold-dark mb-2 font-cn">免费 30 分钟咨询</p>
+            <h3 class="font-cn text-[24px] font-bold leading-tight text-ink">告诉我们您的生意情况。</h3>
+            <p class="text-[13px] italic text-text-soft mt-1.5 font-cn">没有推销话术。真正聊聊评价、转介绍、回头客这些事。</p>
+
+            <form class="mt-5 space-y-4 text-[13px]">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[12px] font-semibold text-ink mb-1 font-cn">您的姓名 *</label>
+                  <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="王老板" />
+                </div>
+                <div>
+                  <label class="block text-[12px] font-semibold text-ink mb-1 font-cn">电子邮箱 *</label>
+                  <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="您的@邮箱.com" />
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[12px] font-semibold text-ink mb-1 font-cn">电话</label>
+                  <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="(555) 555-1234" />
+                  <p class="text-[10.5px] text-text-muted mt-0.5 font-cn">可选 — 仅用于短信确认。</p>
+                </div>
+                <div>
+                  <label class="block text-[12px] font-semibold text-ink mb-1 font-cn">网站</label>
+                  <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="https://您的网站.com" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-[12px] font-semibold text-ink mb-1 font-cn">店铺地址</label>
+                <input class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="街道, 城市, 州" />
+                <p class="text-[10.5px] text-text-muted mt-0.5 font-cn">方便我们在通话前先看您的 Google 商家资料。</p>
+              </div>
+              <div>
+                <label class="block text-[12px] font-semibold text-ink mb-1.5 font-cn">方便沟通时段</label>
+                <div class="flex gap-2">
+                  <label class="flex-1 flex items-center gap-2 cursor-pointer rounded-md border-2 border-forest bg-forest/[0.04] px-3 py-2">
+                    <input type="radio" name="when_zh" checked />
+                    <span class="font-medium font-cn">上午 <span class="text-text-muted">(9 点 – 12 点)</span></span>
+                  </label>
+                  <label class="flex-1 flex items-center gap-2 cursor-pointer rounded-md border border-border-base px-3 py-2">
+                    <input type="radio" name="when_zh" />
+                    <span class="font-cn">下午 <span class="text-text-muted">(1 – 5 点)</span></span>
+                  </label>
+                </div>
+                <p class="text-[10.5px] text-text-muted mt-1 font-cn">我们会根据您的偏好,回复两个具体时间供您挑选。</p>
+              </div>
+              <div>
+                <label class="block text-[12px] font-semibold text-ink mb-1 font-cn">想让我们提前知道的事 <span class="text-text-muted font-normal">(可选)</span></label>
+                <textarea rows="3" class="w-full rounded-md border border-border-base bg-white px-3 py-2" placeholder="行业、最头疼的评价问题、服务的语言…"></textarea>
+              </div>
+              <button type="button" class="w-full rounded-md bg-forest px-4 py-3 text-paper font-semibold hover:bg-forest-dark font-cn">
+                提交咨询请求
+              </button>
+              <p class="text-[11px] text-center text-text-muted font-cn">
+                1 个工作日内回复,附两个时间供您选择。
+                <br />不发垃圾邮件,也没有自动推销电话。
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 2 — Confirmation page                                    -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper font-bold">2</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 2 · Public page · <code>/consult/thanks</code></p>
+            <h2 class="font-display text-[26px] text-ink">Confirmation page after submit</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">Server action validated and saved the request; auto-confirm email was triggered; sales got notified. User sees this immediately so they know something happened.</p>
+
+        <div class="grid lg:grid-cols-2 gap-4">
+          <!-- English -->
+          <div class="rounded-2xl border border-border-base bg-paper p-10 shadow-sm text-center">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-gold/60 bg-gold/15 text-gold-dark">
+              <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <p class="mt-3 text-[11px] font-semibold uppercase stage-label text-gold-dark">Got it</p>
+            <h3 class="mt-1 font-display text-[28px] leading-tight">Thanks, <em class="not-italic text-forest">Jane</em>.</h3>
+            <p class="mt-3 text-[14px] text-text-soft max-w-md mx-auto leading-relaxed">
+              We received your request. A team member will email
+              <span class="font-medium text-ink">jane@example.com</span> within 1 business day with 2 proposed time slots.
+            </p>
+            <div class="mt-6 rounded-lg bg-cream-deep p-4 text-[12px] text-text-soft text-left max-w-md mx-auto">
+              <p class="font-semibold text-ink mb-1">Heads up:</p>
+              <ul class="list-disc list-inside space-y-0.5">
+                <li>Check your spam folder if you don't see our reply by tomorrow EOD.</li>
+                <li>Want to send anything else? Reply to our confirmation email.</li>
+              </ul>
+            </div>
+            <a href="#" class="inline-block mt-6 text-[13px] text-forest hover:underline">← Back to homepage</a>
+          </div>
+
+          <!-- Chinese -->
+          <div class="rounded-2xl border border-border-base bg-paper p-10 shadow-sm text-center">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-gold/60 bg-gold/15 text-gold-dark">
+              <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <p class="mt-3 text-[11px] font-semibold uppercase stage-label text-gold-dark font-cn">已收到</p>
+            <h3 class="mt-1 font-display text-[28px] leading-tight font-cn">谢谢您,<em class="not-italic text-forest">王老板</em>。</h3>
+            <p class="mt-3 text-[14px] text-text-soft max-w-md mx-auto leading-relaxed font-cn">
+              我们已收到您的请求。1 个工作日内,会有团队成员把两个时间发到您的邮箱 <span class="font-medium text-ink">您的@邮箱.com</span> 供您选择。
+            </p>
+            <div class="mt-6 rounded-lg bg-cream-deep p-4 text-[12px] text-text-soft text-left max-w-md mx-auto">
+              <p class="font-semibold text-ink mb-1 font-cn">温馨提示:</p>
+              <ul class="list-disc list-inside space-y-0.5 font-cn">
+                <li>明天下班前还没收到邮件,记得查一下垃圾邮件夹。</li>
+                <li>有补充信息?直接回复我们的确认邮件就行。</li>
+              </ul>
+            </div>
+            <a href="#" class="inline-block mt-6 text-[13px] text-forest hover:underline font-cn">← 返回首页</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 3 — Auto-confirmation email                              -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gold text-paper font-bold">3</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 3 · Email · auto-sent on submit · to user</p>
+            <h2 class="font-display text-[26px] text-ink">Auto-confirmation email</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">Sent immediately so the user has something in their inbox to refer back to. From your domain (support@baamplatform.com) so it doesn't bounce.</p>
+
+        <div class="rounded-2xl border border-border-base bg-paper p-2 shadow-sm max-w-2xl">
+          <!-- Email header -->
+          <div class="rounded-t-xl bg-cream-deep px-5 py-3 text-[12px] text-text-soft space-y-1">
+            <p><span class="text-text-muted">From:</span> <span class="font-medium text-ink">BAAM Review &lt;hello@baamplatform.com&gt;</span></p>
+            <p><span class="text-text-muted">To:</span> jane@example.com</p>
+            <p><span class="text-text-muted">Subject:</span> <span class="font-semibold text-ink">We got your consultation request — picking 2 times for you</span></p>
+          </div>
+          <!-- Email body -->
+          <div class="px-7 py-7 space-y-4 text-[14px] leading-relaxed text-text">
+            <p>Hi Jane,</p>
+            <p>Thanks for reaching out about BAAM Review's Full Service plan. We got your request and someone from our team will email you within <strong>1 business day</strong> with two specific time slots for a 30-minute call.</p>
+            <div class="rounded-lg border border-border-base bg-cream-deep/50 p-4 text-[13px] space-y-1.5">
+              <p class="text-[11px] font-semibold uppercase stage-label text-text-muted mb-1">What you sent us</p>
+              <p><strong>Business:</strong> 123 Main St, City, ST</p>
+              <p><strong>Website:</strong> yourbusiness.com</p>
+              <p><strong>Preferred time:</strong> Morning (9 am – 12 pm ET)</p>
+              <p><strong>Note:</strong> "We're an acupuncture clinic; mostly Chinese-speaking patients."</p>
+            </div>
+            <p>While you wait, here are two things you might find useful:</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li><a href="#" class="text-forest underline">How we work together</a> (3-min read)</li>
+              <li><a href="#" class="text-forest underline">Download the partner guide (PDF)</a></li>
+            </ul>
+            <p>Just reply to this email if anything's changed in the meantime.</p>
+            <p>Talk soon,<br /><span class="font-display italic text-[17px] text-ink">— The BAAM Review team</span></p>
+          </div>
+          <div class="rounded-b-xl border-t border-border-base bg-cream-deep/50 px-5 py-3 text-[11px] text-text-muted text-center">
+            BAAM Review · 90 North St, Middletown, NY · <a href="#" class="underline">unsubscribe</a> · <a href="#" class="underline">view in browser</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 4 — Internal sales notification email                    -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-brick text-paper font-bold">4</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 4 · Email · auto-sent on submit · to sales (internal)</p>
+            <h2 class="font-display text-[26px] text-ink">Sales notification</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">Lands in your inbox the moment the form is submitted. Fields formatted for fast scanning so you can reply immediately.</p>
+
+        <div class="rounded-2xl border border-border-base bg-paper p-2 shadow-sm max-w-2xl">
+          <div class="rounded-t-xl bg-cream-deep px-5 py-3 text-[12px] text-text-soft space-y-1">
+            <p><span class="text-text-muted">From:</span> <span class="font-medium text-ink">BAAM Review Bot &lt;noreply@baamplatform.com&gt;</span></p>
+            <p><span class="text-text-muted">To:</span> john.tang2025@gmail.com</p>
+            <p><span class="text-text-muted">Reply-To:</span> jane@example.com</p>
+            <p><span class="text-text-muted">Subject:</span> <span class="font-semibold text-ink">🟢 New consultation request — Jane Doe (Acupuncture clinic, ZH)</span></p>
+          </div>
+          <div class="px-7 py-6 space-y-5 text-[13px] leading-relaxed text-text">
+            <div class="rounded-lg border border-border-base bg-paper p-4 grid grid-cols-2 gap-x-4 gap-y-1.5">
+              <p><span class="text-text-muted">Name:</span> <strong>Jane Doe</strong></p>
+              <p><span class="text-text-muted">Submitted:</span> 2026-05-22 09:14 ET</p>
+              <p><span class="text-text-muted">Email:</span> <a href="mailto:jane@example.com" class="text-forest">jane@example.com</a></p>
+              <p><span class="text-text-muted">Phone:</span> (555) 555-1234</p>
+              <p><span class="text-text-muted">Website:</span> <a href="#" class="text-forest">yourbusiness.com</a></p>
+              <p><span class="text-text-muted">Language:</span> ZH (Chinese site)</p>
+              <p class="col-span-2"><span class="text-text-muted">Address:</span> 123 Main St, City, ST</p>
+              <p class="col-span-2"><span class="text-text-muted">Prefers:</span> <span class="rounded bg-forest/10 text-forest px-2 py-0.5 font-semibold">Morning (9 am – 12 pm ET)</span></p>
+            </div>
+            <div>
+              <p class="text-[11px] font-semibold uppercase stage-label text-text-muted mb-1">Their note</p>
+              <p class="rounded bg-cream-deep p-3 italic">"We're an acupuncture clinic; mostly Chinese-speaking patients. Currently 4.7★ but only 32 reviews. Want to scale."</p>
+            </div>
+            <div class="rounded-lg bg-gold-soft/40 border border-gold/30 p-4 text-[12.5px]">
+              <p class="font-semibold text-ink mb-1.5">⚡ Suggested reply template (pre-filled in your reply):</p>
+              <p class="italic text-text">"Hi Jane — thanks for reaching out. I have two slots that match your morning preference: <strong>Tue May 26 at 10 am ET</strong> or <strong>Wed May 27 at 11 am ET</strong>. Just hit reply with whichever works. Looking forward to it. — John"</p>
+            </div>
+            <div class="flex gap-2 pt-2">
+              <a href="#" class="inline-flex items-center gap-1.5 rounded bg-forest px-3 py-2 text-paper text-[12px] font-semibold">Open in BAAM Studio admin →</a>
+              <a href="mailto:jane@example.com" class="inline-flex items-center gap-1.5 rounded border border-border-base bg-paper px-3 py-2 text-[12px] font-semibold">Reply to Jane</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 5 — Slot proposal email                                  -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gold text-paper font-bold">5</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 5 · Email · manual reply from you · to user</p>
+            <h2 class="font-display text-[26px] text-ink">Slot proposal</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">You hit reply on Stage 4 and pick 2 specific times. Template makes it feel personal but takes 60 seconds to send.</p>
+
+        <div class="rounded-2xl border border-border-base bg-paper p-2 shadow-sm max-w-2xl">
+          <div class="rounded-t-xl bg-cream-deep px-5 py-3 text-[12px] text-text-soft space-y-1">
+            <p><span class="text-text-muted">From:</span> <span class="font-medium text-ink">John Tang &lt;john@baamplatform.com&gt;</span></p>
+            <p><span class="text-text-muted">To:</span> jane@example.com</p>
+            <p><span class="text-text-muted">Subject:</span> <span class="font-semibold text-ink">Re: We got your consultation request — picking 2 times for you</span></p>
+          </div>
+          <div class="px-7 py-7 space-y-4 text-[14px] leading-relaxed text-text">
+            <p>Hi Jane,</p>
+            <p>Thanks again for reaching out. Looking at your morning preference, here are two slots that work on my end:</p>
+            <div class="space-y-2">
+              <div class="rounded-lg border-2 border-forest/40 bg-forest/[0.04] p-4">
+                <p class="font-display text-[18px] text-ink">Option 1 — Tuesday, May 26</p>
+                <p class="text-[13px] text-text-soft">10:00 AM ET · 30 minutes · Google Meet</p>
+              </div>
+              <div class="rounded-lg border-2 border-forest/40 bg-forest/[0.04] p-4">
+                <p class="font-display text-[18px] text-ink">Option 2 — Wednesday, May 27</p>
+                <p class="text-[13px] text-text-soft">11:00 AM ET · 30 minutes · Google Meet</p>
+              </div>
+            </div>
+            <p>Just hit reply with whichever works for you and I'll send a calendar invite right after.</p>
+            <p>A bit about how the call usually goes:</p>
+            <ul class="list-disc list-inside text-[13.5px] space-y-1 ml-1">
+              <li>We pull up your Google Business Profile together</li>
+              <li>I show you a sample weekly review-send for a clinic like yours</li>
+              <li>We talk through what's worth doing first, no commitment needed</li>
+            </ul>
+            <p>Looking forward to it.</p>
+            <p>— John<br />
+              <span class="text-[12.5px] text-text-soft italic">BAAM Review · john@baamplatform.com</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- Discussion notes                                                -->
+      <!-- ============================================================== -->
+      <section class="rounded-2xl border border-dashed border-gold/40 bg-gold-soft/20 p-7 space-y-4 max-w-4xl mx-auto">
+        <h2 class="font-display text-[24px] text-ink">Implementation notes</h2>
+        <div class="grid md:grid-cols-2 gap-5 text-[13px] text-text-soft leading-relaxed">
+          <div>
+            <p class="font-semibold text-ink mb-1">What gets built</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li><code>/consult</code> route (with <code>?lang=zh</code>) — Stage 1 form</li>
+              <li><code>/consult/thanks</code> route — Stage 2</li>
+              <li>Server action <code>submitConsultRequest</code> with input validation</li>
+              <li><code>consultation_requests</code> table (Supabase migration 0028)</li>
+              <li>Two Resend emails on submit: auto-confirm + sales notification</li>
+              <li>Update <span class="font-cn">预约免费咨询</span> button href from <code>/signup</code> to <code>/consult?lang=zh</code></li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-semibold text-ink mb-1">Open questions for you</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Confirm <strong>sales notification recipient</strong> — just john.tang2025@gmail.com, or another inbox?</li>
+              <li>Confirm <strong>"From" addresses</strong>: hello@baamplatform.com for user-facing, noreply@ or john@ for sales notif?</li>
+              <li>Phone is currently optional — keep that, or require it?</li>
+              <li>Should Stage 4 (notification) link to a BAAM Studio admin page where requests are listed, or is email enough for now?</li>
+              <li>Do we need an English-language version of the same flow now, or only Chinese for v1 since this CTA is on the Chinese site?</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </body>
+</html>

@@ -485,9 +485,13 @@ export interface Database {
           name: string;
           email: string;
           business: string | null;
+          phone: string | null;
+          website: string | null;
+          address: string | null;
           preferred_time: string | null;
           notes: string | null;
           source: string | null;
+          language: string;
           user_agent: string | null;
           created_at: string;
         };
@@ -496,9 +500,13 @@ export interface Database {
           name: string;
           email: string;
           business?: string | null;
+          phone?: string | null;
+          website?: string | null;
+          address?: string | null;
           preferred_time?: string | null;
           notes?: string | null;
           source?: string | null;
+          language?: string;
           user_agent?: string | null;
           created_at?: string;
         };
