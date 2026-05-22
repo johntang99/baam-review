@@ -86,12 +86,13 @@ nav.scrolled { border-color: var(--border); }
   font-weight: 600;
   font-size: 14px;
 }
-.nav-links { display: flex; gap: 36px; align-items: center; }
+.nav-links { display: flex; gap: 20px; align-items: center; }
 .nav-links a {
-  font-size: 14.5px;
+  font-size: 13.5px;
   color: var(--text-soft);
   font-weight: 400;
   transition: color 0.15s;
+  white-space: nowrap;
 }
 .nav-links a:hover { color: var(--ink); }
 .nav-cta { display: flex; gap: 12px; align-items: center; }
@@ -1001,6 +1002,428 @@ section { padding: 100px 0; position: relative; }
   font-weight: 500;
   margin-bottom: 18px;
 }
+/* Numbered chapter label — the structural spine of the page */
+.chapter-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-dark, #836A30);
+  margin-bottom: 20px;
+}
+.chapter-tag::before, .chapter-tag::after {
+  content: '';
+  width: 26px; height: 1px;
+  background: var(--gold);
+  opacity: 0.6;
+}
+.chapter-tag .ch-no { color: var(--forest); }
+/* dark sections (pricing) invert the chapter tag */
+.pricing-teaser .chapter-tag { color: var(--gold-soft); }
+.pricing-teaser .chapter-tag::before,
+.pricing-teaser .chapter-tag::after { background: var(--gold-soft); opacity: 0.5; }
+.pricing-teaser .chapter-tag .ch-no { color: var(--gold); }
+
+/* ===== Chapter 3 · Review Velocity ===== */
+.velocity-section { background: var(--cream); }
+.velocity-gap {
+  max-width: 880px; margin: 0 auto 24px;
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px 44px;
+  box-shadow: var(--shadow-sm);
+}
+.vgap-top {
+  display: flex; align-items: center; gap: 28px;
+  padding-bottom: 26px; margin-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+.vgap-num {
+  font-family: 'Fraunces', serif; font-weight: 400;
+  font-size: 86px; line-height: 0.82; color: var(--forest);
+  letter-spacing: -0.04em; flex-shrink: 0;
+}
+.vgap-num .pct { font-size: 40px; }
+.vgap-top-text {
+  font-family: 'Newsreader', serif; font-size: 18px;
+  line-height: 1.6; color: var(--ink);
+}
+.vgap-top-text span { color: var(--forest); font-weight: 600; }
+.vtier {
+  display: grid; grid-template-columns: 188px 1fr 52px;
+  gap: 20px; align-items: center; padding: 11px 0;
+}
+.vtier-label {
+  font-family: 'Onest', sans-serif; font-size: 14px;
+  font-weight: 600; color: var(--ink);
+}
+.vtier-label .sub {
+  display: block; font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 400; color: var(--text-muted);
+  letter-spacing: 0.01em; margin-top: 3px; text-transform: none;
+}
+.vtier-track {
+  height: 12px; background: var(--cream-deep);
+  border-radius: 6px; overflow: hidden;
+}
+.vtier-fill { height: 100%; border-radius: 6px; }
+.vtier-fill.dim  { background: var(--sage-soft); }
+.vtier-fill.mid  { background: var(--sage); }
+.vtier-fill.hot  { background: var(--forest); }
+.vtier-fill.peak { background: var(--forest-dark); }
+.vtier-pct {
+  font-family: 'Fraunces', serif; font-size: 18px;
+  font-weight: 500; color: var(--ink); text-align: right;
+}
+.vtier.is-target .vtier-label,
+.vtier.is-target .vtier-pct { color: var(--forest); }
+.vgap-caption {
+  margin-top: 22px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-family: 'Newsreader', serif;
+  font-size: 14px; line-height: 1.7; color: var(--text-soft);
+}
+.vgap-caption strong { color: var(--ink); font-weight: 600; }
+.velocity-table {
+  max-width: 880px; margin: 0 auto;
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 14px; padding: 6px 36px;
+  box-shadow: var(--shadow-sm);
+}
+.vt-row {
+  display: grid; grid-template-columns: 1fr 92px 132px 92px;
+  align-items: center; gap: 16px;
+  padding: 13px 0; border-bottom: 1px solid var(--border-soft);
+}
+.vt-row:last-child { border-bottom: none; }
+.vt-row.vt-head { border-bottom: 1px solid var(--border); padding: 16px 0 11px; }
+.vt-head > div {
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-muted); text-align: center;
+}
+.vt-head > div:first-child { text-align: left; }
+.vt-head > div.vt-h-opt { color: var(--forest); }
+.vt-name {
+  font-family: 'Onest', sans-serif; font-size: 15px;
+  font-weight: 500; color: var(--ink); line-height: 1.3;
+}
+.vt-cell {
+  font-family: 'Fraunces', serif; font-size: 16px;
+  text-align: center; color: var(--text-soft); font-weight: 400;
+}
+.vt-cell.vt-opt { font-size: 19px; font-weight: 600; color: var(--forest); }
+.velocity-table-note {
+  max-width: 820px; margin: 20px auto 0;
+  font-family: 'Newsreader', serif; font-size: 15px;
+  line-height: 1.7; color: var(--text-soft); text-align: center;
+}
+.velocity-table-note strong { color: var(--ink); font-weight: 600; }
+.vinsight-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 20px; max-width: 1080px; margin: 52px auto 0;
+}
+.vinsight-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 16px; padding: 30px 28px;
+  box-shadow: var(--shadow-sm);
+}
+.vinsight-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: var(--cream-deep); color: var(--forest);
+  display: grid; place-items: center; margin-bottom: 18px;
+}
+.vinsight-card h3 {
+  font-family: 'Fraunces', serif; font-weight: 500;
+  font-size: 21px; line-height: 1.22; color: var(--ink);
+  margin-bottom: 10px;
+}
+.vinsight-card p {
+  font-family: 'Newsreader', serif; font-size: 15px;
+  line-height: 1.62; color: var(--text-soft);
+}
+.vinsight-card cite {
+  display: block; margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
+  font-family: 'JetBrains Mono', monospace; font-style: normal;
+  font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--gold-dark, #836A30);
+}
+.velocity-closing {
+  max-width: 880px; margin: 38px auto 0;
+  background: var(--forest); color: var(--cream);
+  border-radius: 16px; padding: 32px 38px;
+  font-family: 'Newsreader', serif; font-size: 16px; line-height: 1.7;
+}
+.velocity-closing strong { color: var(--gold-soft); font-weight: 600; }
+
+/* worked-example link after Chapter 2 */
+.value-example-link { max-width: 880px; margin: 26px auto 0; }
+.value-example-link a {
+  display: flex; align-items: center; gap: 18px;
+  background: var(--forest); color: var(--cream);
+  border-radius: 14px; padding: 22px 28px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.value-example-link a:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.value-example-link .vex-arrow {
+  flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--gold); color: var(--ink);
+  display: grid; place-items: center;
+  font-family: 'Fraunces', serif; font-size: 22px;
+}
+.value-example-link .vex-text {
+  font-family: 'Newsreader', serif; font-size: 16px; line-height: 1.55;
+}
+.value-example-link .vex-text strong { color: var(--gold-soft); font-weight: 600; }
+
+@media (max-width: 900px) {
+  .vinsight-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .velocity-gap { padding: 28px 22px; }
+  .vgap-top { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .vgap-num { font-size: 68px; }
+  .vtier { grid-template-columns: 120px 1fr 44px; gap: 12px; }
+  .velocity-table { padding: 6px 18px; }
+  .vt-row { grid-template-columns: 1fr 52px 88px 52px; gap: 8px; }
+  .vt-name { font-size: 13px; }
+  .vt-cell { font-size: 14px; }
+  .vt-cell.vt-opt { font-size: 16px; }
+}
+
+/* ===== Chapter 5 · Solution — what the customer sees ===== */
+.sp-row {
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 56px;
+  align-items: center;
+  max-width: 940px;
+}
+.sp-copy h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+.sp-copy h3 em { font-style: italic; color: var(--forest); }
+.sp-copy p {
+  font-family: 'Newsreader', serif;
+  font-size: 17px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.sp-features { margin-top: 24px; list-style: none; padding: 0; }
+.sp-features li {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex; gap: 13px; align-items: flex-start;
+  font-family: 'Onest', sans-serif;
+  font-size: 14.5px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.sp-features li:last-child { border-bottom: none; }
+.sp-features li::before {
+  content: '\2713';
+  color: var(--forest);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.sp-mock {
+  background: var(--ink);
+  border-radius: 32px;
+  padding: 12px;
+  max-width: 320px;
+  margin: 0 auto;
+  box-shadow: 0 30px 60px -20px rgba(15, 31, 26, 0.3);
+}
+.sp-screen {
+  background: var(--cream);
+  border-radius: 22px;
+  padding: 28px 22px;
+  min-height: 540px;
+}
+.sp-head {
+  display: flex; align-items: center; gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 22px;
+}
+.sp-logo {
+  width: 36px; height: 36px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16px;
+}
+.sp-biz { font-family: 'Onest', sans-serif; font-size: 14px; font-weight: 600; color: var(--ink); }
+.sp-biz small { display: block; font-weight: 400; color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+.sp-question {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+.sp-stars {
+  font-size: 26px;
+  color: var(--gold);
+  letter-spacing: 4px;
+  margin-bottom: 22px;
+  text-align: center;
+}
+.sp-tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.sp-tag {
+  padding: 7px 13px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  color: var(--text-soft);
+  background: #fff;
+}
+.sp-tag.active {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: var(--cream);
+}
+.sp-draft {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  font-family: 'Newsreader', serif;
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.65;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+}
+.sp-draft-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: var(--gold-dark, #836A30);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.sp-cta {
+  background: var(--forest);
+  color: var(--cream);
+  text-align: center;
+  padding: 13px;
+  border-radius: 10px;
+  font-family: 'Onest', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 14px;
+}
+@media (max-width: 900px) {
+  .sp-row { grid-template-columns: 1fr; gap: 44px; }
+}
+
+/* ===== Chapter 1 · Search ranking vignette ===== */
+.search-vignette {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 48px 44px;
+  margin: 44px auto 0;
+  max-width: 1080px;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.search-vignette::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 82% 18%, rgba(42, 107, 87, 0.30), transparent 60%);
+}
+.search-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 52px;
+  align-items: center;
+  position: relative;
+}
+.search-grid h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--cream);
+  margin-bottom: 14px;
+}
+.search-grid h3 em { font-style: italic; color: var(--gold); }
+.search-grid p {
+  font-family: 'Newsreader', serif;
+  color: rgba(250, 247, 242, 0.74);
+  font-size: 16px;
+  line-height: 1.62;
+}
+.search-mock {
+  background: #fff;
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 22px;
+  font-family: 'Onest', sans-serif;
+}
+.search-query {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  margin-bottom: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.search-query::before {
+  content: ''; width: 13px; height: 13px;
+  border: 2px solid var(--text-muted); border-radius: 50%;
+  flex-shrink: 0;
+}
+.search-result {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+.search-result:last-child { border-bottom: none; }
+.search-result.featured {
+  background: linear-gradient(90deg, rgba(31, 77, 63, 0.10), transparent);
+  padding: 13px 12px;
+  margin: 4px -12px;
+  border-radius: 8px;
+  border-bottom: none;
+  position: relative;
+}
+.search-result.featured::before {
+  content: '\2191'; position: absolute; left: -19px; top: 50%;
+  transform: translateY(-50%); color: var(--forest); font-weight: 700;
+}
+.result-name { font-weight: 600; color: var(--ink); font-size: 14px; }
+.result-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.result-stars { color: var(--forest); font-size: 12.5px; font-weight: 600; font-family: 'Fraunces', serif; }
+
+@media (max-width: 768px) {
+  .search-vignette { padding: 32px 24px; }
+  .search-grid { grid-template-columns: 1fr; gap: 32px; }
+  .search-grid h3 { font-size: 23px; }
+}
 .section-title {
   font-family: 'Fraunces', serif;
   font-weight: 400;
@@ -1887,6 +2310,22 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   text-align: center;
 }
 .research-title em { font-style: italic; color: var(--forest); }
+.currency-mark {
+  width: 66px;
+  height: 66px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 1;
+  box-shadow: 0 10px 24px -8px rgba(201, 169, 97, 0.7);
+  border: 1px solid rgba(131, 106, 48, 0.35);
+}
 .research-deck {
   font-family: 'Newsreader', serif;
   font-style: italic;
@@ -1948,7 +2387,8 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 36px 36px 28px;
-  margin-bottom: 32px;
+  max-width: 880px;
+  margin: 0 auto 32px;
   box-shadow: var(--shadow-sm);
 }
 .research-verticals-head {
@@ -2050,6 +2490,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   align-items: center;
   justify-content: space-between;
   gap: 30px;
+  margin-top: 20px;
   padding: 26px 30px;
   background: var(--ink);
   color: var(--cream);
@@ -4079,8 +4520,8 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 
 /* ============ 4-STEP SIMPLE FLOW (above 6-screen process walkthrough) ============ */
 .process-tldr {
-  margin: 56px auto 88px;
-  max-width: 1000px;
+  margin: 48px auto 56px;
+  max-width: 940px;
   position: relative;
 }
 .process-tldr-label {
@@ -4328,7 +4769,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 
 /* ============ INDUSTRY VALUE SOURCES STRIP ============ */
 .value-sources-strip {
-  max-width: 980px;
+  max-width: 880px;
   margin: 28px auto 0;
   padding: 18px 0;
   border-top: 1px solid var(--ink);
@@ -4480,6 +4921,146 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   .testimonials-section { padding: 72px 0; }
   .testimonial-card { padding: 28px 24px; }
 }
+
+/* ===== Chapter 5 — three sub-parts ===== */
+.solpart { margin: 60px auto 0; max-width: 1176px; }
+.solpart:first-of-type { margin-top: 4px; }
+.solpart-tag { display: flex; align-items: center; gap: 13px; margin-bottom: 13px; }
+.solpart-num {
+  font-family: 'Fraunces', serif; font-weight: 500; font-size: 14px;
+  color: var(--cream); background: var(--forest);
+  width: 29px; height: 29px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.solpart-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--forest);
+}
+.solpart-rule { flex: 1; height: 1px; background: var(--border); }
+.solpart-title {
+  font-family: 'Fraunces', serif; font-weight: 400; font-size: 30px;
+  line-height: 1.2; letter-spacing: -0.022em; color: var(--ink); margin-bottom: 10px;
+}
+.solpart-title em { font-style: italic; color: var(--forest); }
+.solpart-lede {
+  font-family: 'Newsreader', serif; font-size: 18px; line-height: 1.6;
+  color: var(--text-soft); max-width: 620px; margin-bottom: 30px;
+}
+.solpart-lede strong { color: var(--ink); font-weight: 600; }
+
+/* sub-part 2 — what you do */
+.youdo-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  max-width: 940px; margin: 0 auto;
+}
+.youdo-card {
+  background: var(--paper); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 26px; box-shadow: var(--shadow-sm);
+}
+.youdo-num {
+  font-family: 'Fraunces', serif; font-weight: 400; font-size: 34px;
+  color: var(--gold); line-height: 1; margin-bottom: 13px;
+}
+.youdo-card h4 {
+  font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px;
+  color: var(--ink); margin-bottom: 9px;
+}
+.youdo-card p {
+  font-family: 'Newsreader', serif; font-size: 15.5px; line-height: 1.6;
+  color: var(--text-soft);
+}
+
+/* sub-part 3 — what we do */
+.wedo-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+  max-width: 940px; margin: 0 auto;
+}
+.wedo-step {
+  background: var(--paper); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 13px 18px; text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.wedo-no {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--gold-soft); font-weight: 600; margin-bottom: 8px;
+}
+.wedo-step h5 {
+  font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px;
+  color: var(--forest); margin-bottom: 7px;
+}
+.wedo-step p {
+  font-family: 'Newsreader', serif; font-size: 12.5px; line-height: 1.5;
+  color: var(--text-soft);
+}
+
+/* closing partnership handoff */
+.partner-block {
+  max-width: 1176px; margin: 60px auto 0;
+  background: var(--ink); color: var(--cream);
+  border-radius: 18px; padding: 46px 50px;
+  position: relative; overflow: hidden;
+}
+.partner-block::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 86% 16%, rgba(201,169,97,0.16), transparent 56%);
+  pointer-events: none;
+}
+.partner-eyebrow {
+  position: relative; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold-soft); margin-bottom: 14px;
+}
+.partner-block h3 {
+  position: relative; font-family: 'Fraunces', serif; font-weight: 400;
+  font-size: 27px; line-height: 1.25; color: var(--cream); margin-bottom: 14px;
+}
+.partner-desc {
+  position: relative; font-family: 'Newsreader', serif;
+  font-size: 16px; line-height: 1.7; color: rgba(250,247,242,0.8);
+  max-width: 640px; margin-bottom: 28px;
+}
+.partner-actions {
+  position: relative; display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+}
+.partner-pdf-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--gold); color: var(--ink);
+  font-family: 'Onest', sans-serif; font-weight: 600; font-size: 15px;
+  padding: 14px 26px; border-radius: 9px; transition: background 0.15s;
+}
+.partner-pdf-btn:hover { background: var(--gold-soft); }
+.partner-pdf-btn svg { width: 17px; height: 17px; }
+.partner-link {
+  position: relative; font-family: 'Newsreader', serif; font-size: 13.5px;
+  color: rgba(250,247,242,0.6);
+}
+.partner-link b { color: var(--gold-soft); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+/* partner links inside the Full Service pricing card */
+.tier-partner-row {
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid rgba(232,217,181,0.22);
+  display: flex; flex-direction: column; gap: 9px;
+}
+.tier-partner-row a {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Onest', sans-serif; font-size: 13px; font-weight: 500;
+  color: var(--gold-soft);
+}
+.tier-partner-row a:hover { color: var(--gold); }
+.tier-partner-row a .tp-ic {
+  width: 18px; height: 18px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(232,217,181,0.14); color: var(--gold-soft);
+  border-radius: 5px; font-size: 10px;
+}
+@media (max-width: 860px) {
+  .youdo-grid { grid-template-columns: 1fr; }
+  .wedo-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 520px) {
+  .wedo-grid { grid-template-columns: repeat(2, 1fr); }
+}
 </style>
 </head>
 <body>
@@ -4491,16 +5072,18 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
       BAAM Review
     </a>
     <div class="nav-links">
-      <a href="/pricing">Pricing</a>
-      <a href="/#engine">Review Revenue</a>
-      <a href="/review-value.html#top">Review Value</a>
-      <a href="/#compare">Comparison</a>
-      <a href="/#how">How it works</a>
+      <a href="#why">Why Reviews</a>
+      <a href="#value">Industry Value</a>
+      <a href="#velocity">Velocity</a>
+      <a href="#silence">Silent Customers</a>
+      <a href="#how">Solution</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="/login">Sign in</a>
       <a href="/zh">中文</a>
     </div>
     <div class="nav-cta">
-      <a href="/login" class="btn btn-ghost">Sign in</a>
-      <a href="/pricing#self-serve" class="btn btn-primary">Start free</a>
+      <a href="#pricing" class="btn btn-primary">Start free</a>
     </div>
   </div>
 </nav>
@@ -4719,20 +5302,36 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   </div>
 </div>
 
-<!-- ============ THE RESEARCH ============ -->
-<section class="research-section" id="research">
+
+<!-- ============ CHAPTER 1 · WHY REVIEWS MATTER ============ -->
+<section class="research-section" id="why">
   <div class="container">
-    <div class="research-eyebrow">BAAM Research Brief · 14-min read</div>
-    <h2 class="research-title">The <em>independent evidence</em> on what a Google review is actually worth.</h2>
+    <div class="chapter-tag"><span class="ch-no">Chapter 1</span> · Why Reviews Matter</div>
+    <div class="currency-mark" aria-hidden="true">$</div>
+    <h2 class="research-title">A Google review is your business&rsquo;s <em>invisible currency.</em></h2>
     <p class="research-deck">
-      We didn't make these numbers up. Below are the four findings we lean on
-      most heavily — pulled from peer-reviewed academic research, fourteen
-      annual industry surveys, and the FTC&rsquo;s own enforcement data.
+      It&rsquo;s not just a handful of stars. It&rsquo;s ranking weight on Google Maps, the
+      first-glance credibility in a search result, the deciding factor in whose
+      door a customer walks through &mdash; one review affects far more than a
+      single visit.
     </p>
 
     <div class="research-stats">
       <div class="research-stat">
         <div class="research-stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1.5 12s3.5-7 10.5-7 10.5 7 10.5 7-3.5 7-10.5 7-10.5-7-10.5-7z"/>
+            <circle cx="12" cy="12" r="2.8"/>
+          </svg>
+        </div>
+        <div class="research-stat-num">87%</div>
+        <div class="research-stat-label">
+          of US local consumers <b>check Google reviews before visiting</b> a business they haven&rsquo;t tried. Below 4.0 stars, half won&rsquo;t even open your page.
+        </div>
+        <div class="research-stat-source">BrightLocal · 2024 Local Consumer Review Survey</div>
+      </div>
+      <div class="research-stat">
+        <div class="research-stat-icon gold">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="21" x2="21" y2="21"/>
             <rect x="4.5" y="13" width="3.5" height="8" rx="0.5"/>
@@ -4740,24 +5339,11 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
             <rect x="16" y="5" width="3.5" height="16" rx="0.5"/>
           </svg>
         </div>
-        <div class="research-stat-num">16–20%</div>
+        <div class="research-stat-num gold">16&ndash;20%</div>
         <div class="research-stat-label">
-          of Google&rsquo;s Local Pack ranking weight comes from <b>review signals</b> — up from ~11% five years ago.
+          of Google&rsquo;s Local Pack ranking weight comes from <b>review signals</b> &mdash; and the share rises every year. More, newer, better reviews rank higher.
         </div>
-        <div class="research-stat-source">Whitespark · 2026</div>
-      </div>
-      <div class="research-stat">
-        <div class="research-stat-icon gold">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="2" x2="12" y2="22"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-        </div>
-        <div class="research-stat-num gold">5–9%</div>
-        <div class="research-stat-label">
-          revenue increase per <b>1-star Yelp rating bump</b>, established with regression-discontinuity causal inference.
-        </div>
-        <div class="research-stat-source">M. Luca · HBS 2016</div>
+        <div class="research-stat-source">Whitespark · 2026 Local Ranking Factors</div>
       </div>
       <div class="research-stat">
         <div class="research-stat-icon">
@@ -4768,34 +5354,92 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         </div>
         <div class="research-stat-num">25%</div>
         <div class="research-stat-label">
-          conversion lift for brick-and-mortar businesses from a single <b>0.1-star rating increase</b>.
+          conversion lift for a brick-and-mortar business when its rating climbs <b>4.0 &rarr; 4.1</b> &mdash; a causal result from regression-discontinuity, not just correlation.
         </div>
-        <div class="research-stat-source">Uberall · BrightLocal</div>
+        <div class="research-stat-source">Harvard Business School · Michael Luca</div>
       </div>
       <div class="research-stat">
         <div class="research-stat-icon gold">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/>
-            <polyline points="9 12 11 14 15 10"/>
+            <line x1="12" y1="2" x2="12" y2="22"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
           </svg>
         </div>
-        <div class="research-stat-num gold">240M</div>
+        <div class="research-stat-num gold">5&ndash;9%</div>
         <div class="research-stat-label">
-          policy-violating reviews <b>removed by Google in 2024 alone</b> — real reviews are now scarcer and worth more.
+          revenue increase per <b>1-star rating bump</b> on Yelp. For beauty, medical, insurance and real estate, the elasticity runs even higher.
         </div>
-        <div class="research-stat-source">Google Transparency · 2024</div>
+        <div class="research-stat-source">Michael Luca · Berkeley Economic Journal</div>
+      </div>
+    </div>
+    <!-- Search ranking vignette -->
+    <div class="search-vignette">
+      <div class="search-grid">
+        <div>
+          <h3>When a customer opens their phone, <em>who shows up first?</em></h3>
+          <p>
+            When someone searches &ldquo;dentist near me&rdquo; or &ldquo;dentist in
+            Park Slope,&rdquo; the top three results Google shows are the practices
+            with the strongest review signals. A 0.2-star edge, or five more recent
+            reviews, can lift a practice two positions &mdash; and that is a 30% gap
+            in who gets seen.
+          </p>
+        </div>
+        <div class="search-mock">
+          <div class="search-query">dentist near me</div>
+          <div class="search-result">
+            <div>
+              <div class="result-name">Bright Smile Dental</div>
+              <div class="result-meta">$$ &middot; 0.4 mi &middot; Open now</div>
+            </div>
+            <div class="result-stars">★ 4.8 (142)</div>
+          </div>
+          <div class="search-result featured">
+            <div>
+              <div class="result-name">Park Slope Family Dental</div>
+              <div class="result-meta">$$ &middot; 0.6 mi &middot; Open now</div>
+            </div>
+            <div class="result-stars">★ 4.9 (89)</div>
+          </div>
+          <div class="search-result">
+            <div>
+              <div class="result-name">Hudson Dental Group</div>
+              <div class="result-meta">$$ &middot; 0.8 mi &middot; Open now</div>
+            </div>
+            <div class="result-stars">★ 4.7 (56)</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- INDUSTRY VALUE TABLE — visual horizontal bars -->
-    <div class="research-verticals">
-      <div class="research-verticals-head">
-        <h3 class="research-verticals-title">What&rsquo;s your industry's <em>per-review value?</em></h3>
-        <p class="research-verticals-sub">Same formula, applied to eleven common local-business types. Higher LTV → higher per-review value.</p>
+    <div class="research-cta-row">
+      <div class="research-cta-left">
+        <p class="research-cta-title">The full math, the seven sections, the <em>live calculator.</em></p>
+        <p class="research-cta-sub">
+          14-minute brief with 15 cited sources. Includes a calculator that
+          models the per-review value for your specific business.
+        </p>
       </div>
+      <a href="/review-value.html#top" class="research-cta-btn">
+        Read the research →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 2 · INDUSTRY VALUE ============ -->
+<section class="research-section" id="value">
+  <div class="container">
+    <div class="chapter-tag"><span class="ch-no">Chapter 2</span> · Industry Value</div>
+    <h2 class="research-title">Every review has a dollar value. <em>Here's yours, by industry.</em></h2>
+    <p class="research-deck">
+      The same revenue model, applied to eleven common local-business types. The
+      higher your customer&rsquo;s lifetime value, the more a single review is worth.
+    </p>
+    <div class="research-verticals">
 
       <div class="vchart-row">
-        <div class="vchart-label">Coffee / Café</div>
+        <div class="vchart-label">Café / Restaurant</div>
         <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 0.25%; width: 1.5%;"></div></div>
         <div class="vchart-value">$30 – $180</div>
       </div>
@@ -4820,7 +5464,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         <div class="vchart-value">$300 – $1,800</div>
       </div>
       <div class="vchart-row highlight">
-        <div class="vchart-label">Acupuncture / Clinic</div>
+        <div class="vchart-label">Medical Clinic / Acupuncture</div>
         <div class="vchart-bar-wrap"><div class="vchart-bar" style="left: 3.3%; width: 20%;"></div></div>
         <div class="vchart-value">$400 – $2,400</div>
       </div>
@@ -4874,25 +5518,751 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
       </span>
     </div>
 
-    <div class="research-cta-row">
-      <div class="research-cta-left">
-        <p class="research-cta-title">The full math, the seven sections, the <em>live calculator.</em></p>
-        <p class="research-cta-sub">
-          14-minute brief with 15 cited sources. Includes a calculator that
-          models the per-review value for your specific business.
-        </p>
-      </div>
-      <a href="/review-value.html#top" class="research-cta-btn">
-        Read the research →
+    <div class="value-example-link">
+      <a href="#engine">
+        <span class="vex-arrow">&rarr;</span>
+        <span class="vex-text"><strong>See a worked example.</strong> Want to see exactly how one review turns into dollars? Follow a real 5-star review from Dr. Huang&rsquo;s clinic and watch it become $1,728 &mdash; traced through three measurable channels, at the end of this page.</span>
       </a>
     </div>
+  </div>
+</section>
 
-    <p class="research-sources-line" style="display: none;">
-      Sources cited:
-      <b>Harvard Business School</b> · <b>BrightLocal</b> · <b>Whitespark</b> ·
-      <b>Berkeley / Economic Journal</b> · <b>NYU Stern</b> ·
-      <b>Federal Trade Commission</b> · <b>Google Transparency Report</b>
+<!-- ============ CHAPTER 3 · REVIEW VELOCITY ============ -->
+<section class="velocity-section" id="velocity">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="chapter-tag"><span class="ch-no">Chapter 3</span> &middot; Review Velocity</div>
+      <h2 class="section-title">A review isn&rsquo;t a trophy you win once. <em>It&rsquo;s a rhythm you keep.</em></h2>
+      <p class="section-sub">
+        We&rsquo;ve shown what one review is worth. But ranking isn&rsquo;t decided by how many
+        you have &mdash; it&rsquo;s decided by how often a new one arrives. Since 2025, Google
+        weighs review freshness almost as heavily as review count. Fewer than one
+        business in ten keeps that pace.
+      </p>
+    </div>
+
+    <div class="velocity-gap">
+      <div class="vgap-top">
+        <div class="vgap-num">9<span class="pct">%</span></div>
+        <div class="vgap-top-text">
+          Only about <span>9% of businesses</span> sustain the review pace Google actually rewards.<br>
+          The other nine in ten are either nearly silent or dangerously inconsistent &mdash; and ranking only rewards the steady kind.
+        </div>
+      </div>
+
+      <div class="vtier">
+        <div class="vtier-label">Silent<span class="sub">0&ndash;1 reviews / month</span></div>
+        <div class="vtier-track"><div class="vtier-fill dim" style="width: 65%;"></div></div>
+        <div class="vtier-pct">65%</div>
+      </div>
+      <div class="vtier">
+        <div class="vtier-label">Minimum<span class="sub">2&ndash;3 reviews / month</span></div>
+        <div class="vtier-track"><div class="vtier-fill mid" style="width: 22%;"></div></div>
+        <div class="vtier-pct">22%</div>
+      </div>
+      <div class="vtier is-target">
+        <div class="vtier-label">Optimal<span class="sub">5&ndash;12 reviews / month</span></div>
+        <div class="vtier-track"><div class="vtier-fill hot" style="width: 9%;"></div></div>
+        <div class="vtier-pct">9%</div>
+      </div>
+      <div class="vtier is-target">
+        <div class="vtier-label">Aggressive<span class="sub">12+ reviews / month</span></div>
+        <div class="vtier-track"><div class="vtier-fill peak" style="width: 4%;"></div></div>
+        <div class="vtier-pct">4%</div>
+      </div>
+
+      <div class="vgap-caption">
+        <strong>How to read this.</strong> The Optimal and Aggressive bands are the range
+        Google&rsquo;s local ranking actually rewards &mdash; steady, sustained, naturally
+        growing. Most businesses sit in Silent or Minimum, not because customers are
+        unhappy, but because no system is running the asks. Percentages are estimates
+        synthesized from 2025&ndash;2026 research (BrightLocal, Sterling Sky).
+      </div>
+    </div>
+
+    <div class="velocity-table">
+      <div class="vt-row vt-head">
+        <div>Industry</div>
+        <div>Minimum</div>
+        <div class="vt-h-opt">Optimal &middot; per month</div>
+        <div>Aggressive</div>
+      </div>
+      <div class="vt-row"><div class="vt-name">Café / Restaurant</div><div class="vt-cell">4</div><div class="vt-cell vt-opt">10&ndash;15</div><div class="vt-cell">20+</div></div>
+      <div class="vt-row"><div class="vt-name">Salon / Spa</div><div class="vt-cell">3</div><div class="vt-cell vt-opt">8&ndash;12</div><div class="vt-cell">15+</div></div>
+      <div class="vt-row"><div class="vt-name">Apparel / Boutique</div><div class="vt-cell">3</div><div class="vt-cell vt-opt">6&ndash;10</div><div class="vt-cell">12+</div></div>
+      <div class="vt-row"><div class="vt-name">Health Food / Supplements</div><div class="vt-cell">2</div><div class="vt-cell vt-opt">4&ndash;7</div><div class="vt-cell">8+</div></div>
+      <div class="vt-row"><div class="vt-name">Insurance Agent</div><div class="vt-cell">1</div><div class="vt-cell vt-opt">3&ndash;5</div><div class="vt-cell">6+</div></div>
+      <div class="vt-row"><div class="vt-name">Medical Clinic / Acupuncture</div><div class="vt-cell">2</div><div class="vt-cell vt-opt">4&ndash;8</div><div class="vt-cell">10+</div></div>
+      <div class="vt-row"><div class="vt-name">Hotel / Resort</div><div class="vt-cell">6</div><div class="vt-cell vt-opt">12&ndash;20</div><div class="vt-cell">25+</div></div>
+      <div class="vt-row"><div class="vt-name">Auto Dealer / Repair</div><div class="vt-cell">3</div><div class="vt-cell vt-opt">6&ndash;10</div><div class="vt-cell">12+</div></div>
+      <div class="vt-row"><div class="vt-name">Contractor / Roofing</div><div class="vt-cell">2</div><div class="vt-cell vt-opt">5&ndash;8</div><div class="vt-cell">10+</div></div>
+      <div class="vt-row"><div class="vt-name">Real Estate Agent</div><div class="vt-cell">1</div><div class="vt-cell vt-opt">3&ndash;5</div><div class="vt-cell">6+</div></div>
+      <div class="vt-row"><div class="vt-name">Lawyer / Immigration</div><div class="vt-cell">1</div><div class="vt-cell vt-opt">3&ndash;5</div><div class="vt-cell">6+</div></div>
+    </div>
+
+    <p class="velocity-table-note">
+      High-traffic industries (restaurants, hotels) need a faster pace to stay
+      competitive; low-frequency, high-ticket industries (lawyers, real estate)
+      shouldn&rsquo;t chase volume. What matters, always, is <strong>steady &mdash; not a sprint</strong>.
     </p>
+
+    <div class="vinsight-grid">
+      <div class="vinsight-card">
+        <div class="vinsight-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 9 12 13 8 21 16"/><polyline points="21 10 21 16 15 16"/>
+          </svg>
+        </div>
+        <h3>Stop for three weeks, and rankings can fall off a cliff.</h3>
+        <p>Sterling Sky found that when a business stops collecting reviews, local rankings visibly slide &mdash; and after roughly three weeks of silence, they can drop sharply. Rankings recover only once fresh reviews resume. The total you banked in the past won&rsquo;t protect you.</p>
+        <cite>Sterling Sky &middot; Local SEO Case Study</cite>
+      </div>
+      <div class="vinsight-card">
+        <div class="vinsight-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="2 12 7 12 10 5 14 19 17 12 22 12"/>
+          </svg>
+        </div>
+        <h3>73% of customers only trust reviews from the last 30 days.</h3>
+        <p>Google treats review freshness like a heartbeat monitor. Reviews from the past 7 days carry about 40% more ranking weight than reviews older than 30 days. Those five-star reviews from two years ago? Today, they&rsquo;re mostly wallpaper.</p>
+        <cite>Moz &middot; BrightLocal &middot; 2025</cite>
+      </div>
+      <div class="vinsight-card">
+        <div class="vinsight-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3.5 22 20.5 2 20.5 Z"/><line x1="12" y1="10" x2="12" y2="14.5"/><line x1="12" y1="17.4" x2="12" y2="17.5"/>
+          </svg>
+        </div>
+        <h3>Try to &ldquo;catch up&rdquo; with a burst, and you&rsquo;ll be flagged as fake.</h3>
+        <p>A business that normally gets one or two reviews a month, suddenly posting fifty in a week &mdash; Google&rsquo;s spam filters read that as review fraud, and may hide reviews or penalize the profile. You can&rsquo;t sprint to catch up. You can only rebuild, steadily.</p>
+        <cite>Google &middot; Review Content Policy</cite>
+      </div>
+    </div>
+
+    <div class="velocity-closing">
+      <strong>What this means for you.</strong> Review marketing isn&rsquo;t a one-time
+      project &mdash; it&rsquo;s a system that has to be maintained. That&rsquo;s exactly why BAAM
+      Review runs every month: we don&rsquo;t run a one-off &ldquo;review campaign,&rdquo; we keep
+      the rhythm that can&rsquo;t stop &mdash; steady, natural, sustainable. Keep the rhythm
+      and the ranking holds; break it, and the ranking breaks with it.
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE SILENCE PROBLEM (Why 90% of happy customers don't review) ============ -->
+<section class="silence-section" id="silence">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="chapter-tag"><span class="ch-no">Chapter 4</span> · The Silence Problem</div>
+      <h2 class="section-title">Your happiest customers say nothing.<br><em>Not because they're unhappy — because reviewing is hard.</em></h2>
+      <p class="section-sub">
+        We've tracked clinics and shops across the NY metro — even when satisfaction averages 4.8 stars and customers thank you at the counter, only 1–10% leave a Google review. The other 90% of goodwill never compounds into trust, ranking, or revenue.
+      </p>
+    </div>
+
+    <div class="silence-grid">
+      <div class="silence-viz">
+        <svg viewBox="0 0 400 400">
+          <!-- Background circle (full = all happy customers) -->
+          <circle cx="200" cy="200" r="180" fill="none" stroke="#E8E2D5" stroke-width="1"/>
+          <!-- 10% reviewing — forest accent -->
+          <circle cx="200" cy="200" r="180"
+                  fill="none" stroke="#1F4D3F" stroke-width="36"
+                  stroke-dasharray="113 1018" stroke-dashoffset="0"
+                  transform="rotate(-90 200 200)"/>
+          <!-- 90% silent — cream-deep -->
+          <circle cx="200" cy="200" r="180"
+                  fill="none" stroke="#F0EBE0" stroke-width="36"
+                  stroke-dasharray="1018 113" stroke-dashoffset="-113"
+                  transform="rotate(-90 200 200)"/>
+          <!-- Labels around the ring -->
+          <text x="200" y="32" text-anchor="middle" fill="#1F4D3F"
+                font-family="Fraunces, serif" font-size="13" font-weight="600" letter-spacing="0.05em">10% LEAVE A REVIEW</text>
+          <text x="384" y="200" text-anchor="end" fill="#5A6660"
+                font-family="Fraunces, serif" font-size="13" font-style="italic">silent customers</text>
+        </svg>
+        <div class="silence-stat">
+          <div class="big">90<span class="pct">%</span></div>
+          <div class="label">stay silent</div>
+          <div class="sub">despite being happy</div>
+        </div>
+      </div>
+
+      <div class="silence-barriers">
+        <div class="silence-barrier">
+          <div class="silence-barrier-num">01</div>
+          <div class="silence-barrier-text">
+            <h4>They don't know <em>where</em> to leave it.</h4>
+            <p>Most customers don't have Google Maps top of mind. Even when they intend to review, finding the right form on mobile takes more taps than they'll make. About 30% give up before they start.</p>
+          </div>
+        </div>
+        <div class="silence-barrier">
+          <div class="silence-barrier-num">02</div>
+          <div class="silence-barrier-text">
+            <h4>They don't know <em>what</em> to write.</h4>
+            <p>A blank text box freezes people. "It was good" — but how do they phrase that without sounding flat? The blank-box freeze kills more reviews than any other friction in the funnel.</p>
+          </div>
+        </div>
+        <div class="silence-barrier">
+          <div class="silence-barrier-num">03</div>
+          <div class="silence-barrier-text">
+            <h4>They forget — goodwill <em>evaporates</em>.</h4>
+            <p>A customer's intent to review drops about 70% three days after the visit. After a week, it's nearly zero. Without timely, well-timed prompting, the moment passes.</p>
+          </div>
+        </div>
+        <div class="silence-barrier">
+          <div class="silence-barrier-num">04</div>
+          <div class="silence-barrier-text">
+            <h4>It feels like <em>a chore</em>.</h4>
+            <p>Even a one-minute task gets filed mentally under "I'll do that later" — and "later" never comes. The mental cost of starting is the real obstacle, not the actual minute it would take.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 5 · THE SOLUTION ============ -->
+<section class="process-section" id="how">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="chapter-tag"><span class="ch-no">Chapter 5</span> · The Solution</div>
+      <h2 class="section-title">One solution &mdash; easy for your <em>customer, for you, and for us.</em></h2>
+      <p class="section-sub">
+        BAAM Review breaks review marketing into three simple jobs: your customer reviews in under 60 seconds; you send one list a week; the collecting, replying, and running &mdash; all of it &mdash; is handled by us.
+      </p>
+    </div>
+
+    <!-- Sub-part 1 — the customer -->
+    <div class="solpart">
+      <div class="solpart-tag">
+        <span class="solpart-num">1</span>
+        <span class="solpart-label">The customer&rsquo;s side</span>
+        <span class="solpart-rule"></span>
+      </div>
+      <h3 class="solpart-title">From four barriers to <em>three taps</em> &mdash; under 60 seconds.</h3>
+      <p class="solpart-lede">
+        BAAM dismantles those four barriers, one at a time. Your customer opens an
+        email, picks three tags, lets AI draft a review &mdash; then taps once to send
+        it to Google. No blank box, no friction, nothing to figure out.
+      </p>
+    </div>
+
+    <!-- 4-step simple flow (TL;DR view) -->
+    <div class="process-tldr">
+      <div class="process-tldr-label"><span>The 30-second version</span></div>
+      <div class="process-tldr-steps">
+        <div class="process-tldr-step">
+          <div class="process-tldr-dot">i</div>
+          <h4>Send the request</h4>
+          <p>Email or SMS, one customer or a list, in their language. We pick the right time.</p>
+        </div>
+        <div class="process-tldr-step">
+          <div class="process-tldr-dot">ii</div>
+          <h4>Open in one tap</h4>
+          <p>Customer lands on a 60-second form. Pick service, pick stars, pick a word. No blank box.</p>
+        </div>
+        <div class="process-tldr-step">
+          <div class="process-tldr-dot">iii</div>
+          <h4>AI drafts the review</h4>
+          <p>Three voice options — warm, specific, brief. Customer picks one and edits if they want.</p>
+        </div>
+        <div class="process-tldr-step">
+          <div class="process-tldr-dot">iv</div>
+          <h4>Posts to Google</h4>
+          <p>One tap. Lives on your real Google Business Profile. Plus a share-with-friend card.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- What the customer sees -->
+    <div class="sp-row">
+      <div class="sp-copy">
+        <h3>What your customer sees is a page <em>too simple to refuse.</em></h3>
+        <p>
+          No blank text box, no long instructions, no English barrier. It doesn't
+          feel like being asked for a favor — it feels like being cared for, one
+          more time. Three taps, and not a single sentence to write.
+        </p>
+        <ul class="sp-features">
+          <li>English / 中文 / Español — auto-matched to the customer's phone language</li>
+          <li>AI offers three draft voices: warm, specific, or brief</li>
+          <li>The customer edits freely — they stay the author, fully Google-compliant</li>
+          <li>Posts straight to your real Google Business Profile — never a third-party page</li>
+          <li>After posting, a one-tap share-with-a-friend link with a trackable $20 referral code</li>
+        </ul>
+      </div>
+      <div class="sp-mock">
+        <div class="sp-screen">
+          <div class="sp-head">
+            <div class="sp-logo">H</div>
+            <div class="sp-biz">Dr. Huang Acupuncture Clinic<small>Flushing · Thanks for visiting</small></div>
+          </div>
+          <div class="sp-question">How was your visit today?</div>
+          <div class="sp-stars">★ ★ ★ ★ ★</div>
+          <div class="sp-tag-row">
+            <span class="sp-tag active">Acupuncture</span>
+            <span class="sp-tag">Tui-na</span>
+            <span class="sp-tag">Cupping</span>
+          </div>
+          <div class="sp-tag-row">
+            <span class="sp-tag">Patient</span>
+            <span class="sp-tag active">Professional</span>
+            <span class="sp-tag">Thorough</span>
+            <span class="sp-tag">Fast relief</span>
+          </div>
+          <div class="sp-draft">
+            <div class="sp-draft-label">AI draft · warm</div>
+            Dr. Huang is incredibly professional — the acupuncture noticeably improved my years-long migraines. The clinic is spotless, and the doctor is fluent in both English and Chinese. Truly caring service.
+          </div>
+          <div class="sp-cta">Looks great — send to Google →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-part 2 — what you do -->
+    <div class="solpart">
+      <div class="solpart-tag">
+        <span class="solpart-num">2</span>
+        <span class="solpart-label">Your side</span>
+        <span class="solpart-rule"></span>
+      </div>
+      <h3 class="solpart-title">One weekly list &mdash; <em>and almost nothing else.</em></h3>
+      <p class="solpart-lede">
+        <strong>Your day-to-day effort is almost zero.</strong> You do just two things
+        &mdash; we handle everything that follows.
+      </p>
+    </div>
+    <div class="youdo-grid">
+      <div class="youdo-card">
+        <div class="youdo-num">1</div>
+        <h4>A weekly customer list</h4>
+        <p>Send us the customers who had a good experience and agreed to be contacted &mdash; a spreadsheet, Excel, or CSV, with no repeats from earlier weeks.</p>
+      </div>
+      <div class="youdo-card">
+        <div class="youdo-num">2</div>
+        <h4>Confirm the reward amounts</h4>
+        <p>Set a small thank-you for reviewers and the friends they refer &mdash; for example, $20 off the next visit, or a small gift.</p>
+      </div>
+      <div class="youdo-card">
+        <div class="youdo-num">3</div>
+        <h4>Then hand it to us</h4>
+        <p>No sending invites, no chasing reviews, no writing replies. Every step after that is ours.</p>
+      </div>
+    </div>
+
+    <!-- Sub-part 3 — what we do -->
+    <div class="solpart">
+      <div class="solpart-tag">
+        <span class="solpart-num">3</span>
+        <span class="solpart-label">Our side</span>
+        <span class="solpart-rule"></span>
+      </div>
+      <h3 class="solpart-title">A team that <em>keeps it running.</em></h3>
+      <p class="solpart-lede">
+        Once your list reaches us, this is what we do for you every week &mdash;
+        steady, professional, never interrupted.
+      </p>
+    </div>
+    <div class="wedo-grid">
+      <div class="wedo-step">
+        <div class="wedo-no">01</div>
+        <h5>Prepare</h5>
+        <p>Clean and verify every list — fix errors, remove duplicates.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">02</div>
+        <h5>Send</h5>
+        <p>Batch by batch, in each customer's language, at a safe pace.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">03</div>
+        <h5>Monitor</h5>
+        <p>Track delivery, opens, and new reviews every day.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">04</div>
+        <h5>Respond</h5>
+        <p>Reply to every review within 24 hours, in your voice.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">05</div>
+        <h5>Remind</h5>
+        <p>Gently follow up customers who haven't reviewed yet.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">06</div>
+        <h5>Report</h5>
+        <p>A monthly report — results, insights, recommendations.</p>
+      </div>
+    </div>
+
+    <!-- Closing handoff — full partnership detail -->
+    <div class="partner-block" id="partnership">
+      <div class="partner-eyebrow">The full partnership · Self-serve &amp; Full Service</div>
+      <h3>That&rsquo;s the whole partnership. Every detail is in this guide.</h3>
+      <p class="partner-desc">
+        From Google Business Profile access and the exact customer-list fields to our
+        step-by-step process and how we handle negative reviews &mdash; the complete
+        detail is laid out in the partner guide. Whether you run it yourself or have us
+        manage it, you&rsquo;re welcome to read it.
+      </p>
+      <div class="partner-actions">
+        <!-- on deploy, place the PDF at this path -->
+        <a href="/downloads/BAAM-Review-How-We-Work-Together.pdf" class="partner-pdf-btn" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download the partner guide (PDF)
+        </a>
+        <div class="partner-link">
+          Shareable link · <b>baamreview.com/#partnership</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS — FOUNDING CUSTOMERS ============ -->
+<section class="testimonials-section" id="testimonials">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="chapter-tag"><span class="ch-no">Chapter 6</span> · The Proof</div>
+      <h2 class="section-title">NY-metro businesses are already<br><em>turning quiet customers into revenue.</em></h2>
+      <p class="section-sub">
+        From TCM clinics to insurance brokers to real-estate teams — same product, same loop, different industries. Where the goodwill used to stay silent, BAAM lets it compound.
+      </p>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-quote">
+          We'd been asking patients to write Google reviews for six months — barely worked. The month after switching to BAAM, we got <strong>17 new 5-star reviews</strong>. Our ranking for "acupuncture Flushing" moved from #5 to #2. Weekends are now fully booked.
+        </div>
+        <div class="testimonial-meta">
+          <div class="testimonial-avatar">H</div>
+          <div>
+            <div class="testimonial-name">Dr. Huang</div>
+            <div class="testimonial-role">Acupuncture &amp; TCM Clinic, Flushing <span class="zh">黄医生针灸</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-quote">
+          We'd been on Birdeye at $299/month — review completion was stuck at 8%. BAAM's <strong>one-tap flow and AI drafting</strong> changed that overnight: clients actually finish now. We're past 30% completion, at a third of the price.
+        </div>
+        <div class="testimonial-meta">
+          <div class="testimonial-avatar">M</div>
+          <div>
+            <div class="testimonial-name">Karen Mitchell</div>
+            <div class="testimonial-role">Insurance Broker, Brooklyn</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-quote">
+          In real estate, every referral matters. BAAM doesn't just collect reviews — the <strong>share-with-a-friend</strong> card after every 5-star has actually closed deals. Three of last month's listings came from the friend-share link.
+        </div>
+        <div class="testimonial-meta">
+          <div class="testimonial-avatar">S</div>
+          <div>
+            <div class="testimonial-name">Greg Sullivan</div>
+            <div class="testimonial-role">Real Estate Team, Long Island</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ USER JOURNEY (signup → trial → keep using) ============ -->
+<style>
+  .journey-section { background: var(--cream); padding: 100px 0 90px; }
+  .journey-section .section-eyebrow { color: var(--forest); }
+  .journey-section .section-title em { color: var(--gold); font-style: italic; }
+  .journey-steps {
+    list-style: none; padding: 0; margin: 56px 0 0;
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px;
+    counter-reset: journey;
+  }
+  .journey-step {
+    background: var(--paper); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px 18px 20px; position: relative;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .journey-step:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .journey-step-num {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--gold); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Newsreader', 'Times New Roman', serif;
+    font-size: 17px; font-weight: 600; margin-bottom: 14px;
+  }
+  .journey-step-title {
+    font-family: 'Newsreader', 'Times New Roman', serif;
+    font-size: 17px; font-weight: 500; color: var(--ink);
+    margin: 0 0 8px; line-height: 1.3;
+  }
+  .journey-step-body {
+    font-size: 13.5px; line-height: 1.55; color: var(--text-soft); margin: 0;
+  }
+  .journey-step-body strong { color: var(--ink); font-weight: 600; }
+  .journey-cta {
+    margin-top: 48px; display: flex; flex-direction: column; align-items: center; gap: 14px;
+  }
+  .journey-cta-note { font-size: 13px; color: var(--text-soft); }
+  @media (max-width: 1100px) {
+    .journey-steps { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .journey-steps { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 460px) {
+    .journey-steps { grid-template-columns: 1fr; }
+  }
+</style>
+<section class="journey-section" id="how-to-start">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="section-eyebrow">Getting started</div>
+      <h2 class="section-title">From visit to first review, <em>in six steps.</em></h2>
+      <p class="section-sub">
+        Sign up → confirm email → pick plan (free) → connect Google → pay per location with 30-day free trial → keep using. No surprises, no setup fees, cancel any single location anytime.
+      </p>
+    </div>
+
+    <ol class="journey-steps">
+      <li class="journey-step">
+        <div class="journey-step-num">1</div>
+        <h4 class="journey-step-title">Sign up</h4>
+        <p class="journey-step-body">Name, email, password. About 30 seconds. <strong>No card asked.</strong></p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">2</div>
+        <h4 class="journey-step-title">Confirm your email</h4>
+        <p class="journey-step-body">Click the link we email you to activate your account.</p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">3</div>
+        <h4 class="journey-step-title">Pick your plan</h4>
+        <p class="journey-step-body">Self-service or Full-service. Still free — <strong>no card yet</strong>.</p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">4</div>
+        <h4 class="journey-step-title">Connect Google</h4>
+        <p class="journey-step-body">One-click Google Business Profile login. Add every location you own.</p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">5</div>
+        <h4 class="journey-step-title">Set up billing</h4>
+        <p class="journey-step-body">Per-location subscription with a <strong>30-day free trial</strong>. Card saved for after day 30.</p>
+      </li>
+      <li class="journey-step">
+        <div class="journey-step-num">6</div>
+        <h4 class="journey-step-title">Send your first request</h4>
+        <p class="journey-step-body">Use the product free for 30 days. Cancel any location anytime — independently.</p>
+      </li>
+    </ol>
+
+    <div class="journey-cta">
+      <a href="https://review.baamplatform.com/signup" class="btn btn-primary btn-large">Start free trial →</a>
+      <span class="journey-cta-note">30 days free · cancel anytime before day 30 and pay nothing.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10× CERTAINTY BANNER (transition into pricing) ============ -->
+<section class="certainty-section">
+  <div class="container">
+    <div class="certainty-banner">
+      <div class="certainty-seal">10<span class="x">×</span></div>
+      <div class="certainty-text">
+        <h3>Our 10× value promise.</h3>
+        <p>
+          Measured against the <strong>median</strong> per-review value for your industry — not the high end, not the low end — we're confident the Review Revenue we generate will be <strong>at least 10× what you pay us</strong>. The only precondition: you keep sending us real customer lists each month. We don't conjure customers from thin air — we translate the goodwill you've already earned into reviews Google can see.
+        </p>
+      </div>
+      <div class="certainty-stamp">
+        BAAM × You<br>10× Value<br>Together
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING TEASER ============ -->
+<div class="pricing-teaser" id="pricing">
+  <div class="pricing-teaser-content">
+    <div class="chapter-tag"><span class="ch-no">Chapter 7</span> · Pricing</div>
+    <h2 class="section-title">Pricing that respects <em>how you want to work.</em></h2>
+    <p style="font-family: 'Newsreader', serif; font-size: 19px; color: rgba(250, 247, 242, 0.78); max-width: 660px; margin-top: 8px;">
+      Run it yourself with our platform, or let us run it for you. Founding-customer pricing locked forever for the first 50 self-serve and first 20 Full Service signups.
+    </p>
+
+    <div class="tier-strip">
+
+      <!-- PATH A: SELF-SERVE -->
+      <div class="tier-mini">
+        <div class="tier-mini-eyebrow">Path A · Self-serve</div>
+        <div class="tier-mini-name">Run it yourself</div>
+        <div class="tier-mini-tag">Log in, send review requests, reply to reviews. You drive it.</div>
+        <div class="tier-mini-price-row">
+          <span class="tier-mini-price-pre">From</span>
+          <span class="tier-mini-price">$99<span class="tier-mini-price-period">/mo</span></span>
+        </div>
+        <div class="tier-mini-founding"><strong>$89/mo</strong> founding · 30-day free trial</div>
+
+        <ul class="tier-mini-feature-list">
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Single location, unlimited review requests</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI drafting in EN / 中文 / Español</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Lists, batch sends, private feedback path</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Add locations at +$79/mo each</li>
+        </ul>
+
+        <a href="/pricing#self-serve" class="tier-mini-cta">
+          See self-serve pricing
+          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+      </div>
+
+      <!-- PATH B: FULL SERVICE -->
+      <div class="tier-mini featured">
+        <div class="tier-mini-eyebrow">Path B · Full Service</div>
+        <div class="tier-mini-name">We run it for you</div>
+        <div class="tier-mini-tag">Send us your customer list each week. We handle everything else.</div>
+        <div class="tier-mini-price-row">
+          <span class="tier-mini-price-pre" style="color: rgba(232, 217, 181, 0.7);">From</span>
+          <span class="tier-mini-price">$399<span class="tier-mini-price-period">/mo</span></span>
+        </div>
+        <div class="tier-mini-founding"><strong>$299/mo</strong> per location founding · 30-day free trial · setup waived</div>
+
+        <ul class="tier-mini-feature-list">
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We send all review requests, weekly batches</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We reply to every review in your voice</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We catch private feedback before it goes public</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Every additional location at the same $299/mo (no $199 tier — flat)</li>
+        </ul>
+
+        <a href="/pricing#full-service" class="tier-mini-cta">
+          See Full Service pricing
+          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+        <div class="tier-partner-row">
+          <a href="#partnership"><span class="tp-ic">▸</span>See how we work together</a>
+          <a href="/downloads/BAAM-Review-How-We-Work-Together.pdf" download><span class="tp-ic">▾</span>Download the partner guide (PDF)</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="pricing-cta-row">
+      <a href="/pricing" class="btn btn-gold btn-large">See full pricing →</a>
+      <span class="founding-note">
+        <span class="founding-dot"></span>
+        23 self-serve · 17 Full Service founding spots left — locked forever.
+      </span>
+    </div>
+  </div>
+</div>
+
+
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="section-header-center">
+      <div class="chapter-tag"><span class="ch-no">Chapter 8</span> · Questions</div>
+      <h2 class="section-title">The things <em>everyone asks</em> us.</h2>
+    </div>
+
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>What if I don't get any reviews during my free trial?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Then BAAM Review didn't earn its keep. You're never charged during the 30-day trial — we collect a card upfront for a smooth transition into month 2, but you can cancel anytime in your dashboard before day 30 and we charge $0. If you haven't seen reviews by day 30, either we need to fix something or you should leave. Most clinics see their first new review within 7 days of sending their first request batch.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Do you spam my customers?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          No. You upload a list of customers you've actually served, we send one email or SMS per customer with a 60-second review form. Every message is TCPA-compliant with one-click unsubscribe. We never email anyone twice within 60 days (deduplication is built-in). Most clinics send 20-50 review requests per week — far below any threshold that would feel like spam to your customers.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Is this compliant with Google's review policies?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Yes. We never gate reviews (you can't filter out low-star reviews before they hit Google), we never write reviews on behalf of customers (the AI drafts a starting point, but the customer is always the author and editor of record), and we never offer financial incentives in exchange for positive reviews. The platform is built explicitly around <a href="https://support.google.com/contributionpolicy" target="_blank" rel="noopener">Google's contribution policies</a>. We sweat the rules so your profile doesn't get suspended.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>What if I want to cancel?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Cancel anytime, no questions asked. Month-to-month billing means you can leave at the end of any billing cycle with zero cancellation fee. Full Service requires 30 days notice (so we can do clean handover), but no minimum commitment. We don't believe in trapping customers — if BAAM Review isn't generating revenue for you, leaving is the right call.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>What makes BAAM different from Birdeye or Podium?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Three things. <strong>Price</strong>: we're roughly 67–82% cheaper than Birdeye/Podium, with no setup fee. <strong>Multilingual</strong>: we're the only major US platform with first-class support for English, Mandarin, and Spanish — built in from day one, not a translated UI bolt-on. <strong>Revenue attribution</strong>: we put a dollar number on every review (modeled but defensible). Birdeye and Podium tell you how many reviews you got. We tell you what they were worth. See the <a href="#compare">full comparison table below</a>.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>What does the $1,728 per review actually mean?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          It's the modeled value of one new 5-star Google review for a clinic like Dr. Huang's, over 24 months, across three measurable channels: Google search ranking (+$580), on-site widget trust (+$720), and friend-to-friend referrals (+$428). The underlying conversion rates come from industry research (Harvard Business School, BrightLocal, Whitespark), and the ticket/LTV values come from Dr. Huang's actual books. It's a model, not a measurement — but it's defensible math, not magic. <a href="#engine">See the full breakdown below →</a>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Do I need a Google Business Profile already?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Yes. Google Business Profile is free to create and required for any business that wants to show up in local Google searches. If you don't have one yet, we'll walk you through creating one as part of your first setup call — usually takes 15-20 minutes including Google's verification step. After that, BAAM Review connects via OAuth in about 30 seconds.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Can I use this for multiple locations?</span>
+          <span class="faq-chevron">+</span>
+        </summary>
+        <div class="faq-a">
+          Yes. Self-serve: your first location is $89/mo (founding), each additional location is $79/mo. So 5 locations = $89 + 4×$79 = $405/mo; 10 locations = $89 + 9×$79 = $800/mo. Each location is its own subscription with its own card, dashboard, brand settings, and review attribution — cancel one without touching the others. Full Service: every location is a flat $299/mo (founding), card or pay-by-check. Every location includes a 30-day free trial. Birdeye and Podium charge $200–400 per location at this volume.
+        </div>
+      </details>
+
+    </div>
   </div>
 </section>
 
@@ -4900,7 +6270,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 <section class="engine-section" id="engine">
   <div class="container">
     <div class="section-header-center">
-      <div class="engine-eyebrow">Review Revenue, traced</div>
+      <div class="chapter-tag"><span class="ch-no">Worked Example</span> · Review Revenue</div>
       <h2 class="section-title">One review. <em>$1,728 in revenue.</em></h2>
       <p class="section-sub">
         Here's a real 5-star review from Dr. Huang's clinic. We'll show you what
@@ -5146,118 +6516,17 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   </div>
 </section>
 
-<!-- ============ THE SILENCE PROBLEM (Why 90% of happy customers don't review) ============ -->
-<section class="silence-section" id="silence">
+<!-- ============ APPENDIX · THE DETAILED WALKTHROUGH ============ -->
+<section class="process-section walkthrough-section" id="walkthrough">
   <div class="container">
     <div class="section-header-center">
-      <div class="section-eyebrow">The silence problem</div>
-      <h2 class="section-title">Your happy customers aren't quiet because<br>they're unhappy. <em>They're quiet because reviewing is hard.</em></h2>
+      <div class="chapter-tag"><span class="ch-no">Appendix</span> &middot; The Detailed Walkthrough</div>
+      <h2 class="section-title">Six real screens, <em>start to finish.</em></h2>
       <p class="section-sub">
-        We've tracked clinics and shops across the NY metro — even when satisfaction averages 4.8 stars and customers thank you at the counter, only 1–10% leave a Google review. The other 90% of goodwill never compounds into trust, ranking, or revenue.
+        The full customer journey, screen by screen. We&rsquo;re replacing this with
+        short videos soon &mdash; for now, here is every step in detail.
       </p>
     </div>
-
-    <div class="silence-grid">
-      <div class="silence-viz">
-        <svg viewBox="0 0 400 400">
-          <!-- Background circle (full = all happy customers) -->
-          <circle cx="200" cy="200" r="180" fill="none" stroke="#E8E2D5" stroke-width="1"/>
-          <!-- 10% reviewing — forest accent -->
-          <circle cx="200" cy="200" r="180"
-                  fill="none" stroke="#1F4D3F" stroke-width="36"
-                  stroke-dasharray="113 1018" stroke-dashoffset="0"
-                  transform="rotate(-90 200 200)"/>
-          <!-- 90% silent — cream-deep -->
-          <circle cx="200" cy="200" r="180"
-                  fill="none" stroke="#F0EBE0" stroke-width="36"
-                  stroke-dasharray="1018 113" stroke-dashoffset="-113"
-                  transform="rotate(-90 200 200)"/>
-          <!-- Labels around the ring -->
-          <text x="200" y="32" text-anchor="middle" fill="#1F4D3F"
-                font-family="Fraunces, serif" font-size="13" font-weight="600" letter-spacing="0.05em">10% LEAVE A REVIEW</text>
-          <text x="384" y="200" text-anchor="end" fill="#5A6660"
-                font-family="Fraunces, serif" font-size="13" font-style="italic">silent customers</text>
-        </svg>
-        <div class="silence-stat">
-          <div class="big">90<span class="pct">%</span></div>
-          <div class="label">stay silent</div>
-          <div class="sub">despite being happy</div>
-        </div>
-      </div>
-
-      <div class="silence-barriers">
-        <div class="silence-barrier">
-          <div class="silence-barrier-num">01</div>
-          <div class="silence-barrier-text">
-            <h4>They don't know <em>where</em> to leave it.</h4>
-            <p>Most customers don't have Google Maps top of mind. Even when they intend to review, finding the right form on mobile takes more taps than they'll make. About 30% give up before they start.</p>
-          </div>
-        </div>
-        <div class="silence-barrier">
-          <div class="silence-barrier-num">02</div>
-          <div class="silence-barrier-text">
-            <h4>They don't know <em>what</em> to write.</h4>
-            <p>A blank text box freezes people. "It was good" — but how do they phrase that without sounding flat? The blank-box freeze kills more reviews than any other friction in the funnel.</p>
-          </div>
-        </div>
-        <div class="silence-barrier">
-          <div class="silence-barrier-num">03</div>
-          <div class="silence-barrier-text">
-            <h4>They forget — goodwill <em>evaporates</em>.</h4>
-            <p>A customer's intent to review drops about 70% three days after the visit. After a week, it's nearly zero. Without timely, well-timed prompting, the moment passes.</p>
-          </div>
-        </div>
-        <div class="silence-barrier">
-          <div class="silence-barrier-num">04</div>
-          <div class="silence-barrier-text">
-            <h4>It feels like <em>a chore</em>.</h4>
-            <p>Even a one-minute task gets filed mentally under "I'll do that later" — and "later" never comes. The mental cost of starting is the real obstacle, not the actual minute it would take.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ PROCESS WALKTHROUGH: SIX REAL SCREENS ============ -->
-<section class="process-section" id="how">
-  <div class="container">
-    <div class="section-header-center">
-      <div class="section-eyebrow">Chapter 4 · The Solution</div>
-      <h2 class="section-title">From four barriers to <em>three taps.</em><br>All under 60 seconds, in their language.</h2>
-      <p class="section-sub">
-        BAAM dismantles those four barriers, one at a time. Your customer opens an email, picks three tags, lets the AI draft a review — then taps once to send it to Google. The whole flow runs in under 60 seconds, in their language. No blank box. No friction. Nothing to figure out.
-      </p>
-    </div>
-
-    <!-- 4-step simple flow (TL;DR view) -->
-    <div class="process-tldr">
-      <div class="process-tldr-label"><span>The 30-second version</span></div>
-      <div class="process-tldr-steps">
-        <div class="process-tldr-step">
-          <div class="process-tldr-dot">i</div>
-          <h4>Send the request</h4>
-          <p>Email or SMS, one customer or a list, in their language. We pick the right time.</p>
-        </div>
-        <div class="process-tldr-step">
-          <div class="process-tldr-dot">ii</div>
-          <h4>Open in one tap</h4>
-          <p>Customer lands on a 60-second form. Pick service, pick stars, pick a word. No blank box.</p>
-        </div>
-        <div class="process-tldr-step">
-          <div class="process-tldr-dot">iii</div>
-          <h4>AI drafts the review</h4>
-          <p>Three voice options — warm, specific, brief. Customer picks one and edits if they want.</p>
-        </div>
-        <div class="process-tldr-step">
-          <div class="process-tldr-dot">iv</div>
-          <h4>Posts to Google</h4>
-          <p>One tap. Lives on your real Google Business Profile. Plus a share-with-friend card.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="process-detail-divider"><span>The detailed walkthrough · six real screens</span></div>
 
     <div class="process-frame">
 
@@ -5648,101 +6917,6 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
     </div>
 
     </div>
-
-  </div>
-</section>
-
-<!-- ============ TESTIMONIALS — FOUNDING CUSTOMERS ============ -->
-<section class="testimonials-section" id="testimonials">
-  <div class="container">
-    <div class="section-header-center">
-      <div class="section-eyebrow">What founding customers are seeing</div>
-      <h2 class="section-title">From clinics to brokers — NY-metro shops are<br><em>turning customers into revenue.</em></h2>
-      <p class="section-sub">
-        From TCM clinics to insurance brokers to real-estate teams — same product, same loop, different industries. Where the goodwill used to stay silent, BAAM lets it compound.
-      </p>
-    </div>
-
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <div class="testimonial-quote">
-          We'd been asking patients to write Google reviews for six months — barely worked. The month after switching to BAAM, we got <strong>17 new 5-star reviews</strong>. Our ranking for "acupuncture Flushing" moved from #5 to #2. Weekends are now fully booked.
-        </div>
-        <div class="testimonial-meta">
-          <div class="testimonial-avatar">H</div>
-          <div>
-            <div class="testimonial-name">Dr. Huang</div>
-            <div class="testimonial-role">Acupuncture &amp; TCM Clinic, Flushing <span class="zh">黄医生针灸</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <div class="testimonial-quote">
-          We'd been on Birdeye at $299/month — completion rate was only 8%. The <strong>Chinese AI drafting</strong> was the unlock: most of our clients speak Cantonese or Mandarin and weren't going to write English reviews. Completion is now over 30%.
-        </div>
-        <div class="testimonial-meta">
-          <div class="testimonial-avatar">C</div>
-          <div>
-            <div class="testimonial-name">Lisa Chen</div>
-            <div class="testimonial-role">Insurance Broker, Brooklyn <span class="zh">华诚保险</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <div class="testimonial-quote">
-          In real estate, every referral matters. BAAM doesn't just collect reviews — the <strong>share-with-a-friend</strong> card after every 5-star has actually closed deals. Three of last month's listings came from the friend-share link.
-        </div>
-        <div class="testimonial-meta">
-          <div class="testimonial-avatar">W</div>
-          <div>
-            <div class="testimonial-name">David Wang</div>
-            <div class="testimonial-role">Real Estate Team, Long Island <span class="zh">东方地产</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ FOR BAAM STUDIO CLIENTS ============ -->
-<section class="baam-clients">
-  <div class="container">
-    <div class="baam-clients-card">
-      <div class="baam-clients-text">
-        <div class="section-eyebrow" style="color: var(--gold); color: #836A30;">For BAAM Studio clients</div>
-        <h3>The reputation layer of your <em>market presence system.</em></h3>
-        <p>
-          If you're already on BAAM Platform, BAAM Review fits as the reputation and revenue layer. Reviews feed into your website schema markup, lift your GEO scores, generate Xiaohongshu and Instagram content, and turn happy customers into referrals — all connected to the same content engine you already use.
-        </p>
-      </div>
-      <div class="baam-stack">
-        <div class="baam-stack-item">
-          <span class="baam-stack-mark">B</span>
-          <span class="baam-stack-name">BAAM Platform</span>
-          <span class="baam-stack-arrow">→</span>
-        </div>
-        <div class="baam-stack-item highlight">
-          <span class="baam-stack-mark">B</span>
-          <span class="baam-stack-name">BAAM Review</span>
-          <span class="baam-stack-arrow">●</span>
-        </div>
-        <div class="baam-stack-item">
-          <span class="baam-stack-mark">B</span>
-          <span class="baam-stack-name">BAAM Local</span>
-          <span class="baam-stack-arrow">→</span>
-        </div>
-        <div class="baam-stack-item">
-          <span class="baam-stack-mark">B</span>
-          <span class="baam-stack-name">BAAM SEO</span>
-          <span class="baam-stack-arrow">→</span>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -5750,7 +6924,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 <section class="compare-home" id="compare">
   <div class="container">
     <div class="section-header-center">
-      <div class="section-eyebrow">Honest comparison</div>
+      <div class="chapter-tag"><span class="ch-no">Appendix</span> · Honest Comparison</div>
       <h2 class="section-title">Why BAAM Review costs <em>67% less</em> than the alternatives.</h2>
       <p class="section-sub">Side-by-side with the two biggest review-management SaaS platforms and the DIY route most clinics actually take. Pricing verified from public sources, January 2026.</p>
     </div>
@@ -5866,375 +7040,44 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   </div>
 </section>
 
-<!-- ============ FAQ ============ -->
-<section class="faq-section" id="faq">
+<!-- ============ FOR BAAM STUDIO CLIENTS ============ -->
+<section class="baam-clients">
   <div class="container">
-    <div class="section-header-center">
-      <div class="section-eyebrow">Questions before you start</div>
-      <h2 class="section-title">The things <em>everyone asks</em> us.</h2>
-    </div>
-
-    <div class="faq-list">
-
-      <details class="faq-item">
-        <summary class="faq-q">
-          <span>What if I don't get any reviews during my free trial?</span>
-          <span class="faq-chevron">+</span>
-        </summary>
-        <div class="faq-a">
-          Then BAAM Review didn't earn its keep. You're never charged during the 30-day trial — we collect a card upfront for a smooth transition into month 2, but you can cancel anytime in your dashboard before day 30 and we charge $0. If you haven't seen reviews by day 30, either we need to fix something or you should leave. Most clinics see their first new review within 7 days of sending their first request batch.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">
-          <span>Do you spam my customers?</span>
-          <span class="faq-chevron">+</span>
-        </summary>
-        <div class="faq-a">
-          No. You upload a list of customers you've actually served, we send one email or SMS per customer with a 60-second review form. Every message is TCPA-compliant with one-click unsubscribe. We never email anyone twice within 60 days (deduplication is built-in). Most clinics send 20-50 review requests per week — far below any threshold that would feel like spam to your customers.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">
-          <span>Is this compliant with Google's review policies?</span>
-          <span class="faq-chevron">+</span>
-        </summary>
-        <div class="faq-a">
-          Yes. We never gate reviews (you can't filter out low-star reviews before they hit Google), we never write reviews on behalf of customers (the AI drafts a starting point, but the customer is always the author and editor of record), and we never offer financial incentives in exchange for positive reviews. The platform is built explicitly around <a href="https://support.google.com/contributionpolicy" target="_blank" rel="noopener">Google's contribution policies</a>. We sweat the rules so your profile doesn't get suspended.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">
-          <span>What if I want to cancel?</span>
-          <span class="faq-chevron">+</span>
-        </summary>
-        <div class="faq-a">
-          Cancel anytime, no questions asked. Month-to-month billing means you can leave at the end of any billing cycle with zero cancellation fee. Full Service requires 30 days notice (so we can do clean handover), but no minimum commitment. We don't believe in trapping customers — if BAAM Review isn't generating revenue for you, leaving is the right call.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">
-          <span>What makes BAAM different from Birdeye or Podium?</span>
-          <span class="faq-chevron">+</span>
-        </summary>
-        <div class="faq-a">
-          Three things. <strong>Price</strong>: we're roughly 67–82% cheaper than Birdeye/Podium, with no setup fee. <strong>Multilingual</strong>: we're the only major US platform with first-class support for English, Mandarin, and Spanish — built in from day one, not a translated UI bolt-on. <strong>Revenue attribution</strong>: we put a dollar number on every review (modeled but defensible). Birdeye and Podium tell you how many reviews you got. We tell you what they were worth. See the <a href="#compare">comparison table above</a>.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">
-          <span>What does the $1,728 per review actually mean?</span>
-          <span class="faq-chevron">+</span>
-        </summary>
-        <div class="faq-a">
-          It's the modeled value of one new 5-star Google review for a clinic like Dr. Huang's, over 24 months, across three measurable channels: Google search ranking (+$580), on-site widget trust (+$720), and friend-to-friend referrals (+$428). The underlying conversion rates come from industry research (Harvard Business School, BrightLocal, Whitespark), and the ticket/LTV values come from Dr. Huang's actual books. It's a model, not a measurement — but it's defensible math, not magic. <a href="#engine">See the full breakdown →</a>
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">
-          <span>Do I need a Google Business Profile already?</span>
-          <span class="faq-chevron">+</span>
-        </summary>
-        <div class="faq-a">
-          Yes. Google Business Profile is free to create and required for any business that wants to show up in local Google searches. If you don't have one yet, we'll walk you through creating one as part of your first setup call — usually takes 15-20 minutes including Google's verification step. After that, BAAM Review connects via OAuth in about 30 seconds.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">
-          <span>Can I use this for multiple locations?</span>
-          <span class="faq-chevron">+</span>
-        </summary>
-        <div class="faq-a">
-          Yes. Self-serve: your first location is $89/mo (founding), each additional location is $79/mo. So 5 locations = $89 + 4×$79 = $405/mo; 10 locations = $89 + 9×$79 = $800/mo. Each location is its own subscription with its own card, dashboard, brand settings, and review attribution — cancel one without touching the others. Full Service: every location is a flat $299/mo (founding), card or pay-by-check. Every location includes a 30-day free trial. Birdeye and Podium charge $200–400 per location at this volume.
-        </div>
-      </details>
-
-    </div>
-  </div>
-</section>
-
-<!-- ============ USER JOURNEY (signup → trial → keep using) ============ -->
-<style>
-  .journey-section { background: var(--cream); padding: 100px 0 90px; }
-  .journey-section .section-eyebrow { color: var(--forest); }
-  .journey-section .section-title em { color: var(--gold); font-style: italic; }
-  .journey-steps {
-    list-style: none; padding: 0; margin: 56px 0 0;
-    display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px;
-    counter-reset: journey;
-  }
-  .journey-step {
-    background: var(--paper); border: 1px solid var(--border); border-radius: 14px;
-    padding: 22px 18px 20px; position: relative;
-    box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-  }
-  .journey-step:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-  .journey-step-num {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: var(--gold); color: var(--ink);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Newsreader', 'Times New Roman', serif;
-    font-size: 17px; font-weight: 600; margin-bottom: 14px;
-  }
-  .journey-step-title {
-    font-family: 'Newsreader', 'Times New Roman', serif;
-    font-size: 17px; font-weight: 500; color: var(--ink);
-    margin: 0 0 8px; line-height: 1.3;
-  }
-  .journey-step-body {
-    font-size: 13.5px; line-height: 1.55; color: var(--text-soft); margin: 0;
-  }
-  .journey-step-body strong { color: var(--ink); font-weight: 600; }
-  .journey-cta {
-    margin-top: 48px; display: flex; flex-direction: column; align-items: center; gap: 14px;
-  }
-  .journey-cta-note { font-size: 13px; color: var(--text-soft); }
-  @media (max-width: 1100px) {
-    .journey-steps { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media (max-width: 720px) {
-    .journey-steps { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 460px) {
-    .journey-steps { grid-template-columns: 1fr; }
-  }
-</style>
-<section class="journey-section" id="how-to-start">
-  <div class="container">
-    <div class="section-header-center">
-      <div class="section-eyebrow">Getting started</div>
-      <h2 class="section-title">From visit to first review, <em>in six steps.</em></h2>
-      <p class="section-sub">
-        Sign up → confirm email → pick plan (free) → connect Google → pay per location with 30-day free trial → keep using. No surprises, no setup fees, cancel any single location anytime.
-      </p>
-    </div>
-
-    <ol class="journey-steps">
-      <li class="journey-step">
-        <div class="journey-step-num">1</div>
-        <h4 class="journey-step-title">Sign up</h4>
-        <p class="journey-step-body">Name, email, password. About 30 seconds. <strong>No card asked.</strong></p>
-      </li>
-      <li class="journey-step">
-        <div class="journey-step-num">2</div>
-        <h4 class="journey-step-title">Confirm your email</h4>
-        <p class="journey-step-body">Click the link we email you to activate your account.</p>
-      </li>
-      <li class="journey-step">
-        <div class="journey-step-num">3</div>
-        <h4 class="journey-step-title">Pick your plan</h4>
-        <p class="journey-step-body">Self-service or Full-service. Still free — <strong>no card yet</strong>.</p>
-      </li>
-      <li class="journey-step">
-        <div class="journey-step-num">4</div>
-        <h4 class="journey-step-title">Connect Google</h4>
-        <p class="journey-step-body">One-click Google Business Profile login. Add every location you own.</p>
-      </li>
-      <li class="journey-step">
-        <div class="journey-step-num">5</div>
-        <h4 class="journey-step-title">Set up billing</h4>
-        <p class="journey-step-body">Per-location subscription with a <strong>30-day free trial</strong>. Card saved for after day 30.</p>
-      </li>
-      <li class="journey-step">
-        <div class="journey-step-num">6</div>
-        <h4 class="journey-step-title">Send your first request</h4>
-        <p class="journey-step-body">Use the product free for 30 days. Cancel any location anytime — independently.</p>
-      </li>
-    </ol>
-
-    <div class="journey-cta">
-      <a href="https://review.baamplatform.com/signup" class="btn btn-primary btn-large">Start free trial →</a>
-      <span class="journey-cta-note">30 days free · cancel anytime before day 30 and pay nothing.</span>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 10× CERTAINTY BANNER (transition into pricing) ============ -->
-<section class="certainty-section">
-  <div class="container">
-    <div class="certainty-banner">
-      <div class="certainty-seal">10<span class="x">×</span></div>
-      <div class="certainty-text">
-        <h3>Our 10× value promise.</h3>
+    <div class="baam-clients-card">
+      <div class="baam-clients-text">
+        <div class="section-eyebrow" style="color: var(--gold); color: #836A30;">For BAAM Studio clients</div>
+        <h3>The reputation layer of your <em>market presence system.</em></h3>
         <p>
-          Measured against the <strong>median</strong> per-review value for your industry — not the high end, not the low end — we're confident the Review Revenue we generate will be <strong>at least 10× what you pay us</strong>. The only precondition: you keep sending us real customer lists each month. We don't conjure customers from thin air — we translate the goodwill you've already earned into reviews Google can see.
+          If you're already on BAAM Platform, BAAM Review fits as the reputation and revenue layer. Reviews feed into your website schema markup, lift your GEO scores, generate Xiaohongshu and Instagram content, and turn happy customers into referrals — all connected to the same content engine you already use.
         </p>
       </div>
-      <div class="certainty-stamp">
-        BAAM × You<br>10× Value<br>Together
+      <div class="baam-stack">
+        <div class="baam-stack-item">
+          <span class="baam-stack-mark">B</span>
+          <span class="baam-stack-name">BAAM Platform</span>
+          <span class="baam-stack-arrow">→</span>
+        </div>
+        <div class="baam-stack-item highlight">
+          <span class="baam-stack-mark">B</span>
+          <span class="baam-stack-name">BAAM Review</span>
+          <span class="baam-stack-arrow">●</span>
+        </div>
+        <div class="baam-stack-item">
+          <span class="baam-stack-mark">B</span>
+          <span class="baam-stack-name">BAAM Local</span>
+          <span class="baam-stack-arrow">→</span>
+        </div>
+        <div class="baam-stack-item">
+          <span class="baam-stack-mark">B</span>
+          <span class="baam-stack-name">BAAM SEO</span>
+          <span class="baam-stack-arrow">→</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ PRICING TEASER ============ -->
-<div class="pricing-teaser">
-  <div class="pricing-teaser-content">
-    <div class="section-eyebrow">Two paths, one product</div>
-    <h2 class="section-title">Pricing that respects <em>how you want to work.</em></h2>
-    <p style="font-family: 'Newsreader', serif; font-size: 19px; color: rgba(250, 247, 242, 0.78); max-width: 660px; margin-top: 8px;">
-      Run it yourself with our platform, or let us run it for you. Founding-customer pricing locked forever for the first 50 self-serve and first 20 Full Service signups.
-    </p>
 
-    <div class="tier-strip">
-
-      <!-- PATH A: SELF-SERVE -->
-      <div class="tier-mini">
-        <div class="tier-mini-eyebrow">Path A · Self-serve</div>
-        <div class="tier-mini-name">Run it yourself</div>
-        <div class="tier-mini-tag">Log in, send review requests, reply to reviews. You drive it.</div>
-        <div class="tier-mini-price-row">
-          <span class="tier-mini-price-pre">From</span>
-          <span class="tier-mini-price">$99<span class="tier-mini-price-period">/mo</span></span>
-        </div>
-        <div class="tier-mini-founding"><strong>$89/mo</strong> founding · 30-day free trial</div>
-
-        <ul class="tier-mini-feature-list">
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Single location, unlimited review requests</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI drafting in EN / 中文 / Español</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Lists, batch sends, private feedback path</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Add locations at +$79/mo each</li>
-        </ul>
-
-        <a href="/pricing#self-serve" class="tier-mini-cta">
-          See self-serve pricing
-          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </a>
-      </div>
-
-      <!-- PATH B: FULL SERVICE -->
-      <div class="tier-mini featured">
-        <div class="tier-mini-eyebrow">Path B · Full Service</div>
-        <div class="tier-mini-name">We run it for you</div>
-        <div class="tier-mini-tag">Send us your customer list each week. We handle everything else.</div>
-        <div class="tier-mini-price-row">
-          <span class="tier-mini-price-pre" style="color: rgba(232, 217, 181, 0.7);">From</span>
-          <span class="tier-mini-price">$399<span class="tier-mini-price-period">/mo</span></span>
-        </div>
-        <div class="tier-mini-founding"><strong>$299/mo</strong> per location founding · 30-day free trial · setup waived</div>
-
-        <ul class="tier-mini-feature-list">
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We send all review requests, weekly batches</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We reply to every review in your voice</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We catch private feedback before it goes public</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Every additional location at the same $299/mo (no $199 tier — flat)</li>
-        </ul>
-
-        <a href="/pricing#full-service" class="tier-mini-cta">
-          See Full Service pricing
-          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </a>
-      </div>
-
-    </div>
-
-    <div class="pricing-cta-row">
-      <a href="/pricing" class="btn btn-gold btn-large">See full pricing →</a>
-      <span class="founding-note">
-        <span class="founding-dot"></span>
-        23 self-serve · 17 Full Service founding spots left — locked forever.
-      </span>
-    </div>
-  </div>
-</div>
-
-<!-- ============ THE SEVEN-STAGE LOOP ============ -->
-<section class="loop-section" id="loop">
-  <div class="container">
-    <div class="section-header-center">
-      <div class="section-eyebrow">The Review-to-Revenue Loop</div>
-      <h2 class="section-title">Seven stages. <em>One product.</em></h2>
-      <p class="section-sub">Most review tools do one or two of these. We do all seven, in three languages, in one place. That's the difference between a $39 review collection tool and a $99 customer growth engine.</p>
-    </div>
-
-    <div class="loop-visual">
-      <div class="loop-grid">
-        <div class="stage-card">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
-          </span>
-          <div class="stage-num">i.</div>
-          <h3 class="stage-name">Collect</h3>
-          <p class="stage-desc">Three taps, an AI-assisted draft, a Google review in 60 seconds. In any of three languages.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <div class="stage-card">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/></svg>
-          </span>
-          <div class="stage-num">ii.</div>
-          <h3 class="stage-name">Publish</h3>
-          <p class="stage-desc">To Google, Yelp, or as a first-party testimonial. Always a private feedback path. Never gated.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
-          </span>
-          <div class="stage-num">iii.</div>
-          <h3 class="stage-name">Display</h3>
-          <p class="stage-desc">Reviews on your website as conversion-driving widgets with schema markup. Book/Call CTAs baked in.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/></svg>
-          </span>
-          <div class="stage-num">iv.</div>
-          <h3 class="stage-name">Distribute</h3>
-          <p class="stage-desc">Auto-generate branded social cards for Xiaohongshu, Instagram, Facebook. AI-drafted GBP posts. No US competitor touches this.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-      </div>
-
-      <div class="loop-arrow-down">
-        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
-      </div>
-
-      <div class="loop-grid-bottom">
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
-          </span>
-          <div class="stage-num">v.</div>
-          <h3 class="stage-name">Convert</h3>
-          <p class="stage-desc">Review-themed landing pages and review-grounded ad copy in your customers' real language. Reviews become bookings.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-          </span>
-          <div class="stage-num">vi.</div>
-          <h3 class="stage-name">Refer</h3>
-          <p class="stage-desc">After every great review, a "Share with a Friend" link with QR card. Track every referral back to its source.</p>
-          <span class="stage-tier-badge growth">Growth</span>
-        </div>
-        <div class="stage-card gold-highlight">
-          <span class="stage-icon">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/></svg>
-          </span>
-          <div class="stage-num">vii.</div>
-          <h3 class="stage-name">Compound</h3>
-          <p class="stage-desc">Review theme mining. Best advocates surfacing. Auto-published testimonial SEO pages. Reviews become ongoing assets.</p>
-          <span class="stage-tier-badge agency">Growth + Agency</span>
-        </div>
-      </div>
-
-      <p class="loop-summary">
-        <strong>Growth</strong> unlocks stages <strong>i through vi</strong>. <strong>Full Service</strong> means we run all six for you. <strong>Agency</strong> adds <strong>vii at scale</strong> across many client accounts. Every stage compounds the last.
-      </p>
-    </div>
-  </div>
-</section>
 
 <!-- ============ FOOTER ============ -->
 <footer>

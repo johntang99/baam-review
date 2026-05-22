@@ -474,10 +474,18 @@ const FUZZY_HINTS: Array<[string, ReviewCategory]> = [
   // Beauty / fitness
   ["barber", "hair_salon"],
   ["hair", "hair_salon"],
+  ["理容", "hair_salon"], // Japanese / Chinese: barbershop
+  ["理髪", "hair_salon"], // Japanese: barbershop
+  ["理發", "hair_salon"], // traditional Chinese: barbershop
+  ["理发", "hair_salon"], // simplified Chinese: barbershop
+  ["美髮", "hair_salon"], // traditional Chinese: hair salon
+  ["美发", "hair_salon"], // simplified Chinese: hair salon
   ["nail", "nail_salon"],
   ["manicur", "nail_salon"],
+  ["美甲", "nail_salon"], // Chinese: nail salon
   ["spa", "spa_massage"],
   ["massage", "spa_massage"],
+  ["按摩", "spa_massage"], // Chinese: massage
   ["reflexolog", "spa_massage"],
   ["facial", "spa_massage"],
   ["yoga", "gym_fitness"],
@@ -500,11 +508,27 @@ const FUZZY_HINTS: Array<[string, ReviewCategory]> = [
   ["tutor", "tutoring_test_prep"],
   ["test prep", "tutoring_test_prep"],
   ["after-school", "tutoring_test_prep"],
+  ["after school", "tutoring_test_prep"],
+  ["educational institution", "tutoring_test_prep"],
+  ["education center", "tutoring_test_prep"],
+  ["learning center", "tutoring_test_prep"],
+  ["training center", "tutoring_test_prep"],
+  ["补习", "tutoring_test_prep"], // simplified Chinese: cram school
+  ["補習", "tutoring_test_prep"], // traditional Chinese: cram school
+  ["教育机构", "tutoring_test_prep"], // simplified Chinese: educational institution
+  ["教育機構", "tutoring_test_prep"], // traditional Chinese
   ["language school", "language_school"],
   ["esl", "language_school"],
+  ["语言学校", "language_school"], // simplified Chinese
+  ["語言學校", "language_school"], // traditional Chinese
   ["translat", "translation_immigration"],
   ["interpreter", "translation_immigration"],
   ["notary", "translation_immigration"],
+  ["翻译", "translation_immigration"], // simplified Chinese: translation
+  ["翻譯", "translation_immigration"], // traditional Chinese
+  ["翻訳", "translation_immigration"], // Japanese: translation
+  ["公证", "translation_immigration"], // simplified Chinese: notary
+  ["公證", "translation_immigration"], // traditional Chinese
 
   // Professional
   ["accountant", "accounting_tax"],

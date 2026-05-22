@@ -1199,12 +1199,12 @@ section { padding: 100px 0; position: relative; }
 
 /* ===== Chapter 5 · Solution — what the customer sees ===== */
 .sp-row {
-  margin: 60px auto 0;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   gap: 56px;
   align-items: center;
-  max-width: 1060px;
+  max-width: 940px;
 }
 .sp-copy h3 {
   font-family: 'Fraunces', serif;
@@ -4520,8 +4520,8 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 
 /* ============ 4-STEP SIMPLE FLOW (above 6-screen process walkthrough) ============ */
 .process-tldr {
-  margin: 56px auto 88px;
-  max-width: 1000px;
+  margin: 48px auto 56px;
+  max-width: 940px;
   position: relative;
 }
 .process-tldr-label {
@@ -4920,6 +4920,146 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 @media (max-width: 760px) {
   .testimonials-section { padding: 72px 0; }
   .testimonial-card { padding: 28px 24px; }
+}
+
+/* ===== Chapter 5 — three sub-parts ===== */
+.solpart { margin: 60px auto 0; max-width: 1176px; }
+.solpart:first-of-type { margin-top: 4px; }
+.solpart-tag { display: flex; align-items: center; gap: 13px; margin-bottom: 13px; }
+.solpart-num {
+  font-family: 'Fraunces', serif; font-weight: 500; font-size: 14px;
+  color: var(--cream); background: var(--forest);
+  width: 29px; height: 29px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.solpart-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--forest);
+}
+.solpart-rule { flex: 1; height: 1px; background: var(--border); }
+.solpart-title {
+  font-family: 'Fraunces', serif; font-weight: 400; font-size: 30px;
+  line-height: 1.2; letter-spacing: -0.022em; color: var(--ink); margin-bottom: 10px;
+}
+.solpart-title em { font-style: italic; color: var(--forest); }
+.solpart-lede {
+  font-family: 'Newsreader', serif; font-size: 18px; line-height: 1.6;
+  color: var(--text-soft); max-width: 620px; margin-bottom: 30px;
+}
+.solpart-lede strong { color: var(--ink); font-weight: 600; }
+
+/* sub-part 2 — what you do */
+.youdo-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  max-width: 940px; margin: 0 auto;
+}
+.youdo-card {
+  background: var(--paper); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 26px; box-shadow: var(--shadow-sm);
+}
+.youdo-num {
+  font-family: 'Fraunces', serif; font-weight: 400; font-size: 34px;
+  color: var(--gold); line-height: 1; margin-bottom: 13px;
+}
+.youdo-card h4 {
+  font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px;
+  color: var(--ink); margin-bottom: 9px;
+}
+.youdo-card p {
+  font-family: 'Newsreader', serif; font-size: 15.5px; line-height: 1.6;
+  color: var(--text-soft);
+}
+
+/* sub-part 3 — what we do */
+.wedo-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+  max-width: 940px; margin: 0 auto;
+}
+.wedo-step {
+  background: var(--paper); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 13px 18px; text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.wedo-no {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--gold-soft); font-weight: 600; margin-bottom: 8px;
+}
+.wedo-step h5 {
+  font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px;
+  color: var(--forest); margin-bottom: 7px;
+}
+.wedo-step p {
+  font-family: 'Newsreader', serif; font-size: 12.5px; line-height: 1.5;
+  color: var(--text-soft);
+}
+
+/* closing partnership handoff */
+.partner-block {
+  max-width: 1176px; margin: 60px auto 0;
+  background: var(--ink); color: var(--cream);
+  border-radius: 18px; padding: 46px 50px;
+  position: relative; overflow: hidden;
+}
+.partner-block::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 86% 16%, rgba(201,169,97,0.16), transparent 56%);
+  pointer-events: none;
+}
+.partner-eyebrow {
+  position: relative; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold-soft); margin-bottom: 14px;
+}
+.partner-block h3 {
+  position: relative; font-family: 'Fraunces', serif; font-weight: 400;
+  font-size: 27px; line-height: 1.25; color: var(--cream); margin-bottom: 14px;
+}
+.partner-desc {
+  position: relative; font-family: 'Newsreader', serif;
+  font-size: 16px; line-height: 1.7; color: rgba(250,247,242,0.8);
+  max-width: 640px; margin-bottom: 28px;
+}
+.partner-actions {
+  position: relative; display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+}
+.partner-pdf-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--gold); color: var(--ink);
+  font-family: 'Onest', sans-serif; font-weight: 600; font-size: 15px;
+  padding: 14px 26px; border-radius: 9px; transition: background 0.15s;
+}
+.partner-pdf-btn:hover { background: var(--gold-soft); }
+.partner-pdf-btn svg { width: 17px; height: 17px; }
+.partner-link {
+  position: relative; font-family: 'Newsreader', serif; font-size: 13.5px;
+  color: rgba(250,247,242,0.6);
+}
+.partner-link b { color: var(--gold-soft); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+/* partner links inside the Full Service pricing card */
+.tier-partner-row {
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid rgba(232,217,181,0.22);
+  display: flex; flex-direction: column; gap: 9px;
+}
+.tier-partner-row a {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Onest', sans-serif; font-size: 13px; font-weight: 500;
+  color: var(--gold-soft);
+}
+.tier-partner-row a:hover { color: var(--gold); }
+.tier-partner-row a .tp-ic {
+  width: 18px; height: 18px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(232,217,181,0.14); color: var(--gold-soft);
+  border-radius: 5px; font-size: 10px;
+}
+@media (max-width: 860px) {
+  .youdo-grid { grid-template-columns: 1fr; }
+  .wedo-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 520px) {
+  .wedo-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -5587,9 +5727,24 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   <div class="container">
     <div class="section-header-center">
       <div class="chapter-tag"><span class="ch-no">Chapter 5</span> · The Solution</div>
-      <h2 class="section-title">From four barriers to <em>three taps.</em><br>Under 60 seconds, in their own language.</h2>
+      <h2 class="section-title">One solution &mdash; easy for your <em>customer, for you, and for us.</em></h2>
       <p class="section-sub">
-        BAAM dismantles those four barriers, one at a time. Your customer opens an email, picks three tags, lets the AI draft a review — then taps once to send it to Google. The whole flow runs in under 60 seconds, in their language. No blank box. No friction. Nothing to figure out.
+        BAAM Review breaks review marketing into three simple jobs: your customer reviews in under 60 seconds; you send one list a week; the collecting, replying, and running &mdash; all of it &mdash; is handled by us.
+      </p>
+    </div>
+
+    <!-- Sub-part 1 — the customer -->
+    <div class="solpart">
+      <div class="solpart-tag">
+        <span class="solpart-num">1</span>
+        <span class="solpart-label">The customer&rsquo;s side</span>
+        <span class="solpart-rule"></span>
+      </div>
+      <h3 class="solpart-title">From four barriers to <em>three taps</em> &mdash; under 60 seconds.</h3>
+      <p class="solpart-lede">
+        BAAM dismantles those four barriers, one at a time. Your customer opens an
+        email, picks three tags, lets AI draft a review &mdash; then taps once to send
+        it to Google. No blank box, no friction, nothing to figure out.
       </p>
     </div>
 
@@ -5661,6 +5816,109 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
             Dr. Huang is incredibly professional — the acupuncture noticeably improved my years-long migraines. The clinic is spotless, and the doctor is fluent in both English and Chinese. Truly caring service.
           </div>
           <div class="sp-cta">Looks great — send to Google →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-part 2 — what you do -->
+    <div class="solpart">
+      <div class="solpart-tag">
+        <span class="solpart-num">2</span>
+        <span class="solpart-label">Your side</span>
+        <span class="solpart-rule"></span>
+      </div>
+      <h3 class="solpart-title">One weekly list &mdash; <em>and almost nothing else.</em></h3>
+      <p class="solpart-lede">
+        <strong>Your day-to-day effort is almost zero.</strong> You do just two things
+        &mdash; we handle everything that follows.
+      </p>
+    </div>
+    <div class="youdo-grid">
+      <div class="youdo-card">
+        <div class="youdo-num">1</div>
+        <h4>A weekly customer list</h4>
+        <p>Send us the customers who had a good experience and agreed to be contacted &mdash; a spreadsheet, Excel, or CSV, with no repeats from earlier weeks.</p>
+      </div>
+      <div class="youdo-card">
+        <div class="youdo-num">2</div>
+        <h4>Confirm the reward amounts</h4>
+        <p>Set a small thank-you for reviewers and the friends they refer &mdash; for example, $20 off the next visit, or a small gift.</p>
+      </div>
+      <div class="youdo-card">
+        <div class="youdo-num">3</div>
+        <h4>Then hand it to us</h4>
+        <p>No sending invites, no chasing reviews, no writing replies. Every step after that is ours.</p>
+      </div>
+    </div>
+
+    <!-- Sub-part 3 — what we do -->
+    <div class="solpart">
+      <div class="solpart-tag">
+        <span class="solpart-num">3</span>
+        <span class="solpart-label">Our side</span>
+        <span class="solpart-rule"></span>
+      </div>
+      <h3 class="solpart-title">A team that <em>keeps it running.</em></h3>
+      <p class="solpart-lede">
+        Once your list reaches us, this is what we do for you every week &mdash;
+        steady, professional, never interrupted.
+      </p>
+    </div>
+    <div class="wedo-grid">
+      <div class="wedo-step">
+        <div class="wedo-no">01</div>
+        <h5>Prepare</h5>
+        <p>Clean and verify every list — fix errors, remove duplicates.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">02</div>
+        <h5>Send</h5>
+        <p>Batch by batch, in each customer's language, at a safe pace.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">03</div>
+        <h5>Monitor</h5>
+        <p>Track delivery, opens, and new reviews every day.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">04</div>
+        <h5>Respond</h5>
+        <p>Reply to every review within 24 hours, in your voice.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">05</div>
+        <h5>Remind</h5>
+        <p>Gently follow up customers who haven't reviewed yet.</p>
+      </div>
+      <div class="wedo-step">
+        <div class="wedo-no">06</div>
+        <h5>Report</h5>
+        <p>A monthly report — results, insights, recommendations.</p>
+      </div>
+    </div>
+
+    <!-- Closing handoff — full partnership detail -->
+    <div class="partner-block" id="partnership">
+      <div class="partner-eyebrow">The full partnership · Self-serve &amp; Full Service</div>
+      <h3>That&rsquo;s the whole partnership. Every detail is in this guide.</h3>
+      <p class="partner-desc">
+        From Google Business Profile access and the exact customer-list fields to our
+        step-by-step process and how we handle negative reviews &mdash; the complete
+        detail is laid out in the partner guide. Whether you run it yourself or have us
+        manage it, you&rsquo;re welcome to read it.
+      </p>
+      <div class="partner-actions">
+        <!-- on deploy, place the PDF at this path -->
+        <a href="/BAAM-Review-How-We-Work-Together.pdf" class="partner-pdf-btn" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download the partner guide (PDF)
+        </a>
+        <div class="partner-link">
+          Shareable link · <b>baamreview.com/#partnership</b>
         </div>
       </div>
     </div>
@@ -5896,6 +6154,10 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           See Full Service pricing
           <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
+        <div class="tier-partner-row">
+          <a href="#partnership"><span class="tp-ic">▸</span>See how we work together</a>
+          <a href="/BAAM-Review-How-We-Work-Together.pdf" download><span class="tp-ic">▾</span>Download the partner guide (PDF)</a>
+        </div>
       </div>
 
     </div>
