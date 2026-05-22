@@ -4,58 +4,58 @@ import { useState, useTransition } from "react";
 import { Check, Save } from "lucide-react";
 import type {
   OfferImageAspect,
-  ReferralConfig,
+  RewardConfig,
 } from "@/lib/database.types";
 import { Field } from "@/components/ui/section";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LogoUploader } from "@/components/locations/logo-uploader";
-import { OfferBlock } from "@/app/s/[token]/offer-block";
 import { cn } from "@/lib/utils";
-import { saveReferralConfig } from "./actions";
+import { ReviewerRewardCard } from "@/components/review/reviewer-reward-card";
+import { saveRewardConfig } from "./reward-actions";
 
-interface ReferralSetupProps {
+interface RewardSetupProps {
   locationId: string;
-  /** Account ID — used for the storage upload path so the RLS policy on the
-   * `logos` bucket (scoped to account_id prefix) allows the write. */
+  /** Account ID — used for the storage upload path (logos bucket RLS). */
   accountId: string;
-  locationSlug: string;
   brandColor: string;
   bookingFallback: string | null;
-  appUrl: string;
-  initialConfig: ReferralConfig;
+  displayName: string;
+  initialConfig: RewardConfig;
 }
 
 interface Draft {
   enabled: boolean;
-  offer_title: string;
-  offer_subtitle: string;
-  offer_description: string;
-  offer_code: string;
-  offer_image_url: string | null;
-  offer_image_aspect: OfferImageAspect;
-  accent_color: string;
-  cta_label: string;
-  cta_url: string;
+  title: string;
+  subtitle: string;
+  code: string;
   expires_at: string; // YYYY-MM-DD or ""
+  booking_enabled: boolean;
+  booking_url: string;
+  booking_cta_label: string;
+  image_url: string | null;
+  image_aspect: OfferImageAspect;
+  description: string;
+  accent_color: string;
 }
 
-/** Curated palette mirrors the prototype's preset row. Owner can pick one
- * or override with a custom hex via the color input. */
 const ACCENT_PRESETS: { value: string; label: string }[] = [
+  { value: "#C9A961", label: "Gold (default)" },
+  { value: "#A88847", label: "Bronze" },
+  { value: "#1F4D3F", label: "Forest" },
   { value: "#962D22", label: "Clinic red" },
-  { value: "#1F4D3F", label: "BAAM forest" },
-  { value: "#0F4C81", label: "Sapphire" },
-  { value: "#7A4A1F", label: "Bronze" },
   { value: "#5E3F76", label: "Aubergine" },
-  { value: "#2F5F4F", label: "Sage" },
+  { value: "#3F6A8E", label: "Sapphire" },
 ];
 
 const ASPECT_OPTIONS: { value: OfferImageAspect; label: string; hint: string }[] = [
   { value: "4:3", label: "4:3", hint: "Classic landscape (default)" },
   { value: "16:9", label: "16:9", hint: "Wide landscape" },
   { value: "1:1", label: "1:1", hint: "Square" },
+  { value: "3:4", label: "3:4", hint: "Portrait" },
 ];
+
+const DEFAULT_ACCENT = "#C9A961";
 
 function toDateInput(iso: string | null | undefined): string {
   if (!iso) return "";
@@ -64,27 +64,27 @@ function toDateInput(iso: string | null | undefined): string {
   return d.toISOString().slice(0, 10);
 }
 
-export function ReferralSetup({
+export function RewardSetup({
   locationId,
   accountId,
-  locationSlug,
   brandColor,
   bookingFallback,
-  appUrl: _appUrl,
+  displayName,
   initialConfig,
-}: ReferralSetupProps) {
+}: RewardSetupProps) {
   const [draft, setDraft] = useState<Draft>({
-    enabled: initialConfig.enabled !== false,
-    offer_title: initialConfig.offer_title ?? "",
-    offer_subtitle: initialConfig.offer_subtitle ?? "",
-    offer_description: initialConfig.offer_description ?? "",
-    offer_code: initialConfig.offer_code ?? "",
-    offer_image_url: initialConfig.offer_image_url ?? null,
-    offer_image_aspect: initialConfig.offer_image_aspect ?? "4:3",
-    accent_color: initialConfig.accent_color ?? brandColor,
-    cta_label: initialConfig.cta_label ?? "Book with this offer",
-    cta_url: initialConfig.cta_url ?? "",
+    enabled: initialConfig.enabled === true,
+    title: initialConfig.title ?? "",
+    subtitle: initialConfig.subtitle ?? "",
+    code: initialConfig.code ?? "",
     expires_at: toDateInput(initialConfig.expires_at),
+    booking_enabled: initialConfig.booking_enabled !== false,
+    booking_url: initialConfig.booking_url ?? "",
+    booking_cta_label: initialConfig.booking_cta_label ?? "",
+    image_url: initialConfig.image_url ?? null,
+    image_aspect: initialConfig.image_aspect ?? "4:3",
+    description: initialConfig.description ?? "",
+    accent_color: initialConfig.accent_color ?? DEFAULT_ACCENT,
   });
 
   const [savedAt, setSavedAt] = useState<number | null>(null);
@@ -94,21 +94,22 @@ export function ReferralSetup({
   function save() {
     setError(null);
     startTransition(async () => {
-      const res = await saveReferralConfig(locationId, {
+      const res = await saveRewardConfig(locationId, {
         enabled: draft.enabled,
-        offer_title: draft.offer_title || null,
-        offer_subtitle: draft.offer_subtitle || null,
-        offer_description: draft.offer_description || null,
-        offer_code: draft.offer_code || null,
-        offer_image_url: draft.offer_image_url,
-        offer_image_aspect: draft.offer_image_aspect,
+        title: draft.title || null,
+        subtitle: draft.subtitle || null,
+        code: draft.code || null,
+        expires_at: draft.expires_at || null,
+        booking_enabled: draft.booking_enabled,
+        booking_url: draft.booking_url || null,
+        booking_cta_label: draft.booking_cta_label || null,
+        image_url: draft.image_url,
+        image_aspect: draft.image_aspect,
+        description: draft.description || null,
         accent_color:
-          draft.accent_color && draft.accent_color !== brandColor
+          draft.accent_color && draft.accent_color !== DEFAULT_ACCENT
             ? draft.accent_color
             : null,
-        cta_label: draft.cta_label || null,
-        cta_url: draft.cta_url || null,
-        expires_at: draft.expires_at || null,
       });
       if (res.ok) {
         setSavedAt(Date.now());
@@ -126,9 +127,7 @@ export function ReferralSetup({
           <input
             type="checkbox"
             checked={draft.enabled}
-            onChange={(e) =>
-              setDraft({ ...draft, enabled: e.target.checked })
-            }
+            onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })}
             className="sr-only"
           />
           <span
@@ -139,69 +138,71 @@ export function ReferralSetup({
                 : "border-border-base bg-paper",
             )}
           >
-            {draft.enabled && <Check className="h-3 w-3 text-cream stroke-[3.5]" />}
+            {draft.enabled && (
+              <Check className="h-3 w-3 text-cream stroke-[3.5]" />
+            )}
           </span>
           <div className="text-left">
             <div className="text-[13.5px] font-medium text-ink">
-              Show the referral offer on share landing pages
+              Show the reward on the thank-you page
             </div>
             <div className="text-[12px] text-text-soft">
-              Turning this off hides the offer block but keeps the
-              recommendation card.
+              Turning this off hides the reward card. The share card still
+              renders below.
             </div>
           </div>
         </label>
 
         <div className="space-y-4">
           <h3 className="font-display text-[17px] font-medium text-ink">
-            1. Offer title
+            1. Reward title
             <span className="ml-2 font-sans text-[12px] font-normal text-text-muted">
-              — what hooks the friend
+              — what the reviewer earns
             </span>
           </h3>
 
           <Field
-            label="Offer title"
-            htmlFor="ref_title"
-            hint="The headline shown front-and-center on the share landing. e.g. “$20 off your first visit”, “Free consultation”, “10% off any product”."
+            label="Reward title"
+            htmlFor="rw_title"
+            hint="Works for any business — visit, purchase, service, repair. e.g. “You earned $20 off your next visit”, “Free oil change with your next service”, “10% off any product”."
           >
             <Input
-              id="ref_title"
-              value={draft.offer_title}
+              id="rw_title"
+              value={draft.title}
               onChange={(e) =>
-                setDraft({ ...draft, offer_title: e.target.value.slice(0, 80) })
+                setDraft({ ...draft, title: e.target.value.slice(0, 100) })
               }
-              maxLength={80}
-              placeholder="$20 off your first visit"
+              maxLength={100}
+              placeholder="You earned $20 off your next visit"
             />
           </Field>
         </div>
 
         <div className="space-y-4">
           <h3 className="font-display text-[17px] font-medium text-ink">
-            2. Offer subtitle
+            2. Reward subtitle
             <span className="ml-2 font-sans text-[12px] font-normal text-text-muted">
-              — one supporting line
+              — how to redeem
             </span>
           </h3>
 
           <Field
-            label="Offer subtitle"
-            htmlFor="ref_subtitle"
-            hint="Short fine print right below the title. Restrictions, eligibility, how to redeem. For longer detail use the description below."
+            label="Reward subtitle"
+            htmlFor="rw_subtitle"
+            hint="e.g. “Show this page at next appointment”, “Mention this code at checkout”, “Apply at our online store”. Keep it warm and clear."
           >
             <textarea
-              id="ref_subtitle"
-              value={draft.offer_subtitle}
+              id="rw_subtitle"
+              value={draft.subtitle}
               onChange={(e) =>
                 setDraft({
                   ...draft,
-                  offer_subtitle: e.target.value.slice(0, 240),
+                  subtitle: e.target.value.slice(0, 240),
                 })
               }
               rows={2}
               maxLength={240}
-              placeholder="Use this code at booking. Valid for new patients only."
+              placeholder="Show this page at your next visit, or mention the code when you call."
               className="w-full rounded-md border border-border-base bg-paper px-3 py-2 text-[14px] text-text shadow-sm transition-colors focus:border-forest focus:outline-none"
             />
           </Field>
@@ -215,28 +216,28 @@ export function ReferralSetup({
           <div className="grid grid-cols-2 gap-3">
             <Field
               label="Discount code"
-              htmlFor="ref_code"
-              hint="Auto-uppercased, no spaces."
+              htmlFor="rw_code"
+              hint="Auto-uppercased, no spaces. Can be the same as the friend's code or different."
             >
               <Input
-                id="ref_code"
-                value={draft.offer_code}
+                id="rw_code"
+                value={draft.code}
                 onChange={(e) =>
                   setDraft({
                     ...draft,
-                    offer_code: e.target.value
+                    code: e.target.value
                       .replace(/\s+/g, "")
                       .toUpperCase()
                       .slice(0, 30),
                   })
                 }
-                placeholder="FRIEND20"
+                placeholder="THANKS20"
                 className="font-mono uppercase"
               />
             </Field>
-            <Field label="Expires" htmlFor="ref_expires" hint="Optional.">
+            <Field label="Expires" htmlFor="rw_expires" hint="Optional.">
               <Input
-                id="ref_expires"
+                id="rw_expires"
                 type="date"
                 value={draft.expires_at}
                 onChange={(e) =>
@@ -249,55 +250,89 @@ export function ReferralSetup({
 
         <div className="space-y-4">
           <h3 className="font-display text-[17px] font-medium text-ink">
-            4. Call to action
-            <span className="ml-2 font-sans text-[12px] font-normal text-text-muted">
-              — the booking button
-            </span>
+            4. Make appointment
           </h3>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field
-              label="Button label"
-              htmlFor="ref_cta_label"
-              hint='Customize for your booking flow. Default "Book with this offer", but try "Book now — show your coupon when you visit" if your booking site has no coupon field.'
-            >
-              <Input
-                id="ref_cta_label"
-                value={draft.cta_label}
-                onChange={(e) =>
-                  setDraft({
-                    ...draft,
-                    cta_label: e.target.value.slice(0, 60),
-                  })
-                }
-                maxLength={60}
-                placeholder="Book with this offer"
-              />
-            </Field>
-            <Field
-              label="Button URL"
-              htmlFor="ref_cta_url"
-              hint={
-                bookingFallback
-                  ? "Defaults to your location's booking URL when blank."
-                  : "Required if no booking URL is set on the location."
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border-base bg-paper p-3.5">
+            <input
+              type="checkbox"
+              checked={draft.booking_enabled}
+              onChange={(e) =>
+                setDraft({ ...draft, booking_enabled: e.target.checked })
               }
+              className="sr-only"
+            />
+            <span
+              className={cn(
+                "mt-0.5 flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded-[5px] border-2",
+                draft.booking_enabled
+                  ? "border-forest bg-forest"
+                  : "border-border-base bg-paper",
+              )}
             >
-              <Input
-                id="ref_cta_url"
-                type="url"
-                value={draft.cta_url}
-                onChange={(e) => setDraft({ ...draft, cta_url: e.target.value })}
-                placeholder={bookingFallback ?? "https://book.example.com/..."}
-                className="font-mono text-[12.5px]"
-              />
-            </Field>
-          </div>
+              {draft.booking_enabled && (
+                <Check className="h-3 w-3 text-cream stroke-[3.5]" />
+              )}
+            </span>
+            <div className="text-left">
+              <div className="text-[13.5px] font-medium text-ink">
+                Customer can book an appointment for this reward
+              </div>
+              <div className="text-[12px] text-text-soft">
+                Adds a “Book now &amp; apply this code” button to the reward
+                card. Uncheck for stores, product sales, or walk-in services.
+              </div>
+            </div>
+          </label>
+
+          {draft.booking_enabled && (
+            <>
+              <Field
+                label="Booking URL"
+                htmlFor="rw_booking_url"
+                hint={
+                  bookingFallback
+                    ? "Optional. Defaults to your location's booking URL when blank."
+                    : "Required to enable the booking button. Set a booking URL on the location or paste one here."
+                }
+              >
+                <Input
+                  id="rw_booking_url"
+                  type="url"
+                  value={draft.booking_url}
+                  onChange={(e) =>
+                    setDraft({ ...draft, booking_url: e.target.value })
+                  }
+                  placeholder={bookingFallback ?? "https://book.example.com/..."}
+                  className="font-mono text-[12.5px]"
+                />
+              </Field>
+
+              <Field
+                label="Booking button text"
+                htmlFor="rw_booking_cta_label"
+                hint='Customize the button label to match how your booking flow handles coupons. e.g. "Book now — show your coupon when you visit" (for booking sites without a coupon field), "Book now & apply this code" (default), or "Reserve now". Leave blank to use the default.'
+              >
+                <Input
+                  id="rw_booking_cta_label"
+                  value={draft.booking_cta_label}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      booking_cta_label: e.target.value.slice(0, 80),
+                    })
+                  }
+                  maxLength={80}
+                  placeholder="Book now — show your coupon when you visit"
+                />
+              </Field>
+            </>
+          )}
         </div>
 
         <div className="space-y-4">
           <h3 className="font-display text-[17px] font-medium text-ink">
-            5. Hero image
+            5. Reward image
             <span className="ml-2 font-sans text-[12px] font-normal text-text-muted">
               — optional
             </span>
@@ -305,17 +340,15 @@ export function ReferralSetup({
 
           <Field
             label="Image"
-            hint="Shown at the top of the offer card — service photo, product shot, gift card mock, etc."
+            hint="JPEG, PNG, WebP, GIF, or SVG. Up to 4MB. Use this to show the reward visually — a coupon mock, a product photo, a service banner, a gift card."
           >
             <LogoUploader
               accountId={accountId}
-              initialUrl={draft.offer_image_url}
-              brandColor={brandColor}
-              fallbackInitial="📷"
-              fieldName="offer_image_url"
-              onChange={(url) =>
-                setDraft({ ...draft, offer_image_url: url })
-              }
+              initialUrl={draft.image_url}
+              brandColor={draft.accent_color}
+              fallbackInitial="🎁"
+              fieldName="reward_image_url"
+              onChange={(url) => setDraft({ ...draft, image_url: url })}
             />
           </Field>
 
@@ -325,13 +358,13 @@ export function ReferralSetup({
           >
             <div className="flex flex-wrap gap-1.5">
               {ASPECT_OPTIONS.map((opt) => {
-                const active = draft.offer_image_aspect === opt.value;
+                const active = draft.image_aspect === opt.value;
                 return (
                   <button
                     key={opt.value}
                     type="button"
                     onClick={() =>
-                      setDraft({ ...draft, offer_image_aspect: opt.value })
+                      setDraft({ ...draft, image_aspect: opt.value })
                     }
                     title={opt.hint}
                     className={cn(
@@ -364,31 +397,29 @@ export function ReferralSetup({
 
         <div className="space-y-4">
           <h3 className="font-display text-[17px] font-medium text-ink">
-            6. Offer description
+            6. Reward description
             <span className="ml-2 font-sans text-[12px] font-normal text-text-muted">
-              — optional, supports Markdown
+              — optional, plain text with line breaks
             </span>
           </h3>
 
           <Field
             label="Description"
-            htmlFor="ref_description"
-            hint="Long-form fine print rendered below the code on the share landing. Markdown-lite: **bold**, *italic*, and bullet lines starting with “-” are rendered."
+            htmlFor="rw_description"
+            hint="Add the fine print — what's included, restrictions, contact info. Markdown-lite: **bold**, *italic*, and bullet lines starting with “-” are rendered. Shown below the image."
           >
             <textarea
-              id="ref_description"
-              value={draft.offer_description}
+              id="rw_description"
+              value={draft.description}
               onChange={(e) =>
                 setDraft({
                   ...draft,
-                  offer_description: e.target.value.slice(0, 1500),
+                  description: e.target.value.slice(0, 1500),
                 })
               }
-              rows={5}
+              rows={6}
               maxLength={1500}
-              placeholder={
-                "**Includes:**\n- $20 off any service over $80\n- Valid for first-time customers\n- One per household\n\n*Questions? Call us at (555) 123-4567.*"
-              }
+              placeholder={"**Includes:**\n- $20 off any service over $80\n- Valid for 90 days\n\n*Questions? Call us at (555) 123-4567.*"}
               className="w-full rounded-md border border-border-base bg-paper px-3 py-2 font-mono text-[13px] text-text leading-relaxed shadow-sm transition-colors focus:border-forest focus:outline-none"
             />
           </Field>
@@ -401,7 +432,7 @@ export function ReferralSetup({
 
           <Field
             label="Accent color"
-            hint="Drives the share-card gradient, code styling, and CTA button. Defaults to your location's brand color."
+            hint="Drives the reward card gradient, icon background, and code pill styling. Default gold differentiates the reward from the referral card."
           >
             <div className="flex flex-wrap items-center gap-2">
               {ACCENT_PRESETS.map((p) => {
@@ -441,15 +472,15 @@ export function ReferralSetup({
                 }
                 className="w-28 font-mono uppercase"
               />
-              {draft.accent_color.toLowerCase() !== brandColor.toLowerCase() && (
+              {draft.accent_color.toLowerCase() !== DEFAULT_ACCENT.toLowerCase() && (
                 <button
                   type="button"
                   onClick={() =>
-                    setDraft({ ...draft, accent_color: brandColor })
+                    setDraft({ ...draft, accent_color: DEFAULT_ACCENT })
                   }
                   className="text-[12px] text-text-soft hover:underline"
                 >
-                  Reset to brand color
+                  Reset to gold
                 </button>
               )}
             </div>
@@ -474,56 +505,61 @@ export function ReferralSetup({
         </div>
 
         <p className="text-[12px] text-text-muted">
-          Public share-landing URL pattern:{" "}
+          The reward card appears on{" "}
           <code className="rounded bg-cream-deep px-1.5 py-0.5 font-mono text-[11.5px]">
-            /s/&lt;reviewer_id&gt;
-          </code>
-          . Friends arrive here when an existing reviewer shares their card.
+            /r/&lt;slug&gt;/thank-you
+          </code>{" "}
+          after a customer posts a review.
         </p>
       </div>
 
-      {/* LIVE PREVIEW — component-render of the same OfferBlock the friend
-          sees on /s/<token>. Updates as you type; no review_request needed. */}
+      {/* LIVE PREVIEW */}
       <aside className="space-y-3">
         <p className="text-[12.5px] font-medium tracking-tight text-text-soft">
-          Live preview — share landing
+          Live preview — thank-you page
         </p>
         <div className="rounded-2xl border border-border-base bg-cream-deep/40 p-4">
-          {draft.enabled && draft.offer_title ? (
-            <OfferBlock
-              accent={draft.accent_color || brandColor}
-              title={draft.offer_title}
-              subtitle={draft.offer_subtitle || null}
-              description={draft.offer_description || null}
-              code={draft.offer_code || null}
-              imageUrl={draft.offer_image_url}
-              imageAspect={draft.offer_image_aspect}
-              ctaLabel={draft.cta_label || "Book with this offer"}
-              ctaUrl={draft.cta_url || bookingFallback}
-              expiresAt={
-                draft.expires_at
-                  ? new Date(draft.expires_at).toISOString()
-                  : null
-              }
-              isExpired={
-                draft.expires_at
-                  ? new Date(draft.expires_at).getTime() < Date.now()
-                  : false
-              }
+          {draft.enabled && draft.title ? (
+            <ReviewerRewardCard
               lang="en"
+              reward={{
+                title: draft.title,
+                subtitle: draft.subtitle || null,
+                code: draft.code || null,
+                imageUrl: draft.image_url,
+                imageAspect: draft.image_aspect,
+                description: draft.description || null,
+                bookingEnabled: draft.booking_enabled,
+                bookingUrl:
+                  draft.booking_url ||
+                  (draft.booking_enabled ? bookingFallback : null),
+                bookingCtaLabel: draft.booking_cta_label || null,
+                accentColor: draft.accent_color || DEFAULT_ACCENT,
+                expiresAt: draft.expires_at
+                  ? new Date(draft.expires_at).toISOString()
+                  : null,
+                isExpired: draft.expires_at
+                  ? new Date(draft.expires_at).getTime() < Date.now()
+                  : false,
+              }}
             />
           ) : (
             <div className="rounded-xl border border-dashed border-border-base bg-paper p-6 text-center text-[13px] text-text-soft">
               {!draft.enabled
-                ? "Referral offer is disabled — toggle it on to see the preview."
-                : "Add an offer title to see the preview."}
+                ? "Reward is disabled — toggle it on to see the preview."
+                : "Add a reward title to see the preview."}
             </div>
           )}
         </div>
         <p className="text-center text-[11px] text-text-muted">
           Live preview reflects unsaved edits. Save to publish.
-          <br />
-          Slug: <span className="font-mono">{locationSlug}</span>
+          {brandColor && (
+            <>
+              <br />
+              Location:{" "}
+              <span className="font-medium text-text-soft">{displayName}</span>
+            </>
+          )}
         </p>
       </aside>
     </div>

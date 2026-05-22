@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin — Setup Reward</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              paper: "#FAF6EE",
+              cream: "#F5F0E4",
+              "cream-deep": "#EFE7D4",
+              ink: "#2A2520",
+              text: "#3D3530",
+              "text-soft": "#6B5F55",
+              "text-muted": "#8B7F73",
+              "border-base": "#E5D9C5",
+              forest: "#1F4D3F",
+              "forest-dark": "#143329",
+              brick: "#962D22",
+              "brick-dark": "#6E2C24",
+              gold: "#C9A961",
+              "gold-dark": "#A88847",
+              "gold-soft": "#E8D9B2",
+              sage: "#7FA68F",
+              "sage-soft": "#E3EBE3",
+              success: "#2F7D54",
+            },
+            fontFamily: {
+              display: ['"Cormorant Garamond"', "serif"],
+              sans: ["Inter", "system-ui", "sans-serif"],
+              mono: ['"JetBrains Mono"', "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        background: #FAF6EE;
+      }
+      .font-display {
+        font-family: "Cormorant Garamond", serif;
+        letter-spacing: -0.01em;
+      }
+      input[type="checkbox"].big-check {
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        background: #fff;
+        border: 1.5px solid #E5D9C5;
+        border-radius: 6px;
+        position: relative;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      input[type="checkbox"].big-check:checked {
+        background: #1F4D3F;
+        border-color: #1F4D3F;
+      }
+      input[type="checkbox"].big-check:checked::after {
+        content: "";
+        position: absolute;
+        top: 4px;
+        left: 7px;
+        width: 5px;
+        height: 10px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+      .accent-swatch {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.1s;
+      }
+      .accent-swatch.selected {
+        outline: 2px solid #2A2520;
+        outline-offset: 2px;
+      }
+      input[type="text"], input[type="date"], input[type="url"], textarea {
+        font-family: inherit;
+      }
+      input[type="text"]:focus, input[type="date"]:focus, input[type="url"]:focus, textarea:focus {
+        outline: 2px solid #C9A961;
+        outline-offset: -1px;
+      }
+      .md-toolbar button {
+        font-family: inherit;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-ink">
+    <div class="mx-auto max-w-7xl px-8 py-8">
+      <!-- Breadcrumb / page header -->
+      <div class="mb-5">
+        <a href="#" class="inline-flex items-center gap-1.5 text-[12.5px] text-text-soft hover:text-ink">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to location
+        </a>
+        <h1 class="mt-2 font-display text-[34px] text-ink leading-tight">
+          Referral &amp; Reward
+        </h1>
+        <p class="text-[13px] text-text-soft mt-1">
+          What you offer the friend, and how you thank the reviewer.
+        </p>
+      </div>
+
+      <!-- Tab nav -->
+      <div class="border-b border-border-base mb-8">
+        <nav class="flex items-center gap-1">
+          <a href="#" class="relative inline-flex items-center gap-1.5 px-4 py-3 text-[13.5px] font-semibold text-ink border-b-2 border-gold -mb-px">
+            <svg class="h-4 w-4 text-gold-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Setup Reward
+          </a>
+          <a href="#" class="inline-flex items-center gap-1.5 px-4 py-3 text-[13.5px] text-text-soft hover:text-ink">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M20 8v6"></path><path d="M23 11h-6"></path></svg>
+            Setup Referral
+          </a>
+          <a href="#" class="inline-flex items-center gap-1.5 px-4 py-3 text-[13.5px] text-text-soft hover:text-ink">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            Best advocates
+          </a>
+          <a href="#" class="inline-flex items-center gap-1.5 px-4 py-3 text-[13.5px] text-text-soft hover:text-ink">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            Activity
+          </a>
+        </nav>
+      </div>
+
+      <!-- 2-col layout -->
+      <div class="grid grid-cols-[1fr_440px] gap-10">
+        <!-- LEFT: form -->
+        <div class="space-y-7">
+          <!-- Visibility -->
+          <div class="flex items-start gap-3 rounded-lg bg-cream-deep p-4">
+            <input type="checkbox" class="big-check mt-0.5" checked />
+            <div>
+              <p class="text-[14px] font-semibold text-ink">
+                Show the reward on the thank-you page
+              </p>
+              <p class="text-[12.5px] text-text-soft mt-0.5">
+                Turning this off hides the reward card. The reviewer still sees
+                the share card.
+              </p>
+            </div>
+          </div>
+
+          <!-- ============================== -->
+          <!-- 1. Reward title                -->
+          <!-- ============================== -->
+          <div>
+            <label class="block text-[12.5px] font-semibold text-ink mb-1.5">
+              1. Reward title
+              <span class="ml-1 font-normal text-text-muted">— what the reviewer earns</span>
+            </label>
+            <input
+              type="text"
+              value="You earned $20 off your next visit"
+              class="w-full rounded-md border border-border-base bg-white px-3 py-2.5 text-[14px] text-ink"
+            />
+            <p class="mt-1 text-[11.5px] text-text-soft">
+              Works for any business — visit, purchase, service, repair, install.
+              e.g. "You earned $20 off your next <em>purchase</em>",
+              "Free oil change with your next service",
+              "10% off any product".
+            </p>
+          </div>
+
+          <!-- ============================== -->
+          <!-- 2. Reward subtitle (redeem)    -->
+          <!-- ============================== -->
+          <div>
+            <label class="block text-[12.5px] font-semibold text-ink mb-1.5">
+              2. Reward subtitle
+              <span class="ml-1 font-normal text-text-muted">— how to redeem</span>
+            </label>
+            <textarea
+              rows="2"
+              class="w-full rounded-md border border-border-base bg-white px-3 py-2.5 text-[14px] text-ink resize-y"
+            >Show this page at your next visit, or mention the code when you call.</textarea>
+            <p class="mt-1 text-[11.5px] text-text-soft">
+              e.g. "Show this page at next appointment", "Mention this code at
+              checkout", "Apply at our online store". Keep it warm and clear.
+            </p>
+          </div>
+
+          <!-- ============================== -->
+          <!-- 3. Code + Expires              -->
+          <!-- ============================== -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[12.5px] font-semibold text-ink mb-1.5">
+                3. Discount code
+              </label>
+              <input
+                type="text"
+                value="THANKS20"
+                class="w-full rounded-md border border-border-base bg-white px-3 py-2.5 font-mono text-[14px] uppercase tracking-wider text-ink"
+              />
+              <p class="mt-1 text-[11.5px] text-text-soft">
+                Auto-uppercased, no spaces.
+              </p>
+            </div>
+            <div>
+              <label class="block text-[12.5px] font-semibold text-ink mb-1.5">
+                Expires
+              </label>
+              <input
+                type="date"
+                class="w-full rounded-md border border-border-base bg-white px-3 py-2.5 text-[14px] text-ink"
+              />
+              <p class="mt-1 text-[11.5px] text-text-soft">
+                Optional.
+              </p>
+            </div>
+          </div>
+
+          <!-- ============================== -->
+          <!-- 4. Booking (optional)          -->
+          <!-- ============================== -->
+          <div class="rounded-lg border border-border-base bg-white p-4 space-y-3">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" class="big-check mt-0.5" id="bookEnabled" checked />
+              <div>
+                <p class="text-[13.5px] font-semibold text-ink">
+                  4. Customer can book an appointment for this reward
+                </p>
+                <p class="text-[11.5px] text-text-soft mt-0.5">
+                  Adds a "Book now &amp; apply this code" button to the reward
+                  card. Uncheck for stores, product sales, walk-in services, or
+                  anywhere appointments don't apply.
+                </p>
+              </div>
+            </label>
+            <!-- Conditional URL field -->
+            <div class="pl-8 space-y-1.5" id="bookUrlGroup">
+              <label class="block text-[12px] font-semibold text-ink">
+                Booking URL
+              </label>
+              <input
+                type="url"
+                value="https://example.com/book"
+                placeholder="https://"
+                class="w-full rounded-md border border-border-base bg-paper px-3 py-2 text-[13.5px] text-ink"
+              />
+              <p class="text-[11.5px] text-text-muted">
+                The button on the reward card opens this link in a new tab.
+              </p>
+            </div>
+          </div>
+
+          <!-- ============================== -->
+          <!-- 5. Reward image (optional)     -->
+          <!-- ============================== -->
+          <div>
+            <label class="block text-[12.5px] font-semibold text-ink mb-1.5">
+              5. Reward image
+              <span class="ml-1 font-normal text-text-muted">— optional</span>
+            </label>
+            <div class="flex items-start gap-4">
+              <!-- Current image preview -->
+              <div class="flex h-28 w-28 flex-shrink-0 items-center justify-center rounded-lg border border-border-base bg-cream-deep text-text-muted relative overflow-hidden">
+                <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              </div>
+              <div class="flex-1 space-y-2 min-w-0">
+                <div class="flex items-center gap-2">
+                  <button class="inline-flex items-center gap-1.5 rounded-md border border-border-base bg-white px-3 py-2 text-[13px] font-medium text-ink hover:bg-cream">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    Upload
+                  </button>
+                  <button class="text-[12px] text-text-soft hover:text-ink underline">
+                    Remove
+                  </button>
+                </div>
+                <p class="text-[11.5px] text-text-soft leading-relaxed">
+                  JPEG, PNG, WebP, GIF, or SVG · up to 4MB.<br />
+                  Square (1:1) or landscape (4:3) recommended. Auto-compressed
+                  on upload for fast mobile load.
+                </p>
+                <p class="text-[11.5px] text-text-muted italic">
+                  Use this to show the reward visually — a coupon mock, a
+                  product photo, a service banner, a gift card image.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================== -->
+          <!-- 6. Reward text (markdown)      -->
+          <!-- ============================== -->
+          <div>
+            <label class="block text-[12.5px] font-semibold text-ink mb-1.5">
+              6. Reward description
+              <span class="ml-1 font-normal text-text-muted">— optional, supports Markdown</span>
+            </label>
+            <!-- Mini markdown toolbar -->
+            <div class="md-toolbar flex items-center gap-1 rounded-t-md border border-b-0 border-border-base bg-cream-deep px-2 py-1">
+              <button class="rounded p-1.5 text-[12px] font-bold text-text-soft hover:bg-paper hover:text-ink" title="Bold">B</button>
+              <button class="rounded p-1.5 text-[12px] italic text-text-soft hover:bg-paper hover:text-ink" title="Italic">I</button>
+              <span class="text-text-muted">|</span>
+              <button class="rounded p-1.5 text-[12px] text-text-soft hover:bg-paper hover:text-ink" title="Heading">H</button>
+              <button class="rounded p-1.5 text-text-soft hover:bg-paper hover:text-ink" title="Bullet list">
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              </button>
+              <button class="rounded p-1.5 text-text-soft hover:bg-paper hover:text-ink" title="Link">
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              </button>
+            </div>
+            <textarea
+              rows="5"
+              class="w-full rounded-b-md border border-border-base bg-white px-3 py-2.5 text-[14px] text-ink resize-y font-mono leading-relaxed"
+            >**Includes:**
+- $20 off any service over $80
+- Combine with any other promotion
+- Valid for 90 days from today
+
+_Questions? Call us at (555) 123-4567._</textarea>
+            <p class="mt-1 text-[11.5px] text-text-soft">
+              Markdown supported: **bold**, *italic*, lists, links. If an image
+              is uploaded, the text appears below the image on the reward card.
+            </p>
+          </div>
+
+          <!-- ============================== -->
+          <!-- 7. Visual                      -->
+          <!-- ============================== -->
+          <div class="space-y-4 pt-2">
+            <h2 class="font-display text-[22px] text-ink leading-tight">
+              7. Visual
+            </h2>
+
+            <div>
+              <label class="block text-[12.5px] font-semibold text-ink mb-2">
+                Accent color
+              </label>
+              <div class="flex flex-wrap items-center gap-3">
+                <span class="accent-swatch selected" style="background:#C9A961"></span>
+                <span class="accent-swatch" style="background:#A88847"></span>
+                <span class="accent-swatch" style="background:#1F4D3F"></span>
+                <span class="accent-swatch" style="background:#962D22"></span>
+                <span class="accent-swatch" style="background:#5B3A77"></span>
+                <span class="accent-swatch" style="background:#3F6A8E"></span>
+                <span class="text-text-muted">|</span>
+                <span class="inline-block h-9 w-9 rounded-md border border-border-base" style="background:#C9A961"></span>
+                <input
+                  type="text"
+                  value="#C9A961"
+                  class="w-28 rounded-md border border-border-base bg-white px-2.5 py-1.5 font-mono text-[13px] text-ink"
+                />
+                <button class="text-[12.5px] text-text-soft underline hover:text-ink">
+                  Reset to brand color
+                </button>
+              </div>
+              <p class="mt-1.5 text-[11.5px] text-text-soft">
+                Drives the reward card gradient, icon background, and code
+                pill styling.
+              </p>
+            </div>
+          </div>
+
+          <!-- Save bar -->
+          <div class="border-t border-border-base pt-5 flex items-center justify-between">
+            <p class="text-[12px] text-text-muted">
+              Changes apply to the next thank-you page view.
+            </p>
+            <div class="flex gap-2">
+              <button class="rounded-md border border-border-base bg-white px-4 py-2 text-[13px] font-medium text-text-soft hover:text-ink">
+                Cancel
+              </button>
+              <button class="rounded-md bg-forest px-5 py-2 text-[13px] font-semibold text-paper hover:bg-forest-dark">
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: live preview -->
+        <div>
+          <div class="sticky top-6 space-y-3">
+            <p class="text-[13px] text-text-soft">
+              Live preview — thank-you page
+            </p>
+
+            <div class="rounded-2xl border-2 border-gold/50 bg-gradient-to-br from-gold-soft/60 via-gold-soft/30 to-paper p-5 space-y-4 relative overflow-hidden">
+              <div class="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-gold/20 blur-2xl pointer-events-none"></div>
+
+              <!-- Header: icon + title + subtitle (how to redeem) -->
+              <div class="flex items-start gap-3">
+                <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-gold to-gold-dark shadow-sm">
+                  <svg class="h-6 w-6 text-paper" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-gold-dark">
+                    A thank-you, just for you
+                  </p>
+                  <h2 class="font-display text-[21px] text-ink leading-tight mt-0.5">
+                    You earned <em class="not-italic text-gold-dark">$20 off</em>
+                    your next visit
+                  </h2>
+                  <p class="text-[12.5px] italic text-text-soft mt-1 leading-relaxed">
+                    Show this page at your next visit, or mention the code
+                    when you call.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Code pill -->
+              <div class="rounded-xl border-2 border-dashed border-gold/60 bg-white/80 p-3">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted">
+                      Your code
+                    </p>
+                    <p class="font-mono text-[20px] font-bold text-ink tracking-wider mt-0.5">
+                      THANKS20
+                    </p>
+                  </div>
+                  <button class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-2 text-[12px] font-semibold text-paper">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copy code
+                  </button>
+                </div>
+              </div>
+
+              <!-- Hero image (placeholder when no upload — comment out in real) -->
+              <div class="rounded-lg overflow-hidden bg-white/60 border border-gold/30 aspect-[4/3] flex items-center justify-center text-text-muted text-[12px]">
+                <div class="text-center px-3">
+                  <svg class="h-8 w-8 mx-auto opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  <p class="mt-1 italic">Reward image goes here</p>
+                  <p class="text-[10.5px]">(upload above)</p>
+                </div>
+              </div>
+
+              <!-- Markdown description (below image) -->
+              <div class="rounded-lg bg-white/60 p-3.5 text-[13px] text-text leading-relaxed space-y-1.5">
+                <p><strong>Includes:</strong></p>
+                <ul class="list-disc list-inside space-y-0.5 pl-1">
+                  <li>$20 off any service over $80</li>
+                  <li>Combine with any other promotion</li>
+                  <li>Valid for 90 days from today</li>
+                </ul>
+                <p class="italic text-text-soft pt-0.5">
+                  Questions? Call us at (555) 123-4567.
+                </p>
+              </div>
+
+              <!-- Booking CTA (conditional) -->
+              <a href="#" class="flex items-center justify-center gap-2 rounded-xl border border-gold-dark/40 bg-white px-4 py-2.5 text-[13px] font-semibold text-ink">
+                <svg class="h-4 w-4 text-gold-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Book now &amp; apply this code
+              </a>
+            </div>
+
+            <p class="text-center text-[11px] text-text-muted">
+              When "Customer can book an appointment" is unchecked, the
+              booking button disappears from this card.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="mt-12 rounded-xl border border-dashed border-text-muted/40 bg-paper/60 p-5 text-[12.5px] text-text-soft space-y-2 max-w-3xl">
+        <p class="font-semibold text-text">Design notes</p>
+        <ul class="list-disc list-inside space-y-1">
+          <li>
+            <strong>Universal structure:</strong> works for clinics
+            (appointment), stores (no appointment, image of coupon),
+            auto-repair (image of service voucher), home services (image of
+            certificate). Image + markdown text describes any reward type.
+          </li>
+          <li>
+            <strong>Image upload:</strong> 4MB cap is fine — we auto-compress
+            to ~500KB-1MB on upload for mobile speed. SVGs sanitized
+            server-side to block XSS payloads. Supabase Storage handles the
+            file; the location row stores the URL.
+          </li>
+          <li>
+            <strong>Markdown:</strong> we'll use a small allow-listed renderer
+            (no raw HTML, no iframes, no scripts) — same approach BAAM Studio
+            uses for testimonial blocks. Bold, italic, lists, links only.
+          </li>
+          <li>
+            <strong>Booking checkbox:</strong> when unchecked, the booking URL
+            field hides (greyed out) and the customer page omits the "Book
+            now" button entirely — no half-broken CTAs for stores/walk-ins.
+          </li>
+          <li>
+            <strong>Trigger rule:</strong> reward card only shows after 4★ or
+            5★ reviews. 1–3★ goes straight to private feedback.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

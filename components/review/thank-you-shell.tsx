@@ -24,10 +24,16 @@ function FacebookGlyph({ className }: { className?: string }) {
     </svg>
   );
 }
-import type { Language, SocialHandles } from "@/lib/database.types";
+import type {
+  Language,
+  OfferImageAspect,
+  SocialHandles,
+} from "@/lib/database.types";
 import { STRINGS } from "@/lib/i18n/review";
 import { logPostReviewAction } from "@/app/r/[slug]/thank-you/actions";
 import { LanguageSwitcher } from "./language-switcher";
+import { MarkdownLite } from "./markdown-lite";
+import { ReviewerRewardCard } from "./reviewer-reward-card";
 import { cn } from "@/lib/utils";
 
 interface ThankYouShellProps {
@@ -56,9 +62,25 @@ interface ThankYouShellProps {
   offer: {
     title: string;
     subtitle: string | null;
+    description: string | null;
     code: string | null;
     imageUrl: string | null;
     imageAspect: "16:9" | "4:3" | "1:1" | "21:9" | "3:4";
+    accentColor: string;
+    expiresAt: string | null;
+    isExpired: boolean;
+  } | null;
+  /** Reviewer's personal reward card, or null when none configured. */
+  reward: {
+    title: string;
+    subtitle: string | null;
+    code: string | null;
+    imageUrl: string | null;
+    imageAspect: OfferImageAspect;
+    description: string | null;
+    bookingEnabled: boolean;
+    bookingUrl: string | null;
+    bookingCtaLabel: string | null;
     accentColor: string;
     expiresAt: string | null;
     isExpired: boolean;
@@ -80,6 +102,7 @@ export function ThankYouShell(props: ThankYouShellProps) {
     isPrivate,
     shareablePreviewQuote,
     offer,
+    reward,
   } = props;
   const s = STRINGS[lang];
 
@@ -232,9 +255,16 @@ export function ThankYouShell(props: ThankYouShellProps) {
         <LanguageSwitcher current={lang} available={supportedLangs} />
       </div>
 
-      {/* Confirmation card */}
+      {/* Confirmation card — compact when a reward card follows (to avoid
+          double "thank-you" messaging). Reward card carries the longer
+          gratitude copy; here we keep just the checkmark + name. */}
       <section className="overflow-hidden rounded-3xl border border-border-base bg-paper shadow-sm">
-        <div className="relative overflow-hidden bg-gradient-to-br from-forest to-forest-dark px-[30px] pt-9 pb-8 text-center text-cream">
+        <div
+          className={cn(
+            "relative overflow-hidden bg-gradient-to-br from-forest to-forest-dark text-center text-cream",
+            reward ? "px-[24px] pt-6 pb-6" : "px-[30px] pt-9 pb-8",
+          )}
+        >
           <div className="pointer-events-none absolute inset-0 opacity-[0.18]">
             <div className="absolute right-[-20%] top-[-30%] h-[280px] w-[280px] rounded-full bg-gold/30 blur-3xl" />
             <div className="absolute bottom-[-30%] left-[-15%] h-[240px] w-[240px] rounded-full bg-sage/40 blur-3xl" />
@@ -242,16 +272,32 @@ export function ThankYouShell(props: ThankYouShellProps) {
           <div className="relative">
             <span
               className={cn(
-                "mx-auto mb-[18px] flex h-14 w-14 items-center justify-center rounded-full border border-gold bg-gold/20 text-gold",
+                "mx-auto flex items-center justify-center rounded-full border border-gold bg-gold/20 text-gold",
+                reward ? "mb-3 h-10 w-10" : "mb-[18px] h-14 w-14",
                 "animate-[checkmark-pop_0.5s_cubic-bezier(0.34,1.56,0.64,1)_backwards]",
               )}
             >
-              <Check className="h-7 w-7 stroke-[2.5]" />
+              <Check
+                className={cn(
+                  "stroke-[2.5]",
+                  reward ? "h-5 w-5" : "h-7 w-7",
+                )}
+              />
             </span>
-            <p className="mb-2.5 text-[11.5px] font-medium uppercase tracking-[0.16em] text-gold">
+            <p
+              className={cn(
+                "text-[11.5px] font-medium uppercase tracking-[0.16em] text-gold",
+                reward ? "mb-1.5" : "mb-2.5",
+              )}
+            >
               {eyebrow}
             </p>
-            <h1 className="font-display text-[32px] font-normal leading-[1.1] tracking-[-0.025em] text-cream">
+            <h1
+              className={cn(
+                "font-display font-normal leading-[1.1] tracking-[-0.025em] text-cream",
+                reward ? "text-[24px]" : "text-[32px]",
+              )}
+            >
               {nameLine.split("\n").map((line, i, arr) =>
                 i === arr.length - 1 ? (
                   <em key={i} className="not-italic text-gold italic">
@@ -265,9 +311,14 @@ export function ThankYouShell(props: ThankYouShellProps) {
                 ),
               )}
             </h1>
-            <p className="mx-auto mt-3 max-w-[360px] font-display text-[16px] italic leading-[1.5] text-cream/80">
-              {subText}
-            </p>
+            {/* Drop the long gratitude paragraph when a reward card follows —
+                the reward card already conveys the "thank you for sharing"
+                message and we don't want to repeat it. */}
+            {!reward && (
+              <p className="mx-auto mt-3 max-w-[360px] font-display text-[16px] italic leading-[1.5] text-cream/80">
+                {subText}
+              </p>
+            )}
           </div>
         </div>
 
@@ -303,9 +354,32 @@ export function ThankYouShell(props: ThankYouShellProps) {
         </div>
       </section>
 
+      {/* Reviewer's personal reward card — gold (or configured) accent.
+          Replaces the "While you're here / Book your next visit" block
+          because the reward's own CTA handles booking when applicable. */}
+      {reward && (
+        <ReviewerRewardCard
+          lang={lang}
+          reward={reward}
+          onBookClick={() =>
+            void logPostReviewAction({
+              locationId: location.id,
+              requestId,
+              actionType: "book_click",
+              language: lang,
+              metadata: {
+                source: "reward_card",
+                booking_url: reward.bookingUrl ?? null,
+              },
+            })
+          }
+        />
+      )}
+
       {/* Next steps — only renders when there's an external CTA to surface
-          (booking_url). The share card lives in its own section below. */}
-      {location.bookingUrl && (
+          (booking_url) AND no reward card is shown (reward card carries its
+          own booking CTA). The share card lives in its own section below. */}
+      {!reward && location.bookingUrl && (
         <section className="overflow-hidden rounded-3xl border border-border-base bg-paper shadow-sm">
           <div className="border-b border-border-soft px-7 pb-[18px] pt-[26px]">
             <p className="mb-2 text-[11.5px] font-medium uppercase tracking-[0.14em] text-text-muted">
@@ -630,6 +704,7 @@ function SharePreview({
   offer: {
     title: string;
     subtitle: string | null;
+    description: string | null;
     code: string | null;
     imageUrl: string | null;
     imageAspect: "16:9" | "4:3" | "1:1" | "21:9" | "3:4";
@@ -701,6 +776,14 @@ function SharePreview({
                }}>
               {offer.code}
             </p>
+          )}
+          {offer.description && (
+            <div className="mt-3 rounded-md bg-cream-deep/50 px-3 py-2.5">
+              <MarkdownLite
+                text={offer.description}
+                className="text-[12px] text-text-soft"
+              />
+            </div>
           )}
         </div>
       )}

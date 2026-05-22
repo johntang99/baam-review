@@ -1,26 +1,32 @@
 import Link from "next/link";
-import { Activity, Settings, Trophy } from "lucide-react";
+import { Activity, Gift, Settings, Trophy } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSelectedLocationId } from "@/lib/selected-location";
-import type { ReferralConfig } from "@/lib/database.types";
+import type {
+  ReferralConfig,
+  RewardConfig,
+} from "@/lib/database.types";
 import { PageHeader } from "@/components/admin/page-header";
+import { RewardSetup } from "./reward-setup";
 import { ReferralSetup } from "./referral-setup";
 import { AdvocatesTable } from "./advocates-table";
 import { ActivityFeed } from "./activity-feed";
 
-export const metadata = { title: "Referrals — BAAM Review" };
+export const metadata = { title: "Reward & Referrals — BAAM Review" };
 export const dynamic = "force-dynamic";
 
+type Tab = "reward" | "referral" | "advocates" | "activity";
+
 const TAB_DESC: Record<Tab, string> = {
-  setup:
+  reward:
+    "Configure the personal thank-you reward shown to your reviewer on the thank-you page. Works for any business — visit, purchase, service, or product. Add an image and description to make it your own.",
+  referral:
     "Configure the offer your reviewers' friends see on the share landing page. Each settings change applies to new share links generated after save.",
   advocates:
     "Reviewers who shared their link. Ranked by conversions, clicks, then recency over the last 90 days.",
   activity:
     "Recent referral events across all your locations — every share view, offer click, and converted review.",
 };
-
-type Tab = "setup" | "advocates" | "activity";
 
 export default async function ReferralsPage({
   searchParams,
@@ -29,11 +35,13 @@ export default async function ReferralsPage({
 }) {
   const { tab: tabRaw } = await searchParams;
   const tab: Tab =
-    tabRaw === "advocates"
-      ? "advocates"
-      : tabRaw === "activity"
-        ? "activity"
-        : "setup";
+    tabRaw === "referral"
+      ? "referral"
+      : tabRaw === "advocates"
+        ? "advocates"
+        : tabRaw === "activity"
+          ? "activity"
+          : "reward";
 
   const supabase = await createClient();
   const selectedId = await getSelectedLocationId();
@@ -42,7 +50,7 @@ export default async function ReferralsPage({
     ? await supabase
         .from("locations")
         .select(
-          "id, account_id, slug, display_name, brand_color, booking_url, referral_config",
+          "id, account_id, slug, display_name, brand_color, booking_url, referral_config, reward_config",
         )
         .eq("id", selectedId)
         .maybeSingle()
@@ -52,7 +60,7 @@ export default async function ReferralsPage({
     const { data: first } = await supabase
       .from("locations")
       .select(
-        "id, account_id, slug, display_name, brand_color, booking_url, referral_config",
+        "id, account_id, slug, display_name, brand_color, booking_url, referral_config, reward_config",
       )
       .order("created_at", { ascending: false })
       .limit(1)
@@ -67,14 +75,14 @@ export default async function ReferralsPage({
     return (
       <main className="px-10 py-10 space-y-6">
         <PageHeader
-          eyebrow="Referrals"
-          title="Set up your referral program"
-          description="Pick a location to configure the offer your reviewers share with friends."
+          eyebrow="Reward & Referrals"
+          title="Set up your reward and referral program"
+          description="Pick a location to configure the reward your reviewer gets and the offer they share with friends."
         />
         <div className="rounded-2xl border border-dashed border-border-base bg-paper/60 p-10 text-center max-w-2xl">
           <p className="text-[14px] text-text-soft">
             Connect a Google Business Profile first so we have a location to
-            attach the offer to.
+            attach the reward and offer to.
           </p>
           <Link
             href="/app/locations"
@@ -90,17 +98,23 @@ export default async function ReferralsPage({
   return (
     <main className="px-10 py-10 space-y-6">
       <PageHeader
-        eyebrow="Referrals"
+        eyebrow="Reward & Referrals"
         title={location.display_name}
         description={TAB_DESC[tab]}
       />
 
       <nav className="flex gap-1 border-b border-border-base">
         <TabLink
-          href="/app/referrals?tab=setup"
-          active={tab === "setup"}
+          href="/app/referrals?tab=reward"
+          active={tab === "reward"}
+          icon={Gift}
+          label="Setup Reward"
+        />
+        <TabLink
+          href="/app/referrals?tab=referral"
+          active={tab === "referral"}
           icon={Settings}
-          label="Setup"
+          label="Setup Referral"
         />
         <TabLink
           href="/app/referrals?tab=advocates"
@@ -116,7 +130,18 @@ export default async function ReferralsPage({
         />
       </nav>
 
-      {tab === "setup" && (
+      {tab === "reward" && (
+        <RewardSetup
+          locationId={location.id}
+          accountId={location.account_id}
+          brandColor={location.brand_color ?? "#1F4D3F"}
+          bookingFallback={location.booking_url ?? null}
+          displayName={location.display_name}
+          initialConfig={(location.reward_config ?? {}) as RewardConfig}
+        />
+      )}
+
+      {tab === "referral" && (
         <ReferralSetup
           locationId={location.id}
           accountId={location.account_id}

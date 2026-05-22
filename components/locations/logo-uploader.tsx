@@ -108,7 +108,7 @@ export function LogoUploader({
           </p>
         )}
         <p className="text-[11px] text-text-muted">
-          PNG, JPG, WebP, or SVG · up to 2MB
+          PNG, JPG, WebP, or SVG · up to 4MB
         </p>
       </div>
     </div>

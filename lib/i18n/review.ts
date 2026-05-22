@@ -95,6 +95,16 @@ export const STRINGS = {
     next_title_em: "here.",
     next_sub: "No pressure — close the tab whenever you want.",
 
+    // Reviewer reward card
+    reward_eyebrow: "A thank-you, just for you",
+    reward_code_label: "Your code",
+    reward_copy: "Copy code",
+    reward_copied: "Copied",
+    reward_how: "How to redeem",
+    reward_book_cta: "Book now & apply this code",
+    reward_expires: "Expires {date}",
+    reward_expired: "Offer expired",
+
     // Book CTA
     book_title: "Book your next visit",
     book_desc: "Open slots this week — 30 seconds to reserve.",
@@ -225,6 +235,15 @@ export const STRINGS = {
     next_title_em: "在这里。",
     next_sub: "不勉强 —— 随时可以关闭此页面。",
 
+    reward_eyebrow: "给您的小心意",
+    reward_code_label: "您的优惠码",
+    reward_copy: "复制优惠码",
+    reward_copied: "已复制",
+    reward_how: "兑换方式",
+    reward_book_cta: "立即预约并使用此优惠码",
+    reward_expires: "有效期至 {date}",
+    reward_expired: "优惠已过期",
+
     book_title: "预约下次就诊",
     book_desc: "本周有空档 —— 30 秒即可预约。",
 
@@ -347,6 +366,15 @@ export const STRINGS = {
     next_title: "Mientras está aquí.",
     next_title_em: "aquí.",
     next_sub: "Sin presión — cierre la pestaña cuando quiera.",
+
+    reward_eyebrow: "Un agradecimiento, solo para usted",
+    reward_code_label: "Su código",
+    reward_copy: "Copiar código",
+    reward_copied: "Copiado",
+    reward_how: "Cómo canjear",
+    reward_book_cta: "Reservar y aplicar este código",
+    reward_expires: "Vence el {date}",
+    reward_expired: "Oferta vencida",
 
     book_title: "Reserve su próxima visita",
     book_desc: "Horarios disponibles esta semana — 30 segundos para reservar.",

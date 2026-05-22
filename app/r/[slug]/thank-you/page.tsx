@@ -6,9 +6,11 @@ import {
 } from "@/lib/i18n/review";
 import type {
   ReferralConfig,
+  RewardConfig,
   SocialHandles,
 } from "@/lib/database.types";
 import { resolveReferralConfig } from "@/lib/referral/config";
+import { resolveRewardConfig } from "@/lib/reward/config";
 import { ThankYouShell } from "@/components/review/thank-you-shell";
 
 export const dynamic = "force-dynamic";
@@ -44,7 +46,7 @@ export default async function ThankYouPage({
   const { data: location } = await supabase
     .from("locations")
     .select(
-      "id, slug, display_name, brand_color, logo_url, address, default_language, supported_languages, booking_url, social_handles, consent_display_enabled, referral_config",
+      "id, slug, display_name, brand_color, logo_url, address, default_language, supported_languages, booking_url, social_handles, consent_display_enabled, referral_config, reward_config",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -118,6 +120,10 @@ export default async function ThankYouPage({
     location.referral_config as ReferralConfig | null,
     brandColor,
   );
+  const reward = resolveRewardConfig(
+    location.reward_config as RewardConfig | null,
+    location.booking_url ?? null,
+  );
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-cream px-4 pb-10 sm:px-6">
@@ -148,12 +154,31 @@ export default async function ThankYouPage({
             ? {
                 title: offer.offerTitle!,
                 subtitle: offer.offerSubtitle,
+                description: offer.offerDescription,
                 code: offer.offerCode,
                 imageUrl: offer.offerImageUrl,
                 imageAspect: offer.offerImageAspect,
                 accentColor: offer.accentColor,
                 expiresAt: offer.expiresAt,
                 isExpired: offer.isExpired,
+              }
+            : null
+        }
+        reward={
+          reward.hasReward
+            ? {
+                title: reward.title!,
+                subtitle: reward.subtitle,
+                code: reward.code,
+                imageUrl: reward.imageUrl,
+                imageAspect: reward.imageAspect,
+                description: reward.description,
+                bookingEnabled: reward.bookingEnabled,
+                bookingUrl: reward.bookingUrl,
+                bookingCtaLabel: reward.bookingCtaLabel,
+                accentColor: reward.accentColor,
+                expiresAt: reward.expiresAt,
+                isExpired: reward.isExpired,
               }
             : null
         }

@@ -64,6 +64,11 @@ export interface ReferralConfig {
   enabled?: boolean;
   offer_title?: string | null;
   offer_subtitle?: string | null;
+  /**
+   * Long-form fine print rendered below the image and code. Markdown-lite:
+   * **bold**, *italic*, and bullet lines starting with "- " or "* ".
+   */
+  offer_description?: string | null;
   offer_code?: string | null;
   offer_image_url?: string | null;
   offer_image_aspect?: OfferImageAspect | null;
@@ -71,6 +76,43 @@ export interface ReferralConfig {
   accent_color?: string | null;
   cta_label?: string | null;
   cta_url?: string | null;
+  expires_at?: string | null; // ISO timestamp
+}
+
+/**
+ * Reviewer's reward card — separate from ReferralConfig (which is the
+ * friend's offer on the /s/<token> share landing). This is the personal
+ * thank-you shown to the reviewer on /r/<slug>/thank-you after they post.
+ */
+export interface RewardConfig {
+  enabled?: boolean;
+  /** Headline of the reward. e.g. "You earned $20 off your next visit". */
+  title?: string | null;
+  /** How to redeem. e.g. "Show this page at your next visit". */
+  subtitle?: string | null;
+  /** Coupon / discount code. Independent from referral offer_code. */
+  code?: string | null;
+  /** Optional hero image at the top of the reward card. */
+  image_url?: string | null;
+  image_aspect?: OfferImageAspect | null;
+  /** Long-form description, plain text with newlines (markdown-lite). */
+  description?: string | null;
+  /**
+   * When false the reward card omits the "Book now & apply this code" CTA —
+   * appropriate for retail, walk-in services, product sales etc. When true
+   * we use booking_url (or fall back to locations.booking_url).
+   */
+  booking_enabled?: boolean;
+  booking_url?: string | null;
+  /**
+   * Custom label for the booking CTA button. When null/empty we fall back to
+   * the localized default ("Book now & apply this code"). Lets businesses
+   * whose booking site doesn't have a coupon field write something like
+   * "Book now — show your coupon at your visit".
+   */
+  booking_cta_label?: string | null;
+  /** Override accent color for the reward card. Defaults to gold. */
+  accent_color?: string | null;
   expires_at?: string | null; // ISO timestamp
 }
 
@@ -195,6 +237,7 @@ export interface Database {
           widget_config: WidgetConfig;
           default_share_theme: string | null;
           referral_config: ReferralConfig;
+          reward_config: RewardConfig;
           created_at: string;
           updated_at: string;
         };
@@ -233,6 +276,7 @@ export interface Database {
           widget_config?: WidgetConfig;
           default_share_theme?: string | null;
           referral_config?: ReferralConfig;
+          reward_config?: RewardConfig;
           created_at?: string;
           updated_at?: string;
         };

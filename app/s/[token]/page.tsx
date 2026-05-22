@@ -113,6 +113,7 @@ export default async function SharePage({
     enabled?: string;
     offer_title?: string;
     offer_subtitle?: string;
+    offer_description?: string;
     offer_code?: string;
     offer_image?: string;
     offer_image_aspect?: string;
@@ -198,6 +199,8 @@ export default async function SharePage({
         enabled: sp.enabled === "0" ? false : true,
         offer_title: sp.offer_title ?? baseRefCfg?.offer_title ?? null,
         offer_subtitle: sp.offer_subtitle ?? baseRefCfg?.offer_subtitle ?? null,
+        offer_description:
+          sp.offer_description ?? baseRefCfg?.offer_description ?? null,
         offer_code: sp.offer_code ?? baseRefCfg?.offer_code ?? null,
         offer_image_url: sp.offer_image ?? baseRefCfg?.offer_image_url ?? null,
         offer_image_aspect:
@@ -327,6 +330,7 @@ export default async function SharePage({
             accent={accent}
             title={offer.offerTitle!}
             subtitle={offer.offerSubtitle}
+            description={offer.offerDescription}
             code={offer.offerCode}
             imageUrl={offer.offerImageUrl}
             imageAspect={offer.offerImageAspect}

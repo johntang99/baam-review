@@ -38,7 +38,7 @@ const workspaceItems: WorkspaceItem[] = [
   { href: "/app/send", label: "Send review request", icon: Send },
   { href: "/app/lists", label: "Lists", icon: ClipboardCheck, badgeKey: "lists" },
   { href: "/app/reviews", label: "Reviews Reply & Share", icon: Star },
-  { href: "/app/referrals", label: "Referral settings", icon: Users },
+  { href: "/app/referrals", label: "Reward & Referral Settings", icon: Users },
   { href: "/app/share", label: "Widget & QR poster", icon: Share2 },
   { href: "/app/analytics", label: "Analytics & Review Revenue", icon: BarChart3 },
 ];

@@ -9,6 +9,8 @@ export interface ResolvedReferralConfig {
   hasOffer: boolean;
   offerTitle: string | null;
   offerSubtitle: string | null;
+  /** Long-form fine print (markdown-lite). Rendered below the code. */
+  offerDescription: string | null;
   offerCode: string | null;
   offerImageUrl: string | null;
   /** Aspect ratio of the hero image. Width is fixed by the card; height = width / aspect. */
@@ -39,6 +41,7 @@ export function isValidAspect(x: unknown): x is OfferImageAspect {
 const DEFAULT_CTA_LABEL = "Book with this offer";
 const TITLE_MAX = 80;
 const SUBTITLE_MAX = 240;
+const DESCRIPTION_MAX = 1500;
 const CODE_MAX = 30;
 const CTA_LABEL_MAX = 60;
 
@@ -58,6 +61,7 @@ export function resolveReferralConfig(
   const enabled = c.enabled !== false; // default true; explicit false hides
   const offerTitle = cleanString(c.offer_title, TITLE_MAX);
   const offerSubtitle = cleanString(c.offer_subtitle, SUBTITLE_MAX);
+  const offerDescription = cleanString(c.offer_description, DESCRIPTION_MAX);
   const offerCode = cleanCode(c.offer_code);
   const offerImageUrl = cleanUrl(c.offer_image_url);
   const accentColor =
@@ -80,6 +84,7 @@ export function resolveReferralConfig(
     hasOffer: enabled && !!offerTitle,
     offerTitle,
     offerSubtitle,
+    offerDescription,
     offerCode,
     offerImageUrl,
     offerImageAspect,

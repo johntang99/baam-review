@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Calendar, Check, Copy } from "lucide-react";
 import type { Language } from "@/lib/i18n/review";
 import type { OfferImageAspect } from "@/lib/database.types";
+import { MarkdownLite } from "@/components/review/markdown-lite";
 
 const STRINGS: Record<
   Language,
@@ -46,6 +47,8 @@ interface OfferBlockProps {
   accent: string;
   title: string;
   subtitle: string | null;
+  /** Long-form fine print rendered below the code (markdown-lite). */
+  description: string | null;
   code: string | null;
   imageUrl: string | null;
   imageAspect: OfferImageAspect;
@@ -65,6 +68,7 @@ export function OfferBlock({
   accent,
   title,
   subtitle,
+  description,
   code,
   imageUrl,
   imageAspect,
@@ -182,6 +186,12 @@ export function OfferBlock({
                 </>
               )}
             </button>
+          </div>
+        )}
+
+        {description && (
+          <div className="mt-4 rounded-lg bg-cream-deep/60 px-3.5 py-3">
+            <MarkdownLite text={description} />
           </div>
         )}
 

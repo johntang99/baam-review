@@ -7,6 +7,7 @@ import type { ReferralConfig } from "@/lib/database.types";
 
 const TITLE_MAX = 80;
 const SUBTITLE_MAX = 240;
+const DESCRIPTION_MAX = 1500;
 const CODE_MAX = 30;
 const CTA_LABEL_MAX = 60;
 
@@ -33,6 +34,12 @@ export async function saveReferralConfig(
     clean.offer_subtitle = t || null;
   } else if (config.offer_subtitle === null) {
     clean.offer_subtitle = null;
+  }
+  if (typeof config.offer_description === "string") {
+    const t = config.offer_description.slice(0, DESCRIPTION_MAX);
+    clean.offer_description = t.trim() ? t : null;
+  } else if (config.offer_description === null) {
+    clean.offer_description = null;
   }
   if (typeof config.offer_code === "string") {
     const c = config.offer_code
