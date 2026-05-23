@@ -58,6 +58,46 @@ export function MarketingScripts() {
       recalc();
     }
 
+    // "Start now" → Stripe Checkout. POSTs to /api/billing/start-fullservice
+    // and redirects to the hosted Stripe URL. The inline <script> in
+    // marketing-pricing.html is stripped at render time (see
+    // lib/marketing/render.ts), so the handler lives here. Errors surface as
+    // an alert; richer error UI is a TODO.
+    const startNowButtons = Array.from(
+      document.querySelectorAll<HTMLButtonElement>(
+        "[data-start-now-fullservice]",
+      ),
+    );
+    const onStartNow = async (e: Event) => {
+      e.preventDefault();
+      const button = e.currentTarget as HTMLButtonElement;
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = "Loading Stripe…";
+      try {
+        const res = await fetch("/api/billing/start-fullservice", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ interval: "month" }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.url) {
+          throw new Error(data.error || "Could not start checkout");
+        }
+        window.location.assign(data.url);
+      } catch (err) {
+        button.disabled = false;
+        button.textContent = original;
+        alert(
+          "Sorry — could not start checkout. Please try again, or email support@baamplatform.com.",
+        );
+        console.error(err);
+      }
+    };
+    startNowButtons.forEach((b) =>
+      b.addEventListener("click", onStartNow),
+    );
+
     return () => {
       window.removeEventListener("scroll", onScroll);
       if (recalc) {
@@ -65,6 +105,9 @@ export function MarketingScripts() {
         cmSlider?.removeEventListener("input", recalc);
         liftSlider?.removeEventListener("input", recalc);
       }
+      startNowButtons.forEach((b) =>
+        b.removeEventListener("click", onStartNow),
+      );
     };
   }, []);
 

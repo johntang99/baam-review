@@ -6,9 +6,11 @@
  * 30-day trial. Webhook handler at /api/webhooks/stripe later creates a
  * customer_records row from the completed session.
  *
- * Custom fields: business_name + business_address (Stripe supports up to
- * 2 of them on Checkout). We use both so staff can later match the right
- * GBP to the customer record.
+ * Custom fields: customer_name + business_name + business_address.
+ * Stripe Checkout allows up to 3 custom_fields per session and that's
+ * exactly what we use. customer_name is the contact person (often
+ * different from the cardholder name when paying with a business card),
+ * the other two let staff match the right GBP to the customer record.
  *
  * Session metadata: source=start_now_fullservice — webhook uses this to
  * branch into the right handler.
@@ -64,9 +66,17 @@ export async function POST(request: Request) {
     // having to query the subscription separately.
     metadata: { source: "start_now_fullservice", interval },
 
-    // Stripe collects email natively; the two custom fields cover the
-    // business-info we need to match the right GBP to this payment later.
+    // Stripe collects email + cardholder name natively. We additionally
+    // collect the customer's own name (separate from the cardholder, which
+    // for business cards is often the company name) plus the business
+    // identity fields. Order here is the display order in Checkout.
     custom_fields: [
+      {
+        key: "customer_name",
+        label: { type: "custom", custom: "Your name" },
+        type: "text",
+        text: { minimum_length: 2, maximum_length: 80 },
+      },
       {
         key: "business_name",
         label: { type: "custom", custom: "Business name" },

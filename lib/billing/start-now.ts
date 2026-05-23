@@ -16,6 +16,7 @@ const TEAM_NOTIFY_EMAIL = "baamplatform@gmail.com";
 interface StartNowSessionData {
   email: string;
   firstName: string;
+  customerName: string | null;
   businessName: string | null;
   businessAddress: string | null;
   stripeCustomerId: string;
@@ -57,16 +58,23 @@ export async function handleStartNowCheckoutSession(
     return;
   }
 
-  // Custom fields hold business name + address. Stripe returns them in an
-  // array of { key, text: { value } } objects when type === "text".
+  // Custom fields hold customer's own name + business name + address.
+  // Stripe returns them in an array of { key, text: { value } } objects
+  // when type === "text".
   const fields = session.custom_fields ?? [];
+  const customerName =
+    fields.find((f) => f.key === "customer_name")?.text?.value?.trim() ??
+    null;
   const businessName =
     fields.find((f) => f.key === "business_name")?.text?.value ?? null;
   const businessAddress =
     fields.find((f) => f.key === "business_address")?.text?.value ?? null;
 
-  // We may have only the email from Stripe — derive a friendly first name.
+  // Prefer the explicit "Your name" custom field (the contact person) over
+  // the cardholder name — they often differ for business cards. Fall back
+  // to the cardholder name, then to the email handle.
   const firstName =
+    customerName?.split(/\s+/)[0] ||
     session.customer_details?.name?.trim().split(/\s+/)[0] ||
     email.split("@")[0].split(/[._-]/)[0] ||
     "there";
@@ -120,6 +128,7 @@ export async function handleStartNowCheckoutSession(
   const data: StartNowSessionData = {
     email,
     firstName,
+    customerName,
     businessName,
     businessAddress,
     stripeCustomerId: customerId,
@@ -196,7 +205,7 @@ async function sendTeamNotification(data: StartNowSessionData) {
   const lines = [
     `🟢 New Full Service signup via Start Now`,
     "",
-    `Customer:       ${data.firstName}`,
+    `Contact:        ${data.customerName ?? data.firstName}`,
     `Email:          ${data.email}`,
     `Business:       ${data.businessName ?? "—"}`,
     `Address:        ${data.businessAddress ?? "—"}`,

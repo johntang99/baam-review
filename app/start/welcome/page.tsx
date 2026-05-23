@@ -35,9 +35,15 @@ export default async function StartWelcomePage({
       const session = await stripe.checkout.sessions.retrieve(sessionId, {
         expand: ["subscription"],
       });
-      const fullName = session.customer_details?.name?.trim() ?? null;
-      firstName = fullName ? fullName.split(/\s+/)[0] : null;
       const fields = session.custom_fields ?? [];
+      // Prefer the explicit "Your name" custom field over the cardholder
+      // name — they differ when the card belongs to the business.
+      const customerName =
+        fields.find((f) => f.key === "customer_name")?.text?.value?.trim() ??
+        null;
+      const fullName =
+        customerName ?? session.customer_details?.name?.trim() ?? null;
+      firstName = fullName ? fullName.split(/\s+/)[0] : null;
       businessName =
         fields.find((f) => f.key === "business_name")?.text?.value ?? null;
       const sub = session.subscription;
