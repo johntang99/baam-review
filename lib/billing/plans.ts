@@ -4,22 +4,24 @@
  *
  * Both plans bill PER LOCATION as independent subscriptions (own card, own
  * interval, no proration, 30-day free trial). There is NO account-level
- * base subscription.
+ * base subscription. Per-location pricing is now UNIFORM in both plans:
+ * every location costs the same regardless of count. Discounts go through
+ * Stripe Coupons / Promotion Codes rather than a "first vs. additional"
+ * price split.
  *
  *   Self-service tier (the owner runs it themselves):
- *     • First location:        $89/mo ($890/yr)   ← promotional rate
- *     • Each additional:       $79/mo ($790/yr)
+ *     • Every location:        $99/mo ($990/yr) flat
  *
  *   Full-service tier (BAAM runs it for the customer):
- *     • Every location:        $299/mo ($2990/yr) flat
+ *     • Every location:        $399/mo ($3990/yr) flat
  *
  * Annual = 10 × monthly, paid once. Every plan gets a 30-day free trial
  * (card on file collected upfront for card flow; no charge until day 30).
  * Stripe Price IDs live in env (STRIPE_PRICE_ENV).
  *
- * Stripe price-slot naming is legacy — `base` = "first" tier ($89 self /
- * $299 full); `location` = "additional" tier ($79 self / unused full,
- * FULL_LOC archived).
+ * Stripe price-slot naming is legacy — `base` and `location` slots are kept
+ * to preserve the env map shape, but both now resolve to the same price
+ * per plan (uniform). The naming may be collapsed in a future migration.
  */
 
 export type ReviewPlan = "self_service" | "full_service";
@@ -29,10 +31,12 @@ export type PriceComponent = "base" | "location";
 
 /** Monthly price in cents per Stripe slot. Annual = × ANNUAL_MONTHS. */
 const MONTHLY_CENTS: Record<ReviewPlan, Record<PriceComponent, number>> = {
-  // base = first self-service location ($89), location = additional ($79).
-  self_service: { base: 8900, location: 7900 },
-  // base = every full-service location ($299); FULL "location" ($199) retired.
-  full_service: { base: 29900, location: 19900 },
+  // Uniform $99/mo per self-service location (base and location slots both
+  // resolve to this — the slot split is preserved only for env compatibility).
+  self_service: { base: 9900, location: 9900 },
+  // Uniform $399/mo per full-service location. FULL "location" slot is
+  // retained for env compatibility but bills the same as base.
+  full_service: { base: 39900, location: 39900 },
 };
 
 export const ANNUAL_MONTHS = 10;
@@ -56,21 +60,20 @@ function amount(
 /**
  * Which Stripe price slot a per-location subscription uses.
  *
- *   self_service + isFirst=true  → "base"     ($89)  promo rate
- *   self_service + isFirst=false → "location" ($79)  additional
- *   full_service (any)           → "base"     ($299) flat
+ *   self_service (any) → "base"  ($99)  uniform
+ *   full_service (any) → "base"  ($399) uniform
+ *
+ * The `isFirst` parameter is kept for callsite stability but is now
+ * ignored — both plans use uniform per-location pricing. Discounts are
+ * applied via Stripe Coupons / Promotion Codes at checkout, not via a
+ * separate price tier.
  */
 export function locationPriceRef(
   plan: ReviewPlan,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isFirst: boolean,
 ): { plan: ReviewPlan; component: PriceComponent } {
-  if (plan === "self_service") {
-    return {
-      plan: "self_service",
-      component: isFirst ? "base" : "location",
-    };
-  }
-  return { plan: "full_service", component: "base" };
+  return { plan, component: "base" };
 }
 
 /** Per-location price an account would be charged for its FIRST location. */
@@ -83,8 +86,9 @@ export function firstLocationCents(
 }
 
 /**
- * Per-location price for an ADDITIONAL location. For full_service this is
- * the same as the first (flat $299); for self_service it's the lower $79.
+ * Per-location price for an ADDITIONAL location. Both plans are now uniform
+ * (self $99, full $399), so this returns the same as firstLocationCents.
+ * Kept as a separate export so callers don't need to change.
  */
 export function additionalLocationCents(
   plan: ReviewPlan,

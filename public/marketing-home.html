@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BAAM Review — Turn happy customers into reviews, referrals, and revenue</title>
-<meta name="description" content="The Review-to-Revenue Engine for local businesses. Collect Google reviews in 60 seconds, display them on your website, distribute to Xiaohongshu and social, and turn happy customers into referrals. From $89/month founding pricing.">
+<meta name="description" content="The Review-to-Revenue Engine for local businesses. Collect Google reviews in 60 seconds, display them on your website, distribute to Xiaohongshu and social, and turn happy customers into referrals. From $99/month.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1943,8 +1943,8 @@ section { padding: 100px 0; position: relative; }
   font-weight: 500;
 }
 .tier-mini-founding {
-  font-size: 13px;
-  color: var(--gold);
+  font-size: 13.5px;
+  color: rgba(250, 247, 242, 0.92);
   font-weight: 600;
   margin-top: 8px;
   font-family: 'Onest', sans-serif;
@@ -4635,97 +4635,124 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   .process-tldr-steps::before { display: none; }
 }
 
-/* ============ 10× CERTAINTY BANNER (before pricing) ============ */
+/* ============ 5× CERTAINTY BANNER (before pricing) ============ */
+/* ============ 5× VALUE PROMISE ============ */
 .certainty-section {
   padding: 80px 0 0;
   background: var(--cream);
 }
-.certainty-banner {
+.promise-banner {
   max-width: 1080px;
   margin: 0 auto;
   background: var(--forest);
   color: var(--cream);
-  padding: 44px 56px;
-  border-radius: 20px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 48px;
+  padding: 66px 64px 56px;
+  border-radius: 24px;
+  border: 1px solid rgba(201, 169, 97, 0.28);
   box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
+  text-align: center;
 }
-.certainty-banner::before {
+.promise-banner::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 85% 30%, rgba(201, 169, 97, 0.18), transparent 60%);
+  background:
+    radial-gradient(circle at 82% 6%, rgba(201, 169, 97, 0.24), transparent 52%),
+    radial-gradient(circle at 8% 102%, rgba(201, 169, 97, 0.13), transparent 48%);
   pointer-events: none;
 }
-.certainty-seal {
-  font-family: 'Fraunces', serif;
-  font-size: 76px;
-  font-weight: 400;
-  line-height: 1;
-  color: var(--gold-soft);
-  letter-spacing: -0.04em;
-  position: relative;
-}
-.certainty-seal .x { font-size: 96px; color: var(--gold); }
-.certainty-text {
-  border-left: 1px solid rgba(232, 217, 181, 0.28);
-  padding-left: 44px;
-  position: relative;
-}
-.certainty-text h3 {
-  font-family: 'Fraunces', serif;
-  font-size: 28px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: var(--cream);
-  letter-spacing: -0.015em;
-}
-.certainty-text p {
-  font-family: 'Newsreader', serif;
-  font-size: 16px;
-  color: rgba(250, 247, 242, 0.86);
-  line-height: 1.7;
-}
-.certainty-text p strong { color: var(--gold-soft); font-weight: 500; }
-.certainty-stamp {
+.promise-banner > * { position: relative; z-index: 1; }
+
+.promise-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  color: var(--gold-soft);
-  text-align: center;
-  border: 1px solid rgba(232, 217, 181, 0.42);
-  padding: 14px;
-  border-radius: 50%;
-  width: 124px; height: 124px;
-  display: grid; place-items: center;
-  line-height: 1.8;
-  flex-shrink: 0;
+  font-size: 11px;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
+  color: var(--gold);
   font-weight: 600;
-  position: relative;
+  margin: 0 0 30px;
+}
+.promise-eyebrow::before, .promise-eyebrow::after {
+  content: '';
+  width: 30px;
+  height: 1px;
+  background: rgba(201, 169, 97, 0.55);
 }
 
-@media (max-width: 900px) {
-  .certainty-banner {
-    grid-template-columns: 1fr;
-    gap: 28px;
-    text-align: center;
-    padding: 36px 32px;
-  }
-  .certainty-text {
-    border-left: none;
-    padding-left: 0;
-    border-top: 1px solid rgba(232, 217, 181, 0.28);
-    padding-top: 28px;
-  }
-  .certainty-stamp { margin: 0 auto; }
-  .certainty-seal { font-size: 60px; }
-  .certainty-seal .x { font-size: 76px; }
+.promise-claim {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: clamp(27px, 3.3vw, 41px);
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  color: var(--cream);
+  max-width: 920px;
+  margin: 0 auto;
+}
+.promise-claim .tv { color: var(--gold-soft); }
+.promise-claim .atleast { white-space: nowrap; }
+.promise-claim .multi {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: -0.03em;
+}
+.promise-claim .yr { color: var(--gold); white-space: nowrap; }
+
+.promise-qualifier {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: rgba(250, 247, 242, 0.6);
+  max-width: 640px;
+  margin: 28px auto 0;
+}
+.promise-qualifier .q-em { color: var(--gold-soft); font-style: normal; }
+
+.promise-rule {
+  width: 60px;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 2px;
+  margin: 34px auto 30px;
+}
+
+.promise-closer {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: clamp(19px, 1.85vw, 24px);
+  line-height: 1.42;
+  letter-spacing: -0.015em;
+  color: var(--cream);
+  max-width: 730px;
+  margin: 0 auto 32px;
+}
+.promise-closer em { color: var(--gold); font-style: italic; }
+
+.promise-stamp {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  font-weight: 600;
+  border: 1px solid rgba(232, 217, 181, 0.4);
+  border-radius: 999px;
+  padding: 9px 20px;
+}
+
+@media (max-width: 760px) {
+  .promise-banner { padding: 44px 26px 38px; }
+  .promise-eyebrow { margin-bottom: 22px; }
+  .promise-qualifier { font-size: 14.5px; }
 }
 
 /* ============ RESEARCH STAT ICONS + ENHANCED HOVER ============ */
@@ -5124,8 +5151,8 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         </div>
 
         <div class="hero-ctas">
-          <a href="/pricing#self-serve" class="btn btn-primary btn-large">Start free trial →</a>
-          <a href="/pricing#full-service" class="btn btn-gold btn-large">Full Service →</a>
+          <a href="#pricing" class="btn btn-primary btn-large">Start free trial →</a>
+          <a href="#promise" class="btn btn-gold btn-large">5× value promise →</a>
           <a href="#engine" class="btn btn-outline btn-large">See the $1,728 math →</a>
         </div>
         <div class="hero-trust">
@@ -5675,10 +5702,12 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
                   fill="none" stroke="#F0EBE0" stroke-width="36"
                   stroke-dasharray="1018 113" stroke-dashoffset="-113"
                   transform="rotate(-90 200 200)"/>
-          <!-- Labels around the ring -->
-          <text x="200" y="32" text-anchor="middle" fill="#1F4D3F"
+          <!-- Top label inside the donut hollow so the colored arc above
+               stays clean; side label moved to upper-right area above the
+               big "90%" number so it doesn't intersect the % character. -->
+          <text x="200" y="72" text-anchor="middle" fill="#1F4D3F"
                 font-family="Fraunces, serif" font-size="13" font-weight="600" letter-spacing="0.05em">10% LEAVE A REVIEW</text>
-          <text x="384" y="200" text-anchor="end" fill="#5A6660"
+          <text x="346" y="118" text-anchor="end" fill="#5A6660"
                 font-family="Fraunces, serif" font-size="13" font-style="italic">silent customers</text>
         </svg>
         <div class="silence-stat">
@@ -6079,20 +6108,27 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   </div>
 </section>
 
-<!-- ============ 10× CERTAINTY BANNER (transition into pricing) ============ -->
-<section class="certainty-section">
+<!-- ============ 5× VALUE PROMISE ============ -->
+<section class="certainty-section" id="promise">
   <div class="container">
-    <div class="certainty-banner">
-      <div class="certainty-seal">10<span class="x">×</span></div>
-      <div class="certainty-text">
-        <h3>Our 10× value promise.</h3>
-        <p>
-          Measured against the <strong>median</strong> per-review value for your industry — not the high end, not the low end — we're confident the Review Revenue we generate will be <strong>at least 10× what you pay us</strong>. The only precondition: you keep sending us real customer lists each month. We don't conjure customers from thin air — we translate the goodwill you've already earned into reviews Google can see.
-        </p>
-      </div>
-      <div class="certainty-stamp">
-        BAAM × You<br>10× Value<br>Together
-      </div>
+    <div class="promise-banner">
+      <h3 class="promise-eyebrow">The 5× Value Promise</h3>
+
+      <p class="promise-claim">
+        We're confident the <span class="tv">Total Review Value</span> we generate will be <span class="atleast">at least <span class="multi">5×</span></span> what you pay us <span class="yr">within a year</span>.
+      </p>
+
+      <p class="promise-qualifier">
+        Measured against the <span class="q-em">median</span> per-review value for your industry — not the high end, not the low end. The only precondition: you keep sending us real customer lists each month.
+      </p>
+
+      <div class="promise-rule"></div>
+
+      <p class="promise-closer">
+        We don't conjure customers from thin air — <em>we translate the goodwill you've already earned into reviews Google can see.</em>
+      </p>
+
+      <div class="promise-stamp">BAAM × You · 5× Value · Together</div>
     </div>
   </div>
 </section>
@@ -6103,7 +6139,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
     <div class="chapter-tag"><span class="ch-no">Chapter 7</span> · Pricing</div>
     <h2 class="section-title">Pricing that respects <em>how you want to work.</em></h2>
     <p style="font-family: 'Newsreader', serif; font-size: 19px; color: rgba(250, 247, 242, 0.78); max-width: 660px; margin-top: 8px;">
-      Run it yourself with our platform, or let us run it for you. Founding-customer pricing locked forever for the first 50 self-serve and first 20 Full Service signups.
+      Run it yourself with our platform, or let us run it for you. Every plan starts with a 30-day free trial — and an annual option that gives you two months free.
     </p>
 
     <div class="tier-strip">
@@ -6114,16 +6150,15 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         <div class="tier-mini-name">Run it yourself</div>
         <div class="tier-mini-tag">Log in, send review requests, reply to reviews. You drive it.</div>
         <div class="tier-mini-price-row">
-          <span class="tier-mini-price-pre">From</span>
-          <span class="tier-mini-price">$99<span class="tier-mini-price-period">/mo</span></span>
+          <span class="tier-mini-price">$99<span class="tier-mini-price-period">/month</span></span>
         </div>
-        <div class="tier-mini-founding"><strong>$89/mo</strong> founding · 30-day free trial</div>
+        <div class="tier-mini-founding">or <strong>$990/year</strong> — 2 months free<br>30-day free trial on either plan · cancel anytime</div>
 
         <ul class="tier-mini-feature-list">
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Single location, unlimited review requests</li>
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI drafting in EN / 中文 / Español</li>
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Lists, batch sends, private feedback path</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Add locations at +$79/mo each</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Each additional location: same $99/mo</li>
         </ul>
 
         <a href="/pricing#self-serve" class="tier-mini-cta">
@@ -6138,16 +6173,15 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         <div class="tier-mini-name">We run it for you</div>
         <div class="tier-mini-tag">Send us your customer list each week. We handle everything else.</div>
         <div class="tier-mini-price-row">
-          <span class="tier-mini-price-pre" style="color: rgba(232, 217, 181, 0.7);">From</span>
-          <span class="tier-mini-price">$399<span class="tier-mini-price-period">/mo</span></span>
+          <span class="tier-mini-price">$399<span class="tier-mini-price-period">/month</span></span>
         </div>
-        <div class="tier-mini-founding"><strong>$299/mo</strong> per location founding · 30-day free trial · setup waived</div>
+        <div class="tier-mini-founding">or <strong>$3,990/year</strong> — 2 months free<br>30-day free trial on either plan · cancel anytime</div>
 
         <ul class="tier-mini-feature-list">
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We send all review requests, weekly batches</li>
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We reply to every review in your voice</li>
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We catch private feedback before it goes public</li>
-          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Every additional location at the same $299/mo (no $199 tier — flat)</li>
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Every additional location at the same flat $399/mo</li>
         </ul>
 
         <a href="/pricing#full-service" class="tier-mini-cta">
@@ -6162,11 +6196,13 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 
     </div>
 
+    <p style="text-align: center; font-family: 'Newsreader', serif; font-style: italic; font-size: 18px; font-weight: 700; color: rgba(250, 247, 242, 0.95); margin: 8px 0 28px;">Special promotional pricing may be available from time to time — ask us for current offers.</p>
+
     <div class="pricing-cta-row">
-      <a href="/pricing" class="btn btn-gold btn-large">See full pricing →</a>
+      <a href="/pricing" class="btn btn-gold btn-large">See pricing page →</a>
       <span class="founding-note">
         <span class="founding-dot"></span>
-        23 self-serve · 17 Full Service founding spots left — locked forever.
+        Every plan includes a 30-day free trial · no setup fees · cancel anytime.
       </span>
     </div>
   </div>
@@ -6258,7 +6294,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="faq-chevron">+</span>
         </summary>
         <div class="faq-a">
-          Yes. Self-serve: your first location is $89/mo (founding), each additional location is $79/mo. So 5 locations = $89 + 4×$79 = $405/mo; 10 locations = $89 + 9×$79 = $800/mo. Each location is its own subscription with its own card, dashboard, brand settings, and review attribution — cancel one without touching the others. Full Service: every location is a flat $299/mo (founding), card or pay-by-check. Every location includes a 30-day free trial. Birdeye and Podium charge $200–400 per location at this volume.
+          Yes. Self-serve: your first location is $99/mo, each additional location is $79/mo. So 5 locations = $99 + 4×$79 = $415/mo; 10 locations = $99 + 9×$79 = $810/mo. Each location is its own subscription with its own card, dashboard, brand settings, and review attribution — cancel one without touching the others. Full Service: every location is a flat $399/mo, card or pay-by-check. Every location includes a 30-day free trial. Birdeye and Podium charge $200–400 per location at this volume.
         </div>
       </details>
 
@@ -6936,7 +6972,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
             <th class="compare-th-feature"></th>
             <th class="compare-th compare-th-baam">
               <div class="compare-th-name">BAAM Review</div>
-              <div class="compare-th-price"><strong>$89</strong>/mo founding</div>
+              <div class="compare-th-price"><strong>$99</strong>/mo</div>
             </th>
             <th class="compare-th">
               <div class="compare-th-name">Birdeye</div>
@@ -7130,44 +7166,9 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 <script>
   // Nav border on scroll
   const nav = document.getElementById('nav');
-  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
-
-  // ROI calculator
-  const cvSlider = document.getElementById('roi-cv');
-  const cmSlider = document.getElementById('roi-cm');
-  const liftSlider = document.getElementById('roi-lift');
-  const cvVal = document.getElementById('roi-cv-val');
-  const cmVal = document.getElementById('roi-cm-val');
-  const liftVal = document.getElementById('roi-lift-val');
-  const out = document.getElementById('roi-out');
-  const extraCustomersEl = document.getElementById('roi-extra-customers');
-  const multipleEl = document.getElementById('roi-multiple');
-
-  function fmt(n) {
-    return n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  if (nav) {
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
   }
-
-  function recalc() {
-    const cv = parseInt(cvSlider.value);
-    const cm = parseInt(cmSlider.value);
-    const lift = parseInt(liftSlider.value);
-    cvVal.textContent = fmt(cv);
-    cmVal.textContent = fmt(cm);
-    liftVal.textContent = lift;
-
-    const extraCustomers = Math.round(cm * (lift / 100));
-    const monthlyImpact = extraCustomers * cv;
-    out.textContent = fmt(monthlyImpact);
-    extraCustomersEl.textContent = extraCustomers;
-
-    const multiple = Math.round(monthlyImpact / 99);
-    multipleEl.textContent = (multiple >= 1 ? multiple : 1) + '×';
-  }
-
-  cvSlider.addEventListener('input', recalc);
-  cmSlider.addEventListener('input', recalc);
-  liftSlider.addEventListener('input', recalc);
-  recalc();
 </script>
 
 <!-- ============ STICKY MOBILE CTA (mobile only) ============ -->

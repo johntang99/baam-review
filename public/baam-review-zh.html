@@ -2401,7 +2401,7 @@ footer {
         <div class="stat-label">一条 5 星评价<br>24 个月模型估值</div>
       </div>
       <div>
-        <div class="stat-num">10<span class="x">×</span></div>
+        <div class="stat-num">5<span class="x">×</span></div>
         <div class="stat-label">「评价营收」承诺<br>按行业中位数测算</div>
       </div>
     </div>
@@ -2598,7 +2598,7 @@ footer {
     <div class="industry-note">
       <strong>怎么读这张表?</strong> 一条评价的价值,是它在 24 个月内通过 Google 排名提升、
       网站转化率提升、朋友推荐成交三个渠道累计创造的「评价营收」。
-      我们对您的 10× 承诺,即以 <strong>中位数</strong>(不取高、不取低)为测算基准:
+      我们对您的 5× 承诺,即以 <strong>中位数</strong>(不取高、不取低)为测算基准:
       以针灸诊所为例 —— 中位数约 $1,400/条,每月稳定新增 12 条评价,
       24 个月累计「评价营收」约 $40 万,远远超出全年的订阅成本。
       本数据基于哈佛商学院、BrightLocal、Whitespark 等独立研究机构的公开数据,
@@ -2817,10 +2817,12 @@ footer {
                   fill="none" stroke="#ebe2d2" stroke-width="36"
                   stroke-dasharray="1018 113" stroke-dashoffset="-113"
                   transform="rotate(-90 200 200)"/>
-          <!-- Labels around the ring -->
-          <text x="200" y="36" text-anchor="middle" fill="#b73225"
-                font-family="Noto Serif SC" font-size="13" font-weight="600">留下评价的</text>
-          <text x="380" y="200" text-anchor="end" fill="#6b5f52"
+          <!-- Top label inside the donut hollow so the colored arc above
+               stays clean; side label moved to upper-right area above the
+               big "90%" number so it doesn't intersect the % character. -->
+          <text x="200" y="72" text-anchor="middle" fill="#b73225"
+                font-family="Noto Serif SC" font-size="13" font-weight="600">10% 留下评价</text>
+          <text x="346" y="118" text-anchor="end" fill="#6b5f52"
                 font-family="Noto Serif SC" font-size="13">沉默的满意顾客</text>
         </svg>
         <div class="problem-stat">
@@ -3246,16 +3248,16 @@ footer {
 
     <!-- 10X CERTAINTY BANNER -->
     <div class="guarantee-banner">
-      <div class="guarantee-seal">10<span class="x">×</span></div>
+      <div class="guarantee-seal">5<span class="x">×</span></div>
       <div class="guarantee-text">
-        <h3>我们的 10× 价值承诺</h3>
+        <h3>我们的 5× 价值承诺</h3>
         <p>按行业评价价值的 <strong>中位数</strong> 测算 —— 不取高、不取低 —— 我们有十足把握,
-        为您创造的「评价营收」<strong>不少于您所付费用的 10 倍</strong>。
+        为您创造的「评价营收」<strong>不少于您所付费用的 5 倍</strong>。
         前提是您每月持续将真实客户名单交给我们;
         我们做的不是凭空造客,而是把您已经赢得的好感,翻译成 Google 上看得见的好评。</p>
       </div>
       <div class="guarantee-stamp">
-        BAAM × 您<br>10× 价值<br>协力达成
+        BAAM × 您<br>5× 价值<br>协力达成
       </div>
     </div>
 
@@ -3266,9 +3268,8 @@ footer {
         <h3>您自己来用</h3>
         <p class="plan-tagline">登录后台、发出邀请、回复评价 —— 控制权在您手上。适合愿意自己花 30 分钟/周打理的店家。</p>
         <div class="plan-price">
-          <span class="dollars">$89</span>
-          <span class="per">/ 月 · 创始价</span>
-          <span class="plan-price-was">$99</span>
+          <span class="dollars">$99</span>
+          <span class="per">/ 月 · 每店面</span>
         </div>
         <ul class="plan-features">
           <li>单店面,无限次评价邀请</li>
@@ -3276,7 +3277,7 @@ footer {
           <li>批量上传名单、自动跟进、60 天去重</li>
           <li>网站评价展示组件 + Schema 结构化数据</li>
           <li>30 天免费试用,30 天后才开始计费</li>
-          <li>第二家店起 $79/月/店</li>
+          <li>每家店统一 $99/月,无阶梯加价</li>
         </ul>
         <a href="https://review.baamplatform.com/signup" class="plan-cta light">开始 30 天免费试用</a>
       </div>
@@ -3288,9 +3289,8 @@ footer {
         <h3>我们替您打理</h3>
         <p class="plan-tagline">您只需要每周把客户名单发给我们,其余的事 —— 发邀请、回复评价、监控负评 —— 都由我们的团队完成。</p>
         <div class="plan-price">
-          <span class="dollars">$299</span>
-          <span class="per">/ 月 · 创始价</span>
-          <span class="plan-price-was">$399</span>
+          <span class="dollars">$399</span>
+          <span class="per">/ 月 · 每店面</span>
         </div>
         <ul class="plan-features">
           <li>我们每周替您发出所有评价邀请</li>
@@ -3298,7 +3298,7 @@ footer {
           <li>在差评发到公开页面前,我们先拦截、先解决</li>
           <li>每月书面运营报告(中文)</li>
           <li>30 天免费试用 · 免设置费 · 月结、可随时取消</li>
-          <li>多店面统一 $299/月/店(创始价,锁定终身)</li>
+          <li>多店面统一 $399/月/店</li>
         </ul>
         <a href="/book/zh" class="plan-cta dark">预约免费咨询</a>
         <div class="plan-partner-row">
@@ -3356,13 +3356,13 @@ footer {
       </div>
 
       <div class="faq-item">
-        <button class="faq-q">"10× 价值承诺"具体怎么算?<span class="faq-icon"></span></button>
+        <button class="faq-q">"5× 价值承诺"具体怎么算?<span class="faq-icon"></span></button>
         <div class="faq-a">
           我们用一套基于独立行业研究的「评价营收」模型,核算每一条新评价对您带来的实际价值
           (Google 搜索排名提升 + 网站转化率提升 + 朋友推荐成交)。
           测算口径采用的是 <strong>行业评价价值的中位数</strong>,既不取高端预估,也不取保守下限 ——
           这样的数字才经得起回头复盘。按 24 个月模型核算,
-          绝大多数 BAAM Review 客户在第一年内就已大幅越过 10× 价值线;
+          绝大多数 BAAM Review 客户在第一年内就已大幅越过 5× 价值线;
           中医诊所、保险经纪、地产经纪等中高 LTV 行业,通常在前 3–6 个月就达成。
           这份承诺成立的前提是您每月持续向我们交付真实的服务过的客户名单 ——
           我们做的不是凭空造客,而是把您已经赢得的好感,翻译成 Google 上看得见的好评。
@@ -3402,7 +3402,7 @@ footer {
         <button class="faq-q">我有多家分店,价格怎么算?<span class="faq-icon"></span></button>
         <div class="faq-a">
           每家分店都是独立订阅,独立的后台、品牌设置和评价归因。
-          自助版第一家 $89/月,第二家起 $79/月/店。全托管版统一 $299/月/店。
+          自助版每家店 $99/月,全托管版每家店 $399/月。
           每家店都享 30 天免费试用,30 天后才开始计费。
           相比之下,Birdeye 和 Podium 在多店面上每店收 $300–500,我们仍然显著便宜。
         </div>
