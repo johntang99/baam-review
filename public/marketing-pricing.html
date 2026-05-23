@@ -264,6 +264,146 @@ section { padding: 80px 0; }
 .section-header-center { text-align: center; max-width: 760px; margin: 0 auto 50px; }
 .section-header-center .section-sub { margin-left: auto; margin-right: auto; }
 
+/* ====== 5× PROMISE (Full Service only) — pricing-page variant ======
+   Different visual treatment from the homepage's all-green promise banner:
+   a white card with a gold left rail and a two-column split — the big "5×"
+   seal on the left, the conditional "if / then" copy on the right, plus a
+   clear self-serve disclaimer block. Lives between the pricing tiers and
+   the comparison table. */
+.promise-pricing { padding: 70px 0 90px; background: var(--cream); }
+.promise-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 20px;
+  padding: 48px 52px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+.promise-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: radial-gradient(circle at 12% 20%, rgba(201, 169, 97, 0.08), transparent 55%);
+  pointer-events: none;
+}
+.promise-card-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 48px;
+  position: relative;
+  z-index: 1;
+}
+.promise-seal-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.promise-conditional-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.promise-conditional-tag svg { width: 13px; height: 13px; }
+.promise-seal-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 128px;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--forest);
+  margin-top: 8px;
+}
+.promise-seal-x { color: var(--gold); font-size: 0.85em; margin-left: 4px; }
+.promise-seal-label {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+.promise-text-col {
+  border-left: 1px solid var(--border-soft);
+  padding-left: 48px;
+}
+.promise-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.promise-headline {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+.promise-if {
+  display: inline-block;
+  padding: 1px 10px;
+  background: rgba(31, 77, 63, 0.08);
+  border-radius: 6px;
+  font-style: italic;
+  color: var(--forest);
+  font-weight: 500;
+}
+.promise-then em {
+  font-style: italic;
+  color: var(--forest);
+  font-weight: 500;
+}
+.promise-detail {
+  font-family: 'Newsreader', serif;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--text-soft);
+  margin-bottom: 22px;
+}
+.promise-detail strong { color: var(--ink); font-weight: 600; }
+.promise-disclaimer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--cream-deep);
+  border-radius: 12px;
+  border-left: 3px solid var(--sage);
+}
+.promise-disclaimer svg {
+  width: 18px; height: 18px;
+  color: var(--sage);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.promise-disclaimer p {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+.promise-disclaimer strong { color: var(--ink); font-weight: 600; }
+
+@media (max-width: 880px) {
+  .promise-card { padding: 36px 28px; }
+  .promise-card-grid { grid-template-columns: 1fr; gap: 28px; }
+  .promise-text-col { border-left: 0; padding-left: 0; border-top: 1px solid var(--border-soft); padding-top: 28px; }
+  .promise-seal-num { font-size: 96px; }
+  .promise-headline { font-size: 24px; }
+}
+
 /* ====== COMPARISON TABLE ====== */
 .compare-section { background: var(--cream-deep); padding: 80px 0; }
 .compare-table-wrap {
@@ -518,6 +658,45 @@ footer a:hover { color: var(--cream); }
 
   <p class="plans-footnote">Running multiple locations? Every location is its own subscription at the same per-location price — no multi-location surcharge — each with its own dashboard and review profile. Special promotional pricing is available from time to time; ask us for current offers.</p>
 </div>
+
+<!-- ============ 5× VALUE PROMISE (Full Service only) ============ -->
+<section class="promise-pricing" id="promise">
+  <div class="container">
+    <div class="promise-card">
+      <div class="promise-card-grid">
+        <!-- LEFT: the 5× seal -->
+        <div class="promise-seal-col">
+          <div class="promise-conditional-tag">
+            <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+            Full Service only
+          </div>
+          <div class="promise-seal-num">5<span class="promise-seal-x">×</span></div>
+          <div class="promise-seal-label">Total Review Value<br>vs. what you pay us</div>
+        </div>
+
+        <!-- RIGHT: the conditional promise -->
+        <div class="promise-text-col">
+          <div class="promise-eyebrow">The promise</div>
+          <h2 class="promise-headline">
+            <span class="promise-if">If</span> we run it for you —
+            <span class="promise-then">we're confident the Total Review Value we generate will be at least <em>5× what you pay us, within 12 months.</em></span>
+          </h2>
+
+          <p class="promise-detail">
+            Measured against the <strong>median</strong> per-review value for your industry — not the high end, not the low end. The only precondition: you keep sending us real customer lists each month. We don't conjure customers from thin air — we translate the goodwill you've already earned into reviews Google can see.
+          </p>
+
+          <div class="promise-disclaimer">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+            <p>
+              <strong>Self-serve customers get the same platform</strong>, but because we don't run the operations side, the 5× outcome depends on your own execution — we can't guarantee a number we don't control. Switch to Full Service anytime to activate the promise.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- ============ COMPARISON TABLE ============ -->
 <section class="compare-section" id="compare">

@@ -28,7 +28,7 @@ export default function BookPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-[560px] px-6 pb-24 pt-6">
+      <div className="mx-auto max-w-[840px] px-6 pb-24 pt-6">
         <p className="text-[11.5px] font-medium uppercase tracking-[0.14em] text-gold-dark">
           A free 30-min call
         </p>

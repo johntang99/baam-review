@@ -43,6 +43,7 @@ export async function submitBookingRequest(
   const email = field(fd, "email");
   const phone = field(fd, "phone");
   const website = field(fd, "website");
+  const business = field(fd, "business");
   const address = field(fd, "address");
   const preferredTime = field(fd, "preferred_time");
   const notes = field(fd, "notes");
@@ -73,6 +74,7 @@ export async function submitBookingRequest(
     email,
     phone: phone || null,
     website: website || null,
+    business: business || null,
     address: address || null,
     preferred_time: preferredTime || null,
     notes: notes || null,
@@ -109,6 +111,7 @@ export async function submitBookingRequest(
         `Name:           ${name}`,
         `Email:          ${email}`,
         `Phone:          ${phone || "—"}`,
+        `Business:       ${business || "—"}`,
         `Website:        ${website || "—"}`,
         `Address:        ${address || "—"}`,
         `Preferred:      ${preferredTime ? preferredTimeLabel(preferredTime, "en") : "—"}`,
@@ -125,7 +128,7 @@ export async function submitBookingRequest(
       const text = lines.join("\n");
       await sendEmailViaResend({
         to: BOOKING_NOTIFY_EMAIL,
-        subject: `🟢 Consultation request — ${name}${address ? ` (${address})` : ""}${subjectLangTag}`,
+        subject: `🟢 Consultation request — ${name}${business ? ` · ${business}` : ""}${subjectLangTag}`,
         text,
         html: `<pre style="font-family:ui-monospace,Menlo,monospace;font-size:13px;white-space:pre-wrap;line-height:1.55">${escapeHtml(text)}</pre>`,
         replyTo: email,
@@ -151,6 +154,7 @@ export async function submitBookingRequest(
         email,
         phone,
         website,
+        business,
         address,
         preferredTime: prettyTime,
         notes,
@@ -181,12 +185,21 @@ function buildUserConfirmation(opts: {
   email: string;
   phone: string;
   website: string;
+  business: string;
   address: string;
   preferredTime: string;
   notes: string;
 }): { subject: string; body: { text: string; html: string } } {
-  const { lang, greeting, phone, website, address, preferredTime, notes } =
-    opts;
+  const {
+    lang,
+    greeting,
+    phone,
+    website,
+    business,
+    address,
+    preferredTime,
+    notes,
+  } = opts;
 
   if (lang === "zh") {
     const subject = "已收到您的咨询请求 — BAAM Review";
@@ -198,6 +211,7 @@ function buildUserConfirmation(opts: {
       "─────────────────",
       "您提交的信息:",
       `电话:     ${phone || "—"}`,
+      `店铺名称: ${business || "—"}`,
       `网站:     ${website || "—"}`,
       `店铺地址: ${address || "—"}`,
       `方便时段: ${preferredTime}`,
@@ -229,6 +243,7 @@ function buildUserConfirmation(opts: {
     "─────────────────",
     "What you sent us:",
     `Phone:      ${phone || "—"}`,
+    `Business:   ${business || "—"}`,
     `Website:    ${website || "—"}`,
     `Address:    ${address || "—"}`,
     `Preferred:  ${preferredTime}`,

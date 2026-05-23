@@ -1904,7 +1904,12 @@ section { padding: 100px 0; position: relative; }
   background: var(--forest);
   color: var(--cream);
   border-radius: 32px;
-  margin: 60px 32px;
+  /* Match the 1080px container width used by .certainty-banner so the
+     pricing section reads as the same row as the rest of the page rather
+     than a fullscreen-bleeding band. */
+  max-width: 1080px;
+  width: calc(100% - 64px);
+  margin: 60px auto;
   padding: 88px 60px;
   position: relative;
   overflow: hidden;
@@ -1931,7 +1936,7 @@ section { padding: 100px 0; position: relative; }
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(250, 247, 242, 0.5);
+  color: rgba(250, 247, 242, 0.82);
   font-weight: 600;
   margin-bottom: 12px;
 }
@@ -1939,7 +1944,7 @@ section { padding: 100px 0; position: relative; }
 .tier-mini-price-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .tier-mini-price-pre {
   font-size: 14px;
-  color: rgba(250, 247, 242, 0.55);
+  color: rgba(250, 247, 242, 0.82);
   font-weight: 500;
 }
 .tier-mini-founding {
@@ -1959,7 +1964,7 @@ section { padding: 100px 0; position: relative; }
 }
 .tier-mini-feature-list li {
   font-size: 13px;
-  color: rgba(250, 247, 242, 0.78);
+  color: rgba(250, 247, 242, 0.94);
   display: flex;
   align-items: flex-start;
   gap: 7px;
@@ -2017,7 +2022,7 @@ section { padding: 100px 0; position: relative; }
   font-family: 'Newsreader', serif;
   font-style: italic;
   font-size: 14px;
-  color: rgba(250, 247, 242, 0.65);
+  color: rgba(250, 247, 242, 0.88);
   margin-bottom: 18px;
   line-height: 1.4;
 }
@@ -2033,16 +2038,16 @@ section { padding: 100px 0; position: relative; }
 .tier-mini.featured .tier-mini-price { color: var(--gold); }
 .tier-mini-price-period {
   font-size: 13px;
-  color: rgba(250, 247, 242, 0.55);
+  color: rgba(250, 247, 242, 0.82);
   margin-left: 2px;
 }
 .tier-mini.featured .tier-mini-price-period { color: rgba(232, 217, 181, 0.7); }
 .tier-mini-feature {
   margin-top: 16px;
   font-size: 13px;
-  color: rgba(250, 247, 242, 0.7);
+  color: rgba(250, 247, 242, 0.92);
 }
-.tier-mini.featured .tier-mini-feature { color: rgba(250, 247, 242, 0.85); }
+.tier-mini.featured .tier-mini-feature { color: rgba(250, 247, 242, 0.95); }
 
 .pricing-cta-row {
   display: flex;
@@ -2055,7 +2060,7 @@ section { padding: 100px 0; position: relative; }
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: rgba(250, 247, 242, 0.7);
+  color: rgba(250, 247, 242, 0.92);
   font-style: italic;
   font-family: 'Newsreader', serif;
 }
@@ -4665,6 +4670,59 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 }
 .promise-banner > * { position: relative; z-index: 1; }
 
+/* Conditional tag at the very top of the promise banner — signals that
+   the 5× guarantee only applies on Full Service plans. Pill-style, gold
+   on dark-gold tint so it reads against the forest background without
+   competing with the gold 5× number lower down. */
+.promise-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  background: rgba(201, 169, 97, 0.16);
+  border: 1px solid rgba(201, 169, 97, 0.55);
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+.promise-tag svg { width: 13px; height: 13px; color: var(--gold); flex-shrink: 0; }
+
+/* The "If we run it for you," lead-in: italic, gold-tinted, slightly
+   smaller than the rest of the claim so the conditional reads as a
+   premise to the promise rather than another headline. */
+.promise-conditional {
+  display: inline-block;
+  font-style: italic;
+  color: var(--gold-soft);
+  font-weight: 500;
+  font-size: 0.78em;
+  letter-spacing: -0.005em;
+  margin-right: 4px;
+}
+
+/* Self-serve disclaimer at the bottom — same dark band as the main
+   banner but with sage left border + lower opacity so it reads as a
+   footnote that clarifies the boundary of the guarantee. */
+.promise-selfserve-note {
+  font-family: 'Newsreader', serif;
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(250, 247, 242, 0.72);
+  background: rgba(135, 168, 153, 0.08);
+  border-left: 3px solid var(--sage);
+  border-radius: 8px;
+  padding: 12px 18px;
+  max-width: 720px;
+  margin: 22px auto 0;
+  text-align: left;
+}
+.promise-selfserve-note strong { color: var(--sage-soft); font-weight: 600; }
+
 .promise-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -6112,10 +6170,15 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 <section class="certainty-section" id="promise">
   <div class="container">
     <div class="promise-banner">
+      <div class="promise-tag">
+        <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+        Full Service customers only
+      </div>
+
       <h3 class="promise-eyebrow">The 5× Value Promise</h3>
 
       <p class="promise-claim">
-        We're confident the <span class="tv">Total Review Value</span> we generate will be <span class="atleast">at least <span class="multi">5×</span></span> what you pay us <span class="yr">within a year</span>.
+        <span class="promise-conditional">If we run it for you,</span> we're confident the <span class="tv">Total Review Value</span> we generate will be <span class="atleast">at least <span class="multi">5×</span></span> what you pay us <span class="yr">within a year</span>.
       </p>
 
       <p class="promise-qualifier">
@@ -6128,6 +6191,10 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
         We don't conjure customers from thin air — <em>we translate the goodwill you've already earned into reviews Google can see.</em>
       </p>
 
+      <p class="promise-selfserve-note">
+        <strong>Self-serve customers</strong> get the same platform, but because the work is on your side, the 5× outcome depends on your own execution. Switch to Full Service anytime to activate the promise.
+      </p>
+
       <div class="promise-stamp">BAAM × You · 5× Value · Together</div>
     </div>
   </div>
@@ -6138,7 +6205,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
   <div class="pricing-teaser-content">
     <div class="chapter-tag"><span class="ch-no">Chapter 7</span> · Pricing</div>
     <h2 class="section-title">Pricing that respects <em>how you want to work.</em></h2>
-    <p style="font-family: 'Newsreader', serif; font-size: 19px; color: rgba(250, 247, 242, 0.78); max-width: 660px; margin-top: 8px;">
+    <p style="font-family: 'Newsreader', serif; font-size: 19px; color: rgba(250, 247, 242, 0.94); max-width: 660px; margin-top: 8px;">
       Run it yourself with our platform, or let us run it for you. Every plan starts with a 30-day free trial — and an annual option that gives you two months free.
     </p>
 

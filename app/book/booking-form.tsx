@@ -12,6 +12,8 @@ interface BookingStrings {
   phone: string;
   phone_hint: string;
   website: string;
+  business: string;
+  business_hint: string;
   address: string;
   address_hint: string;
   preferred_time: string;
@@ -38,6 +40,8 @@ const STRINGS: Record<BookingLang, BookingStrings> = {
     phone: "Phone",
     phone_hint: "Optional — for SMS confirmation only.",
     website: "Website",
+    business: "Business name",
+    business_hint: "The name customers see on your Google Business Profile.",
     address: "Business address",
     address_hint: "So we can pull your Google Business Profile before the call.",
     preferred_time: "Preferred meeting time",
@@ -63,6 +67,8 @@ const STRINGS: Record<BookingLang, BookingStrings> = {
     phone: "电话",
     phone_hint: "可选 — 仅用于短信确认。",
     website: "网站",
+    business: "店铺名称",
+    business_hint: "Google 商家资料上显示的名称。",
     address: "店铺地址",
     address_hint: "方便我们在通话前先看您的 Google 商家资料。",
     preferred_time: "方便沟通时段",
@@ -186,6 +192,14 @@ export function BookingForm({
             placeholder="https://"
           />
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="bk-business" className={labelCls}>
+          {s.business}
+        </label>
+        <input id="bk-business" name="business" className={inputCls} />
+        <p className="mt-1 text-[11px] text-text-muted">{s.business_hint}</p>
       </div>
 
       <div>
