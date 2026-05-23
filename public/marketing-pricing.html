@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pricing — BAAM Review</title>
-<meta name="description" content="Transparent per-location pricing for BAAM Review. Self-serve: flat $99/mo per location. Full Service: flat $399/mo per location. 30-day free trial on every location. No setup fees. Discount codes available — ask us.">
+<meta name="description" content="Simple pricing for BAAM Review. Self-serve is $99/month or $990/year; Full Service is $399/month or $3,990/year. Every plan starts with a 30-day free trial — no setup fees, cancel anytime.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -134,175 +134,97 @@ nav.scrolled { border-color: var(--border); }
 .hero-meta strong { color: var(--gold-dark); font-weight: 600; }
 .hero-meta-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.2); }
 
-/* ====== TWO PATHS ====== */
-.two-paths-intro {
-  padding: 50px 0 30px;
-  text-align: center;
+/* ====== PLANS ====== */
+.plans-intro { padding: 50px 0 14px; text-align: center; }
+.plans-q {
+  font-family: 'Fraunces', serif; font-weight: 400; font-size: 32px;
+  line-height: 1.15; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 12px;
 }
-.two-paths-q {
-  font-family: 'Fraunces', serif;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  margin-bottom: 12px;
+.plans-q em { font-style: italic; color: var(--forest); }
+.plans-sub {
+  font-family: 'Newsreader', serif; font-style: italic; font-size: 18px;
+  color: var(--text-soft); max-width: 600px; margin: 0 auto;
 }
-.two-paths-q em { font-style: italic; color: var(--forest); }
-.two-paths-sub {
-  font-family: 'Newsreader', serif;
-  font-style: italic;
-  font-size: 18px;
-  color: var(--text-soft);
-  max-width: 600px;
-  margin: 0 auto;
+.plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 38px 0 18px; }
+.plan-card {
+  background: var(--paper); border: 1px solid var(--border); border-radius: 24px;
+  padding: 38px 36px 32px; display: flex; flex-direction: column;
+  position: relative; transition: all 0.2s;
 }
-
-.paths-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  padding: 30px 0 60px;
+.plan-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.plan-card.featured { border-color: var(--forest); }
+.plan-card.featured::before {
+  content: 'Most popular'; position: absolute; top: -10px; left: 36px;
+  background: var(--forest); color: var(--cream); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600;
+  padding: 4px 12px; border-radius: 999px;
 }
-.path-card {
-  background: var(--paper);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 36px 36px 32px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  transition: all 0.2s;
+.plan-eyebrow {
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600; margin-bottom: 6px;
 }
-.path-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.path-card.featured { border-color: var(--forest); }
-.path-card.featured::before {
-  content: 'Most popular';
-  position: absolute;
-  top: -10px;
-  left: 36px;
-  background: var(--forest);
-  color: var(--cream);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 999px;
+.plan-name {
+  font-family: 'Fraunces', serif; font-weight: 500; font-size: 30px;
+  letter-spacing: -0.02em; color: var(--ink); margin-bottom: 10px;
 }
-.path-eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  font-weight: 600;
-  margin-bottom: 6px;
+.plan-name em { font-style: italic; color: var(--forest); }
+.plan-tag {
+  font-family: 'Newsreader', serif; font-style: italic; font-size: 15.5px;
+  color: var(--text-soft); margin-bottom: 22px; line-height: 1.45; min-height: 44px;
 }
-.path-name {
-  font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-size: 30px;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  margin-bottom: 10px;
+.bill-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 26px; }
+.bill-option {
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 18px 22px; background: var(--cream);
 }
-.path-name em { font-style: italic; color: var(--forest); }
-.path-tag {
-  font-family: 'Newsreader', serif;
-  font-style: italic;
-  font-size: 15.5px;
-  color: var(--text-soft);
-  margin-bottom: 24px;
-  line-height: 1.45;
-  min-height: 44px;
+.bill-option.annual {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, var(--paper), rgba(201, 169, 97, 0.08));
 }
-
-.path-price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
-.path-price {
-  font-family: 'Fraunces', serif;
-  font-weight: 400;
-  font-size: 56px;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-  line-height: 1;
+.bill-head { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.bill-label {
+  font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 700;
 }
-.path-price-period {
-  font-size: 16px;
-  color: var(--text-muted);
-  font-family: 'Onest', sans-serif;
-  font-weight: 500;
+.bill-option.annual .bill-label { color: var(--gold-dark); }
+.bill-badge {
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700;
+  color: var(--ink); background: var(--gold); border-radius: 999px; padding: 3px 9px;
 }
-.path-price-pre {
-  font-size: 14px;
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-right: 2px;
+.bill-price { display: flex; align-items: baseline; gap: 5px; margin-bottom: 6px; }
+.bill-price-num {
+  font-family: 'Fraunces', serif; font-weight: 400; font-size: 40px;
+  letter-spacing: -0.025em; color: var(--ink); line-height: 1;
 }
-.path-price-founding {
-  font-size: 13.5px;
-  color: var(--gold-dark);
-  font-weight: 600;
-  margin-bottom: 18px;
+.bill-price-per { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+.bill-detail { font-size: 13px; color: var(--text-soft); line-height: 1.5; }
+.bill-detail strong { color: var(--ink); font-weight: 600; }
+.plan-features {
+  list-style: none; margin: 0 0 26px; flex: 1;
+  border-top: 1px solid var(--border-soft); padding-top: 20px;
 }
-.path-price-founding strong { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; }
-
-.path-features {
-  list-style: none;
-  margin: 18px 0 28px;
-  flex: 1;
+.plan-features li {
+  padding: 7px 0; font-size: 14.5px; color: var(--text);
+  display: flex; align-items: flex-start; gap: 10px; line-height: 1.45;
 }
-.path-features li {
-  padding: 9px 0;
-  font-size: 14.5px;
-  color: var(--text);
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  line-height: 1.45;
+.plan-features li svg {
+  width: 16px; height: 16px; color: var(--forest); flex-shrink: 0; margin-top: 3px;
 }
-.path-features li svg {
-  width: 16px;
-  height: 16px;
-  color: var(--forest);
-  flex-shrink: 0;
-  margin-top: 3px;
+.plan-features li strong { font-weight: 600; color: var(--ink); }
+.plan-cta {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 24px; background: var(--ink); color: var(--cream);
+  border-radius: 12px; font-family: 'Onest', sans-serif; font-size: 14.5px;
+  font-weight: 500; text-decoration: none; transition: all 0.15s;
 }
-.path-features li strong { font-weight: 600; color: var(--ink); }
-
-.path-cta {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.plan-card.featured .plan-cta { background: var(--forest); }
+.plan-cta:hover { background: var(--forest-dark); color: var(--cream); }
+.plan-cta-note { text-align: center; font-size: 12.5px; color: var(--text-muted); margin-top: 9px; }
+.plans-footnote {
+  text-align: center; font-family: 'Newsreader', serif; font-style: italic;
+  font-size: 15px; color: var(--text-soft); max-width: 640px;
+  margin: 14px auto 60px; line-height: 1.55;
 }
-.path-cta-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 24px;
-  background: var(--ink);
-  color: var(--cream);
-  border-radius: 12px;
-  font-family: 'Onest', sans-serif;
-  font-size: 14.5px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.15s;
-}
-.path-card.featured .path-cta-btn { background: var(--forest); }
-.path-cta-btn:hover { background: var(--forest-dark); color: var(--cream); }
-.path-cta-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-soft);
-  padding: 6px;
-  font-weight: 500;
-}
-.path-cta-secondary a { color: var(--forest); }
-.path-cta-secondary a:hover { text-decoration: underline; }
 
 /* ====== SECTION WRAPPER ====== */
 section { padding: 80px 0; }
@@ -341,348 +263,6 @@ section { padding: 80px 0; }
 }
 .section-header-center { text-align: center; max-width: 760px; margin: 0 auto 50px; }
 .section-header-center .section-sub { margin-left: auto; margin-right: auto; }
-
-/* ====== SELF-SERVE TIERS ====== */
-.tier-card {
-  background: var(--paper);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 36px 40px;
-  margin-bottom: 24px;
-}
-.tier-card-top {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 40px;
-  align-items: center;
-  margin-bottom: 24px;
-}
-.tier-name {
-  font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-size: 26px;
-  letter-spacing: -0.015em;
-  color: var(--ink);
-  margin-bottom: 4px;
-}
-.tier-tag {
-  font-family: 'Newsreader', serif;
-  font-style: italic;
-  font-size: 16px;
-  color: var(--text-soft);
-  line-height: 1.4;
-}
-.tier-pricing-row {
-  display: flex;
-  gap: 30px;
-  align-items: baseline;
-  flex-wrap: wrap;
-}
-.tier-price-block { display: flex; align-items: baseline; gap: 6px; }
-.tier-price-num {
-  font-family: 'Fraunces', serif;
-  font-weight: 400;
-  font-size: 48px;
-  letter-spacing: -0.025em;
-  color: var(--ink);
-  line-height: 1;
-}
-.tier-price-period { font-size: 15px; color: var(--text-muted); font-weight: 500; }
-.tier-price-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
-.tier-price-founding-num { color: var(--gold-dark); }
-.tier-price-divider { width: 1px; height: 40px; background: var(--border); }
-
-.tier-feat-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-soft);
-}
-.tier-feat {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 14.5px;
-  color: var(--text);
-  padding: 6px 0;
-  line-height: 1.45;
-}
-.tier-feat svg { width: 15px; height: 15px; color: var(--forest); flex-shrink: 0; margin-top: 3px; }
-
-/* ====== LOCATION SCALING TABLE ====== */
-.scale-section {
-  background: var(--cream-deep);
-  border-radius: 24px;
-  padding: 48px 52px;
-  margin-top: 32px;
-}
-.scale-h {
-  font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-size: 26px;
-  color: var(--ink);
-  letter-spacing: -0.015em;
-  margin-bottom: 6px;
-}
-.scale-h em { font-style: italic; color: var(--forest); }
-.scale-sub {
-  font-family: 'Newsreader', serif;
-  font-style: italic;
-  font-size: 16px;
-  color: var(--text-soft);
-  margin-bottom: 30px;
-  max-width: 600px;
-}
-
-.scale-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-}
-.scale-card {
-  background: var(--paper);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 22px 24px;
-}
-.scale-card.featured { border-color: var(--gold); background: linear-gradient(180deg, var(--paper), var(--gold-soft) 200%); }
-.scale-loc {
-  font-size: 11.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-.scale-loc strong { color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; }
-.scale-price-std {
-  font-family: 'Fraunces', serif;
-  font-weight: 400;
-  font-size: 32px;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.scale-price-std-suffix { font-size: 14px; color: var(--text-muted); font-family: 'Onest', sans-serif; }
-.scale-price-founding {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--gold-dark);
-  font-weight: 500;
-  margin-top: 4px;
-}
-.scale-price-formula { font-size: 11.5px; color: var(--text-muted); margin-top: 12px; font-family: 'JetBrains Mono', monospace; }
-
-/* ====== FULL SERVICE TIERS ====== */
-.fs-tier-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 30px;
-}
-.fs-tier-card {
-  background: var(--paper);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 36px 36px 32px;
-  display: flex;
-  flex-direction: column;
-}
-.fs-tier-card.featured { border-color: var(--forest); background: linear-gradient(180deg, var(--paper), rgba(31, 77, 63, 0.02) 100%); }
-.fs-tier-name {
-  font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-size: 28px;
-  letter-spacing: -0.015em;
-  color: var(--ink);
-  margin-bottom: 6px;
-}
-.fs-tier-name em { font-style: italic; color: var(--forest); }
-.fs-tier-tag {
-  font-family: 'Newsreader', serif;
-  font-style: italic;
-  font-size: 15px;
-  color: var(--text-soft);
-  margin-bottom: 24px;
-  line-height: 1.45;
-  min-height: 42px;
-}
-.fs-tier-price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 2px;
-}
-.fs-tier-price {
-  font-family: 'Fraunces', serif;
-  font-weight: 400;
-  font-size: 52px;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-  line-height: 1;
-}
-.fs-tier-price-period { font-size: 15px; color: var(--text-muted); font-weight: 500; }
-.fs-tier-setup-line { font-size: 12.5px; color: var(--text-muted); margin-top: 8px; }
-.fs-tier-setup-line s { color: var(--text-muted); }
-.fs-tier-founding {
-  background: var(--gold-soft);
-  border-radius: 10px;
-  padding: 12px 16px;
-  margin: 18px 0 22px;
-  font-size: 13px;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.fs-tier-founding-icon { width: 24px; height: 24px; background: var(--gold); color: var(--ink); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.fs-tier-founding-icon svg { width: 13px; height: 13px; }
-.fs-tier-founding strong { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; color: var(--gold-dark); }
-.fs-tier-founding-sub { font-size: 11.5px; color: var(--text-soft); margin-top: 1px; }
-
-.fs-features {
-  list-style: none;
-  flex: 1;
-  margin-bottom: 24px;
-}
-.fs-features li {
-  padding: 11px 0;
-  font-size: 14.5px;
-  color: var(--text);
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  line-height: 1.5;
-  border-bottom: 1px dashed var(--border-soft);
-}
-.fs-features li:last-child { border-bottom: none; }
-.fs-features li svg { width: 16px; height: 16px; color: var(--forest); flex-shrink: 0; margin-top: 3px; }
-.fs-features li strong { font-weight: 600; color: var(--ink); }
-.fs-features li em { font-style: italic; color: var(--gold-dark); font-weight: 500; }
-
-.fs-add-locs {
-  background: var(--cream-deep);
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 13px;
-  color: var(--text-soft);
-  margin-bottom: 22px;
-}
-.fs-add-locs strong { color: var(--ink); font-weight: 600; }
-
-.fs-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 24px;
-  background: var(--ink);
-  color: var(--cream);
-  border-radius: 12px;
-  font-family: 'Onest', sans-serif;
-  font-size: 14.5px;
-  font-weight: 500;
-  text-decoration: none;
-}
-.fs-tier-card.featured .fs-cta { background: var(--forest); }
-.fs-cta:hover { background: var(--forest-dark); color: var(--cream); }
-
-/* ====== AGENCY ====== */
-.agency-card {
-  background: var(--ink);
-  color: var(--cream);
-  border-radius: 24px;
-  padding: 48px 52px;
-  position: relative;
-  overflow: hidden;
-}
-.agency-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 85% 20%, rgba(201, 169, 97, 0.18), transparent 55%);
-}
-.agency-card > * { position: relative; }
-.agency-grid {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 50px;
-  align-items: center;
-}
-.agency-eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--gold);
-  font-weight: 600;
-  margin-bottom: 14px;
-}
-.agency-h {
-  font-family: 'Fraunces', serif;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--cream);
-  margin-bottom: 14px;
-}
-.agency-h em { font-style: italic; color: var(--gold); }
-.agency-body {
-  font-family: 'Newsreader', serif;
-  font-size: 17px;
-  line-height: 1.55;
-  color: rgba(250, 247, 242, 0.78);
-  margin-bottom: 20px;
-}
-.agency-body strong { color: var(--cream); font-weight: 500; }
-
-.agency-formula {
-  background: rgba(250, 247, 242, 0.08);
-  border: 1px solid rgba(250, 247, 242, 0.15);
-  border-radius: 16px;
-  padding: 28px 30px;
-}
-.agency-formula-label {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(250, 247, 242, 0.55);
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-.agency-formula-eq {
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-size: 24px;
-  color: var(--gold);
-  margin-bottom: 14px;
-  line-height: 1.3;
-}
-.agency-formula-ex {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12.5px;
-  color: rgba(250, 247, 242, 0.7);
-  line-height: 1.6;
-}
-.agency-formula-ex strong { color: var(--cream); font-weight: 500; }
-.agency-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 13px 22px;
-  background: var(--gold);
-  color: var(--ink);
-  border-radius: 999px;
-  font-family: 'Onest', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  margin-top: 4px;
-}
-.agency-cta:hover { background: var(--cream); }
-.agency-cta svg { width: 14px; height: 14px; }
 
 /* ====== COMPARISON TABLE ====== */
 .compare-section { background: var(--cream-deep); padding: 80px 0; }
@@ -806,11 +386,7 @@ footer a:hover { color: var(--cream); }
 
 /* ====== RESPONSIVE ====== */
 @media (max-width: 1024px) {
-  .paths-grid { grid-template-columns: 1fr; }
-  .fs-tier-grid { grid-template-columns: 1fr; }
-  .tier-card-top { grid-template-columns: 1fr; gap: 20px; }
-  .agency-grid { grid-template-columns: 1fr; gap: 30px; }
-  .scale-grid { grid-template-columns: 1fr; }
+  .plans-grid { grid-template-columns: 1fr; }
   .faq-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
@@ -818,16 +394,12 @@ footer a:hover { color: var(--cream); }
   .hero { padding: 50px 0 30px; }
   .hero h1 { font-size: 42px; }
   .hero-sub { font-size: 18px; }
-  .section-title { font-family: 'Fraunces', serif; font-size: 32px; }
-  .path-card, .tier-card, .fs-tier-card { padding: 26px 24px; }
-  .scale-section, .agency-card { padding: 32px 24px; }
+  .section-title { font-size: 32px; }
+  .plan-card { padding: 28px 24px; }
   .nav-links { display: none; }
   .footer-cta-h { font-size: 36px; }
   .compare-table-wrap { overflow-x: auto; }
-  .compare-table { min-width: 760px; }
-  .tier-pricing-row { gap: 16px; }
-  .tier-price-num { font-size: 38px; }
-  .tier-feat-grid { grid-template-columns: 1fr; }
+  .compare-table { min-width: 680px; }
 }
 </style>
 </head>
@@ -848,7 +420,7 @@ footer a:hover { color: var(--cream); }
         <a href="/#how">How it works</a>
         <a href="/pricing/zh">中文</a>
         <a href="/login" class="btn">Sign in</a>
-        <a href="/pricing#self-serve" class="btn btn-primary">Start free</a>
+        <a href="#plans" class="btn btn-primary">Start free</a>
       </div>
     </div>
   </div>
@@ -859,308 +431,93 @@ footer a:hover { color: var(--cream); }
   <div class="container-narrow">
     <div class="hero-eyebrow">Pricing</div>
     <h1>Two paths. <em>Pick the one</em> that matches how you want to work.</h1>
-    <p class="hero-sub">Run it yourself with our platform — or let us run it for you. Per-location, no setup fees, 30-day free trial on every location. Founding-customer pricing locked forever for the first 50 self-serve and first 20 Full Service signups.</p>
+    <p class="hero-sub">Run it yourself with our platform — or let us run it for you. Every plan starts with a 30-day free trial. No setup fees. Cancel anytime.</p>
     <div class="hero-meta">
       <span class="hero-meta-dot"></span>
-      <span><strong>23</strong> founding self-serve spots left</span>
-      <span style="color: var(--text-muted); margin: 0 8px;">·</span>
-      <span><strong>17</strong> Full Service founding spots left</span>
+      <span><strong>30-day free trial</strong> on every plan · monthly or annual</span>
     </div>
   </div>
 </section>
 
-<!-- TWO PATHS INTRO -->
-<div class="container">
-  <div class="two-paths-intro">
-    <h2 class="two-paths-q">How do you want to <em>manage reviews?</em></h2>
-    <p class="two-paths-sub">The product is the same. The work is what changes.</p>
+<!-- PLANS -->
+<div class="container" id="plans">
+  <div class="plans-intro">
+    <h2 class="plans-q">How do you want to <em>manage reviews?</em></h2>
+    <p class="plans-sub">The product is the same. The work is what changes.</p>
   </div>
 
-  <!-- TWO PATH CARDS -->
-  <div class="paths-grid">
+  <div class="plans-grid">
 
-    <!-- SELF-SERVE PATH -->
-    <div class="path-card">
-      <div class="path-eyebrow">Path A · Self-serve</div>
-      <div class="path-name">Run it <em>yourself</em></div>
-      <div class="path-tag">Log in, send review requests, reply to reviews. We give you the platform; you drive it.</div>
+    <!-- SELF-SERVE -->
+    <div class="plan-card">
+      <div class="plan-eyebrow">Path A · Self-serve</div>
+      <div class="plan-name">Run it <em>yourself</em></div>
+      <div class="plan-tag">Log in, send review requests, reply to reviews. We give you the platform; you drive it.</div>
 
-      <div class="path-price-row">
-        <span class="path-price-pre">First location</span>
-        <span class="path-price">$99</span>
-        <span class="path-price-period">/mo</span>
+      <div class="bill-grid">
+        <div class="bill-option">
+          <div class="bill-head"><span class="bill-label">Monthly</span></div>
+          <div class="bill-price"><span class="bill-price-num">$99</span><span class="bill-price-per">/month</span></div>
+          <div class="bill-detail">30 days free, then <strong>$99/month</strong> · cancel anytime</div>
+        </div>
+        <div class="bill-option annual">
+          <div class="bill-head"><span class="bill-label">Annual</span><span class="bill-badge">2 months free</span></div>
+          <div class="bill-price"><span class="bill-price-num">$990</span><span class="bill-price-per">/year</span></div>
+          <div class="bill-detail">30 days free, then <strong>$990/year</strong> · cancel anytime</div>
+        </div>
       </div>
-      <div class="path-price-founding"><strong>Each additional location: $99/mo</strong> · 30-day free trial</div>
 
-      <ul class="path-features">
-        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Single location, full review-to-revenue loop</li>
-        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI-assisted review drafting in 3 languages</li>
-        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Send by email or SMS, unlimited requests</li>
-        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Private feedback path, AI replies, referral tracking</li>
-        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> <strong>Additional locations: $79/mo each</strong></li>
+      <ul class="plan-features">
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Unlimited review requests by email or SMS</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI-assisted review drafting in EN / 中文 / Español</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Private feedback path and AI reply queue</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Website widget, QR posters, embed code</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Referral tracking and rewards</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Review Revenue dashboard with attribution</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Each additional location: same $99/month — no surcharge</li>
       </ul>
 
-      <div class="path-cta">
-        <a href="#self-serve" class="path-cta-btn">See self-serve pricing →</a>
-        <span class="path-cta-secondary">Or <a href="https://review.baamplatform.com/signup">start a free trial</a> — 30 days, no charge</span>
-      </div>
+      <a href="https://review.baamplatform.com/signup" class="plan-cta">Start 30-day free trial →</a>
+      <div class="plan-cta-note">No charge today · card saved for after day 30</div>
     </div>
 
-    <!-- FULL SERVICE PATH -->
-    <div class="path-card featured">
-      <div class="path-eyebrow">Path B · Full Service</div>
-      <div class="path-name">We run it <em>for you</em></div>
-      <div class="path-tag">Send us your customer list each week. We handle review collection, replies, private feedback, and reporting.</div>
+    <!-- FULL SERVICE -->
+    <div class="plan-card featured">
+      <div class="plan-eyebrow">Path B · Full Service</div>
+      <div class="plan-name">We run it <em>for you</em></div>
+      <div class="plan-tag">Send us your customer list each week. We handle collection, replies, private feedback, and reporting.</div>
 
-      <div class="path-price-row">
-        <span class="path-price-pre">Per location</span>
-        <span class="path-price">$399</span>
-        <span class="path-price-period">/mo</span>
+      <div class="bill-grid">
+        <div class="bill-option">
+          <div class="bill-head"><span class="bill-label">Monthly</span></div>
+          <div class="bill-price"><span class="bill-price-num">$399</span><span class="bill-price-per">/month</span></div>
+          <div class="bill-detail">30 days free, then <strong>$399/month</strong> · cancel anytime</div>
+        </div>
+        <div class="bill-option annual">
+          <div class="bill-head"><span class="bill-label">Annual</span><span class="bill-badge">2 months free</span></div>
+          <div class="bill-price"><span class="bill-price-num">$3,990</span><span class="bill-price-per">/year</span></div>
+          <div class="bill-detail">30 days free, then <strong>$3,990/year</strong> · cancel anytime</div>
+        </div>
       </div>
-      <div class="path-price-founding"><strong>Flat for every location</strong> · 30-day free trial · no setup fee</div>
 
-      <ul class="path-features">
-        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We send all review requests, weekly batches</li>
+      <ul class="plan-features">
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Everything in Self-serve, fully managed</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We send all review requests in weekly batches</li>
         <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We reply to every review in <strong>your voice</strong></li>
-        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We respond to private feedback before it goes public</li>
-        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Monthly written report · estimated revenue impact</li>
-        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> <strong>Every additional location: same $299/mo</strong> (no tiered upsell)</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> We catch private feedback before it goes public</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Monthly written report with estimated revenue impact</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Pay by card or by check (net-30 invoice)</li>
+        <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Each additional location: same $399/month — no surcharge</li>
       </ul>
 
-      <div class="path-cta">
-        <a href="#full-service" class="path-cta-btn">See Full Service pricing →</a>
-        <span class="path-cta-secondary"><a href="/book">Book a free consultation</a></span>
-      </div>
+      <a href="/book" class="plan-cta">Book a free consultation →</a>
+      <div class="plan-cta-note">Or start a 30-day free trial — no charge today</div>
     </div>
 
   </div>
+
+  <p class="plans-footnote">Running multiple locations? Every location is its own subscription at the same per-location price — no multi-location surcharge — each with its own dashboard and review profile. Special promotional pricing is available from time to time; ask us for current offers.</p>
 </div>
-
-<!-- ============ SELF-SERVE SECTION ============ -->
-<section id="self-serve">
-  <div class="container">
-    <div class="section-divider"></div>
-    <div class="section-header-center">
-      <div class="section-eyebrow">Path A · Self-serve</div>
-      <h2 class="section-title">Run it <em>yourself.</em></h2>
-      <p class="section-sub">One product. One price for the first location. Add more locations as you grow.</p>
-    </div>
-
-    <!-- SELF-SERVE TIER CARD -->
-    <div class="tier-card">
-      <div class="tier-card-top">
-        <div>
-          <div class="tier-name">Self-serve</div>
-          <div class="tier-tag">Single-location clinics, restaurants, law firms, salons. The center of gravity for self-serve.</div>
-        </div>
-        <div class="tier-pricing-row">
-          <div class="tier-price-block">
-            <div>
-              <div class="tier-price-label" style="color: var(--gold-dark);">First location · promotional</div>
-              <div style="display: flex; align-items: baseline; gap: 4px;">
-                <span class="tier-price-num tier-price-founding-num">$89</span>
-                <span class="tier-price-period">/mo · locked forever</span>
-              </div>
-            </div>
-          </div>
-          <div class="tier-price-divider"></div>
-          <div class="tier-price-block">
-            <div>
-              <div class="tier-price-label">Each additional location</div>
-              <div style="display: flex; align-items: baseline; gap: 4px;">
-                <span class="tier-price-num">$79</span>
-                <span class="tier-price-period">/mo each</span>
-              </div>
-            </div>
-          </div>
-          <div class="tier-price-divider"></div>
-          <div class="tier-price-block">
-            <div>
-              <div class="tier-price-label">Trial (every location)</div>
-              <div style="display: flex; align-items: baseline; gap: 4px;">
-                <span class="tier-price-num" style="color: var(--success);">30</span>
-                <span class="tier-price-period">days · $0</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="tier-feat-grid">
-        <div class="tier-feat"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Unlimited review requests, email + SMS</div>
-        <div class="tier-feat"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI-assisted review drafting (EN / 中文 / ES)</div>
-        <div class="tier-feat"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Private feedback path, AI reply queue</div>
-        <div class="tier-feat"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Lists for batch sends to many customers</div>
-        <div class="tier-feat"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Website widget, QR posters, embed code</div>
-        <div class="tier-feat"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Referral tracking and rewards</div>
-        <div class="tier-feat"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Review Revenue dashboard with attribution</div>
-        <div class="tier-feat"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Distribute to Xiaohongshu and website</div>
-      </div>
-    </div>
-
-    <!-- MULTI-LOCATION SCALING -->
-    <div class="scale-section">
-      <div class="scale-h">Multiple locations? <em>Linear pricing.</em></div>
-      <p class="scale-sub">Your first location is $89/mo. Each additional location is $79/mo. Every location includes its own 30-day free trial — independent of the others.</p>
-
-      <div class="scale-grid">
-        <div class="scale-card">
-          <div class="scale-loc"><strong>1</strong> location</div>
-          <div class="scale-price-std">$89<span class="scale-price-std-suffix">/mo</span></div>
-          <div class="scale-price-founding">30-day free trial</div>
-          <div class="scale-price-formula">First location</div>
-        </div>
-        <div class="scale-card featured">
-          <div class="scale-loc"><strong>5</strong> locations</div>
-          <div class="scale-price-std">$405<span class="scale-price-std-suffix">/mo</span></div>
-          <div class="scale-price-founding">Each on its own card</div>
-          <div class="scale-price-formula">$89 + 4 × $79</div>
-        </div>
-        <div class="scale-card">
-          <div class="scale-loc"><strong>10</strong> locations</div>
-          <div class="scale-price-std">$800<span class="scale-price-std-suffix">/mo</span></div>
-          <div class="scale-price-founding">Cancel any one independently</div>
-          <div class="scale-price-formula">$89 + 9 × $79</div>
-        </div>
-      </div>
-
-      <p style="font-size: 13px; color: var(--text-muted); margin-top: 20px; line-height: 1.5;">
-        Compare to Birdeye: 5 locations = $1,495/mo. 10 locations = $2,990/mo. Plus $5,000–$15,000 implementation fees.
-        We're priced for local businesses, not for enterprise SaaS budgets.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- ============ FULL SERVICE SECTION ============ -->
-<section id="full-service" style="background: var(--cream-deep);">
-  <div class="container">
-    <div class="section-divider"></div>
-    <div class="section-header-center">
-      <div class="section-eyebrow">Path B · Full Service · 全方位服务</div>
-      <h2 class="section-title">We run it <em>for you.</em></h2>
-      <p class="section-sub">Don't have time? Don't want to learn another tool? Send us your customer list each week — we handle the rest.</p>
-    </div>
-
-    <div class="fs-tier-grid" style="grid-template-columns: minmax(0, 640px); justify-content: center;">
-
-      <!-- FULL SERVICE — single flat tier per location -->
-      <div class="fs-tier-card featured">
-        <div class="fs-tier-name">Full Service</div>
-        <div class="fs-tier-tag">For single- or multi-location businesses that want reviews handled without learning a new tool. One flat per-location price.</div>
-
-        <div class="fs-tier-price-row">
-          <span class="fs-tier-price">$299</span>
-          <span class="fs-tier-price-period">/mo · per location</span>
-        </div>
-        <div class="fs-tier-setup-line">Setup fee: $0</div>
-
-        <div class="fs-tier-founding">
-          <div class="fs-tier-founding-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-          </div>
-          <div>
-            <div><strong>Founding promotional pricing</strong> — locked forever for the first 20 customers</div>
-            <div class="fs-tier-founding-sub">30-day free trial on every location · pay by card or by check (net-30 invoice)</div>
-          </div>
-        </div>
-
-        <ul class="fs-features">
-          <li>
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            <div><strong>We send all review requests.</strong> You email or text us your customer list each week. We batch-send via the BAAM Review platform in their preferred language.</div>
-          </li>
-          <li>
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            <div><strong>We reply to every review</strong> in your voice. AI drafts; we edit for tone, cultural fit, and brand consistency.</div>
-          </li>
-          <li>
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            <div><strong>We respond to private feedback</strong> within 24 hours — before it becomes a public 1-star review.</div>
-          </li>
-          <li>
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            <div><strong>Monthly written report.</strong> Rating change, review count, estimated revenue impact in dollars.</div>
-          </li>
-          <li>
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            <div><strong>Pay-by-check accepted.</strong> Net-30 invoiced by email — common for agencies billing multiple client businesses.</div>
-          </li>
-        </ul>
-
-        <div class="fs-add-locs">
-          <strong>Additional locations:</strong> same $299/mo each · independent subscriptions · cancel any one without touching the others
-        </div>
-
-        <a href="https://review.baamplatform.com/signup" class="fs-cta">Start 30-day free trial →</a>
-      </div>
-
-    </div>
-
-    <!-- FULL SERVICE MULTI-LOCATION SCALING -->
-    <div class="scale-section">
-      <div class="scale-h">Multiple client businesses? <em>Flat per location.</em></div>
-      <p class="scale-sub">Every location is $299/mo, flat — no tiered upsell, no setup fee, 30-day free trial per location. Each business is its own Stripe subscription with its own card or its own invoice.</p>
-
-      <div class="scale-grid">
-        <div class="scale-card">
-          <div class="scale-loc"><strong>1</strong> location</div>
-          <div class="scale-price-std">$299<span class="scale-price-std-suffix">/mo</span></div>
-          <div class="scale-price-founding">Founding price</div>
-          <div class="scale-price-formula">1 × $299</div>
-        </div>
-        <div class="scale-card featured">
-          <div class="scale-loc"><strong>5</strong> clients</div>
-          <div class="scale-price-std">$1,495<span class="scale-price-std-suffix">/mo</span></div>
-          <div class="scale-price-founding">Each on its own card / invoice</div>
-          <div class="scale-price-formula">5 × $299</div>
-        </div>
-        <div class="scale-card">
-          <div class="scale-loc"><strong>10</strong> clients</div>
-          <div class="scale-price-std">$2,990<span class="scale-price-std-suffix">/mo</span></div>
-          <div class="scale-price-founding">No volume discount; no markup</div>
-          <div class="scale-price-formula">10 × $299</div>
-        </div>
-      </div>
-    </div>
-
-    <p style="text-align: center; font-family: 'Newsreader', serif; font-style: italic; font-size: 15px; color: var(--text-soft); max-width: 720px; margin: 30px auto 0; line-height: 1.55;">
-      Compare to a NY-metro marketing agency: typical managed-review pricing is $800–$2,000/mo for one location.
-      We're priced below market because we're specialized, not generalist. Review collection is what we do — not part of what we do.
-    </p>
-  </div>
-</section>
-
-<!-- ============ AGENCY SECTION ============ -->
-<section>
-  <div class="container">
-    <div class="agency-card">
-      <div class="agency-grid">
-        <div>
-          <div class="agency-eyebrow">For agencies and white-label resellers</div>
-          <h2 class="agency-h">Run BAAM Review <em>under your own brand.</em></h2>
-          <p class="agency-body">If you're a marketing agency managing reviews for multiple clients, Full Service is built for you. Each client business is its own subscription at <strong>$299/mo flat</strong> — pay by card per client, or pay-by-check (net-30 invoice) so you can pass each invoice straight through to the client. No base fee, no volume cap, no markup confusion.</p>
-          <a href="https://review.baamplatform.com/signup" class="agency-cta">
-            Start with Full Service
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          </a>
-        </div>
-
-        <div class="agency-formula">
-          <div class="agency-formula-label">How it scales</div>
-          <div class="agency-formula-eq">$299 × clients</div>
-          <div class="agency-formula-ex">
-            <strong>5 clients:</strong>&nbsp; 5 × $299 = $1,495/mo<br>
-            <strong>10 clients:</strong> 10 × $299 = $2,990/mo<br>
-            <strong>25 clients:</strong> 25 × $299 = $7,475/mo<br>
-            <strong>50+ clients:</strong> Same per-location rate — talk to us about portfolio billing<br><br>
-            <span style="font-family: 'Newsreader', serif; font-style: italic; color: rgba(250, 247, 242, 0.6); font-size: 12.5px;">Each client is its own Stripe customer · invoice or card · 30-day trial per client · cancel any one independently</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ============ COMPARISON TABLE ============ -->
 <section class="compare-section" id="compare">
@@ -1177,11 +534,11 @@ footer a:hover { color: var(--cream); }
             <th class="compare-th-spacer"></th>
             <th>
               <div class="compare-th-tier">Self-serve</div>
-              <div class="compare-th-price">$89/mo first · $79/mo each additional</div>
+              <div class="compare-th-price">$99/mo · $990/yr</div>
             </th>
             <th class="compare-th featured">
               <div class="compare-th-tier">Full Service</div>
-              <div class="compare-th-price">$299/mo per location (flat)</div>
+              <div class="compare-th-price">$399/mo · $3,990/yr</div>
             </th>
           </tr>
         </thead>
@@ -1295,29 +652,29 @@ footer a:hover { color: var(--cream); }
             <td>
               <div class="compare-feat-name">Free trial</div>
             </td>
-            <td class="compare-cell"><strong>30 days</strong> per location</td>
-            <td class="compare-cell featured"><strong>30 days</strong> per location</td>
+            <td class="compare-cell"><strong>30 days</strong></td>
+            <td class="compare-cell featured"><strong>30 days</strong></td>
           </tr>
           <tr>
             <td>
-              <div class="compare-feat-name">Additional locations</div>
+              <div class="compare-feat-name">Annual billing</div>
             </td>
-            <td class="compare-cell">+$79/mo each</td>
-            <td class="compare-cell featured">Same flat $299/mo each</td>
+            <td class="compare-cell">$990/year — 2 months free</td>
+            <td class="compare-cell featured">$3,990/year — 2 months free</td>
           </tr>
           <tr>
             <td>
               <div class="compare-feat-name">Payment</div>
             </td>
-            <td class="compare-cell">Card per location</td>
-            <td class="compare-cell featured">Card <em>or</em> pay-by-check (net-30 invoice)</td>
+            <td class="compare-cell">Credit card or ACH</td>
+            <td class="compare-cell featured">Card, ACH, <em>or</em> check (net-30 invoice)</td>
           </tr>
           <tr>
             <td>
               <div class="compare-feat-name">Contract</div>
             </td>
-            <td class="compare-cell">Month-to-month · cancel any location anytime</td>
-            <td class="compare-cell featured">Month-to-month · cancel any location anytime</td>
+            <td class="compare-cell">Month-to-month or annual · cancel anytime</td>
+            <td class="compare-cell featured">Month-to-month or annual · cancel anytime</td>
           </tr>
 
         </tbody>
@@ -1337,43 +694,36 @@ footer a:hover { color: var(--cream); }
     <div class="faq-grid">
 
       <div class="faq-item">
-        <div class="faq-q">What does "founding member" actually mean?</div>
-        <div class="faq-a">The first 50 self-serve customers and first 20 Full Service customers pay a discounted price <strong>locked forever</strong>. Even years from now, you'll still pay your founding rate as long as you stay subscribed. This is our way of rewarding early customers and gathering case studies.</div>
+        <div class="faq-q">Does the 30-day free trial apply to annual plans?</div>
+        <div class="faq-a">Yes. Whether you choose monthly or annual billing, you get the same 30-day free trial. A card is saved when you sign up, and the first charge — $99/month or $990/year on Self-serve — happens only after day 30.</div>
       </div>
-
-      <div class="faq-item">
-        <div class="faq-q">What's the difference between self-serve and Full Service?</div>
-        <div class="faq-a"><strong>Self-serve</strong> means you log in, send review requests, reply to reviews, and run reports yourself. <strong>Full Service</strong> means we do all of that for you — you just send us your customer list each week. Same product underneath; different amount of your time required.</div>
-      </div>
-
       <div class="faq-item">
         <div class="faq-q">What happens after my 30-day free trial?</div>
-        <div class="faq-a">Each location's card is charged at the end of its 30-day trial — $89/mo for your first location, $79/mo for each additional self-serve location, or $299/mo per location on Full Service. We email you 7 days before the first charge, so there are no surprises. You can cancel any location anytime during its trial in your dashboard and you pay $0 for that one.</div>
+        <div class="faq-a">Your card is charged at the end of the 30-day trial for whichever plan and cycle you chose: $99/month or $990/year for Self-serve, $399/month or $3,990/year for Full Service. We email you 7 days before the first charge. Cancel anytime during the trial and you pay <strong>$0</strong>.</div>
       </div>
-
       <div class="faq-item">
-        <div class="faq-q">Can I switch between self-serve and Full Service later?</div>
-        <div class="faq-a">Yes. Many customers start self-serve, realize they don't have time, and upgrade to Full Service after a few months. Your founding-customer pricing carries with you — you'll get the founding Full Service rate too if any spots are still available.</div>
+        <div class="faq-q">What's the difference between Self-serve and Full Service?</div>
+        <div class="faq-a"><strong>Self-serve</strong> means you log in, send review requests, reply to reviews, and run reports yourself. <strong>Full Service</strong> means we do all of that for you — you just send us your customer list each week. Same product underneath; different amount of your time required.</div>
       </div>
-
       <div class="faq-item">
-        <div class="faq-q">How does the "additional location" pricing work?</div>
-        <div class="faq-a">Each physical business address counts as a location. Self-serve: your first location is $89/mo, each additional is $79/mo — so 3 clinics = $89 + 2 × $79 = $247/mo. Full Service: every location is a flat $299/mo — so 3 clinics = 3 × $299 = $897/mo. Each location is its own independent subscription with its own card, own 30-day trial, own dashboard, branding, and review profile. Cancel any one without affecting the others.</div>
+        <div class="faq-q">Can I switch between Self-serve and Full Service later?</div>
+        <div class="faq-a">Yes. Many customers start on Self-serve, decide they'd rather not run it themselves, and move to Full Service. We prorate the change so you only pay for what you use.</div>
       </div>
-
+      <div class="faq-item">
+        <div class="faq-q">Can I use this for multiple locations?</div>
+        <div class="faq-a">Yes. Each location runs as its own subscription with its own dashboard, branding, and review profile, so you can cancel any one without affecting the others. Get in touch and we'll set up multi-location billing for you.</div>
+      </div>
       <div class="faq-item">
         <div class="faq-q">Is there a contract or minimum commitment?</div>
-        <div class="faq-a">No. Month-to-month for everyone. Cancel anytime, no penalty. Full Service has a 30-day notice period for cancellation (so we can do a clean handoff), but no minimum term.</div>
+        <div class="faq-a">No. Choose month-to-month or annual — cancel anytime, no penalty. Full Service has a 30-day notice period so we can do a clean handoff, but there is no minimum term.</div>
       </div>
-
       <div class="faq-item">
         <div class="faq-q">How is BAAM Review different from Birdeye or Podium?</div>
-        <div class="faq-a">Three things: (1) we're priced for local businesses, not enterprise — typically 67–82% cheaper than Birdeye, (2) we're built natively trilingual (EN / 中文 / ES) — no major US competitor does this, and (3) we offer Full Service as a real product, not an upsell. Birdeye charges $5,000–$15,000 just for setup; we charge $0 for every customer.</div>
+        <div class="faq-a">Three things: we're priced for local businesses rather than enterprise, we're built natively trilingual (EN / 中文 / Español), and we offer Full Service as a real managed product, not an upsell. Birdeye and Podium also charge thousands just for setup — we charge $0.</div>
       </div>
-
       <div class="faq-item">
         <div class="faq-q">What payment methods do you accept?</div>
-        <div class="faq-a">Stripe for credit cards and ACH transfers. We also accept Zelle for Full Service customers in the US who prefer it — ask us during your intro call.</div>
+        <div class="faq-a">Credit card and ACH for everyone. Full Service customers can also pay by check on a net-30 invoice — useful for agencies billing multiple client businesses.</div>
       </div>
 
     </div>
@@ -1383,8 +733,8 @@ footer a:hover { color: var(--cream); }
 <!-- ============ FOOTER CTA ============ -->
 <section class="footer-cta">
   <div class="container">
-    <h2 class="footer-cta-h">Founding spots are <em>filling up.</em></h2>
-    <p class="footer-cta-sub">23 self-serve founding spots left. 17 Full Service founding spots left. Once they're gone, standard pricing applies forever. 30-day free trial on every location either way.</p>
+    <h2 class="footer-cta-h">Start collecting reviews <em>this week.</em></h2>
+    <p class="footer-cta-sub">Every plan begins with a 30-day free trial — no setup fees, no commitment. Pick monthly or annual whenever you're ready.</p>
     <div class="footer-cta-buttons">
       <a href="https://review.baamplatform.com/signup" class="btn btn-primary">Start 30-day free trial</a>
       <a href="/book" class="btn btn-gold">Book a free consultation</a>
