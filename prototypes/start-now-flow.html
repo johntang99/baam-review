@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Full Service · Start Now — design prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              paper: "#FAF6EE",
+              cream: "#F5F0E4",
+              "cream-deep": "#EFE7D4",
+              ink: "#2A2520",
+              text: "#3D3530",
+              "text-soft": "#6B5F55",
+              "text-muted": "#8B7F73",
+              "border-base": "#E5D9C5",
+              forest: "#1F4D3F",
+              "forest-dark": "#143329",
+              brick: "#962D22",
+              gold: "#C9A961",
+              "gold-dark": "#A88847",
+              "gold-soft": "#E8D9B2",
+              sage: "#7FA68F",
+              success: "#2F7D54",
+              warn: "#B7791F",
+              alert: "#B7392F",
+            },
+            fontFamily: {
+              display: ['"Cormorant Garamond"', "serif"],
+              sans: ["Inter", "system-ui", "sans-serif"],
+              mono: ['"JetBrains Mono"', "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        background: #ebe2d2;
+      }
+      .font-display { font-family: "Cormorant Garamond", serif; letter-spacing: -0.01em; }
+      .stage-label { letter-spacing: 0.18em; }
+      .arrow-down {
+        width: 2px;
+        background: #C9A961;
+        height: 56px;
+        margin: 0 auto;
+        position: relative;
+      }
+      .arrow-down::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -10px;
+        width: 12px;
+        height: 12px;
+        border-right: 2px solid #C9A961;
+        border-bottom: 2px solid #C9A961;
+        transform: translateX(-50%) rotate(45deg);
+      }
+    </style>
+  </head>
+  <body class="text-ink">
+    <div class="mx-auto max-w-6xl px-6 py-10 space-y-10">
+
+      <!-- Cover -->
+      <header class="text-center max-w-3xl mx-auto">
+        <p class="text-[11px] font-semibold uppercase stage-label text-gold-dark">Design prototype · BAAM Review</p>
+        <h1 class="font-display text-[40px] text-ink leading-tight mt-2">
+          Full Service · &ldquo;Start Now&rdquo; flow
+        </h1>
+        <p class="text-[14px] text-text-soft mt-3 leading-relaxed">
+          Customer pays first, BAAM team handles the rest. Six stages: pricing CTA → Stripe Checkout (with business info fields) → welcome page → auto-confirm email → team notification → staff Onboarding queue. All locations belong to one &ldquo;BAAM Operations&rdquo; account; <code>customer_records</code> table bridges payment to GBP connection.
+        </p>
+      </header>
+
+      <!-- ============================================================== -->
+      <!-- ARCHITECTURE SUMMARY                                            -->
+      <!-- ============================================================== -->
+      <section class="bg-paper border border-border-base rounded-2xl p-7 max-w-5xl mx-auto">
+        <h2 class="font-display text-[22px] text-ink mb-3">Data model — the two new pieces</h2>
+        <div class="grid md:grid-cols-2 gap-5 text-[13px]">
+          <div class="rounded-lg bg-cream-deep p-4 font-mono leading-relaxed text-[12.5px]">
+            <p class="text-text-muted text-[11px] mb-1 font-sans">NEW TABLE</p>
+            <p><strong>customer_records</strong></p>
+            <p class="text-text-soft mt-2">
+              id<br/>
+              email<br/>
+              business_name<br/>
+              business_address<br/>
+              stripe_customer_id<br/>
+              stripe_subscription_id<br/>
+              onboarding_status<br/>
+              <span class="text-text-muted ml-3">'pending_gbp_connect'</span><br/>
+              <span class="text-text-muted ml-3">'gbp_connected'</span><br/>
+              <span class="text-text-muted ml-3">'active'</span><br/>
+              location_id <span class="text-text-muted">(FK, nullable)</span><br/>
+              source <span class="text-text-muted">('start_now')</span><br/>
+              created_at
+            </p>
+          </div>
+          <div class="rounded-lg bg-cream-deep p-4 font-mono leading-relaxed text-[12.5px]">
+            <p class="text-text-muted text-[11px] mb-1 font-sans">EXISTING TABLE — one new FK</p>
+            <p><strong>locations</strong></p>
+            <p class="text-text-soft mt-2">
+              ... existing columns ...<br/>
+              <strong class="text-forest">customer_record_id</strong> <span class="text-text-muted">(FK → customer_records, nullable)</span><br/>
+            </p>
+            <p class="text-text-soft mt-3 font-sans text-[12px] italic">
+              Locations from regular signup have <code>customer_record_id = null</code>. Locations from Start Now have it set, providing the trace back to the original Stripe payment.
+            </p>
+          </div>
+        </div>
+        <p class="text-[12.5px] text-text-soft mt-4">
+          <strong>No changes</strong> to <code>users</code>, <code>accounts</code>, RLS policies, or <code>location_subscriptions</code>. The &ldquo;is this location paid?&rdquo; check stays as it is today: a row in <code>location_subscriptions</code> linking the location to a Stripe subscription means paid.
+        </p>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 1 — Pricing CTA                                          -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper font-bold">1</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 1 · Pricing page · public</p>
+            <h2 class="font-display text-[26px] text-ink">Add a second CTA to the Full Service tier</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">
+          Today the Full Service card has one button: <em>Book a free consultation</em>. We add a second, smaller button below it for buyers who don&rsquo;t want a meeting.
+        </p>
+
+        <div class="rounded-2xl border-2 border-forest bg-paper p-7 shadow-sm max-w-md">
+          <p class="text-[10.5px] font-semibold uppercase stage-label text-text-muted">Path B · Full Service</p>
+          <h3 class="font-display text-[26px] text-ink mt-1">We run it <em class="not-italic text-forest italic">for you</em></h3>
+          <p class="text-[13px] italic text-text-soft mt-2 mb-4 font-display">
+            Send us your customer list each week. We handle collection, replies, private feedback, and reporting.
+          </p>
+          <p class="font-display text-[36px] font-medium text-ink">$399<span class="text-[14px] text-text-muted font-sans"> / month</span></p>
+          <p class="text-[11.5px] text-text-soft">or $3,990/year · 2 months free</p>
+
+          <div class="mt-5 space-y-2">
+            <button class="w-full rounded-md bg-forest text-paper font-semibold py-3 text-[14px]">
+              Book a free consultation
+            </button>
+            <button class="w-full rounded-md border-2 border-forest bg-paper text-forest font-semibold py-3 text-[14px]">
+              Start now &mdash; we&rsquo;ll set it up
+            </button>
+          </div>
+          <p class="text-[11px] text-center text-text-muted mt-3 italic">
+            Pay nothing today &middot; 30-day free trial &middot; we set up your account within 1 week
+          </p>
+        </div>
+      </section>
+
+      <div class="arrow-down"></div>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 2 — Stripe Checkout                                       -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper font-bold">2</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 2 · Stripe Checkout (hosted page) · public</p>
+            <h2 class="font-display text-[26px] text-ink">Customer enters business info + card</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">
+          We use Stripe Checkout&rsquo;s native UI with <code>custom_fields</code> for business name and address. No charge today; subscription created with a 30-day trial. Stripe collects email by default.
+        </p>
+
+        <div class="rounded-2xl border border-border-base bg-paper p-8 max-w-md mx-auto shadow-sm">
+          <div class="text-[12px] text-text-muted mb-4 text-center">checkout.stripe.com · hosted by Stripe</div>
+          <h3 class="font-display text-[22px] text-ink leading-tight">BAAM Review &mdash; Full Service</h3>
+          <div class="text-[13px] mt-2 mb-5 text-text-soft">
+            $399.00 per month &middot; <span class="text-forest font-semibold">30 days free</span>
+          </div>
+
+          <div class="space-y-3 text-[13px]">
+            <div>
+              <p class="text-[11px] uppercase font-semibold text-text-muted mb-1">Email</p>
+              <div class="border border-border-base rounded-md px-3 py-2 bg-cream text-text-muted">you@business.com</div>
+            </div>
+            <div>
+              <p class="text-[11px] uppercase font-semibold text-text-muted mb-1">Card information</p>
+              <div class="border border-border-base rounded-md px-3 py-2 bg-cream text-text-muted">1234 1234 1234 1234</div>
+            </div>
+            <hr class="border-border-base my-2" />
+            <p class="text-[11px] uppercase font-semibold text-gold-dark stage-label mt-2">Tell us about your business</p>
+            <div>
+              <p class="text-[11px] uppercase font-semibold text-text-muted mb-1">Business name</p>
+              <div class="border border-border-base rounded-md px-3 py-2 bg-cream text-text-muted">DR. Huang Acupuncture</div>
+              <p class="text-[10.5px] text-text-muted mt-1">As it appears on your Google Business Profile.</p>
+            </div>
+            <div>
+              <p class="text-[11px] uppercase font-semibold text-text-muted mb-1">Business address</p>
+              <div class="border border-border-base rounded-md px-3 py-2 bg-cream text-text-muted">71 East Main St, Middletown, NY 10940</div>
+            </div>
+          </div>
+
+          <button class="mt-5 w-full bg-ink text-paper font-semibold rounded-md py-3 text-[14px]">
+            Start trial · $0 today
+          </button>
+          <p class="text-[10.5px] text-center text-text-muted mt-3">
+            Your card will be charged $399 after 30 days unless you cancel.
+          </p>
+        </div>
+      </section>
+
+      <div class="arrow-down"></div>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 3 — Welcome page                                          -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper font-bold">3</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 3 · Welcome page · <code>/start/welcome</code></p>
+            <h2 class="font-display text-[26px] text-ink">Customer sees what to do next</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">
+          The single most important step: tell the customer how to add BAAM as a Google Business Profile manager so we can connect.
+        </p>
+
+        <div class="rounded-2xl border border-border-base bg-paper p-10 max-w-2xl mx-auto shadow-sm">
+          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-gold/60 bg-gold/15 text-gold-dark">
+            <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <p class="text-center mt-3 text-[11px] font-semibold uppercase stage-label text-gold-dark">Card saved · subscription started</p>
+          <h3 class="text-center font-display text-[30px] leading-tight mt-1">
+            You&rsquo;re in. Now one quick step.
+          </h3>
+          <p class="text-center text-[14px] text-text-soft mt-3 leading-relaxed max-w-md mx-auto">
+            We need access to your Google Business Profile so we can post replies and pull your reviews. Add our manager email to your GBP and we&rsquo;ll handle the rest within 1 week.
+          </p>
+
+          <div class="rounded-xl border-2 border-gold/40 bg-gold-soft/30 mt-6 p-5 text-[13.5px] leading-relaxed">
+            <p class="font-semibold text-ink mb-2">Add this email as a Manager on your Google Business Profile:</p>
+            <div class="font-mono bg-paper px-3 py-2 rounded border border-gold/50 inline-block text-ink font-semibold">manager@baamplatform.com</div>
+            <ol class="list-decimal list-inside mt-3 space-y-1 text-text">
+              <li>Go to <a href="#" class="text-forest underline">business.google.com</a> and pick your business</li>
+              <li>Click <strong>Menu</strong> → <strong>Business Profile settings</strong> → <strong>People and access</strong></li>
+              <li>Click <strong>Add</strong>, paste <code>manager@baamplatform.com</code>, select <strong>Manager</strong> role</li>
+              <li>Send the invite. We accept within a few hours and start setup.</li>
+            </ol>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mt-5 text-[12.5px]">
+            <div class="rounded-lg border border-border-base p-3">
+              <p class="font-semibold text-ink">📅 First week</p>
+              <p class="text-text-soft mt-1">We connect your GBP, configure your reward, send the first invite batch.</p>
+            </div>
+            <div class="rounded-lg border border-border-base p-3">
+              <p class="font-semibold text-ink">💳 Day 30</p>
+              <p class="text-text-soft mt-1">First $399 charge. Cancel anytime before then with no charge.</p>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-center gap-3">
+            <a href="#" class="text-[12.5px] text-forest hover:underline">Got questions? Reply to your welcome email.</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="arrow-down"></div>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 4 — Customer auto-confirm email                           -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gold text-paper font-bold">4</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 4 · Email · auto-sent · to customer</p>
+            <h2 class="font-display text-[26px] text-ink">Customer auto-confirmation</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">
+          Same GBP-manager instructions but in their inbox for later reference. Includes a magic-link login button (optional &mdash; they don&rsquo;t have to use it).
+        </p>
+
+        <div class="rounded-2xl border border-border-base bg-paper p-2 shadow-sm max-w-2xl">
+          <div class="rounded-t-xl bg-cream-deep px-5 py-3 text-[12px] text-text-soft space-y-1">
+            <p><span class="text-text-muted">From:</span> <span class="font-medium text-ink">BAAM Review &lt;hello@baamplatform.com&gt;</span></p>
+            <p><span class="text-text-muted">To:</span> you@business.com</p>
+            <p><span class="text-text-muted">Subject:</span> <span class="font-semibold text-ink">Welcome to Full Service &mdash; one step to finish setup</span></p>
+          </div>
+          <div class="px-7 py-7 space-y-3 text-[14px] leading-relaxed text-text">
+            <p>Hi John,</p>
+            <p>Thanks for signing up. Your card is saved and your 30-day free trial has started &mdash; we don&rsquo;t charge until <strong>Jun 22, 2026</strong>.</p>
+            <p>To finish setup, please add our manager email as a Manager on your Google Business Profile:</p>
+            <div class="rounded-lg bg-cream-deep p-4 my-2 font-mono text-[13px]">manager@baamplatform.com</div>
+            <p class="text-[13px] text-text-soft">
+              <strong>How:</strong> <a href="#" class="text-forest underline">business.google.com</a> → pick your business → Menu → Business Profile settings → People and access → Add → paste the email → choose Manager.
+            </p>
+            <p>We&rsquo;ll accept within a few hours and have your account live within 1 week. You&rsquo;ll get an email when each step is done.</p>
+            <hr class="border-border-base my-3" />
+            <p class="text-[13px]">If you&rsquo;d like to see your dashboard while we set things up:</p>
+            <a href="#" class="inline-block bg-forest text-paper rounded-md px-5 py-2.5 text-[13px] font-semibold">Log in to my dashboard →</a>
+            <p class="text-[12px] text-text-muted italic">No password needed. The link above logs you in.</p>
+            <hr class="border-border-base my-3" />
+            <p>Reply anytime if you have questions &mdash; this is a real inbox.</p>
+            <p>&mdash; The BAAM Review team</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="arrow-down"></div>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 5 — Internal team notification                            -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-brick text-paper font-bold">5</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 5 · Email · auto-sent · to team (internal)</p>
+            <h2 class="font-display text-[26px] text-ink">Team notification</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">
+          Goes to <code>baamplatform@gmail.com</code> the moment Stripe Checkout completes. Includes a link to the Onboarding queue.
+        </p>
+
+        <div class="rounded-2xl border border-border-base bg-paper p-2 shadow-sm max-w-2xl">
+          <div class="rounded-t-xl bg-cream-deep px-5 py-3 text-[12px] text-text-soft space-y-1">
+            <p><span class="text-text-muted">From:</span> <span class="font-medium text-ink">BAAM Review Bot &lt;noreply@baamplatform.com&gt;</span></p>
+            <p><span class="text-text-muted">To:</span> baamplatform@gmail.com</p>
+            <p><span class="text-text-muted">Reply-To:</span> you@business.com</p>
+            <p><span class="text-text-muted">Subject:</span> <span class="font-semibold text-ink">🟢 New Full Service signup — DR. Huang Acupuncture ($399)</span></p>
+          </div>
+          <div class="px-7 py-6 space-y-4 text-[13px]">
+            <div class="rounded-lg border border-border-base p-4 grid grid-cols-2 gap-x-4 gap-y-1.5">
+              <p><span class="text-text-muted">Customer:</span> <strong>John Tang</strong></p>
+              <p><span class="text-text-muted">Signed up:</span> just now</p>
+              <p><span class="text-text-muted">Email:</span> <a href="mailto:john@example.com" class="text-forest">john@example.com</a></p>
+              <p><span class="text-text-muted">Trial ends:</span> Jun 22, 2026</p>
+              <p class="col-span-2"><span class="text-text-muted">Business:</span> <strong>DR. Huang Acupuncture</strong></p>
+              <p class="col-span-2"><span class="text-text-muted">Address:</span> 71 East Main St, Middletown, NY 10940</p>
+              <p class="col-span-2"><span class="text-text-muted">Stripe sub:</span> <code class="text-[12px]">sub_1Ta8…</code> (trial)</p>
+            </div>
+            <div class="rounded-lg bg-gold-soft/40 border border-gold/30 p-4 text-[13px]">
+              <p class="font-semibold text-ink mb-1">⏱ Action needed within 7 days:</p>
+              <ol class="list-decimal list-inside text-text mt-1">
+                <li>Wait for GBP manager invitation (john should add manager@baamplatform.com)</li>
+                <li>Accept invitation in BAAM&rsquo;s Google account</li>
+                <li>Connect their GBP from the Onboarding queue → location goes live</li>
+              </ol>
+            </div>
+            <a href="#" class="inline-block bg-forest text-paper rounded-md px-4 py-2 text-[12px] font-semibold">Open Onboarding queue →</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="arrow-down"></div>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 6 — Onboarding queue (admin)                              -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper font-bold">6</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 6 · Admin page · <code>/app/onboarding</code> · staff only</p>
+            <h2 class="font-display text-[26px] text-ink">Staff Onboarding queue</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">
+          Where S lives. Every paid-but-not-connected customer waits here. S clicks &ldquo;Connect their GBP&rdquo; to OAuth into Google and pick the right business from the list. The link between Stripe subscription and GBP location happens at this click.
+        </p>
+
+        <div class="rounded-2xl border border-border-base bg-paper shadow-sm overflow-hidden max-w-5xl mx-auto">
+          <!-- Header -->
+          <div class="px-7 py-5 border-b border-border-base bg-cream">
+            <p class="text-[11px] font-semibold uppercase stage-label text-gold-dark">BAAM Operations · staff dashboard</p>
+            <h2 class="font-display text-[28px] text-ink mt-1">Onboarding queue</h2>
+            <p class="text-[13px] text-text-soft mt-1">Customers who paid via Start Now and are waiting for GBP connection.</p>
+          </div>
+
+          <!-- Stat row -->
+          <div class="px-7 py-4 grid grid-cols-4 gap-4 text-center border-b border-border-base">
+            <div>
+              <p class="font-display text-[32px] text-ink leading-none">3</p>
+              <p class="text-[11px] uppercase stage-label text-text-muted mt-1">Awaiting GBP</p>
+            </div>
+            <div>
+              <p class="font-display text-[32px] text-warn leading-none">1</p>
+              <p class="text-[11px] uppercase stage-label text-text-muted mt-1">Day &gt; 5</p>
+            </div>
+            <div>
+              <p class="font-display text-[32px] text-alert leading-none">0</p>
+              <p class="text-[11px] uppercase stage-label text-text-muted mt-1">Day &gt; 7 (urgent)</p>
+            </div>
+            <div>
+              <p class="font-display text-[32px] text-success leading-none">12</p>
+              <p class="text-[11px] uppercase stage-label text-text-muted mt-1">Connected this month</p>
+            </div>
+          </div>
+
+          <!-- Queue rows -->
+          <ul class="divide-y divide-border-base">
+            <!-- Fresh signup -->
+            <li class="px-7 py-5 flex items-center gap-5">
+              <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-success/10 text-success font-bold">A</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-display text-[17px] text-ink leading-tight">DR. Huang Acupuncture</p>
+                <p class="text-[12px] text-text-soft">71 East Main St, Middletown, NY · john@example.com</p>
+                <div class="flex items-center gap-3 mt-1 text-[11px]">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success font-semibold">✓ Paid</span>
+                  <span class="text-text-muted">Signed up <strong class="text-ink">2 hours ago</strong></span>
+                  <span class="text-text-muted">Trial ends <strong class="text-ink">Jun 22</strong></span>
+                </div>
+              </div>
+              <div class="flex flex-col items-end gap-1">
+                <button class="rounded-md bg-forest text-paper text-[13px] font-semibold px-4 py-2 hover:bg-forest-dark">
+                  Connect their GBP →
+                </button>
+                <p class="text-[11px] text-text-muted italic">Waiting for invite</p>
+              </div>
+            </li>
+
+            <!-- Day 3 -->
+            <li class="px-7 py-5 flex items-center gap-5">
+              <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-cream-deep text-ink font-bold font-display">L</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-display text-[17px] text-ink leading-tight">Lin Family Dental</p>
+                <p class="text-[12px] text-text-soft">88-23 Roosevelt Ave, Flushing, NY · drlin@familydental.com</p>
+                <div class="flex items-center gap-3 mt-1 text-[11px]">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success font-semibold">✓ Paid</span>
+                  <span class="text-text-muted">Signed up <strong class="text-ink">3 days ago</strong></span>
+                  <span class="text-success font-semibold">Manager invite received ✓</span>
+                </div>
+              </div>
+              <div class="flex flex-col items-end gap-1">
+                <button class="rounded-md bg-gold text-ink text-[13px] font-semibold px-4 py-2 hover:bg-gold-dark hover:text-paper">
+                  Ready to connect →
+                </button>
+                <p class="text-[11px] text-success italic font-semibold">Action ready</p>
+              </div>
+            </li>
+
+            <!-- Day 6 (warn) -->
+            <li class="px-7 py-5 flex items-center gap-5 bg-gold-soft/20">
+              <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-warn/15 text-warn font-bold font-display">W</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-display text-[17px] text-ink leading-tight">Wei Lin Acupuncture</p>
+                <p class="text-[12px] text-text-soft">142-15 Northern Blvd · wei@weilin-clinic.com</p>
+                <div class="flex items-center gap-3 mt-1 text-[11px]">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success font-semibold">✓ Paid</span>
+                  <span class="text-text-muted">Signed up <strong class="text-warn">6 days ago</strong></span>
+                  <span class="text-warn font-semibold">⚠ No manager invite yet</span>
+                </div>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                <button class="rounded-md border border-warn text-warn text-[12.5px] font-semibold px-4 py-2 hover:bg-warn/10">
+                  Call customer →
+                </button>
+                <p class="text-[11px] text-text-muted italic">Has not added manager</p>
+              </div>
+            </li>
+          </ul>
+
+          <!-- Connected section -->
+          <div class="px-7 py-4 border-t border-border-base bg-cream-deep/40">
+            <p class="text-[11px] uppercase stage-label text-text-muted font-semibold">Recently connected</p>
+          </div>
+          <ul class="divide-y divide-border-base">
+            <li class="px-7 py-3 flex items-center gap-5 text-[13px]">
+              <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded bg-success/15 text-success">✓</span>
+              <p class="flex-1 text-text">Citiwide Master — connected by S yesterday</p>
+              <a href="#" class="text-[12px] text-forest hover:underline">View location</a>
+            </li>
+            <li class="px-7 py-3 flex items-center gap-5 text-[13px]">
+              <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded bg-success/15 text-success">✓</span>
+              <p class="flex-1 text-text">Green Eastern Beauty — connected by S 2 days ago</p>
+              <a href="#" class="text-[12px] text-forest hover:underline">View location</a>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="arrow-down"></div>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 7 — Connect their GBP (modal flow)                        -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper font-bold">7</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 7 · Modal · &ldquo;Connect their GBP&rdquo; click</p>
+            <h2 class="font-display text-[26px] text-ink">The actual connect step</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">
+          When S clicks &ldquo;Connect their GBP&rdquo;, this modal opens. OAuth into Google → list of managed businesses → S picks the right one → location is created + linked to the customer&rsquo;s subscription.
+        </p>
+
+        <div class="rounded-2xl border border-border-base bg-paper p-7 shadow-sm max-w-lg mx-auto">
+          <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Connect GBP for · DR. Huang Acupuncture</p>
+          <h3 class="font-display text-[22px] text-ink mt-1 leading-tight">Pick the right business from John&rsquo;s GBP</h3>
+          <p class="text-[12.5px] text-text-soft mt-1">Authenticated as <code>manager@baamplatform.com</code></p>
+
+          <div class="mt-5 space-y-2">
+            <label class="flex items-start gap-3 rounded-md border-2 border-forest bg-forest/[0.04] p-3 cursor-pointer">
+              <input type="radio" name="biz" checked class="mt-0.5" />
+              <div class="flex-1">
+                <p class="font-semibold text-ink">DR. Huang Acupuncture and Green Eastern Beauty 中醫針灸 美容</p>
+                <p class="text-[12px] text-text-soft">71 East Main St, Middletown, NY 10940 · acupuncture clinic</p>
+                <p class="text-[11px] text-success mt-1 font-semibold">★ Address matches the customer record</p>
+              </div>
+            </label>
+            <label class="flex items-start gap-3 rounded-md border border-border-base p-3 cursor-pointer hover:bg-cream">
+              <input type="radio" name="biz" class="mt-0.5" />
+              <div class="flex-1">
+                <p class="text-ink">Lin&rsquo;s Tea House</p>
+                <p class="text-[12px] text-text-soft">45 Main St, Flushing, NY · tea shop</p>
+              </div>
+            </label>
+            <p class="text-[11.5px] text-text-muted italic">Don&rsquo;t see the right business? Make sure John added <code>manager@baamplatform.com</code> as Manager on the correct GBP.</p>
+          </div>
+
+          <div class="mt-5 rounded-md bg-cream-deep p-3 text-[12.5px] text-text-soft leading-relaxed">
+            <strong class="text-ink">What clicking &ldquo;Connect&rdquo; does:</strong>
+            <ol class="list-decimal list-inside mt-1 space-y-0.5">
+              <li>Creates a location under BAAM Operations account</li>
+              <li>Links it to John&rsquo;s Stripe subscription (already paid)</li>
+              <li>Pulls existing reviews from Google</li>
+              <li>Notifies John by email that his account is ready</li>
+            </ol>
+          </div>
+
+          <div class="flex gap-2 mt-5">
+            <button class="flex-1 rounded-md bg-forest text-paper font-semibold py-2.5 text-[13px]">
+              Connect this business →
+            </button>
+            <button class="rounded-md border border-border-base text-text-soft px-4 py-2.5 text-[13px]">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div class="arrow-down"></div>
+
+      <!-- ============================================================== -->
+      <!-- STAGE 8 — Mixed billing dashboard                               -->
+      <!-- ============================================================== -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gold text-paper font-bold">8</span>
+          <div>
+            <p class="text-[11px] font-semibold uppercase stage-label text-text-muted">Stage 8 · Locations list · staff dashboard · <code>/app/locations</code></p>
+            <h2 class="font-display text-[26px] text-ink">Mixed billing: some pre-paid, some post-paid</h2>
+          </div>
+        </div>
+        <p class="text-[13px] text-text-soft max-w-2xl">
+          Every location S manages shows a billing-status pill. <strong>Pre-paid</strong> (Start Now) and <strong>post-paid</strong> (regular flow) coexist on the same dashboard; S can sort by status to handle pending payments.
+        </p>
+
+        <div class="rounded-2xl border border-border-base bg-paper shadow-sm overflow-hidden max-w-5xl mx-auto">
+          <div class="px-7 py-4 border-b border-border-base bg-cream flex items-center justify-between">
+            <h3 class="font-display text-[22px] text-ink">All locations</h3>
+            <div class="flex items-center gap-2 text-[12px]">
+              <span class="text-text-muted">Filter:</span>
+              <button class="px-3 py-1 rounded-full bg-ink text-paper">All (5)</button>
+              <button class="px-3 py-1 rounded-full border border-border-base text-text">Active (3)</button>
+              <button class="px-3 py-1 rounded-full border border-warn text-warn">Pending payment (1)</button>
+              <button class="px-3 py-1 rounded-full border border-border-base text-text">Onboarding (1)</button>
+            </div>
+          </div>
+          <ul class="divide-y divide-border-base text-[13.5px]">
+            <li class="px-7 py-4 flex items-center gap-4">
+              <span class="flex h-9 w-9 items-center justify-center rounded-md bg-brick text-paper font-display text-[18px] font-semibold">D</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-ink">DR. Huang Acupuncture</p>
+                <p class="text-[12px] text-text-soft">john@example.com · trial ends Jun 22</p>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-success/15 text-success text-[11.5px] font-semibold">
+                ✓ Active · pre-paid
+              </span>
+            </li>
+            <li class="px-7 py-4 flex items-center gap-4">
+              <span class="flex h-9 w-9 items-center justify-center rounded-md bg-sage text-paper font-display text-[18px] font-semibold">L</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-ink">Lin Family Dental</p>
+                <p class="text-[12px] text-text-soft">drlin@familydental.com · billing Jun 18</p>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-success/15 text-success text-[11.5px] font-semibold">
+                ✓ Active · pre-paid
+              </span>
+            </li>
+            <li class="px-7 py-4 flex items-center gap-4">
+              <span class="flex h-9 w-9 items-center justify-center rounded-md bg-gold-dark text-paper font-display text-[18px] font-semibold">M</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-ink">Mei Hua Insurance</p>
+                <p class="text-[12px] text-text-soft">agent@meihua.com · invoice net-30</p>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-success/15 text-success text-[11.5px] font-semibold">
+                ✓ Active · invoice
+              </span>
+            </li>
+            <li class="px-7 py-4 flex items-center gap-4 bg-warn/5">
+              <span class="flex h-9 w-9 items-center justify-center rounded-md bg-warn text-paper font-display text-[18px] font-semibold">W</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-ink">Wei Lin Massage</p>
+                <p class="text-[12px] text-text-soft">wei@massage.com · payment link sent 3 days ago</p>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-warn/15 text-warn text-[11.5px] font-semibold">
+                ⏳ Pending payment
+              </span>
+            </li>
+            <li class="px-7 py-4 flex items-center gap-4 bg-cream-deep/30">
+              <span class="flex h-9 w-9 items-center justify-center rounded-md bg-text-muted text-paper font-display text-[18px] font-semibold">C</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-ink">Citiwide Master</p>
+                <p class="text-[12px] text-text-soft">paid 1h ago · waiting for GBP manager invite</p>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cream-deep text-text-soft text-[11.5px] font-semibold">
+                ⋯ Onboarding · pre-paid
+              </span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- Notes                                                          -->
+      <!-- ============================================================== -->
+      <section class="rounded-2xl border border-dashed border-gold/40 bg-gold-soft/20 p-7 space-y-3 max-w-4xl mx-auto">
+        <h2 class="font-display text-[24px] text-ink">Implementation scope &amp; open questions</h2>
+        <div class="grid md:grid-cols-2 gap-5 text-[13px] text-text-soft leading-relaxed">
+          <div>
+            <p class="font-semibold text-ink mb-1">Backend (1 day)</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Migration 0029: <code>customer_records</code> table + <code>locations.customer_record_id</code> FK</li>
+              <li><code>POST /api/billing/start-fullservice</code>: creates Stripe Checkout session with custom_fields and 30-day trial</li>
+              <li>Webhook handler for <code>checkout.session.completed</code>: insert <code>customer_records</code> row, send 2 emails</li>
+              <li>Server action <code>connectCustomerGbp(customer_record_id, place_id)</code>: creates location + <code>location_subscriptions</code> row</li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-semibold text-ink mb-1">Frontend (1 day)</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>&ldquo;Start now&rdquo; button on pricing page (en + zh)</li>
+              <li><code>/start/welcome</code> page (Stage 3 above)</li>
+              <li><code>/app/onboarding</code> queue page (Stage 6 above)</li>
+              <li>GBP picker modal updated to handle the &ldquo;onboarding queue&rdquo; entry point (Stage 7)</li>
+              <li>Billing-status pills on the locations list (Stage 8)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="text-[13px] text-text-soft leading-relaxed">
+          <p class="font-semibold text-ink mb-1">Open questions before we build</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>Manager email address:</strong> is <code>manager@baamplatform.com</code> the right address for customers to invite? Or do you have an existing operations inbox?</li>
+            <li><strong>Magic-link login for the customer:</strong> the welcome email offers &ldquo;Log in to my dashboard.&rdquo; Should we build a separate read-only customer-facing dashboard, or is that for v2?</li>
+            <li><strong>Stripe custom_fields:</strong> Stripe Checkout supports up to 2 custom fields. Business name + business address fits. If we ever need a 3rd field (e.g., language preference), we&rsquo;d need a separate post-Checkout form.</li>
+            <li><strong>Day-5 / Day-7 alerts:</strong> daily cron with Slack/email alerts for stalled onboarding. Build now or after first 10 customers?</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </body>
+</html>

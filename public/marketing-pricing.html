@@ -219,6 +219,17 @@ nav.scrolled { border-color: var(--border); }
 }
 .plan-card.featured .plan-cta { background: var(--forest); }
 .plan-cta:hover { background: var(--forest-dark); color: var(--cream); }
+/* Secondary CTA on the Full Service card — the "Start now" path that
+   skips the consultation meeting and goes straight to Stripe Checkout. */
+.plan-cta-secondary {
+  display: block; width: 100%; margin-top: 9px;
+  padding: 13px 24px; background: var(--paper); color: var(--forest);
+  border: 2px solid var(--forest); border-radius: 12px;
+  font-family: 'Onest', sans-serif; font-size: 14.5px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.plan-cta-secondary:hover { background: var(--forest); color: var(--cream); }
+.plan-cta-secondary:disabled { opacity: 0.55; cursor: wait; }
 .plan-cta-note { text-align: center; font-size: 12.5px; color: var(--text-muted); margin-top: 9px; }
 .plans-footnote {
   text-align: center; font-family: 'Newsreader', serif; font-style: italic;
@@ -651,7 +662,10 @@ footer a:hover { color: var(--cream); }
       </ul>
 
       <a href="/book" class="plan-cta">Book a free consultation →</a>
-      <div class="plan-cta-note">Or start a 30-day free trial — no charge today</div>
+      <button type="button" class="plan-cta-secondary" data-start-now-fullservice>
+        Start now — we'll set it up →
+      </button>
+      <div class="plan-cta-note">No charge today · 30-day free trial · we set up your account within 1 week</div>
     </div>
 
   </div>
@@ -937,6 +951,36 @@ footer a:hover { color: var(--cream); }
 <script>
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+
+  // "Start now" → Stripe Checkout. POSTs to /api/billing/start-fullservice
+  // and redirects to the hosted Stripe URL. Errors surface as an alert; we
+  // don't have a richer error UI here yet.
+  document.querySelectorAll('[data-start-now-fullservice]').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const button = e.currentTarget;
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Loading Stripe…';
+      try {
+        const res = await fetch('/api/billing/start-fullservice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ interval: 'month' }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.url) {
+          throw new Error(data.error || 'Could not start checkout');
+        }
+        window.location.assign(data.url);
+      } catch (err) {
+        button.disabled = false;
+        button.textContent = original;
+        alert('Sorry — could not start checkout. Please try again, or email support@baamplatform.com.');
+        console.error(err);
+      }
+    });
+  });
 </script>
 
 </body>

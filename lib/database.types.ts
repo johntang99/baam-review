@@ -30,6 +30,23 @@ export type LandingEventType =
   | "platform_clicked"
   | "private_feedback_submitted";
 
+/**
+ * Onboarding state for a Full Service Start Now customer. Drives the
+ * /app/onboarding queue and the day-5/day-7 alert cron.
+ *
+ *   pending_gbp_connect → paid, waiting for the customer to add our manager
+ *                          email to their Google Business Profile.
+ *   gbp_connected       → staff has connected the GBP and a location exists.
+ *                          The 30-day trial is running.
+ *   active              → trial ended, billing active.
+ *   cancelled           → customer cancelled before service went live.
+ */
+export type CustomerRecordStatus =
+  | "pending_gbp_connect"
+  | "gbp_connected"
+  | "active"
+  | "cancelled";
+
 export type PostReviewActionType =
   | "view"
   | "book_click"
@@ -238,6 +255,7 @@ export interface Database {
           default_share_theme: string | null;
           referral_config: ReferralConfig;
           reward_config: RewardConfig;
+          customer_record_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -277,10 +295,45 @@ export interface Database {
           default_share_theme?: string | null;
           referral_config?: ReferralConfig;
           reward_config?: RewardConfig;
+          customer_record_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["locations"]["Insert"]>;
+        Relationships: [];
+      };
+      customer_records: {
+        Row: {
+          id: string;
+          email: string;
+          business_name: string | null;
+          business_address: string | null;
+          stripe_customer_id: string;
+          stripe_subscription_id: string;
+          onboarding_status: CustomerRecordStatus;
+          location_id: string | null;
+          source: string;
+          last_alert_sent_day: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          business_name?: string | null;
+          business_address?: string | null;
+          stripe_customer_id: string;
+          stripe_subscription_id: string;
+          onboarding_status?: CustomerRecordStatus;
+          location_id?: string | null;
+          source?: string;
+          last_alert_sent_day?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["customer_records"]["Insert"]
+        >;
         Relationships: [];
       };
       review_requests: {

@@ -219,6 +219,16 @@ nav.scrolled { border-color: var(--border); }
 }
 .plan-card.featured .plan-cta { background: var(--forest); }
 .plan-cta:hover { background: var(--forest-dark); color: var(--cream); }
+/* 全托管次级 CTA —— 不预约会议、直接进入 Stripe Checkout。 */
+.plan-cta-secondary {
+  display: block; width: 100%; margin-top: 9px;
+  padding: 13px 24px; background: var(--paper); color: var(--forest);
+  border: 2px solid var(--forest); border-radius: 12px;
+  font-family: 'Noto Sans SC', 'Onest', sans-serif; font-size: 14.5px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.plan-cta-secondary:hover { background: var(--forest); color: var(--cream); }
+.plan-cta-secondary:disabled { opacity: 0.55; cursor: wait; }
 .plan-cta-note { text-align: center; font-size: 12.5px; color: var(--text-muted); margin-top: 9px; }
 .plans-footnote {
   text-align: center; font-family: 'Noto Serif SC', 'Newsreader', serif; font-style: italic;
@@ -651,7 +661,10 @@ footer a:hover { color: var(--cream); }
       </ul>
 
       <a href="/book/zh" class="plan-cta">预约免费咨询 →</a>
-      <div class="plan-cta-note">也可先开始 30 天免费试用 —— 今天不收费</div>
+      <button type="button" class="plan-cta-secondary" data-start-now-fullservice>
+        立即开始 —— 由我们替您设置 →
+      </button>
+      <div class="plan-cta-note">今天不收费 · 30 天免费试用 · 我们在 1 周内完成全部设置</div>
     </div>
 
   </div>
@@ -933,6 +946,34 @@ footer a:hover { color: var(--cream); }
 <script>
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+
+  // 「立即开始」按钮 → 跳转到 Stripe Checkout。
+  document.querySelectorAll('[data-start-now-fullservice]').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const button = e.currentTarget;
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = '正在跳转到 Stripe…';
+      try {
+        const res = await fetch('/api/billing/start-fullservice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ interval: 'month' }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.url) {
+          throw new Error(data.error || '无法启动支付');
+        }
+        window.location.assign(data.url);
+      } catch (err) {
+        button.disabled = false;
+        button.textContent = original;
+        alert('抱歉,暂时无法启动支付,请稍后再试,或邮件联系 support@baamplatform.com。');
+        console.error(err);
+      }
+    });
+  });
 </script>
 
 </body>

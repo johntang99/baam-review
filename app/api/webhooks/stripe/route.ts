@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getStripe } from "@/lib/billing/stripe";
 import { applyStripeSubscription } from "@/lib/billing/sync";
+import { handleStartNowCheckoutSession } from "@/lib/billing/start-now";
 
 /**
  * Stripe webhook for BAAM Review billing. Verifies the signature when
@@ -45,6 +46,16 @@ export async function POST(request: NextRequest) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         if (session.mode !== "subscription" || !session.subscription) break;
+
+        // Branch: Start Now Full Service sessions don't have an account or
+        // location yet — they get a customer_records row instead. The
+        // session metadata, set by /api/billing/start-fullservice, tells
+        // us which branch to take.
+        if (session.metadata?.source === "start_now_fullservice") {
+          await handleStartNowCheckoutSession(session, stripe);
+          break;
+        }
+
         const subId =
           typeof session.subscription === "string"
             ? session.subscription

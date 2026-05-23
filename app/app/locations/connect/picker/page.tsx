@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, AlertCircle } from "lucide-react";
+import { ArrowLeft, ExternalLink, AlertCircle, UserCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import {
   getValidAccessToken,
@@ -20,7 +20,13 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function PickerPage() {
+export default async function PickerPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ customer_record?: string }>;
+}) {
+  const { customer_record: customerRecordIdParam } = await searchParams;
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -33,6 +39,19 @@ export default async function PickerPage() {
     .eq("id", user.id)
     .maybeSingle();
   if (!profile?.account_id) redirect("/app/locations?error=no_account");
+
+  // If the picker was opened from the Onboarding queue, this row tells us
+  // which paid-but-unconnected customer the next location should be tied to.
+  // Set in /app/onboarding when staff clicks "Connect their GBP →".
+  const customerRecord = customerRecordIdParam
+    ? (
+        await supabase
+          .from("customer_records")
+          .select("id, business_name, business_address, email, onboarding_status")
+          .eq("id", customerRecordIdParam)
+          .maybeSingle()
+      ).data
+    : null;
 
   // Existing slugs so we can mark already-added places.
   const { data: existing } = await supabase
@@ -101,6 +120,31 @@ export default async function PickerPage() {
           )}
         </PageHeader>
       </div>
+
+      {customerRecord && (
+        <div
+          role="status"
+          className="flex gap-3 rounded-xl border border-gold/40 bg-gold/[0.06] p-4 text-[13.5px] max-w-3xl"
+        >
+          <UserCheck className="h-4 w-4 mt-0.5 flex-shrink-0 text-gold-dark" />
+          <div className="space-y-0.5">
+            <p className="font-semibold text-ink">
+              Connecting GBP for paid customer:{" "}
+              <span className="text-forest">
+                {customerRecord.business_name ?? customerRecord.email}
+              </span>
+            </p>
+            <p className="text-text-soft">
+              {customerRecord.business_address ?? customerRecord.email}
+              {customerRecord.business_address && ` · ${customerRecord.email}`}
+            </p>
+            <p className="text-text-muted text-[12px] mt-1">
+              The location you pick below will be bound to this customer&apos;s
+              Stripe subscription. Pick carefully — undo means opening Stripe.
+            </p>
+          </div>
+        </div>
+      )}
 
       {fatal && (
         <div
@@ -201,8 +245,15 @@ export default async function PickerPage() {
                           name="primary_category"
                           value={loc.primaryCategory ?? ""}
                         />
+                        {customerRecord && (
+                          <input
+                            type="hidden"
+                            name="customer_record_id"
+                            value={customerRecord.id}
+                          />
+                        )}
                         <Button type="submit" size="sm">
-                          Use this location
+                          {customerRecord ? "Bind to customer" : "Use this location"}
                         </Button>
                       </form>
                     )}
