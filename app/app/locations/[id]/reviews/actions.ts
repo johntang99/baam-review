@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { syncReviewsForAccount } from "@/lib/google/sync-reviews";
+import { syncReviewsForUser } from "@/lib/google/sync-reviews";
 
 export interface SyncResult {
   ok: boolean;
@@ -20,16 +20,18 @@ export async function syncReviews(locationId: string): Promise<SyncResult> {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("account_id")
-    .eq("id", user.id)
+  // GBP tokens are per-user. Use the connector's token to fetch reviews,
+  // not the current user's — an account manager clicking Sync on an
+  // assigned location still goes through the original sales' Google
+  // identity.
+  const { data: loc } = await supabase
+    .from("locations")
+    .select("connected_by_user_id")
+    .eq("id", locationId)
     .maybeSingle();
-  if (!profile?.account_id) {
-    return { ok: false, error: "No account for current user." };
-  }
+  const connectorId = loc?.connected_by_user_id ?? user.id;
 
-  const summaries = await syncReviewsForAccount(profile.account_id);
+  const summaries = await syncReviewsForUser(connectorId);
   const mine = summaries.find((s) => s.locationId === locationId);
 
   if (!mine) {

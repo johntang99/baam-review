@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
+import { isUserBaamInternal } from "@/lib/auth/staff";
 
 export const metadata = { title: "Onboarding queue — BAAM Review" };
 export const dynamic = "force-dynamic";
@@ -15,9 +16,10 @@ export const dynamic = "force-dynamic";
  * resulting location is bound back to the customer_record (carrying the
  * Stripe subscription with it).
  *
- * This page reads from customer_records — a table with no per-tenant RLS
- * boundary, so any authenticated user can see it. In practice only BAAM
- * staff have admin logins; this is operational tooling.
+ * Gated by accounts.is_baam_internal. customer_records has no per-tenant
+ * RLS scope (paid rows exist before any tenant account is created), so
+ * the gate here is the only thing keeping customer PII away from regular
+ * Full Service / Self Service users who happen to know the URL.
  */
 export default async function OnboardingQueuePage() {
   const supabase = await createClient();
@@ -25,6 +27,9 @@ export default async function OnboardingQueuePage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/app/onboarding");
+
+  const internal = await isUserBaamInternal(supabase, user.id);
+  if (!internal) redirect("/app");
 
   // Pending (most urgent first by signup date)
   const { data: pending } = await supabase

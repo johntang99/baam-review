@@ -50,7 +50,7 @@ export async function postReply(opts: {
 
   const { data: location } = await supabase
     .from("locations")
-    .select("id, google_resource_name")
+    .select("id, google_resource_name, connected_by_user_id")
     .eq("id", review.location_id)
     .maybeSingle();
   if (!location?.google_resource_name) {
@@ -60,9 +60,14 @@ export async function postReply(opts: {
     };
   }
 
+  // The reply must be posted with the connector's Google identity (since
+  // *their* gmail is what Google sees as a Manager on this GBP). If
+  // connected_by is missing on legacy rows, fall back to the current user.
+  const tokenUserId = location.connected_by_user_id ?? user.id;
+
   let accessToken: string;
   try {
-    accessToken = await getValidAccessToken(profile.account_id);
+    accessToken = await getValidAccessToken(tokenUserId);
   } catch (e) {
     return {
       ok: false,
@@ -127,16 +132,18 @@ export async function removeReply(reviewId: string): Promise<PostReplyResult> {
 
   const { data: location } = await supabase
     .from("locations")
-    .select("id, google_resource_name")
+    .select("id, google_resource_name, connected_by_user_id")
     .eq("id", review.location_id)
     .maybeSingle();
   if (!location?.google_resource_name) {
     return { ok: false, error: "Missing Google resource path." };
   }
 
+  const tokenUserId = location.connected_by_user_id ?? user.id;
+
   let accessToken: string;
   try {
-    accessToken = await getValidAccessToken(profile.account_id);
+    accessToken = await getValidAccessToken(tokenUserId);
   } catch (e) {
     return {
       ok: false,

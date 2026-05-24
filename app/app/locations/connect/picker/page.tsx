@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, AlertCircle, UserCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { isUserBaamInternal } from "@/lib/auth/staff";
 import {
   getValidAccessToken,
   listGoogleAccounts,
@@ -43,6 +44,14 @@ export default async function PickerPage({
   // If the picker was opened from the Onboarding queue, this row tells us
   // which paid-but-unconnected customer the next location should be tied to.
   // Set in /app/onboarding when staff clicks "Connect their GBP →".
+  //
+  // Gate: a customer_record carries someone else's paid Stripe subscription.
+  // Only internal staff may bind it to a location, otherwise a regular user
+  // could steal a paying customer's subscription by crafting the URL.
+  if (customerRecordIdParam) {
+    const internal = await isUserBaamInternal(supabase, user.id);
+    if (!internal) redirect("/app/locations");
+  }
   const customerRecord = customerRecordIdParam
     ? (
         await supabase
@@ -69,12 +78,15 @@ export default async function PickerPage({
   let googleEmail: string | null = null;
 
   try {
-    const accessToken = await getValidAccessToken(profile.account_id);
+    // Tokens are per-user (migration 0032). The picker uses the
+    // logged-in user's gmail token, so they only see GBPs that *their*
+    // email is a manager of.
+    const accessToken = await getValidAccessToken(user.id);
 
     const { data: tokenRow } = await supabase
       .from("google_oauth_tokens")
       .select("google_email")
-      .eq("account_id", profile.account_id)
+      .eq("user_id", user.id)
       .maybeSingle();
     googleEmail = tokenRow?.google_email ?? null;
 

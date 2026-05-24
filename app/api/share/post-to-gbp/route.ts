@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
   const { data: location } = await supabase
     .from("locations")
-    .select("id, account_id, google_resource_name, booking_url")
+    .select("id, account_id, connected_by_user_id, google_resource_name, booking_url")
     .eq("id", review.location_id)
     .maybeSingle();
   if (!location || !location.google_resource_name) {
@@ -68,10 +68,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Exchange refresh token for a current access token.
+  // Use the connector's token (their gmail is the GBP manager). Falls
+  // back to the current user for legacy rows without connected_by.
+  const tokenUserId = location.connected_by_user_id ?? user.id;
+
   let accessToken: string;
   try {
-    accessToken = await getValidAccessToken(location.account_id);
+    accessToken = await getValidAccessToken(tokenUserId);
   } catch {
     return NextResponse.json(
       { error: "Google authorization expired — reconnect in Settings" },

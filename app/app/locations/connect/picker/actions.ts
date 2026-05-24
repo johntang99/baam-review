@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { isUserBaamInternal } from "@/lib/auth/staff";
 import { googleReviewUrl } from "@/lib/google/business-profile";
 import { buildLocationSlug } from "@/lib/slug";
 import { classifyByGoogleCategory } from "@/lib/review/google-category-mapping";
@@ -43,6 +44,19 @@ export async function createLocationFromGoogle(formData: FormData) {
 
   if (!profile?.account_id) {
     throw new Error("No account for current user");
+  }
+
+  // Binding a customer_record transfers someone else's paid Stripe sub
+  // to a location under THIS user's account. Only internal staff may do
+  // that, otherwise a regular user could steal a paying customer's
+  // subscription by posting the form directly.
+  if (customerRecordId) {
+    const internal = await isUserBaamInternal(supabase, user.id);
+    if (!internal) {
+      throw new Error(
+        "Only BAAM internal staff may bind a paid customer record to a location",
+      );
+    }
   }
 
   // If this picker session came from the Onboarding queue, the customer's
@@ -105,6 +119,10 @@ export async function createLocationFromGoogle(formData: FormData) {
       default_language: "en",
       supported_languages: ["en", "zh", "es"],
       customer_record_id: customerRecord?.id ?? null,
+      // Audit + sales' permanent visibility key. The user who clicked Connect
+      // gets credit for this location forever, even after they assign
+      // account managers to handle the daily ops.
+      connected_by_user_id: user.id,
     })
     .select("id, slug, display_name")
     .single();

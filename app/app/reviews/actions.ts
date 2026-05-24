@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { syncReviewsForAccount } from "@/lib/google/sync-reviews";
+import { syncReviewsForUser } from "@/lib/google/sync-reviews";
 
 export interface SyncAllResult {
   ok: boolean;
@@ -27,18 +27,12 @@ export async function syncAllReviews(): Promise<SyncAllResult> {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("account_id")
-    .eq("id", user.id)
-    .maybeSingle();
-  if (!profile?.account_id) {
-    return { ok: false, error: "No account for current user." };
-  }
-
+  // Sync the locations THIS user connected. Other users in the same
+  // tenant sync via their own button click — tokens are per-user, so
+  // we can't sync across users from one button.
   let summaries;
   try {
-    summaries = await syncReviewsForAccount(profile.account_id);
+    summaries = await syncReviewsForUser(user.id);
   } catch (e) {
     return {
       ok: false,

@@ -61,20 +61,25 @@ interface LocationsResponse {
 }
 
 /**
- * Returns a valid access token for the given account, refreshing it if it
+ * Returns a valid access token for the given user, refreshing it if it
  * expired or is within 60 seconds of expiry. Persists any refreshed token.
+ *
+ * Tokens are per-user (see migration 0032) because multiple staff share
+ * the BAAM Operations tenant but each authorizes Google with their own
+ * gmail. The picker / sync / reply path must lookup by the user that
+ * connected the location, not the tenant.
  */
-export async function getValidAccessToken(accountId: string): Promise<string> {
+export async function getValidAccessToken(userId: string): Promise<string> {
   const supabase = createServiceClient();
 
   const { data: row, error } = await supabase
     .from("google_oauth_tokens")
     .select("access_token, refresh_token, expiry")
-    .eq("account_id", accountId)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error) throw new Error(`Token lookup failed: ${error.message}`);
-  if (!row) throw new Error("No Google connection for this account");
+  if (!row) throw new Error("No Google connection for this user");
 
   const expiresAt = new Date(row.expiry).getTime();
   const fresh = expiresAt - Date.now() > 60_000;
@@ -88,7 +93,7 @@ export async function getValidAccessToken(accountId: string): Promise<string> {
       access_token: refreshed.access_token,
       expiry: refreshed.expiry.toISOString(),
     })
-    .eq("account_id", accountId);
+    .eq("user_id", userId);
 
   return refreshed.access_token;
 }

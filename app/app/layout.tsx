@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/admin/sidebar";
 import { getSelectedLocationId } from "@/lib/selected-location";
+import { isUserBaamInternal } from "@/lib/auth/staff";
 
 export default async function AppLayout({
   children,
@@ -40,6 +41,8 @@ export default async function AppLayout({
     .select("id", { count: "exact", head: true })
     .in("status", ["draft", "sending", "active"]);
 
+  const isBaamInternal = await isUserBaamInternal(supabase, user.id);
+
   return (
     <div className="grid min-h-screen grid-cols-[270px_1fr] bg-cream">
       <Sidebar
@@ -48,6 +51,7 @@ export default async function AppLayout({
         locations={locations ?? []}
         selectedLocationId={validSelectedId}
         listsBadge={listsBadge ?? 0}
+        isBaamInternal={isBaamInternal}
       />
       <div className="flex min-h-screen flex-col">{children}</div>
     </div>

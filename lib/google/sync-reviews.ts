@@ -18,38 +18,46 @@ export interface SyncSummary {
 }
 
 /**
- * Sync all locations for a single account, in sequence to be polite to
- * Google's rate limits. Use this from a manual-trigger button or a Vercel
- * cron job — same code path.
+ * Sync all locations connected by a single user, in sequence to be polite
+ * to Google's rate limits. Use this from a manual-trigger button or a
+ * Vercel cron job — same code path.
+ *
+ * Per-user (not per-account) since migration 0032: each staff member
+ * authorizes Google with their own gmail, and the per-user token is the
+ * only credential able to read GBP data for the locations they connected.
  */
-export async function syncReviewsForAccount(
-  accountId: string,
+export async function syncReviewsForUser(
+  userId: string,
 ): Promise<SyncSummary[]> {
   const supabase = createServiceClient();
 
   // Resolve the access token (auto-refreshes if expired).
   let accessToken: string;
   try {
-    accessToken = await getValidAccessToken(accountId);
+    accessToken = await getValidAccessToken(userId);
   } catch {
     return [];
   }
 
-  const { data: account } = await supabase
-    .from("accounts")
-    .select("primary_email, name, suspended_at")
-    .eq("id", accountId)
-    .maybeSingle();
-  if (!account || account.suspended_at) return [];
-
   const { data: locations } = await supabase
     .from("locations")
     .select(
-      "id, display_name, google_place_id, google_resource_name, website_url",
+      "id, display_name, google_place_id, google_resource_name, website_url, account_id",
     )
-    .eq("account_id", accountId);
+    .eq("connected_by_user_id", userId);
 
   if (!locations || locations.length === 0) return [];
+
+  // Look up the tenant primary_email for each location once, for the
+  // low-rating alert recipient. Locations under the ops tenant will all
+  // map to john's address; self-serve customer locations map to the
+  // owner's email — same wiring as before, no special-case.
+  const accountIds = Array.from(new Set(locations.map((l) => l.account_id)));
+  const { data: accounts } = await supabase
+    .from("accounts")
+    .select("id, primary_email, suspended_at")
+    .in("id", accountIds);
+  const accountById = new Map((accounts ?? []).map((a) => [a.id, a]));
 
   // Fetch the GBP location list when ANY of our locations is missing either
   // a resource_name or a website_url. Pulls websiteUri straight from Google
@@ -116,6 +124,13 @@ export async function syncReviewsForAccount(
 
     if (!loc.google_resource_name) {
       summary.error = "No GBP resource name resolved";
+      summaries.push(summary);
+      continue;
+    }
+
+    const account = accountById.get(loc.account_id);
+    if (!account || account.suspended_at) {
+      summary.error = "Tenant suspended or missing";
       summaries.push(summary);
       continue;
     }

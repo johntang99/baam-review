@@ -61,11 +61,15 @@ export async function GET(request: NextRequest) {
     console.error("Google userinfo failed (non-fatal)", e);
   }
 
+  // Tokens are keyed per-user (see migration 0032) — each staff member
+  // authorizes Google with their own gmail, so the picker / sync / reply
+  // path looks up the token by user_id, not account_id.
   const service = createServiceClient();
   const { error: upsertError } = await service
     .from("google_oauth_tokens")
     .upsert(
       {
+        user_id: user.id,
         account_id: profile.account_id,
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
@@ -73,7 +77,7 @@ export async function GET(request: NextRequest) {
         scope: tokens.scope,
         google_email: googleEmail,
       },
-      { onConflict: "account_id" },
+      { onConflict: "user_id" },
     );
 
   if (upsertError) {

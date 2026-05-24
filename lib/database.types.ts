@@ -17,6 +17,7 @@ export type SubscriptionStatus =
   | "canceled"
   | "incomplete";
 export type UserRole = "owner" | "admin" | "staff";
+export type OpsRole = "admin" | "sales" | "account_manager";
 export type Language = "en" | "zh" | "es";
 export type Channel = "sms" | "email";
 export type CompletedPlatform = "google" | "yelp" | "custom" | "private_feedback";
@@ -175,6 +176,7 @@ export interface Database {
           trial_ends_at: string | null;
           suspended_at: string | null;
           suspension_reason: string | null;
+          is_baam_internal: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -194,6 +196,7 @@ export interface Database {
           trial_ends_at?: string | null;
           suspended_at?: string | null;
           suspension_reason?: string | null;
+          is_baam_internal?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -206,6 +209,7 @@ export interface Database {
           account_id: string;
           full_name: string | null;
           role: UserRole;
+          ops_role: OpsRole | null;
           created_at: string;
         };
         Insert: {
@@ -213,6 +217,7 @@ export interface Database {
           account_id: string;
           full_name?: string | null;
           role?: UserRole;
+          ops_role?: OpsRole | null;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["users"]["Insert"]>;
@@ -256,6 +261,7 @@ export interface Database {
           referral_config: ReferralConfig;
           reward_config: RewardConfig;
           customer_record_id: string | null;
+          connected_by_user_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -296,10 +302,31 @@ export interface Database {
           referral_config?: ReferralConfig;
           reward_config?: RewardConfig;
           customer_record_id?: string | null;
+          connected_by_user_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["locations"]["Insert"]>;
+        Relationships: [];
+      };
+      location_assignments: {
+        Row: {
+          id: string;
+          location_id: string;
+          user_id: string;
+          assigned_by_user_id: string | null;
+          assigned_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          user_id: string;
+          assigned_by_user_id?: string | null;
+          assigned_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["location_assignments"]["Insert"]
+        >;
         Relationships: [];
       };
       customer_records: {
@@ -916,6 +943,8 @@ export interface Database {
       };
       google_oauth_tokens: {
         Row: {
+          id: string;
+          user_id: string;
           account_id: string;
           access_token: string;
           refresh_token: string;
@@ -926,6 +955,8 @@ export interface Database {
           updated_at: string;
         };
         Insert: {
+          id?: string;
+          user_id: string;
           account_id: string;
           access_token: string;
           refresh_token: string;

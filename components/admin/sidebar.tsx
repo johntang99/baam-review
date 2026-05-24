@@ -9,6 +9,8 @@ import {
   Share2,
   CreditCard,
   Users,
+  UserPlus,
+  ShieldCheck,
 } from "lucide-react";
 import { UserCard } from "./user-card";
 import { NavItem } from "./nav-item";
@@ -24,6 +26,8 @@ interface SidebarProps {
   selectedLocationId: string | null;
   /** Count of active+pending lists, shown as a badge on the Lists item. */
   listsBadge?: number;
+  /** If true, renders the BAAM Operations section (Onboarding queue, etc.). */
+  isBaamInternal?: boolean;
 }
 
 interface WorkspaceItem {
@@ -48,12 +52,18 @@ const accountItems: WorkspaceItem[] = [
   { href: "/app/billing", label: "Billing", icon: CreditCard },
 ];
 
+const operationsItems: WorkspaceItem[] = [
+  { href: "/app/onboarding", label: "Onboarding queue", icon: UserPlus },
+  { href: "/app/admin/staff", label: "Staff access", icon: ShieldCheck },
+];
+
 export function Sidebar({
   fullName,
   email,
   locations,
   selectedLocationId,
   listsBadge,
+  isBaamInternal,
 }: SidebarProps) {
   return (
     <aside className="sticky top-0 flex h-screen w-[270px] flex-col bg-ink text-cream/90 px-4 py-6">
@@ -79,6 +89,9 @@ export function Sidebar({
           items={workspaceItems}
           listsBadge={listsBadge}
         />
+        {isBaamInternal && (
+          <NavSection label="BAAM Operations" items={operationsItems} />
+        )}
         <NavSection label="Account" items={accountItems} />
       </nav>
 
