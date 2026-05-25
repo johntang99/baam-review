@@ -1,5 +1,11 @@
-// Send a fresh password-recovery email to a user who got an invite link
-// with a bad redirect_to and is now stuck on /login.
+// Send (and print) a password-recovery link that goes DIRECTLY to our
+// /auth/callback?token_hash=… — bypassing Supabase's /auth/v1/verify
+// endpoint, which on PKCE projects emits ?code=… and requires a
+// code_verifier cookie that doesn't exist when the flow was initiated
+// from a script instead of the user's browser.
+//
+// Uses auth.admin.generateLink to obtain the hashed token, then builds
+// the final URL the user can click.
 //
 // Usage:  node scripts/resend-recovery.mjs <email> [<base-url>]
 // Example: node scripts/resend-recovery.mjs support@baamplatform.com http://localhost:4001
@@ -25,36 +31,31 @@ const sb = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } },
 );
 
-// Find the user first so we can report a clear error if they don't exist.
-const { data: list } = await sb.auth.admin.listUsers({ perPage: 1000 });
-const user = list?.users?.find((u) => u.email?.toLowerCase() === email.toLowerCase());
-if (!user) {
-  console.error(`No auth user with email ${email}`);
-  process.exit(1);
-}
-
-const redirectTo = `${base}/auth/callback?next=/reset-password`;
-console.log(`Sending recovery to ${email}`);
-console.log(`  redirect_to: ${redirectTo}`);
-
+console.log(`Generating recovery link for ${email}`);
 const { data, error } = await sb.auth.admin.generateLink({
   type: "recovery",
   email,
-  options: { redirectTo },
+  options: { redirectTo: `${base}/reset-password` },
 });
-if (error) {
-  console.error("✗ generateLink failed:", error.message);
+
+if (error || !data?.properties) {
+  console.error("✗ generateLink failed:", error?.message ?? "no properties");
   process.exit(1);
 }
 
-console.log("\n✓ Recovery email sent.");
+// hashed_token + verification_type are the inputs to verifyOtp.
+const { hashed_token, verification_type } = data.properties;
+const directUrl = `${base}/auth/callback?token_hash=${hashed_token}&type=${verification_type}&next=/reset-password`;
+
+console.log("\n✓ Link generated.");
 console.log(
-  "  The user should receive a 'Reset your password' email shortly.",
+  "\nUser will receive a 'Reset Your Password' email shortly (Supabase auto-sends).",
 );
 console.log(
-  "  Clicking the link → /auth/callback exchanges the code → /reset-password lets them set a password.",
+  "If the email link still bounces (because Supabase's verify endpoint uses PKCE),",
 );
-if (data?.properties?.action_link) {
-  console.log("\n  Direct link (for copy-paste if email is slow):");
-  console.log(`  ${data.properties.action_link}`);
-}
+console.log("paste the URL below into a browser instead:\n");
+console.log(directUrl);
+console.log(
+  "\nThis URL goes straight to /auth/callback, no Supabase /verify step, no PKCE cookie required.",
+);
