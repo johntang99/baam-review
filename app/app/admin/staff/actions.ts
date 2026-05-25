@@ -101,10 +101,23 @@ export async function inviteStaff(formData: FormData): Promise<ActionResult> {
   }
 
   // Origin for any email links (invite / recovery).
-  const h = await headers();
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  const host = h.get("host") ?? "review.baamplatform.com";
-  const origin = `${proto}://${host}`;
+  //
+  // Prefer NEXT_PUBLIC_APP_URL because the email link is opened by the
+  // RECIPIENT, not by the admin who sent it. Reading the current request
+  // host bakes localhost:4001 into invites sent from a dev machine —
+  // the invitee then sees "This site can't be reached" since they have
+  // no localhost server running. Fall back to current host only when
+  // the env var isn't set (e.g. early local-only testing).
+  const envUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+  let origin: string;
+  if (envUrl) {
+    origin = envUrl;
+  } else {
+    const h = await headers();
+    const proto = h.get("x-forwarded-proto") ?? "https";
+    const host = h.get("host") ?? "review.baamplatform.com";
+    origin = `${proto}://${host}`;
+  }
   // After the user clicks the email link, /auth/callback exchanges the
   // code for a session and forwards them to /reset-password to choose a
   // password. /reset-password is the existing recovery page — it works
