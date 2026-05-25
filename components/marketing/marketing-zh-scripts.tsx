@@ -62,20 +62,16 @@ export function MarketingZhScripts() {
     );
 
     // ── "Start now — we'll set it up" → Stripe Checkout ──
-    // The Full Service plan card on /zh now has a secondary button that
-    // posts to /api/billing/start-fullservice and redirects to the
-    // returned Stripe Checkout URL. The same handler lives on EN under
-    // MarketingScripts; we duplicate here because readMarketingDoc
-    // strips the original inline <script> and the ZH home uses a
-    // separate hydration component.
-    const startNowButtons = Array.from(
-      document.querySelectorAll<HTMLButtonElement>(
-        "[data-start-now-fullservice]",
-      ),
-    );
+    // Event-delegated so it survives mid-page DOM changes and SPA
+    // navigation — attaching per-button via querySelectorAll on mount
+    // missed clicks when the button rendered after the effect ran.
     const onStartNow = async (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      const button = target?.closest<HTMLButtonElement>(
+        "[data-start-now-fullservice]",
+      );
+      if (!button || button.disabled) return;
       e.preventDefault();
-      const button = e.currentTarget as HTMLButtonElement;
       const original = button.textContent;
       button.disabled = true;
       button.textContent = "正在跳转 Stripe…";
@@ -99,14 +95,8 @@ export function MarketingZhScripts() {
         console.error(err);
       }
     };
-    startNowButtons.forEach((b) =>
-      b.addEventListener("click", onStartNow as EventListener),
-    );
-    cleanups.push(() =>
-      startNowButtons.forEach((b) =>
-        b.removeEventListener("click", onStartNow as EventListener),
-      ),
-    );
+    document.addEventListener("click", onStartNow);
+    cleanups.push(() => document.removeEventListener("click", onStartNow));
 
     // ── Reveal on scroll ──
     const reveals = document.querySelectorAll<HTMLElement>(".reveal");

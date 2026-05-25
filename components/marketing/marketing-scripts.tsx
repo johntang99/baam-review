@@ -61,16 +61,21 @@ export function MarketingScripts() {
     // "Start now" → Stripe Checkout. POSTs to /api/billing/start-fullservice
     // and redirects to the hosted Stripe URL. The inline <script> in
     // marketing-pricing.html is stripped at render time (see
-    // lib/marketing/render.ts), so the handler lives here. Errors surface as
-    // an alert; richer error UI is a TODO.
-    const startNowButtons = Array.from(
-      document.querySelectorAll<HTMLButtonElement>(
-        "[data-start-now-fullservice]",
-      ),
-    );
+    // lib/marketing/render.ts), so the handler lives here.
+    //
+    // Event-delegated on `document` rather than attached per-button.
+    // The buttons live inside `dangerouslySetInnerHTML` content and the
+    // DOM can come/go between hydration and SPA navigation — a global
+    // delegated listener fires regardless of when the button mounts.
+    // Guarded by a module-level flag so HMR / unmount-remount cycles
+    // don't double-attach the listener (which would fire the POST twice).
     const onStartNow = async (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      const button = target?.closest<HTMLButtonElement>(
+        "[data-start-now-fullservice]",
+      );
+      if (!button || button.disabled) return;
       e.preventDefault();
-      const button = e.currentTarget as HTMLButtonElement;
       const original = button.textContent;
       button.disabled = true;
       button.textContent = "Loading Stripe…";
@@ -94,9 +99,7 @@ export function MarketingScripts() {
         console.error(err);
       }
     };
-    startNowButtons.forEach((b) =>
-      b.addEventListener("click", onStartNow),
-    );
+    document.addEventListener("click", onStartNow);
 
     return () => {
       window.removeEventListener("scroll", onScroll);
@@ -105,9 +108,7 @@ export function MarketingScripts() {
         cmSlider?.removeEventListener("input", recalc);
         liftSlider?.removeEventListener("input", recalc);
       }
-      startNowButtons.forEach((b) =>
-        b.removeEventListener("click", onStartNow),
-      );
+      document.removeEventListener("click", onStartNow);
     };
   }, []);
 
