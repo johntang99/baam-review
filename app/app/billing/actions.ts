@@ -6,6 +6,10 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
+  getInternalContext,
+  canAccessLocation,
+} from "@/lib/auth/staff";
+import {
   getStripe,
   isStripeConfigured,
   resolvePriceId,
@@ -124,6 +128,47 @@ async function locationForAccount(locationId: string, accountId: string) {
   return data && data.account_id === accountId ? data : null;
 }
 
+/**
+ * Tenant + role check for any billing action that targets a single
+ * location.
+ *
+ *   • Customer logins: location must belong to their account (RLS-style
+ *     tenant check) — same as before.
+ *   • Internal users: location must be in the BAAM Operations tenant AND
+ *     the user must have role-based access (admin always, sales for
+ *     locations they connected, account_manager for assigned locations).
+ *
+ * Returns the location row if access is allowed, null otherwise. Pages
+ * call this and return their generic "Location not found." on null —
+ * deliberately doesn't leak whether the location exists.
+ */
+async function locationForUser(
+  locationId: string,
+  accountId: string,
+  userId: string,
+) {
+  const supabase = await createClient();
+  const { data: loc } = await supabase
+    .from("locations")
+    .select("id, display_name, account_id")
+    .eq("id", locationId)
+    .maybeSingle();
+  if (!loc || loc.account_id !== accountId) return null;
+
+  const internal = await getInternalContext(supabase, userId);
+  if (!internal) return loc; // customer — tenant check above was the gate
+  const allowed = await canAccessLocation(supabase, internal, locationId);
+  return allowed ? loc : null;
+}
+
+async function currentUserId(): Promise<string | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user?.id ?? null;
+}
+
 const LIVE_SUB_STATUSES = ["trialing", "active", "past_due"];
 
 /**
@@ -177,7 +222,9 @@ export async function createLocationCheckoutSession(
     return { ok: false, error: "Choose a plan for the account first." };
 
   const locationId = String(fd.get("location_id") ?? "");
-  const loc = await locationForAccount(locationId, account.id);
+  const uid = await currentUserId();
+  if (!uid) return { ok: false, error: "Not signed in." };
+  const loc = await locationForUser(locationId, account.id, uid);
   if (!loc) return { ok: false, error: "Location not found." };
 
   const interval = readInterval(fd);
@@ -266,7 +313,9 @@ export async function createLocationInvoiceSubscription(
     };
 
   const locationId = String(fd.get("location_id") ?? "");
-  const loc = await locationForAccount(locationId, account.id);
+  const uid = await currentUserId();
+  if (!uid) return { ok: false, error: "Not signed in." };
+  const loc = await locationForUser(locationId, account.id, uid);
   if (!loc) return { ok: false, error: "Location not found." };
 
   const interval = readInterval(fd);
@@ -356,6 +405,15 @@ export async function createLocationPortalSession(
   const account = await currentAccount();
   if (!account) return { ok: false, error: "No account." };
   const locationId = String(fd.get("location_id") ?? "");
+
+  // Role gate — managers / sales can only open the portal for a client
+  // they have access to. Otherwise a non-admin could iterate location ids
+  // and open every Stripe portal.
+  const uid = await currentUserId();
+  if (!uid) return { ok: false, error: "Not signed in." };
+  const loc = await locationForUser(locationId, account.id, uid);
+  if (!loc) return { ok: false, error: "No billing for this location yet." };
+
   const { data: sub } = await createServiceClient()
     .from("location_subscriptions")
     .select("stripe_customer_id, account_id")

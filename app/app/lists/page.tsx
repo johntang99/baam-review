@@ -1,6 +1,11 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Plus, Search, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import {
+  getInternalContext,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import { relativeTime } from "@/lib/analytics/aggregate";
 
 export const metadata = {
@@ -59,15 +64,34 @@ export default async function ListsPage({
     FILTERS.find((f) => f.id === filterRaw)?.id ?? "all";
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/app/lists");
+
+  const internal = await getInternalContext(supabase, user.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+  const idFilter =
+    visibleIds === null
+      ? null
+      : visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"];
+
+  let listsQuery = supabase
+    .from("lists")
+    .select(
+      "id, name, status, default_language, customer_count, sent_at, completed_at, created_at, max_touches, location_id",
+    )
+    .order("created_at", { ascending: false });
+  if (idFilter) listsQuery = listsQuery.in("location_id", idFilter);
+
+  let locationsQuery = supabase.from("locations").select("id, display_name");
+  if (idFilter) locationsQuery = locationsQuery.in("id", idFilter);
 
   const [{ data: lists }, { data: locations }] = await Promise.all([
-    supabase
-      .from("lists")
-      .select(
-        "id, name, status, default_language, customer_count, sent_at, completed_at, created_at, max_touches, location_id",
-      )
-      .order("created_at", { ascending: false }),
-    supabase.from("locations").select("id, display_name"),
+    listsQuery,
+    locationsQuery,
   ]);
 
   const allLists = (lists ?? []) as ListRow[];

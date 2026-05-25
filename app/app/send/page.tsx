@@ -4,6 +4,10 @@ import { isTwilioConfigured } from "@/lib/messaging/twilio";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import { PageHeader } from "@/components/admin/page-header";
 import { getLocationBillingMap } from "@/lib/billing/access";
+import {
+  getInternalContext,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import { SendForm } from "./send-form";
 
 export const metadata = {
@@ -17,10 +21,22 @@ export default async function SendPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/app/send");
 
-  const { data: locations } = await supabase
+  const internal = await getInternalContext(supabase, user.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+
+  let locationsQuery = supabase
     .from("locations")
     .select("id, display_name, default_language, supported_languages")
     .order("created_at", { ascending: false });
+  if (visibleIds !== null) {
+    locationsQuery = locationsQuery.in(
+      "id",
+      visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"],
+    );
+  }
+  const { data: locations } = await locationsQuery;
 
   const billing = await getLocationBillingMap(
     (locations ?? []).map((l) => l.id),

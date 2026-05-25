@@ -88,6 +88,42 @@ export async function createLocationFromGoogle(formData: FormData) {
     );
   }
 
+  // Idempotency — if a location with this place id already exists under
+  // the user's account, don't create a duplicate. Return the existing row
+  // so the picker just navigates as if the create succeeded. Without this
+  // a double-click on "Use this location" produces two rows.
+  const { data: alreadyConnected } = await supabase
+    .from("locations")
+    .select("id, slug, display_name, customer_record_id")
+    .eq("account_id", profile.account_id)
+    .eq("google_place_id", placeId)
+    .maybeSingle();
+  if (alreadyConnected) {
+    // If staff is trying to bind a customer_record to an already-connected
+    // location, do the binding now (rare race) and exit. Otherwise just
+    // redirect — nothing more to do.
+    if (customerRecord && alreadyConnected.customer_record_id !== customerRecord.id) {
+      await supabase
+        .from("locations")
+        .update({ customer_record_id: customerRecord.id })
+        .eq("id", alreadyConnected.id);
+      await service
+        .from("customer_records")
+        .update({
+          onboarding_status: "gbp_connected",
+          location_id: alreadyConnected.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", customerRecord.id);
+      redirect("/app/onboarding");
+    }
+    redirect(
+      customerRecord
+        ? "/app/onboarding"
+        : "/app/locations/connect/picker",
+    );
+  }
+
   const slug = buildLocationSlug(title);
 
   const { data: inserted, error } = await supabase
@@ -127,9 +163,29 @@ export async function createLocationFromGoogle(formData: FormData) {
     .select("id, slug, display_name")
     .single();
 
-  if (error || !inserted) {
+  // Race-condition backstop: the pre-check above + the UNIQUE index in
+  // migration 0034 leave a sub-millisecond window where two simultaneous
+  // inserts for the same place_id would both pass the pre-check. The
+  // second one trips the UNIQUE constraint (Postgres error 23505); treat
+  // it identically to "already connected" — fetch and proceed cleanly.
+  let finalInserted = inserted;
+  if (error?.code === "23505") {
+    const { data: existing } = await supabase
+      .from("locations")
+      .select("id, slug, display_name")
+      .eq("account_id", profile.account_id)
+      .eq("google_place_id", placeId)
+      .maybeSingle();
+    if (existing) {
+      finalInserted = existing;
+    }
+  }
+
+  if (!finalInserted) {
     throw new Error(`Failed to create location: ${error?.message ?? "unknown"}`);
   }
+  // Rebind for downstream use.
+  const insertedLoc = finalInserted;
 
   // If this was a Start Now customer, finish the billing handoff: attach
   // account+location to the Stripe sub so future webhook events route to
@@ -143,7 +199,7 @@ export async function createLocationFromGoogle(formData: FormData) {
         {
           metadata: {
             account_id: profile.account_id,
-            location_id: inserted.id,
+            location_id: insertedLoc.id,
             plan: "full_service",
             interval: "month",
             source: "start_now_fullservice",
@@ -164,7 +220,7 @@ export async function createLocationFromGoogle(formData: FormData) {
       .from("customer_records")
       .update({
         onboarding_status: "gbp_connected",
-        location_id: inserted.id,
+        location_id: insertedLoc.id,
         updated_at: new Date().toISOString(),
       })
       .eq("id", customerRecord.id);
@@ -173,7 +229,7 @@ export async function createLocationFromGoogle(formData: FormData) {
     try {
       await sendCustomerLiveEmail({
         to: customerRecord.email,
-        businessName: customerRecord.business_name ?? inserted.display_name,
+        businessName: customerRecord.business_name ?? insertedLoc.display_name,
       });
     } catch (e) {
       console.warn("[picker] customer live email failed", e);

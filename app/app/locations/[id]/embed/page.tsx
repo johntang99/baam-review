@@ -3,6 +3,11 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { WidgetConfig } from "@/lib/database.types";
+import {
+  getInternalContext,
+  canAccessLocation,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import { PageHeader } from "@/components/admin/page-header";
 import { InContentLocationPicker } from "@/components/locations/in-content-location-picker";
 import { EmbedTabs } from "./embed-tabs";
@@ -24,6 +29,23 @@ export default async function EmbedPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/app/locations/${id}/embed`);
 
+  const internal = await getInternalContext(supabase, user.id);
+  const allowed = await canAccessLocation(supabase, internal, id);
+  if (!allowed) redirect("/app/locations");
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+
+  let locationsQuery = supabase
+    .from("locations")
+    .select("id, display_name, brand_color, logo_url")
+    .order("created_at", { ascending: false });
+  if (visibleIds !== null) {
+    locationsQuery = locationsQuery.in(
+      "id",
+      visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"],
+    );
+  }
   const [{ data: location }, { data: locations }] = await Promise.all([
     supabase
       .from("locations")
@@ -32,10 +54,7 @@ export default async function EmbedPage({
       )
       .eq("id", id)
       .maybeSingle(),
-    supabase
-      .from("locations")
-      .select("id, display_name, brand_color, logo_url")
-      .order("created_at", { ascending: false }),
+    locationsQuery,
   ]);
   if (!location) notFound();
 

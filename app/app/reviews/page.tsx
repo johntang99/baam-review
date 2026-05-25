@@ -1,7 +1,12 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Mail, Phone, ExternalLink, Lock, Star, MessageSquareReply } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSelectedLocationId } from "@/lib/selected-location";
+import {
+  getInternalContext,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import { PageHeader } from "@/components/admin/page-header";
 import {
   relativeTime,
@@ -36,22 +41,43 @@ export default async function ReviewsPage({
   const tab: Tab = (TABS.find((t) => t.id === tabRaw)?.id) ?? "all";
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/app/reviews");
   const selectedLocationId = await getSelectedLocationId();
 
-  const { data: locations } = await supabase
-    .from("locations")
-    .select("id, display_name");
+  const internal = await getInternalContext(supabase, user.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+
+  let locationsQuery = supabase.from("locations").select("id, display_name");
+  if (visibleIds !== null) {
+    locationsQuery = locationsQuery.in(
+      "id",
+      visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"],
+    );
+  }
+  const { data: locations } = await locationsQuery;
   const locName = new Map((locations ?? []).map((l) => [l.id, l.display_name]));
   const selectedLocation = selectedLocationId
     ? (locations ?? []).find((l) => l.id === selectedLocationId)
     : null;
+  // Cap every cross-location query to visible ids.
+  const allowedLocationIds = (locations ?? []).map((l) => l.id);
+  const idFilter =
+    allowedLocationIds.length > 0
+      ? allowedLocationIds
+      : ["00000000-0000-0000-0000-000000000000"];
 
   let feedbackQuery = supabase
     .from("private_feedback")
     .select(
       "id, message, rating, contact_email, contact_phone, language, read_at, created_at, location_id",
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .in("location_id", idFilter);
   if (selectedLocationId)
     feedbackQuery = feedbackQuery.eq("location_id", selectedLocationId);
   const { data: feedback } = await feedbackQuery;
@@ -62,7 +88,8 @@ export default async function ReviewsPage({
       "id, recipient_name, recipient_email, recipient_phone, language, channel, completed_platform, completed_at, location_id",
     )
     .not("completed_at", "is", null)
-    .order("completed_at", { ascending: false });
+    .order("completed_at", { ascending: false })
+    .in("location_id", idFilter);
   if (selectedLocationId)
     completedQuery = completedQuery.eq("location_id", selectedLocationId);
   const { data: completed } = await completedQuery;
@@ -72,7 +99,8 @@ export default async function ReviewsPage({
     .select(
       "id, google_review_id, reviewer_display_name, reviewer_profile_photo_url, rating, comment, review_create_time, reply_comment, reply_update_time, location_id",
     )
-    .order("review_create_time", { ascending: false });
+    .order("review_create_time", { ascending: false })
+    .in("location_id", idFilter);
   if (selectedLocationId)
     googleReviewsQuery = googleReviewsQuery.eq("location_id", selectedLocationId);
   const { data: googleReviews } = await googleReviewsQuery;

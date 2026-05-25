@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getInternalContext, canAccessLocation } from "@/lib/auth/staff";
 import { PageHeader } from "@/components/admin/page-header";
 import { parseGoogleComment } from "@/components/widget/review-card";
 import { ShareBuilder } from "./share-builder";
@@ -35,6 +36,10 @@ export default async function ShareReviewPage({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/app/locations/${id}/reviews/${reviewId}/share`);
+
+  const internal = await getInternalContext(supabase, user.id);
+  const allowed = await canAccessLocation(supabase, internal, id);
+  if (!allowed) redirect("/app/locations");
 
   // RLS scopes both queries to the user's account.
   const [{ data: location }, { data: review }] = await Promise.all([

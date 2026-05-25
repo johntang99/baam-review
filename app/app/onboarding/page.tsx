@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/admin/page-header";
-import { isUserBaamInternal } from "@/lib/auth/staff";
+import { getInternalContext } from "@/lib/auth/staff";
 
 export const metadata = { title: "Onboarding queue — BAAM Review" };
 export const dynamic = "force-dynamic";
@@ -28,8 +28,15 @@ export default async function OnboardingQueuePage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/app/onboarding");
 
-  const internal = await isUserBaamInternal(supabase, user.id);
-  if (!internal) redirect("/app");
+  // Restrict to admin + sales — account managers can't connect GBPs and
+  // shouldn't see pending customer PII for clients they're not assigned to.
+  const internal = await getInternalContext(supabase, user.id);
+  const allowed =
+    internal !== null &&
+    (internal.opsRole === "admin" ||
+      internal.opsRole === "sales" ||
+      internal.opsRole === null);
+  if (!allowed) redirect("/app");
 
   // Pending (most urgent first by signup date)
   const { data: pending } = await supabase

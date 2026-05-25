@@ -1,10 +1,14 @@
-import { LogOut } from "lucide-react";
-
 interface UserCardProps {
   fullName: string | null;
   email: string;
 }
 
+/**
+ * Profile display pinned at the bottom of the sidebar. The Sign out
+ * action lives as a sibling sidebar item (SignOutNavItem) inside the
+ * Account section so it scrolls into view naturally and doesn't compete
+ * with this card for attention.
+ */
 export function UserCard({ fullName, email }: UserCardProps) {
   const initial = (fullName || email).charAt(0).toUpperCase();
   const displayName = fullName || email;
@@ -20,15 +24,6 @@ export function UserCard({ fullName, email }: UserCardProps) {
         </p>
         <p className="truncate text-[11.5px] text-cream/55">{email}</p>
       </div>
-      <form action="/api/auth/signout" method="post">
-        <button
-          type="submit"
-          aria-label="Sign out"
-          className="flex h-7 w-7 items-center justify-center rounded-md text-cream/55 hover:bg-cream/[0.08] hover:text-cream transition-colors"
-        >
-          <LogOut className="h-3.5 w-3.5" />
-        </button>
-      </form>
     </div>
   );
 }

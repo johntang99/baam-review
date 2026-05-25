@@ -11,13 +11,16 @@ import {
   Users,
   UserPlus,
   ShieldCheck,
+  KeyRound,
 } from "lucide-react";
 import { UserCard } from "./user-card";
 import { NavItem } from "./nav-item";
+import { SignOutNavItem } from "./sign-out-nav-item";
 import {
   LocationSwitcher,
   type LocationSwitcherLocation,
 } from "./location-switcher";
+import type { OpsRole } from "@/lib/database.types";
 
 interface SidebarProps {
   fullName: string | null;
@@ -26,7 +29,21 @@ interface SidebarProps {
   selectedLocationId: string | null;
   /** Count of active+pending lists, shown as a badge on the Lists item. */
   listsBadge?: number;
-  /** If true, renders the BAAM Operations section (Onboarding queue, etc.). */
+  /**
+   * Ops role of the current user. Drives which items in the BAAM
+   * Operations section render:
+   *   • admin            → Onboarding queue + Staff access
+   *   • sales            → Onboarding queue only
+   *   • account_manager  → no BAAM Operations section at all
+   *   • null / customer  → no BAAM Operations section
+   */
+  opsRole?: OpsRole | null;
+  /**
+   * True for any user whose account is `is_baam_internal=true` —
+   * including legacy users with `ops_role = null`. Used to gate items
+   * that should appear for ALL internal staff regardless of role
+   * (e.g. the Roles & access reference page).
+   */
   isBaamInternal?: boolean;
 }
 
@@ -52,10 +69,32 @@ const accountItems: WorkspaceItem[] = [
   { href: "/app/billing", label: "Billing", icon: CreditCard },
 ];
 
-const operationsItems: WorkspaceItem[] = [
-  { href: "/app/onboarding", label: "Onboarding queue", icon: UserPlus },
-  { href: "/app/admin/staff", label: "Staff access", icon: ShieldCheck },
-];
+// Shown below Billing for any internal user (admin / sales / account_manager).
+// Customers don't see it — the role system doesn't apply to them.
+const rolesItem: WorkspaceItem = {
+  href: "/app/roles",
+  label: "Roles & access",
+  icon: KeyRound,
+};
+
+const onboardingItem: WorkspaceItem = {
+  href: "/app/onboarding",
+  label: "Onboarding queue",
+  icon: UserPlus,
+};
+const staffAccessItem: WorkspaceItem = {
+  href: "/app/admin/staff",
+  label: "Staff access",
+  icon: ShieldCheck,
+};
+
+function operationsItemsForRole(
+  role: OpsRole | null | undefined,
+): WorkspaceItem[] {
+  if (role === "admin") return [onboardingItem, staffAccessItem];
+  if (role === "sales") return [onboardingItem];
+  return [];
+}
 
 export function Sidebar({
   fullName,
@@ -63,8 +102,15 @@ export function Sidebar({
   locations,
   selectedLocationId,
   listsBadge,
+  opsRole,
   isBaamInternal,
 }: SidebarProps) {
+  const operationsItems = operationsItemsForRole(opsRole);
+  // Roles & access is for any internal staff (includes role=null legacy
+  // users who haven't been assigned a role yet). Customers don't see it.
+  const accountSection = isBaamInternal
+    ? [...accountItems, rolesItem]
+    : accountItems;
   return (
     <aside className="sticky top-0 flex h-screen w-[270px] flex-col bg-ink text-cream/90 px-4 py-6">
       <Link href="/app" className="flex items-center gap-2.5 px-2 pb-4">
@@ -83,16 +129,23 @@ export function Sidebar({
         />
       </div>
 
-      <nav className="flex-1 space-y-5">
+      {/* flex-1 + overflow-y-auto so the nav scrolls when its content
+          exceeds the viewport. Without this the bottom items get
+          clipped behind the UserCard on shorter screens. */}
+      <nav className="flex-1 space-y-5 overflow-y-auto pr-1 -mr-1">
         <NavSection
           label="Workspace"
           items={workspaceItems}
           listsBadge={listsBadge}
         />
-        {isBaamInternal && (
+        {operationsItems.length > 0 && (
           <NavSection label="BAAM Operations" items={operationsItems} />
         )}
-        <NavSection label="Account" items={accountItems} />
+        <NavSection
+          label="Account"
+          items={accountSection}
+          trailing={<SignOutNavItem />}
+        />
       </nav>
 
       <UserCard fullName={fullName} email={email} />
@@ -104,10 +157,13 @@ function NavSection({
   label,
   items,
   listsBadge,
+  trailing,
 }: {
   label: string;
   items: WorkspaceItem[];
   listsBadge?: number;
+  /** Optional non-link entry rendered at the end of the section (e.g. Sign out). */
+  trailing?: React.ReactNode;
 }) {
   return (
     <div>
@@ -128,6 +184,7 @@ function NavSection({
             </li>
           );
         })}
+        {trailing && <li>{trailing}</li>}
       </ul>
     </div>
   );

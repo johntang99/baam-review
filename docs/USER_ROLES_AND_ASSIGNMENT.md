@@ -8,14 +8,22 @@ It is the BAAM Review companion to [baam-platform's guide](../../baam-platform/d
 
 ## 1) Who is who
 
+### Single ops tenant
+
+After migration 0032, **every BAAM staff member is a `users` row inside one shared `accounts` row** called "BAAM Operations" (`is_baam_internal = true`). Each customer (Self-Service / Full-Service) keeps their own personal `accounts` row (`is_baam_internal = false`).
+
+Why: cross-staff assignment becomes a single column flip instead of cross-tenant data migration. All Start Now and Regular Sales connected locations live under BAAM Operations; visibility is filtered per-staff via `ops_role` + `location_assignments`.
+
 ### Internal vs customer accounts
 
-Every login is either an **internal staff** or a **paying customer**. The distinction lives on the account row:
+Every login is either an **internal staff** or a **paying customer**:
 
-- `accounts.is_baam_internal = true` → BAAM staff (sees ops-only tools).
-- `accounts.is_baam_internal = false` → a Self-Service or Full-Service customer (sees only their own data via account-scoped RLS).
+- `accounts.is_baam_internal = true` → BAAM Operations (the one shared staff tenant).
+- `accounts.is_baam_internal = false` → a customer (their own tenant, their own data).
 
-Promotion / demotion of an account happens at **`/app/admin/staff`** (gated to internal users).
+Onboarding new staff happens at **`/app/admin/staff`** (admin-only). Two paths:
+- **Invite** — sends a magic-link email; recipient sets a password on `/reset-password`, lands inside BAAM Operations.
+- **Promote** — for someone who already signed up at `/signup`; moves them in, drops their personal account.
 
 ### Ops roles (internal staff only)
 
@@ -92,6 +100,18 @@ The "All locations" card shows a small **"Managed by …"** subtitle listing the
 
 ## 4) Assignment workflow
 
+### Assignment rules at a glance
+
+| Question | Admin | Sales | Account manager |
+|---|---|---|---|
+| Can click Assign on a client card? | Yes — any client | Yes — only clients they connected | No, button is hidden |
+| Who appears in the Assign dropdown? | Every account_manager | Every account_manager | — |
+| Can BE assigned as a manager? | No | No | Yes — only eligible role |
+| Can remove an assigned manager? | Yes — any client | Yes — only clients they connected | No |
+| Can reassign to a different manager? | Yes — remove + add in modal | Yes — only own clients | No |
+| What changes after the assignment lands? | Nothing (admin sees all) | Nothing — connector sees the client forever | Client appears in their All locations; can do daily ops |
+| Notification on being assigned? | — | — | No automatic email — sales tells them in person |
+
 ### Who may click Assign on a card
 
 | Card belongs to | admin can assign? | sales can assign? | account_manager can assign? |
@@ -159,10 +179,17 @@ Self-protection: you cannot demote your own account. Ask another internal user t
 | Analytics | yes | yes | yes | yes |
 | Settings | yes | yes | yes | yes |
 | Billing | yes | yes | yes | yes |
-| **BAAM Operations → Onboarding queue** | yes | yes | yes | no |
-| **BAAM Operations → Staff access** | yes | yes | yes | no |
+| Roles & access | yes | yes | yes | no |
+| **BAAM Operations → Onboarding queue** | yes | yes | no | no |
+| **BAAM Operations → Staff access** | yes | no | no | no |
 
-The "BAAM Operations" section appears only when the logged-in account is `is_baam_internal = true`. Inside the section, page-level gates further restrict actions (e.g., only admin/sales can click Assign; only internal users can read `customer_records`).
+Sidebar item rendering rules (enforced in [components/admin/sidebar.tsx](../components/admin/sidebar.tsx)):
+- The **BAAM Operations** section only appears for users with `ops_role IN ('admin', 'sales')`.
+- **Onboarding queue** appears for admin + sales; account_manager doesn't see it. Account managers don't connect GBPs, and the queue contains pending-customer PII.
+- **Staff access** appears for admin only. Sales and account managers cannot invite or change staff.
+- **Roles & access** (this page) appears for any internal user — a quick reference for what your role can do.
+
+In addition to hiding sidebar items, each route also enforces its own server-side gate, so typing a URL directly still bounces you to `/app` if your role doesn't match.
 
 ---
 
@@ -170,15 +197,43 @@ The "BAAM Operations" section appears only when the logged-in account is `is_baa
 
 | Capability | admin | sales | account_manager |
 |---|---|---|---|
-| Promote/demote internal accounts | yes | no | no |
+| Invite/promote/demote internal staff | yes | no | no |
 | Set another user's ops_role | yes | no | no |
-| See Onboarding queue (Start Now pending) | yes | yes | yes |
+| See Onboarding queue (Start Now pending) | yes | yes | no |
 | Click "Connect their GBP" from queue | yes | yes (uses own gmail) | no |
 | Connect a GBP via Locations → Connect Google | yes | yes | no |
 | Assign account managers to a client | yes (any) | yes (own connected) | no |
 | Remove account manager from a client | yes (any) | yes (own connected) | no |
 | See client billing details | yes (any) | yes (own connected) | yes (own assigned) |
-| Reply to reviews, run review batches | yes (any) | yes (own connected) | yes (own assigned) |
+| Manage client billing (Set up / Manage card / Invoice) | yes (any) | yes (own connected) | yes (own assigned) |
+| Reply to reviews, run review batches, edit settings | yes (any) | yes (own connected) | yes (own assigned) |
+| Change own password | yes | yes | yes |
+
+---
+
+## 7.1) Data scoping per page
+
+Every workspace page applies the same role-based filter via `getVisibleLocationIds(supabase, internal)` ([lib/auth/staff.ts](../lib/auth/staff.ts)). That function returns:
+- `null` for admin / customer logins (no extra filter — RLS handles tenant scoping).
+- `[location_ids]` for sales (locations where `connected_by_user_id = me`).
+- `[location_ids]` for account_manager (locations in `location_assignments` for me).
+
+Pages that apply it (every metric / row / dropdown filtered accordingly):
+
+| Page | What gets filtered |
+|---|---|
+| `/app` (Dashboard) | every funnel, AI reply queue, revenue card |
+| `/app/locations` | location grid, Assign button visibility, "Managed by" subtitle |
+| `/app/locations/[id]` and all subroutes | route-level redirect to `/app/locations` if user can't access |
+| `/app/send` | location picker shows only what they can send for |
+| `/app/lists` | list rows + cross-location filter |
+| `/app/reviews` | private feedback, completed click-throughs, Google reviews |
+| `/app/referrals` | reward + referral config, falls back to first visible location |
+| `/app/share` | widget builder, falls back to first visible location |
+| `/app/analytics` | every metric query and revenue location |
+| `/app/billing` | billing line per client + Set up / Manage / Invoice action gating |
+
+The pattern is identical — single helper, applied at the page level. Server actions that target a single location additionally call `canAccessLocation(...)` so direct POSTs with another location's id are rejected.
 
 ---
 
@@ -225,16 +280,23 @@ The "BAAM Operations" section appears only when the logged-in account is `is_baa
 
 | Concern | File |
 |---|---|
-| Migration | [supabase/migrations/0031_staff_assignment.sql](../supabase/migrations/0031_staff_assignment.sql) |
-| Ops role helper | [lib/auth/staff.ts](../lib/auth/staff.ts) |
-| Internal flag helper | [lib/auth/staff.ts](../lib/auth/staff.ts) |
+| Schema: ops_role + connected_by_user_id + location_assignments | [supabase/migrations/0031_staff_assignment.sql](../supabase/migrations/0031_staff_assignment.sql) |
+| Schema: consolidate to one ops tenant + per-user OAuth | [supabase/migrations/0032_unify_ops_tenant.sql](../supabase/migrations/0032_unify_ops_tenant.sql) |
+| Schema: backfill legacy `connected_by_user_id` | [supabase/migrations/0033_backfill_legacy_connected_by.sql](../supabase/migrations/0033_backfill_legacy_connected_by.sql) |
+| All role + visibility helpers | [lib/auth/staff.ts](../lib/auth/staff.ts) |
+| Per-user OAuth token fetch / refresh | [lib/google/business-profile.ts](../lib/google/business-profile.ts) |
+| Per-user review sync | [lib/google/sync-reviews.ts](../lib/google/sync-reviews.ts) |
 | Picker captures `connected_by_user_id` | [app/app/locations/connect/picker/actions.ts](../app/app/locations/connect/picker/actions.ts) |
-| Locations list applies role filter | [app/app/locations/page.tsx](../app/app/locations/page.tsx) |
+| Locations list + filter + Assign button | [app/app/locations/page.tsx](../app/app/locations/page.tsx) |
 | Assign / unassign actions | [app/app/locations/assignments/actions.ts](../app/app/locations/assignments/actions.ts) |
 | Assign modal UI | [app/app/locations/assignments/assign-manager-modal.tsx](../app/app/locations/assignments/assign-manager-modal.tsx) |
-| Staff admin page | [app/app/admin/staff/](../app/app/admin/staff/) |
+| Staff admin page + Invite/Promote/Demote actions | [app/app/admin/staff/](../app/app/admin/staff/) |
+| Auth callback (hash/code/token_hash handling) | [app/auth/callback/page.tsx](../app/auth/callback/page.tsx) |
 | Sidebar role-gated section | [components/admin/sidebar.tsx](../components/admin/sidebar.tsx) |
-| Onboarding queue (staff-only) | [app/app/onboarding/page.tsx](../app/app/onboarding/page.tsx) |
+| Onboarding queue (admin + sales) | [app/app/onboarding/page.tsx](../app/app/onboarding/page.tsx) |
+| Billing visibility + action gates | [app/app/billing/](../app/app/billing/) |
+| Settings (per-user email, role, change password) | [app/app/settings/](../app/app/settings/) |
+| Roles & access reference (this guide in-app) | [app/app/roles/page.tsx](../app/app/roles/page.tsx) |
 
 ---
 

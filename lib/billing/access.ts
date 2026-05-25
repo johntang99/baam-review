@@ -75,6 +75,11 @@ export interface LocationBillingSummary {
   locStatus: string | null;
   locMethod: "card" | "invoice" | null;
   canceling: boolean;
+  /** When this location's subscription was first created (Stripe sync). */
+  contractStart: string | null;
+  /** Period end — interpret as "next charge date" if active, or "ends on"
+   * if canceling/canceled. */
+  contractEnd: string | null;
 }
 
 /**
@@ -106,7 +111,7 @@ export async function getLocationBillingMap(
   const { data: subs } = await svc
     .from("location_subscriptions")
     .select(
-      "location_id, subscription_status, collection_method, cancel_at_period_end",
+      "location_id, subscription_status, collection_method, cancel_at_period_end, created_at, current_period_end",
     )
     .in("location_id", locationIds);
   const subByLoc = new Map((subs ?? []).map((s) => [s.location_id, s]));
@@ -137,6 +142,8 @@ export async function getLocationBillingMap(
       locStatus,
       locMethod,
       canceling: sub?.cancel_at_period_end === true,
+      contractStart: sub?.created_at ?? null,
+      contractEnd: sub?.current_period_end ?? null,
     });
   }
   return out;

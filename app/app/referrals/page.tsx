@@ -1,7 +1,13 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Activity, Gift, Settings, Trophy } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSelectedLocationId } from "@/lib/selected-location";
+import {
+  getInternalContext,
+  canAccessLocation,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import type {
   ReferralConfig,
   RewardConfig,
@@ -44,9 +50,27 @@ export default async function ReferralsPage({
           : "reward";
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/app/referrals");
   const selectedId = await getSelectedLocationId();
 
-  let { data: location } = selectedId
+  const internal = await getInternalContext(supabase, user.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+  const idFilter =
+    visibleIds === null
+      ? null
+      : visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"];
+
+  // Only honor the cookie's selectedId if the user is allowed to see it.
+  const selectedOk = selectedId
+    ? await canAccessLocation(supabase, internal, selectedId)
+    : false;
+
+  let { data: location } = selectedOk && selectedId
     ? await supabase
         .from("locations")
         .select(
@@ -57,14 +81,15 @@ export default async function ReferralsPage({
     : { data: null };
 
   if (!location) {
-    const { data: first } = await supabase
+    let firstQuery = supabase
       .from("locations")
       .select(
         "id, account_id, slug, display_name, brand_color, booking_url, referral_config, reward_config",
       )
       .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
+    if (idFilter) firstQuery = firstQuery.in("id", idFilter);
+    const { data: first } = await firstQuery.maybeSingle();
     location = first;
   }
 

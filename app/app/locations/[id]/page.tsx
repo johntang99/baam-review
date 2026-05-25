@@ -2,6 +2,11 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, ExternalLink, QrCode, Code, Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import {
+  getInternalContext,
+  canAccessLocation,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import { PageHeader } from "@/components/admin/page-header";
 import { InContentLocationPicker } from "@/components/locations/in-content-location-picker";
 import { SettingsForm } from "./settings-form";
@@ -31,14 +36,34 @@ export default async function LocationSettingsPage({
 
   if (!profile?.account_id) redirect("/app/locations");
 
+  // Role-based access — sales / account_manager users must be either the
+  // connector (sales) or assigned (account_manager) to view a location.
+  // Admin and customers fall through (canAccessLocation returns true).
+  const internal = await getInternalContext(supabase, user.id);
+  const allowed = await canAccessLocation(supabase, internal, id);
+  if (!allowed) redirect("/app/locations");
+
+  // Visibility filter for the in-content picker so it only shows
+  // locations the user is allowed to switch to.
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+
   // Fetch the active location + the full list (for the in-content picker)
   // in parallel.
+  let locationsQuery = supabase
+    .from("locations")
+    .select("id, display_name, brand_color, logo_url")
+    .order("created_at", { ascending: false });
+  if (visibleIds !== null) {
+    locationsQuery = locationsQuery.in(
+      "id",
+      visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"],
+    );
+  }
   const [{ data: location }, { data: locations }] = await Promise.all([
     supabase.from("locations").select("*").eq("id", id).maybeSingle(),
-    supabase
-      .from("locations")
-      .select("id, display_name, brand_color, logo_url")
-      .order("created_at", { ascending: false }),
+    locationsQuery,
   ]);
 
   if (!location) notFound();

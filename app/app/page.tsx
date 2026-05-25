@@ -14,6 +14,10 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import {
+  getInternalContext,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
+import {
   buildFunnel,
   pctFormat,
   PLATFORM_LABEL,
@@ -63,12 +67,24 @@ export default async function DashboardPage() {
 
   const selectedLocationId = await getSelectedLocationId();
 
-  // RLS scopes everything to the user's account automatically.
-  const { data: locations } = await supabase
+  // Role-based visibility — sales / account_manager only see their own
+  // clients on the dashboard. Admin and customer logins fall through.
+  const internal = await getInternalContext(supabase, user!.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+  const idFilter =
+    visibleIds === null
+      ? null
+      : visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"];
+
+  let locationsQuery = supabase
     .from("locations")
     .select(
       "id, display_name, slug, brand_color, address, avg_customer_value_cents, ltv_per_customer_cents, referral_close_rate, review_attribution_share, referral_config, logo_url",
     );
+  if (idFilter) locationsQuery = locationsQuery.in("id", idFilter);
+  const { data: locations } = await locationsQuery;
   const locationName = new Map(
     (locations ?? []).map((l) => [l.id, l.display_name]),
   );
@@ -98,6 +114,7 @@ export default async function DashboardPage() {
     )
     .gte("created_at", sinceIso)
     .order("created_at", { ascending: false });
+  if (idFilter) requestsQuery = requestsQuery.in("location_id", idFilter);
   if (selectedLocationId)
     requestsQuery = requestsQuery.eq("location_id", selectedLocationId);
   const { data: requests } = await requestsQuery;
@@ -109,6 +126,7 @@ export default async function DashboardPage() {
     )
     .gte("created_at", sinceIso)
     .order("created_at", { ascending: false });
+  if (idFilter) feedbackQuery = feedbackQuery.in("location_id", idFilter);
   if (selectedLocationId)
     feedbackQuery = feedbackQuery.eq("location_id", selectedLocationId);
   const { data: feedback } = await feedbackQuery;
@@ -121,6 +139,7 @@ export default async function DashboardPage() {
     )
     .order("review_create_time", { ascending: false })
     .limit(50);
+  if (idFilter) googleReviewsQuery = googleReviewsQuery.in("location_id", idFilter);
   if (selectedLocationId)
     googleReviewsQuery = googleReviewsQuery.eq("location_id", selectedLocationId);
   const { data: googleReviews } = await googleReviewsQuery;
@@ -130,6 +149,7 @@ export default async function DashboardPage() {
     .from("referrals")
     .select("id, event_type, advocate_request_id, location_id, created_at")
     .gte("created_at", sinceIso);
+  if (idFilter) referralsQuery = referralsQuery.in("location_id", idFilter);
   if (selectedLocationId)
     referralsQuery = referralsQuery.eq("location_id", selectedLocationId);
   const { data: referrals } = await referralsQuery;
@@ -140,6 +160,8 @@ export default async function DashboardPage() {
     .select("id, rating, location_id, review_create_time")
     .gte("review_create_time", priorSinceIso)
     .lt("review_create_time", sinceIso);
+  if (idFilter)
+    priorReviewsQuery = priorReviewsQuery.in("location_id", idFilter);
   if (selectedLocationId)
     priorReviewsQuery = priorReviewsQuery.eq("location_id", selectedLocationId);
   const { data: priorReviews } = await priorReviewsQuery;
@@ -149,6 +171,7 @@ export default async function DashboardPage() {
     .from("embed_loads")
     .select("id, occurred_at, location_id")
     .gte("occurred_at", sinceIso);
+  if (idFilter) embedQuery = embedQuery.in("location_id", idFilter);
   if (selectedLocationId)
     embedQuery = embedQuery.eq("location_id", selectedLocationId);
   const { data: embedLoads } = await embedQuery;

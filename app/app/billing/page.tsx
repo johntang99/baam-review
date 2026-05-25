@@ -1,5 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import {
+  getInternalContext,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import { PageHeader } from "@/components/admin/page-header";
 import { Section } from "@/components/ui/section";
 import type { ReviewPlan } from "@/lib/billing/plans";
@@ -69,18 +73,43 @@ export default async function BillingPage({
     .eq("id", profile.account_id)
     .maybeSingle();
 
-  const { data: locations } = await supabase
+  // Role-based visibility: admin sees every client in the ops tenant;
+  // sales sees clients they connected; account_manager sees clients
+  // assigned to them; customer logins fall through (RLS scopes by
+  // account_id naturally).
+  const internal = await getInternalContext(supabase, user.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+
+  let locationsQuery = supabase
     .from("locations")
     .select("id, display_name")
     .eq("account_id", profile.account_id)
     .order("display_name");
+  if (visibleIds !== null) {
+    locationsQuery = locationsQuery.in(
+      "id",
+      visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"],
+    );
+  }
+  const { data: locations } = await locationsQuery;
 
-  const { data: locSubs } = await supabase
+  let subsQuery = supabase
     .from("location_subscriptions")
     .select(
       "location_id, plan, collection_method, subscription_status, billing_interval, current_period_end, cancel_at_period_end",
     )
     .eq("account_id", profile.account_id);
+  if (visibleIds !== null) {
+    subsQuery = subsQuery.in(
+      "location_id",
+      visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"],
+    );
+  }
+  const { data: locSubs } = await subsQuery;
   const subByLoc = new Map(
     (locSubs ?? []).map((s) => [s.location_id, s]),
   );

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { isUserBaamInternal } from "@/lib/auth/staff";
+import { getInternalContext } from "@/lib/auth/staff";
 import type { OpsRole } from "@/lib/database.types";
 
 interface ActionResult {
@@ -31,9 +31,15 @@ async function requireInternalUser(): Promise<string> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/app/admin/staff");
-  const internal = await isUserBaamInternal(supabase, user.id);
-  if (!internal) {
-    throw new Error("Only BAAM internal users can manage staff access");
+  // Admin only — staff invitation/promotion/role changes are admin actions.
+  // Legacy NULL ops_role users (founding accounts) get admin treatment so
+  // we don't lock ourselves out before roles are assigned.
+  const internal = await getInternalContext(supabase, user.id);
+  if (
+    !internal ||
+    (internal.opsRole !== "admin" && internal.opsRole !== null)
+  ) {
+    throw new Error("Only BAAM admins can manage staff access");
   }
   return user.id;
 }

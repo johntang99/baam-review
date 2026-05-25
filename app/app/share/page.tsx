@@ -1,8 +1,14 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Code, LayoutGrid, QrCode } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { WidgetConfig } from "@/lib/database.types";
 import { getSelectedLocationId } from "@/lib/selected-location";
+import {
+  getInternalContext,
+  canAccessLocation,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import { PageHeader } from "@/components/admin/page-header";
 import { QrBuilder } from "../locations/[id]/qr/qr-builder";
 import { EmbedBuilder } from "../locations/[id]/embed/embed-builder";
@@ -34,9 +40,26 @@ export default async function SharePage({
     tabRaw === "button" ? "button" : tabRaw === "qr" ? "qr" : "widget";
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/app/share");
   const selectedId = await getSelectedLocationId();
 
-  let { data: location } = selectedId
+  const internal = await getInternalContext(supabase, user.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+  const idFilter =
+    visibleIds === null
+      ? null
+      : visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"];
+
+  const selectedOk = selectedId
+    ? await canAccessLocation(supabase, internal, selectedId)
+    : false;
+
+  let { data: location } = selectedOk && selectedId
     ? await supabase
         .from("locations")
         .select(
@@ -47,14 +70,15 @@ export default async function SharePage({
     : { data: null };
 
   if (!location) {
-    const { data: first } = await supabase
+    let firstQuery = supabase
       .from("locations")
       .select(
         "id, slug, display_name, default_language, supported_languages, brand_color, widget_config",
       )
       .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
+    if (idFilter) firstQuery = firstQuery.in("id", idFilter);
+    const { data: first } = await firstQuery.maybeSingle();
     location = first;
   }
 

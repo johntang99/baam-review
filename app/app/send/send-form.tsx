@@ -54,9 +54,11 @@ export function SendForm({
   const initialLocation =
     locations.find((l) => l.id === initialLocationId) ?? locations[0];
   const [locationId, setLocationId] = useState<string>(initialLocation?.id ?? "");
-  const [channel, setChannel] = useState<"sms" | "email">(
-    smsEnabled ? "sms" : "email",
-  );
+  // Email is the default channel. SMS only becomes preferred once Twilio
+  // is wired up AND the user explicitly picks it.
+  const [channel, setChannel] = useState<"sms" | "email">("email");
+  // Brief "Coming soon" hint shown when user clicks the disabled SMS toggle.
+  const [smsHintShown, setSmsHintShown] = useState(false);
   const [language, setLanguage] = useState<string>(
     initialLocation?.default_language ?? "en",
   );
@@ -236,20 +238,60 @@ export function SendForm({
           </p>
           <div className="grid grid-cols-2 gap-2">
             <ChannelToggle
-              icon={MessageSquare}
-              label="SMS"
-              active={channel === "sms"}
-              disabled={!smsEnabled}
-              hint={!smsEnabled ? "Twilio not configured" : undefined}
-              onClick={() => setChannel("sms")}
-            />
-            <ChannelToggle
               icon={Mail}
               label="Email"
               active={channel === "email"}
               onClick={() => setChannel("email")}
             />
+            <ChannelToggle
+              icon={MessageSquare}
+              label="SMS"
+              active={channel === "sms"}
+              disabled={!smsEnabled}
+              hint={!smsEnabled ? "Coming soon" : undefined}
+              onClick={() => {
+                if (!smsEnabled) {
+                  // Show the inline hint; persists until the user
+                  // clicks the toggle again (toggle to dismiss).
+                  setSmsHintShown((shown) => !shown);
+                  return;
+                }
+                setChannel("sms");
+              }}
+            />
           </div>
+          {smsHintShown && (
+            <div
+              role="status"
+              className="rounded-lg border border-gold/40 bg-gold/[0.07] px-3.5 py-3 space-y-1.5"
+            >
+              <p className="text-[12.5px] font-semibold text-gold-dark">
+                SMS delivery is coming soon
+              </p>
+              <p className="text-[12px] text-text-soft leading-relaxed">
+                We&apos;re finishing the Twilio integration — verified
+                sender numbers, A2P 10DLC registration for US carriers,
+                and STOP / opt-out handling. Once it&apos;s live SMS will
+                light up automatically for every location.
+              </p>
+              <p className="text-[12px] text-text-soft leading-relaxed">
+                <strong className="text-ink">In the meantime, use Email.</strong>{" "}
+                It has higher open rates for review requests in our data
+                (typically 45–60% vs 25–35% for SMS) and no per-message
+                cost.
+              </p>
+              <p className="text-[11.5px] text-text-muted">
+                Need SMS sooner? Reply to{" "}
+                <a
+                  href="mailto:support@baamplatform.com"
+                  className="text-forest hover:underline"
+                >
+                  support@baamplatform.com
+                </a>{" "}
+                and we&apos;ll prioritize.
+              </p>
+            </div>
+          )}
           <input type="hidden" name="channel" value={channel} />
         </div>
 
@@ -430,14 +472,17 @@ function ChannelToggle({
   return (
     <button
       type="button"
-      onClick={disabled ? undefined : onClick}
-      disabled={disabled}
+      // Always fire onClick — the handler decides whether to switch
+      // channel or show the "Coming soon" hint. Don't set the native
+      // disabled attribute, or the click event never reaches us.
+      onClick={onClick}
+      aria-disabled={disabled || undefined}
       className={cn(
         "flex items-center gap-2 rounded-lg border px-3 py-2.5 text-[13.5px] transition-colors",
         active
           ? "border-forest bg-forest/5 text-ink"
           : "border-border-base bg-paper text-text-soft hover:bg-hover",
-        disabled && "opacity-50 cursor-not-allowed",
+        disabled && "opacity-50 cursor-not-allowed hover:bg-paper",
       )}
     >
       <Icon className="h-4 w-4" />

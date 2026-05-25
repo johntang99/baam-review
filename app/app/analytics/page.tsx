@@ -1,7 +1,12 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { AlertTriangle, BarChart3, DollarSign, Trophy } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSelectedLocationId } from "@/lib/selected-location";
+import {
+  getInternalContext,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import { PageHeader } from "@/components/admin/page-header";
 import { Breakdown } from "@/components/admin/breakdown";
 import { Funnel } from "@/components/admin/funnel";
@@ -32,15 +37,30 @@ export default async function AnalyticsPage({
   const tab: Tab = tabRaw === "revenue" ? "revenue" : "activity";
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/app/analytics");
   const sinceIso = new Date(
     Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000,
   ).toISOString();
 
   const selectedLocationId = await getSelectedLocationId();
 
-  const { data: locations } = await supabase
+  const internal = await getInternalContext(supabase, user.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+  const idFilter =
+    visibleIds === null
+      ? null
+      : visibleIds.length > 0
+        ? visibleIds
+        : ["00000000-0000-0000-0000-000000000000"];
+
+  let locationsQuery = supabase
     .from("locations")
     .select("id, display_name, slug, account_id");
+  if (idFilter) locationsQuery = locationsQuery.in("id", idFilter);
+  const { data: locations } = await locationsQuery;
   const locById = new Map((locations ?? []).map((l) => [l.id, l]));
 
   // ----- Activity tab data (90d funnel uses 30d for parity with prototype) -----
@@ -50,6 +70,7 @@ export default async function AnalyticsPage({
       "id, recipient_name, language, channel, sent_at, delivered_at, clicked_at, completed_platform, completed_at, created_at, location_id, flagged_at, flag_reason",
     )
     .gte("created_at", sinceIso);
+  if (idFilter) requestsQuery = requestsQuery.in("location_id", idFilter);
   if (selectedLocationId)
     requestsQuery = requestsQuery.eq("location_id", selectedLocationId);
   const { data: requests } = await requestsQuery;
@@ -59,6 +80,7 @@ export default async function AnalyticsPage({
     .select("metadata, location_id, occurred_at")
     .eq("event_type", "page_view")
     .gte("occurred_at", sinceIso);
+  if (idFilter) pageViewsQuery = pageViewsQuery.in("location_id", idFilter);
   if (selectedLocationId)
     pageViewsQuery = pageViewsQuery.eq("location_id", selectedLocationId);
   const { data: pageViews } = await pageViewsQuery;
@@ -70,6 +92,7 @@ export default async function AnalyticsPage({
       "id, event_type, advocate_request_id, location_id, created_at",
     )
     .gte("created_at", sinceIso);
+  if (idFilter) referralsQuery = referralsQuery.in("location_id", idFilter);
   if (selectedLocationId)
     referralsQuery = referralsQuery.eq("location_id", selectedLocationId);
   const { data: referrals } = await referralsQuery;
