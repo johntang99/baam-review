@@ -751,8 +751,11 @@ section + section { border-top: 1px solid var(--rule); }
 }
 .section-num {
   font-family: 'Fraunces', serif;
-  font-size: 13px;
-  letter-spacing: 0.2em;
+  /* Bumped to match .section-lede (17px) and made bold per design feedback —
+     the original 13px was hard to read alongside the larger h2 below it. */
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   color: var(--gold);
   margin-bottom: 26px;
   display: flex; align-items: center; justify-content: center; gap: 18px;

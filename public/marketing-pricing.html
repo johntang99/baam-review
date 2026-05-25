@@ -68,8 +68,12 @@ nav.scrolled { border-color: var(--border); }
 .nav-links a.active { color: var(--ink); }
 .btn { display: inline-flex; align-items: center; gap: 7px; padding: 11px 22px; font-family: 'Onest', sans-serif; font-size: 14px; font-weight: 500; border-radius: 999px; border: 1px solid var(--border); background: var(--paper); color: var(--text); cursor: pointer; transition: all 0.18s; }
 .btn:hover { background: var(--cream-deep); transform: translateY(-1px); }
-.btn-primary { background: var(--ink); color: var(--cream); border-color: var(--ink); }
-.btn-primary:hover { background: var(--forest); color: var(--cream); }
+/* Pure white (not --cream) on dark backgrounds. globals.css applies a
+   Tailwind preflight `a { color: inherit }` which can win over var(--cream)
+   in this injected-style context — using a literal #fff is unambiguous and
+   higher contrast on the dark pill. */
+.btn-primary { background: var(--ink); color: #ffffff !important; border-color: var(--ink); }
+.btn-primary:hover { background: var(--forest); color: #ffffff !important; }
 .btn-gold { background: var(--gold); color: var(--ink); border-color: var(--gold); }
 .btn-gold:hover { background: var(--gold-dark); color: var(--cream); border-color: var(--gold-dark); }
 .btn svg { width: 14px; height: 14px; }

@@ -61,6 +61,53 @@ export function MarketingZhScripts() {
       faqHandlers.forEach(({ el, fn }) => el.removeEventListener("click", fn)),
     );
 
+    // ── "Start now — we'll set it up" → Stripe Checkout ──
+    // The Full Service plan card on /zh now has a secondary button that
+    // posts to /api/billing/start-fullservice and redirects to the
+    // returned Stripe Checkout URL. The same handler lives on EN under
+    // MarketingScripts; we duplicate here because readMarketingDoc
+    // strips the original inline <script> and the ZH home uses a
+    // separate hydration component.
+    const startNowButtons = Array.from(
+      document.querySelectorAll<HTMLButtonElement>(
+        "[data-start-now-fullservice]",
+      ),
+    );
+    const onStartNow = async (e: Event) => {
+      e.preventDefault();
+      const button = e.currentTarget as HTMLButtonElement;
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = "正在跳转 Stripe…";
+      try {
+        const res = await fetch("/api/billing/start-fullservice", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ interval: "month" }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.url) {
+          throw new Error(data.error || "Could not start checkout");
+        }
+        window.location.assign(data.url);
+      } catch (err) {
+        button.disabled = false;
+        button.textContent = original;
+        alert(
+          "暂时无法启动结账,请稍后再试,或写信至 support@baamplatform.com。",
+        );
+        console.error(err);
+      }
+    };
+    startNowButtons.forEach((b) =>
+      b.addEventListener("click", onStartNow as EventListener),
+    );
+    cleanups.push(() =>
+      startNowButtons.forEach((b) =>
+        b.removeEventListener("click", onStartNow as EventListener),
+      ),
+    );
+
     // ── Reveal on scroll ──
     const reveals = document.querySelectorAll<HTMLElement>(".reveal");
     if ("IntersectionObserver" in window) {

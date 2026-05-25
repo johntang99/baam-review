@@ -1009,9 +1009,14 @@ section { padding: 100px 0; position: relative; }
   justify-content: center;
   gap: 13px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
+  /* Bumped 11px → 15px and 500 → 700 per design feedback — the original
+     was hard to read alongside the much larger h2 below. Tracking
+     tightened from 0.18em → 0.12em so the heavier uppercase mono doesn't
+     look stretched at the bigger size. Mirrors the same fix on the ZH
+     marketing site's .section-num. */
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--gold-dark, #836A30);
   margin-bottom: 20px;
@@ -1994,6 +1999,64 @@ section { padding: 100px 0; position: relative; }
 .tier-mini.featured .tier-mini-cta { background: var(--gold); border-color: var(--gold); color: var(--ink); }
 .tier-mini.featured .tier-mini-cta:hover { background: var(--cream); }
 .tier-mini-cta svg { width: 12px; height: 12px; }
+
+/* Dual-CTA stack used by the Full Service tier on the home page.
+   Mirrors the pattern on /pricing but tuned for the dark
+   pricing-teaser background: primary becomes solid GOLD, secondary
+   stays outlined-on-dark. The Stripe Checkout button uses
+   data-start-now-fullservice which MarketingScripts wires up. */
+.tier-mini-cta-stack {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.tier-mini-cta-primary {
+  display: block;
+  text-align: center;
+  padding: 13px 18px;
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+.tier-mini-cta-primary:hover {
+  background: var(--cream);
+  transform: translateY(-1px);
+}
+.tier-mini-cta-secondary {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 12px 18px;
+  background: transparent;
+  border: 1.5px solid rgba(250, 247, 242, 0.6);
+  border-radius: 12px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--cream);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tier-mini-cta-secondary:hover {
+  background: var(--cream);
+  color: var(--ink);
+  border-color: var(--cream);
+}
+.tier-mini-cta-secondary:disabled { opacity: 0.55; cursor: wait; }
+.tier-mini-cta-note {
+  margin-top: 4px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(250, 247, 242, 0.65);
+}
 .tier-mini {
   background: rgba(250, 247, 242, 0.06);
   border: 1px solid rgba(250, 247, 242, 0.14);
@@ -6228,10 +6291,15 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Each additional location: same $99/mo</li>
         </ul>
 
-        <a href="/pricing#self-serve" class="tier-mini-cta">
-          See self-serve pricing
-          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </a>
+        <div class="tier-mini-cta-stack">
+          <a href="/signup?plan=self" class="tier-mini-cta-primary">Start free trial →</a>
+          <a href="/pricing#self-serve" class="tier-mini-cta-secondary">
+            Compare plans · FAQ →
+          </a>
+          <div class="tier-mini-cta-note">
+            No charge today · 30-day free trial · cancel anytime
+          </div>
+        </div>
       </div>
 
       <!-- PATH B: FULL SERVICE -->
@@ -6251,10 +6319,15 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Every additional location at the same flat $399/mo</li>
         </ul>
 
-        <a href="/pricing#full-service" class="tier-mini-cta">
-          See Full Service pricing
-          <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </a>
+        <div class="tier-mini-cta-stack">
+          <a href="/book" class="tier-mini-cta-primary">Book a free consultation →</a>
+          <button type="button" class="tier-mini-cta-secondary" data-start-now-fullservice>
+            Start now — we'll set it up →
+          </button>
+          <div class="tier-mini-cta-note">
+            No charge today · 30-day free trial · we set up your account within 1 week
+          </div>
+        </div>
         <div class="tier-partner-row">
           <a href="#partnership"><span class="tp-ic">▸</span>See how we work together</a>
           <a href="/BAAM-Review-How-We-Work-Together.pdf" download><span class="tp-ic">▾</span>Download the partner guide (PDF)</a>

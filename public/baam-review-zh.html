@@ -746,8 +746,11 @@ section + section { border-top: 1px solid var(--rule); }
 }
 .section-num {
   font-family: 'Fraunces', serif;
-  font-size: 13px;
-  letter-spacing: 0.2em;
+  /* Bumped to match .section-lede (17px) and made bold per design feedback —
+     the original 13px was hard to read alongside the larger h2 below it. */
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   color: var(--gold);
   margin-bottom: 26px;
   display: flex; align-items: center; justify-content: center; gap: 18px;
@@ -1809,6 +1812,38 @@ section h2 em {
   background: var(--paper); color: var(--ink);
 }
 .plan-cta.light:hover { background: var(--vermilion); color: var(--paper); }
+
+/* Secondary CTA on Full Service — outlined "Start Now" button that
+   POSTs to /api/billing/start-fullservice and redirects to Stripe
+   Checkout. Mirrors the same pattern on /pricing. */
+.plan-cta-secondary {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px 16px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.plan-cta-secondary:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.plan-cta-secondary:disabled { opacity: 0.55; cursor: wait; }
+.plan-cta-note {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-soft, #5a6660);
+}
 
 @media (max-width: 768px) { .plans { grid-template-columns: 1fr; } }
 
@@ -3345,7 +3380,13 @@ footer {
           <li>月付或年付，均享 30 天免费试用</li>
           <li>每家店统一 $99/月,无阶梯加价</li>
         </ul>
-        <a href="https://review.baamplatform.com/signup" class="plan-cta light">开始 30 天免费试用</a>
+        <a href="/signup?plan=self" class="plan-cta light">开始 30 天免费试用 →</a>
+        <a href="/pricing/zh#self-serve" class="plan-cta-secondary" style="margin-top:8px">
+          查看完整价格对比 ·  常见问题 →
+        </a>
+        <div class="plan-cta-note">
+          今日无费用 · 30 天免费试用 · 可随时取消
+        </div>
       </div>
 
       <!-- Full Service -->
@@ -3368,6 +3409,12 @@ footer {
           <li>多店面统一 $399/月/店</li>
         </ul>
         <a href="/book/zh" class="plan-cta dark">预约免费咨询</a>
+        <button type="button" class="plan-cta-secondary" data-start-now-fullservice>
+          立即开始 —— 由我们替您设置 →
+        </button>
+        <div class="plan-cta-note">
+          今日无费用 · 30 天免费试用 · 一周内由我们替您完成设置
+        </div>
         <div class="plan-partner-row">
           <a href="#partnership">
             <span class="pp-ic">▸</span>了解我们如何携手合作
