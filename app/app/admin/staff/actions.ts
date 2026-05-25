@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { isUserBaamInternal } from "@/lib/auth/staff";
@@ -93,21 +94,55 @@ export async function inviteStaff(formData: FormData): Promise<ActionResult> {
     };
   }
 
-  // Existing user → just move them in.
+  // Origin for any email links (invite / recovery).
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const host = h.get("host") ?? "review.baamplatform.com";
+  const origin = `${proto}://${host}`;
+  // After the user clicks the email link, /auth/callback exchanges the
+  // code for a session and forwards them to /reset-password to choose a
+  // password. /reset-password is the existing recovery page — it works
+  // identically for an invitee who has no password yet.
+  const redirectTo = `${origin}/auth/callback?next=/reset-password`;
+
+  // Existing user → move into ops tenant. If they don't have a password
+  // set yet (never confirmed), send a recovery email so they can finish
+  // setup. Otherwise no email — they already know how to log in.
   const existing = await findAuthUserByEmail(service, email);
   if (existing) {
-    return await moveUserIntoOpsTenant(
+    const moved = await moveUserIntoOpsTenant(
       service,
       existing.id,
       opsAccountId,
       role,
     );
+    if (!moved.ok) return moved;
+
+    if (!existing.confirmedAt) {
+      const { error: recoveryErr } =
+        await service.auth.admin.generateLink({
+          type: "recovery",
+          email,
+          options: { redirectTo },
+        });
+      // Don't fail the whole action if the email fails to enqueue — the
+      // staff row is already correct. Admin can resend via Forgot
+      // password if needed.
+      if (recoveryErr) {
+        console.error(
+          "[inviteStaff] generateLink(recovery) failed",
+          recoveryErr,
+        );
+      }
+    }
+    return { ok: true };
   }
 
   // Brand new — send invite email.
   const { data: invited, error: inviteErr } =
     await service.auth.admin.inviteUserByEmail(email, {
       data: fullName ? { full_name: fullName } : undefined,
+      redirectTo,
     });
   if (inviteErr || !invited?.user) {
     return {
@@ -269,7 +304,7 @@ export async function setOpsRole(formData: FormData): Promise<ActionResult> {
 async function findAuthUserByEmail(
   service: ReturnType<typeof createServiceClient>,
   email: string,
-): Promise<{ id: string } | null> {
+): Promise<{ id: string; confirmedAt: string | null } | null> {
   // Supabase admin SDK doesn't expose a get-by-email; list is paginated.
   // For a small staff team this is fine; if the auth.users table balloons,
   // switch to a service-role SELECT on auth.users.
@@ -280,7 +315,14 @@ async function findAuthUserByEmail(
   const match = (data?.users ?? []).find(
     (u) => u.email?.toLowerCase() === email,
   );
-  return match ? { id: match.id } : null;
+  if (!match) return null;
+  // `confirmed_at` is set the moment they verify their email (clicking
+  // the invite/recovery link counts). If null, they've never finished
+  // setup and have no password yet.
+  return {
+    id: match.id,
+    confirmedAt: match.confirmed_at ?? null,
+  };
 }
 
 /**

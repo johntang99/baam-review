@@ -131,7 +131,10 @@ export default async function LocationsPage({
         .order("full_name", { ascending: true }),
       service
         .from("location_assignments")
-        .select("location_id, user_id, users(id, full_name, account_id)")
+        // Disambiguate: location_assignments has two FKs to users
+        // (user_id, assigned_by_user_id). The !user_id hint tells
+        // PostgREST to join on the manager FK.
+        .select("location_id, user_id, users!user_id(id, full_name, account_id)")
         .in(
           "location_id",
           locations.map((l) => l.id),
