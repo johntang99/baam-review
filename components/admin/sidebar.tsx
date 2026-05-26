@@ -12,6 +12,7 @@ import {
   UserPlus,
   ShieldCheck,
   KeyRound,
+  Building2,
 } from "lucide-react";
 import { UserCard } from "./user-card";
 import { NavItem } from "./nav-item";
@@ -77,6 +78,11 @@ const rolesItem: WorkspaceItem = {
   icon: KeyRound,
 };
 
+const customersItem: WorkspaceItem = {
+  href: "/app/customers",
+  label: "Customers",
+  icon: Building2,
+};
 const onboardingItem: WorkspaceItem = {
   href: "/app/onboarding",
   label: "Onboarding queue",
@@ -91,8 +97,10 @@ const staffAccessItem: WorkspaceItem = {
 function operationsItemsForRole(
   role: OpsRole | null | undefined,
 ): WorkspaceItem[] {
-  if (role === "admin") return [onboardingItem, staffAccessItem];
-  if (role === "sales") return [onboardingItem];
+  if (role === "admin")
+    return [customersItem, onboardingItem, staffAccessItem];
+  if (role === "sales") return [customersItem, onboardingItem];
+  if (role === "account_manager") return [customersItem];
   return [];
 }
 

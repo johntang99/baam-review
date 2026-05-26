@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, Search, Check } from "lucide-react";
+import { Plus, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import {
   getInternalContext,
   getVisibleLocationIds,
 } from "@/lib/auth/staff";
 import { relativeTime } from "@/lib/analytics/aggregate";
+import { ListsSearchInput } from "./search-input";
 
 export const metadata = {
   title: "Lists — BAAM Review",
@@ -57,11 +58,12 @@ interface CustomerRow {
 export default async function ListsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ filter?: string; flash?: string }>;
+  searchParams: Promise<{ filter?: string; flash?: string; q?: string }>;
 }) {
-  const { filter: filterRaw, flash } = await searchParams;
+  const { filter: filterRaw, flash, q: qRaw } = await searchParams;
   const filter: Filter =
     FILTERS.find((f) => f.id === filterRaw)?.id ?? "all";
+  const q = (qRaw ?? "").trim().toLowerCase();
 
   const supabase = await createClient();
   const {
@@ -223,12 +225,25 @@ export default async function ListsPage({
   };
 
   const visibleLists = allLists.filter((l) => {
-    if (filter === "all") return l.status !== "archived";
-    if (filter === "active") return l.status === "active";
-    if (filter === "resend") return eligibleForResend(l) > 0;
-    if (filter === "drafts") return l.status === "draft";
-    if (filter === "completed") return l.status === "completed";
-    return true;
+    // Status tab.
+    if (filter === "all") {
+      if (l.status === "archived") return false;
+    } else if (filter === "active") {
+      if (l.status !== "active") return false;
+    } else if (filter === "resend") {
+      if (!(eligibleForResend(l) > 0)) return false;
+    } else if (filter === "drafts") {
+      if (l.status !== "draft") return false;
+    } else if (filter === "completed") {
+      if (l.status !== "completed") return false;
+    }
+    // Free-text search: list name OR the attached client (location) name.
+    // Empty q passes everything through.
+    if (!q) return true;
+    if (l.name.toLowerCase().includes(q)) return true;
+    const locationName = locName.get(l.location_id) ?? "";
+    if (locationName.toLowerCase().includes(q)) return true;
+    return false;
   });
 
   return (
@@ -329,14 +344,7 @@ export default async function ListsPage({
             );
           })}
         </div>
-        <div className="relative ml-auto">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
-          <input
-            disabled
-            placeholder="Search lists or clients"
-            className="w-[220px] rounded-lg border border-border-base bg-paper py-2 pl-9 pr-3 text-[13px] text-text placeholder:text-text-muted disabled:opacity-60"
-          />
-        </div>
+        <ListsSearchInput initial={qRaw ?? ""} />
       </div>
 
       {/* LIST CARDS */}
