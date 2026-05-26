@@ -95,6 +95,24 @@ nav.scrolled { border-color: var(--border); }
   white-space: nowrap;
 }
 .nav-links a:hover { color: var(--ink); }
+/* Active state — applied by MarketingScripts scroll-spy as the user
+   scrolls (or jumps to) each section. Color shifts to ink + slightly
+   bolder + a 2px gold accent bar so the current section is unmistakable. */
+.nav-links a.active {
+  color: var(--ink);
+  font-weight: 600;
+  position: relative;
+}
+.nav-links a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 1px;
+}
 .nav-cta { display: flex; gap: 12px; align-items: center; }
 
 .btn {
@@ -6434,7 +6452,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span class="faq-chevron">+</span>
         </summary>
         <div class="faq-a">
-          Yes. Self-serve: your first location is $99/mo, each additional location is $79/mo. So 5 locations = $99 + 4×$79 = $415/mo; 10 locations = $99 + 9×$79 = $810/mo. Each location is its own subscription with its own card, dashboard, brand settings, and review attribution — cancel one without touching the others. Full Service: every location is a flat $399/mo, card or pay-by-check. Every location includes a 30-day free trial. Birdeye and Podium charge $200–400 per location at this volume.
+          Yes. Self-serve: every location is a flat $99/mo — no first-location markup, no per-location surcharge. So 5 locations = 5 × $99 = $495/mo; 10 locations = 10 × $99 = $990/mo. Each location is its own subscription with its own card, dashboard, brand settings, and review attribution — cancel one without touching the others. Full Service: every location is a flat $399/mo, card or pay-by-check. Every location includes a 30-day free trial. Birdeye and Podium charge $200–400 per location at this volume.
         </div>
       </details>
 

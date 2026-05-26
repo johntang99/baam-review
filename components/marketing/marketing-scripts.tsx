@@ -101,6 +101,53 @@ export function MarketingScripts() {
     };
     document.addEventListener("click", onStartNow);
 
+    // Scroll-spy on the marketing-home nav. The header has anchor links
+    // like #why / #pricing / #faq — observe each target section and add
+    // .active to the matching link as it scrolls into view. Falls back
+    // silently on pages that don't have these elements (e.g. /pricing).
+    const navAnchors = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>(
+        '.nav-links a[href^="#"]',
+      ),
+    );
+    const sectionToLink = new Map<Element, HTMLAnchorElement>();
+    for (const a of navAnchors) {
+      const id = a.getAttribute("href")?.slice(1);
+      if (!id) continue;
+      const section = document.getElementById(id);
+      if (section) sectionToLink.set(section, a);
+    }
+    let spy: IntersectionObserver | null = null;
+    if (sectionToLink.size > 0 && "IntersectionObserver" in window) {
+      const visible = new Set<Element>();
+      spy = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) visible.add(e.target);
+            else visible.delete(e.target);
+          }
+          // Pick the section closest to the top of the viewport — that's
+          // what the user is currently reading.
+          let topSection: Element | null = null;
+          let topY = Infinity;
+          for (const s of visible) {
+            const y = s.getBoundingClientRect().top;
+            if (y >= -80 && y < topY) {
+              topY = y;
+              topSection = s;
+            }
+          }
+          for (const a of navAnchors) a.classList.remove("active");
+          if (topSection) {
+            const link = sectionToLink.get(topSection);
+            link?.classList.add("active");
+          }
+        },
+        { rootMargin: "-80px 0px -55% 0px", threshold: 0 },
+      );
+      for (const s of sectionToLink.keys()) spy.observe(s);
+    }
+
     return () => {
       window.removeEventListener("scroll", onScroll);
       if (recalc) {
@@ -109,6 +156,7 @@ export function MarketingScripts() {
         liftSlider?.removeEventListener("input", recalc);
       }
       document.removeEventListener("click", onStartNow);
+      spy?.disconnect();
     };
   }, []);
 
