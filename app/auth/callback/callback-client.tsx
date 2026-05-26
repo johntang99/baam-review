@@ -3,7 +3,30 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { createBrowserClient } from "@supabase/ssr";
+import type { Database } from "@/lib/database.types";
+
+/**
+ * Local Supabase client with `detectSessionInUrl: false`. The shared
+ * `lib/supabase/client.ts` defaults to PKCE flow + auto-detect, which
+ * on this page sees the email link's URL params and tries to call
+ * exchangeCodeForSession *before* our handler runs — that fails with
+ * "PKCE code verifier not found in storage" because the verifier
+ * cookie was never set (server-initiated invite). Disabling auto-detect
+ * lets the manual hash/token_hash/code branches below run unimpeded.
+ */
+function makeCallbackClient() {
+  return createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        detectSessionInUrl: false,
+        flowType: "implicit",
+      },
+    },
+  );
+}
 
 type Status = "working" | "error";
 
@@ -34,7 +57,7 @@ export function CallbackClient() {
     };
 
     const run = async () => {
-      const supabase = createClient();
+      const supabase = makeCallbackClient();
       const url = new URL(window.location.href);
       const next = sanitiseNext(url.searchParams.get("next"));
 
