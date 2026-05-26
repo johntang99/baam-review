@@ -76,7 +76,14 @@ export function StaffManager({ currentUserId, staff }: StaffManagerProps) {
   };
 
   const onDemote = (userId: string, email: string) => {
-    if (!confirm(`Remove internal access for ${email}?`)) return;
+    if (
+      !confirm(
+        `Permanently remove ${email}?\n\n` +
+          `This deletes their login. Any locations they connected lose their "connected by" attribution. ` +
+          `To bring them back, send a fresh Invite.`,
+      )
+    )
+      return;
     setMsg(null);
     const fd = new FormData();
     fd.set("user_id", userId);

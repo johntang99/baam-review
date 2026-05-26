@@ -216,10 +216,25 @@ export async function promoteByEmail(
 }
 
 /**
- * Demote an internal staff user back to a regular (customer-shaped)
- * account. Creates a fresh personal account for them and points their
- * user row at it, so they're no longer in the BAAM Operations tenant.
- * Self-protection: cannot demote yourself.
+ * Fully remove an internal staff user — deletes the auth.users row,
+ * which cascades through:
+ *   • public.users (FK to auth.users.id, ON DELETE CASCADE)
+ *   • location_assignments.user_id (CASCADE)
+ *   • location_assignments.assigned_by_user_id (SET NULL)
+ *   • locations.connected_by_user_id (SET NULL)
+ *
+ * We also delete the user's account row if it's a personal account
+ * (is_baam_internal = false) — staff are normally in the shared ops
+ * tenant, but historical demoted-then-readded users may have a stray
+ * personal account left over. The ops tenant itself is never touched.
+ *
+ * Previously this only "demoted" — moved the user to a fresh personal
+ * account and cleared ops_role. That left auth.users intact, so
+ * re-inviting them never sent an email (findAuthUserByEmail saw a
+ * confirmed user and skipped the invite send). Truly removing fixes
+ * that path: re-invite finds nothing and sends a fresh invite.
+ *
+ * Self-protection: cannot remove yourself.
  */
 export async function demoteStaffUser(
   formData: FormData,
@@ -234,44 +249,40 @@ export async function demoteStaffUser(
     return {
       ok: false,
       error:
-        "You can't demote your own user. Ask another internal user to do it.",
+        "You can't remove your own user. Ask another admin to do it.",
     };
   }
 
   const service = createServiceClient();
 
-  // Pull the auth-side email/name so the new personal account is
-  // recognisable in the dashboard (and matches the existing /signup
-  // trigger's naming convention).
-  const { data: authUser } = await service.auth.admin.getUserById(userId);
-  if (!authUser?.user) {
-    return { ok: false, error: "Auth user not found" };
-  }
-  const email = authUser.user.email ?? "";
-  const name =
-    (authUser.user.user_metadata?.full_name as string | undefined) ||
-    email.split("@")[0] ||
-    "Demoted user";
+  // Capture the user's current public.accounts row before cascade
+  // wipes the public.users link. If it's a personal (non-internal)
+  // account left over from a prior demote, delete it after the cascade
+  // so we don't accumulate orphans.
+  const { data: userRow } = await service
+    .from("users")
+    .select("account_id, accounts(id, is_baam_internal)")
+    .eq("id", userId)
+    .maybeSingle();
+  const personalAccountId = (() => {
+    const rel = userRow?.accounts;
+    const acct = Array.isArray(rel) ? rel[0] : rel;
+    return acct && !acct.is_baam_internal ? acct.id : null;
+  })();
 
-  // Mint a fresh personal account, point the user there, clear ops_role.
-  const { data: newAccount, error: insertErr } = await service
-    .from("accounts")
-    .insert({ name, primary_email: email })
-    .select("id")
-    .single();
-  if (insertErr || !newAccount) {
+  // Cascade-delete auth.users.id → public.users → location_assignments
+  // → null out connected_by_user_id / assigned_by_user_id references.
+  const { error: deleteErr } = await service.auth.admin.deleteUser(userId);
+  if (deleteErr) {
     return {
       ok: false,
-      error: `Could not create personal account: ${insertErr?.message ?? "unknown"}`,
+      error: `Remove failed: ${deleteErr.message}. The user may already be gone — refresh the page.`,
     };
   }
 
-  const { error: updateErr } = await service
-    .from("users")
-    .update({ account_id: newAccount.id, ops_role: null })
-    .eq("id", userId);
-  if (updateErr) {
-    return { ok: false, error: `Demote failed: ${updateErr.message}` };
+  // Sweep any orphan personal account.
+  if (personalAccountId) {
+    await service.from("accounts").delete().eq("id", personalAccountId);
   }
 
   revalidatePath("/app/admin/staff");
