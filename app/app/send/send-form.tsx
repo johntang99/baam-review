@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   ExternalLink,
   Info,
+  Sparkles,
+  Undo2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -102,6 +104,53 @@ export function SendForm({
   );
   const [subjectTouched, setSubjectTouched] = useState(false);
   const [bodyTouched, setBodyTouched] = useState(false);
+
+  // AI rewrite state — history stack so the user can undo back through
+  // previous drafts after multiple regenerations.
+  type Tone = "warm" | "brief" | "professional" | "casual";
+  const [tone, setTone] = useState<Tone>("warm");
+  const [rewriting, setRewriting] = useState(false);
+  const [bodyHistory, setBodyHistory] = useState<string[]>([]);
+  const [rewriteError, setRewriteError] = useState<string | null>(null);
+
+  async function rewriteBodyWithAI() {
+    if (!currentLocation || rewriting) return;
+    setRewriteError(null);
+    setRewriting(true);
+    try {
+      const res = await fetch("/api/send/rewrite-body", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentBody: body,
+          businessName: currentLocation.display_name,
+          language: previewLang,
+          tone,
+          channel,
+        }),
+      });
+      const json = (await res.json()) as { ok: boolean; body?: string; error?: string };
+      if (!json.ok || !json.body) {
+        setRewriteError(json.error ?? "Rewrite failed");
+        return;
+      }
+      setBodyHistory((h) => [...h, body]);
+      setBody(json.body);
+      setBodyTouched(true);
+    } catch (e) {
+      setRewriteError(e instanceof Error ? e.message : "Network error");
+    } finally {
+      setRewriting(false);
+    }
+  }
+
+  function undoRewrite() {
+    if (bodyHistory.length === 0) return;
+    const previous = bodyHistory[bodyHistory.length - 1];
+    setBodyHistory((h) => h.slice(0, -1));
+    setBody(previous);
+    setRewriteError(null);
+  }
 
   useEffect(() => {
     const fresh =
@@ -395,12 +444,63 @@ export function SendForm({
           )}
 
           <div className="space-y-1.5">
-            <label
-              htmlFor="message_body"
-              className="block text-[11.5px] font-medium tracking-tight text-text-soft"
-            >
-              {channel === "sms" ? "Text message" : "Body"}
-            </label>
+            <div className="flex items-center justify-between gap-3">
+              <label
+                htmlFor="message_body"
+                className="block text-[11.5px] font-medium tracking-tight text-text-soft"
+              >
+                {channel === "sms" ? "Text message" : "Body"}
+              </label>
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={tone}
+                  onChange={(e) => setTone(e.target.value as Tone)}
+                  disabled={rewriting}
+                  className="rounded-md border border-border-base bg-paper px-2 py-1 text-[11.5px] text-text focus:outline-none focus:ring-2 focus:ring-forest/30 disabled:opacity-50"
+                  aria-label="Rewrite tone"
+                >
+                  {previewLang === "zh" ? (
+                    <>
+                      <option value="warm">親切</option>
+                      <option value="brief">簡潔</option>
+                      <option value="professional">正式</option>
+                      <option value="casual">輕鬆</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="warm">Warm</option>
+                      <option value="brief">Brief</option>
+                      <option value="professional">Professional</option>
+                      <option value="casual">Casual</option>
+                    </>
+                  )}
+                </select>
+                {bodyHistory.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={undoRewrite}
+                    disabled={rewriting}
+                    title="Undo last AI rewrite"
+                    className="inline-flex items-center gap-1 rounded-md border border-border-base bg-paper px-2 py-1 text-[11.5px] text-text-soft hover:bg-cream-deep/30 disabled:opacity-50"
+                  >
+                    <Undo2 className="h-3 w-3" />
+                    Undo
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={rewriteBodyWithAI}
+                  disabled={rewriting || !currentLocation}
+                  className="inline-flex items-center gap-1 rounded-md border border-forest/30 bg-forest/10 px-2 py-1 text-[11.5px] font-medium text-forest hover:bg-forest/15 disabled:opacity-50"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  {rewriting ? "Rewriting…" : "Rewrite with AI"}
+                </button>
+              </div>
+            </div>
+            {rewriteError && (
+              <p className="text-[11px] text-alert">{rewriteError}</p>
+            )}
             <Textarea
               id="message_body"
               name="message_body"

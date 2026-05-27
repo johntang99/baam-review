@@ -251,7 +251,7 @@ export default async function ListsPage({
       {/* TOP BAR */}
       <div className="flex items-center justify-between gap-4 mb-7">
         <p className="text-[12px] uppercase tracking-[0.08em] text-text-muted font-medium">
-          Workspace · Lists
+          Workspace · Bulk Review Requests
         </p>
         <Link
           href="/app/lists/new"

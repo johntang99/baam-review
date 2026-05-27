@@ -57,8 +57,8 @@ export default async function SendPage() {
   return (
     <main className="px-10 py-10 space-y-8">
       <PageHeader
-        eyebrow="Send"
-        title="Send a review request"
+        eyebrow="Request"
+        title="Request a Review"
         description="One customer at a time. They'll receive a link to a 60-second review flow."
       />
       <SendForm
