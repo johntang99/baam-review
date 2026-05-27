@@ -387,6 +387,7 @@ export interface Database {
           flagged_at: string | null;
           flag_reason: string | null;
           consent_display: boolean;
+          variant_index: number | null;
           created_by: string | null;
           created_at: string;
         };
@@ -411,6 +412,7 @@ export interface Database {
           flagged_at?: string | null;
           flag_reason?: string | null;
           consent_display?: boolean;
+          variant_index?: number | null;
           created_by?: string | null;
           created_at?: string;
         };
@@ -689,6 +691,7 @@ export interface Database {
           completed_at: string | null;
           max_touches: number;
           notes: string | null;
+          template_variants: Json | null;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -704,6 +707,7 @@ export interface Database {
           completed_at?: string | null;
           max_touches?: number;
           notes?: string | null;
+          template_variants?: Json | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -744,6 +748,7 @@ export interface Database {
             | null;
           send_request_id: string | null;
           review_id: string | null;
+          variant_index: number | null;
           created_at: string;
           updated_at: string;
         };
@@ -779,6 +784,7 @@ export interface Database {
             | null;
           send_request_id?: string | null;
           review_id?: string | null;
+          variant_index?: number | null;
           created_at?: string;
           updated_at?: string;
         };

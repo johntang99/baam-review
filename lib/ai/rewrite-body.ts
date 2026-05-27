@@ -59,9 +59,10 @@ function buildSystemPrompt(inputs: RewriteInputs): string {
     "2. The URL placeholders <slug> and <token> MUST appear in the BODY EXACTLY as the strings '<slug>' and '<token>'. Do not remove them, rename them, or wrap them in different brackets.",
     "3. The URL format must remain: https://review.baamplatform.com/r/<slug>?t=<token>",
     "4. Include exactly one clear call-to-action pointing to that URL.",
-    "5. NEVER offer incentives, discounts, gifts, or rewards in exchange for a review. NEVER imply the reviewer should leave a specific rating. NEVER use urgency tactics ('limited time', 'today only').",
-    "6. NEVER mention BAAM, AI, rewriting, or any tooling. Sound like a real person from the business wrote it.",
-    "7. NO emojis. NO hashtags. NO ALL-CAPS headlines.",
+    "5. The placeholder {name} MUST appear in the BODY, somewhere in the greeting or opening sentence (e.g. 'Hi {name},' or '{name}, thanks for…'). Do NOT replace it with a generic word like 'Customer' / '客户' / 'Cliente' — leave it as the literal string '{name}'. This is how each customer's first name gets inserted at send time.",
+    "6. NEVER offer incentives, discounts, gifts, or rewards in exchange for a review. NEVER imply the reviewer should leave a specific rating. NEVER use urgency tactics ('limited time', 'today only').",
+    "7. NEVER mention BAAM, AI, rewriting, or any tooling. Sound like a real person from the business wrote it.",
+    "8. NO emojis. NO hashtags. NO ALL-CAPS headlines.",
     "",
     emailMode
       ? 'Output ONLY a JSON object with this exact shape (no preamble, no markdown fence, no commentary): {"subject":"…","body":"…"}'
@@ -128,8 +129,8 @@ export async function rewriteReviewRequestBody(
             role: "user",
             content:
               attempt === 0
-                ? `${originalBlock}\n\nRewrite ${emailMode ? "both subject and body" : "the body"} now.`
-                : `${originalBlock}\n\nYour previous rewrite removed the business name or placeholders. Rewrite again, this time ensuring "${inputs.businessName}" appears literally in the body and the URL ends with "/r/<slug>?t=<token>" exactly.`,
+                ? `${originalBlock}\n\nRewrite ${emailMode ? "both subject and body" : "the body"} now. Remember: the BODY must contain the literal text "{name}" (the placeholder for the recipient's first name), the literal business name "${inputs.businessName}", and the URL placeholders <slug> and <token>.`
+                : `${originalBlock}\n\nYour previous rewrite removed something required. Rewrite again. Required in the body, verbatim: "{name}", "${inputs.businessName}", "<slug>", and "<token>".`,
           },
         ],
       });
@@ -160,14 +161,18 @@ export async function rewriteReviewRequestBody(
         body = text;
       }
 
-      // Validate — body must keep business name + both URL placeholders.
-      // Subject (when present) just needs to be non-empty and not unreasonably long.
+      // Validate — body must keep business name + both URL placeholders +
+      // the {name} personalization placeholder. Without {name}, every
+      // recipient would see the literal greeting ("Dear Customer", "尊敬的顾客")
+      // and lose the personal touch. Subject just needs to be non-empty and
+      // not unreasonably long.
       const hasBusinessName = body.includes(inputs.businessName);
       const hasSlug = body.includes("<slug>");
       const hasToken = body.includes("<token>");
+      const hasName = body.includes("{name}");
       const subjectOk = !emailMode || (subject && subject.length > 0 && subject.length <= 120);
 
-      if (hasBusinessName && hasSlug && hasToken && subjectOk) {
+      if (hasBusinessName && hasSlug && hasToken && hasName && subjectOk) {
         return { ok: true, body, subject: emailMode ? subject : undefined };
       }
       // else fall through to retry

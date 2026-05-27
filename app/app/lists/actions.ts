@@ -3,12 +3,19 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { sendReviewRequest } from "@/app/app/send/actions";
 import {
   validateRow,
   type Lang,
   type RawRow,
 } from "@/lib/lists/normalize";
+import {
+  generateListVariants,
+  personalizeVariant,
+  type ListVariant,
+} from "@/lib/ai/list-variants";
+import { buildEmail, buildSmsBody } from "@/lib/messaging/templates";
 
 export interface CreateListInput {
   name: string;
@@ -180,7 +187,7 @@ export async function sendList(listId: string): Promise<SendListResult> {
 
   const { data: list } = await supabase
     .from("lists")
-    .select("id, status, location_id")
+    .select("id, status, location_id, default_language, template_variants")
     .eq("id", listId)
     .maybeSingle();
   if (!list) return { ok: false, sent: 0, failed: 0, error: "List not found." };
@@ -205,13 +212,49 @@ export async function sendList(listId: string): Promise<SendListResult> {
     return { ok: false, sent: 0, failed: 0, error: "No customers to send to." };
   }
 
+  // If staff generated AI variants, use them — but ONLY for customers
+  // whose language matches the list's default (i.e., the language the
+  // variants were generated in). Customers in other languages would get
+  // a wrong-language email if we used a variant for them, so they fall
+  // back to the language-aware default template via sendReviewRequest.
+  const variants: ListVariant[] | null = Array.isArray(list.template_variants)
+    ? (list.template_variants as unknown as ListVariant[])
+    : null;
+  const variantLang = list.default_language;
+
+  // Customers eligible for a variant — same language as the variants.
+  // Build a balanced round-robin assignment ONLY across eligible customers
+  // so the variant rotation stays even within the eligible subset.
+  const eligibleIndices: number[] = [];
+  targets.forEach((c, i) => {
+    if (c.language === variantLang) eligibleIndices.push(i);
+  });
+  // Map customer-index → assigned variant index (only for eligible customers).
+  const customerVariant = new Map<number, number>();
+  if (variants && variants.length > 0 && eligibleIndices.length > 0) {
+    const ordered = eligibleIndices.map((_, k) => k % variants.length);
+    // Fisher–Yates shuffle.
+    for (let i = ordered.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [ordered[i], ordered[j]] = [ordered[j], ordered[i]];
+    }
+    eligibleIndices.forEach((customerIdx, k) => {
+      customerVariant.set(customerIdx, ordered[k]);
+    });
+  }
+
   // Mark in-flight so a double-click can't re-enter (status guard above).
   await supabase.from("lists").update({ status: "sending" }).eq("id", listId);
+
+  // Service client for the post-send writes that need to touch
+  // review_requests.variant_index (which is otherwise gated by RLS).
+  const service = createServiceClient();
 
   let sent = 0;
   const errors: string[] = [];
 
-  for (const c of targets) {
+  for (let idx = 0; idx < targets.length; idx++) {
+    const c = targets[idx];
     const fd = new FormData();
     fd.set("location_id", list.location_id);
     fd.set("recipient_name", c.name);
@@ -219,6 +262,20 @@ export async function sendList(listId: string): Promise<SendListResult> {
     fd.set("language", c.language);
     if (c.email) fd.set("recipient_email", c.email);
     if (c.phone) fd.set("recipient_phone", c.phone);
+
+    // Pull this customer's pre-assigned variant. Customers whose language
+    // doesn't match the variants' language fall through to the default
+    // template (sendReviewRequest will build it from buildEmail() in the
+    // customer's actual language).
+    let chosenIndex: number | null = null;
+    const assignedVariant = customerVariant.get(idx);
+    if (assignedVariant !== undefined && variants) {
+      chosenIndex = assignedVariant;
+      const v = variants[chosenIndex];
+      const personalized = personalizeVariant(v, c.name);
+      if (c.channel === "email") fd.set("message_subject", personalized.subject);
+      fd.set("message_body", personalized.body);
+    }
 
     let res;
     try {
@@ -237,8 +294,17 @@ export async function sendList(listId: string): Promise<SendListResult> {
           status: "sent",
           touches: 1,
           send_request_id: res.requestId,
+          variant_index: chosenIndex,
         })
         .eq("id", c.id);
+      // Mirror onto review_requests so analytics queries that go through
+      // the lifecycle webhook events can group by variant directly.
+      if (chosenIndex !== null) {
+        await service
+          .from("review_requests")
+          .update({ variant_index: chosenIndex })
+          .eq("id", res.requestId);
+      }
       await supabase.from("list_events").insert({
         list_customer_id: c.id,
         list_id: listId,
@@ -284,6 +350,236 @@ export async function sendList(listId: string): Promise<SendListResult> {
     failed,
     errors: errors.length > 0 ? errors : undefined,
   };
+}
+
+export interface GenerateVariantsResult {
+  ok: boolean;
+  count?: number;
+  error?: string;
+  /** Notice when the list has customers in languages other than the
+   * variants' language — those customers will fall back to the default
+   * template instead of receiving a variant. */
+  mixedLanguageNote?: string;
+}
+
+/**
+ * Generate AI variants for a list (Option B from the bulk-AI plan).
+ *
+ * Builds the location's default template once, then asks Claude Haiku to
+ * rewrite it into 4 additional tones (Brief / Professional / Casual / Warm).
+ * Variant 0 is always the default template — gives staff a baseline and
+ * provides a fallback if all AI rewrites fail validation.
+ *
+ * Stores the array on lists.template_variants. At send time, sendList
+ * picks a random variant per customer. Replacing the variants is a fresh
+ * call to this function (no in-place edit — keep it simple).
+ */
+export async function generateVariantsForList(
+  listId: string,
+): Promise<GenerateVariantsResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: list } = await supabase
+    .from("lists")
+    .select("id, status, location_id, default_language")
+    .eq("id", listId)
+    .maybeSingle();
+  if (!list) return { ok: false, error: "List not found." };
+  if (list.status !== "draft") {
+    return {
+      ok: false,
+      error: `Variants can only be generated while the list is in draft (current: ${list.status}).`,
+    };
+  }
+
+  const { data: location } = await supabase
+    .from("locations")
+    .select("id, display_name")
+    .eq("id", list.location_id)
+    .maybeSingle();
+  if (!location) return { ok: false, error: "Location not found." };
+
+  // Inspect the list's customers to decide channel coverage. If any have
+  // email we generate email variants; if any have SMS we generate SMS too.
+  // For now we generate the channel matching the location's predominant
+  // path (email is the default); SMS lists can be added when SMS is wired.
+  const { data: anyCustomer } = await supabase
+    .from("list_customers")
+    .select("channel")
+    .eq("list_id", listId)
+    .eq("selected", true)
+    .limit(1)
+    .maybeSingle();
+  const channel: "email" | "sms" = anyCustomer?.channel === "sms" ? "sms" : "email";
+
+  // Use {name} placeholder so each customer gets personalized at send time.
+  const vars = {
+    name: "{name}",
+    businessName: location.display_name,
+    link: "https://review.baamplatform.com/r/<slug>?t=<token>",
+  };
+  const base =
+    channel === "email"
+      ? buildEmail(list.default_language, vars)
+      : { subject: "", body: buildSmsBody(list.default_language, vars).body };
+
+  const result = await generateListVariants({
+    baseSubject: base.subject,
+    baseBody: base.body,
+    businessName: location.display_name,
+    language: list.default_language,
+    channel,
+  });
+  if (!result.ok || !result.variants) {
+    return { ok: false, error: result.error ?? "Variant generation failed." };
+  }
+
+  // Cast: ListVariant is JSON-safe (only strings) but Supabase's Json type
+  // is structurally strict and doesn't infer from interface shapes.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const variantsJson = result.variants as any;
+  await supabase
+    .from("lists")
+    .update({ template_variants: variantsJson })
+    .eq("id", listId);
+
+  // Detect mixed-language lists. If any customer's language differs from
+  // the list's default (the variants' language), they'll fall through to
+  // the default template at send time. Tell staff up front so they know.
+  const { data: langRows } = await supabase
+    .from("list_customers")
+    .select("language")
+    .eq("list_id", listId)
+    .eq("selected", true)
+    .is("excluded_reason", null);
+  const counts: Record<string, number> = {};
+  for (const r of langRows ?? []) {
+    counts[r.language] = (counts[r.language] ?? 0) + 1;
+  }
+  const otherLangs = Object.entries(counts).filter(
+    ([lang]) => lang !== list.default_language,
+  );
+  let mixedLanguageNote: string | undefined;
+  if (otherLangs.length > 0) {
+    const labels: Record<string, string> = { en: "English", zh: "中文", es: "Español" };
+    const otherDescribed = otherLangs
+      .map(([lang, n]) => `${n} ${labels[lang] ?? lang}`)
+      .join(", ");
+    const variantLabel = labels[list.default_language] ?? list.default_language;
+    mixedLanguageNote = `Variants generated in ${variantLabel} only. ${otherDescribed} customer${otherLangs.reduce((a, [, n]) => a + n, 0) === 1 ? "" : "s"} will receive the default template in their own language instead.`;
+  }
+
+  revalidatePath(`/app/lists/${listId}/review`);
+  revalidatePath(`/app/lists/${listId}`);
+
+  return {
+    ok: true,
+    count: result.variants.length,
+    mixedLanguageNote,
+  };
+}
+
+export async function clearVariantsForList(
+  listId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await supabase
+    .from("lists")
+    .update({ template_variants: null })
+    .eq("id", listId);
+
+  revalidatePath(`/app/lists/${listId}/review`);
+  return { ok: true };
+}
+
+/**
+ * Inline-edit a single variant. Same compliance guard as the AI rewrite
+ * path: the business name + <slug> + <token> placeholders must survive
+ * every edit, so the staff can't accidentally save a draft that fails at
+ * send time. {name} is allowed but not required (sender may choose to
+ * personalize a fixed-recipient variant — unusual but legal).
+ */
+export async function updateVariantForList(
+  listId: string,
+  index: number,
+  update: { subject: string; body: string },
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: list } = await supabase
+    .from("lists")
+    .select("template_variants, status, location_id")
+    .eq("id", listId)
+    .maybeSingle();
+  if (!list) return { ok: false, error: "List not found." };
+  if (list.status !== "draft") {
+    return {
+      ok: false,
+      error: `Variants can only be edited while the list is in draft (current: ${list.status}).`,
+    };
+  }
+
+  const variants: ListVariant[] = Array.isArray(list.template_variants)
+    ? (list.template_variants as unknown as ListVariant[])
+    : [];
+  if (index < 0 || index >= variants.length) {
+    return { ok: false, error: "Invalid variant index." };
+  }
+
+  // Pull business name for the placeholder check.
+  const { data: location } = await supabase
+    .from("locations")
+    .select("display_name")
+    .eq("id", list.location_id)
+    .maybeSingle();
+  if (!location) return { ok: false, error: "Location not found." };
+
+  const subject = update.subject.trim();
+  const body = update.body.trim();
+
+  if (!body) return { ok: false, error: "Body cannot be empty." };
+  if (!body.includes(location.display_name)) {
+    return {
+      ok: false,
+      error: `Body must include the business name "${location.display_name}".`,
+    };
+  }
+  if (!body.includes("<slug>") || !body.includes("<token>")) {
+    return {
+      ok: false,
+      error:
+        "Body must include the URL placeholders <slug> and <token> so we can fill in each customer's tracking link.",
+    };
+  }
+  if (subject.length > 120) {
+    return { ok: false, error: "Subject is too long (max 120 chars)." };
+  }
+
+  const next = variants.slice();
+  next[index] = { ...next[index], subject, body };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const variantsJson = next as any;
+  await supabase
+    .from("lists")
+    .update({ template_variants: variantsJson })
+    .eq("id", listId);
+
+  revalidatePath(`/app/lists/${listId}/review`);
+  return { ok: true };
 }
 
 const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;

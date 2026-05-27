@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PresendTable, type PresendCustomer } from "./presend-table";
+import { VariantsPanel, type ListVariant } from "./variants-panel";
 
 export const metadata = { title: "Review & send — BAAM Review" };
 export const dynamic = "force-dynamic";
@@ -28,7 +29,7 @@ export default async function ReviewPage({
   const { data: list } = await supabase
     .from("lists")
     .select(
-      "id, name, status, default_language, customer_count, created_at, location_id",
+      "id, name, status, default_language, customer_count, created_at, location_id, template_variants",
     )
     .eq("id", id)
     .maybeSingle();
@@ -115,6 +116,21 @@ export default async function ReviewPage({
           </strong>
         </span>
       </div>
+
+      <VariantsPanel
+        listId={list.id}
+        initialVariants={
+          Array.isArray(list.template_variants)
+            ? (list.template_variants as unknown as ListVariant[])
+            : null
+        }
+        channel={
+          rows.some((r) => r.channel === "sms") &&
+          !rows.some((r) => r.channel === "email")
+            ? "sms"
+            : "email"
+        }
+      />
 
       <PresendTable listId={list.id} initialRows={rows} />
     </main>

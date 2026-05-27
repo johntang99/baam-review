@@ -13,6 +13,7 @@ import {
   X,
   TriangleAlert,
   CircleX,
+  Download,
 } from "lucide-react";
 import { parseTable, mapColumns } from "@/lib/lists/parse";
 import { validateRow, type Lang, type RawRow } from "@/lib/lists/normalize";
@@ -125,7 +126,39 @@ export function NewListForm({
   ).length;
   const excludedCount = validated.length - readyCount;
 
-  function onFile(file: File) {
+  async function onFile(file: File) {
+    const name = file.name.toLowerCase();
+    const isXlsx = name.endsWith(".xlsx") || name.endsWith(".xls");
+
+    if (isXlsx) {
+      // Lazy-load SheetJS only when the user actually picks an Excel file.
+      // The library is ~200 KB; keep it out of the initial bundle.
+      try {
+        const XLSX = await import("xlsx");
+        const buffer = await file.arrayBuffer();
+        const wb = XLSX.read(buffer, { type: "array" });
+        const firstSheetName = wb.SheetNames[0];
+        if (!firstSheetName) {
+          setError("Excel file has no sheets.");
+          return;
+        }
+        const sheet = wb.Sheets[firstSheetName];
+        // sheet_to_csv preserves the header row and renders empty cells as
+        // empty fields — exactly what our existing parser expects.
+        const csv = XLSX.utils.sheet_to_csv(sheet, { blankrows: false });
+        setPasteText(csv);
+        setTab("paste");
+      } catch (e) {
+        setError(
+          e instanceof Error
+            ? `Couldn't read Excel file: ${e.message}`
+            : "Couldn't read Excel file.",
+        );
+      }
+      return;
+    }
+
+    // CSV / TSV path — read as plain text.
     const reader = new FileReader();
     reader.onload = () => {
       setPasteText(String(reader.result ?? ""));
@@ -251,8 +284,8 @@ export function NewListForm({
             active={tab === "csv"}
             onClick={() => setTab("csv")}
             icon={<Upload className="h-4 w-4" />}
-            title="CSV upload"
-            sub="From practice software"
+            title="File upload"
+            sub="Excel or CSV"
           />
           <TabButton
             active={tab === "paste"}
@@ -274,12 +307,34 @@ export function NewListForm({
         <div className="px-9 py-8">
           {tab === "csv" && (
             <>
-              <div className="font-display text-[18px] text-ink mb-1.5">
-                Upload a CSV or TSV
+              <div className="flex items-start justify-between gap-4 mb-1.5">
+                <div className="font-display text-[18px] text-ink">
+                  Upload a spreadsheet
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href="/samples/bulk-review-requests-sample.csv"
+                    download
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3 py-1.5 text-[12px] font-medium text-text-soft hover:bg-cream-deep hover:text-ink whitespace-nowrap"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Sample CSV
+                  </a>
+                  <a
+                    href="/samples/bulk-review-requests-sample.xlsx"
+                    download
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3 py-1.5 text-[12px] font-medium text-text-soft hover:bg-cream-deep hover:text-ink whitespace-nowrap"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Sample Excel
+                  </a>
+                </div>
               </div>
               <p className="text-[13.5px] text-text-soft mb-5">
-                Export from the practice software, then drop the file here.
-                Columns can be in any order — we auto-detect them.
+                Drop an Excel (.xlsx) or CSV/TSV file here. Columns can be in
+                any order — we auto-detect them. Or use a sample as a starting
+                point: open it in Excel/Numbers, replace the rows with your
+                customers, save, and drop it back here.
               </p>
               <button
                 type="button"
@@ -291,13 +346,13 @@ export function NewListForm({
                   Browse files
                 </p>
                 <p className="text-[12.5px] text-text-muted mt-1">
-                  .csv or .tsv
+                  .xlsx, .csv, or .tsv
                 </p>
               </button>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv,.tsv,text/csv,text/tab-separated-values"
+                accept=".csv,.tsv,.xlsx,.xls,text/csv,text/tab-separated-values,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
                 className="hidden"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
@@ -309,12 +364,33 @@ export function NewListForm({
 
           {tab === "paste" && (
             <>
-              <div className="font-display text-[18px] text-ink mb-1.5">
-                Paste from a spreadsheet
+              <div className="flex items-start justify-between gap-4 mb-1.5">
+                <div className="font-display text-[18px] text-ink">
+                  Paste from a spreadsheet
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href="/samples/bulk-review-requests-sample.csv"
+                    download
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3 py-1.5 text-[12px] font-medium text-text-soft hover:bg-cream-deep hover:text-ink whitespace-nowrap"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Sample CSV
+                  </a>
+                  <a
+                    href="/samples/bulk-review-requests-sample.xlsx"
+                    download
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3 py-1.5 text-[12px] font-medium text-text-soft hover:bg-cream-deep hover:text-ink whitespace-nowrap"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Sample Excel
+                  </a>
+                </div>
               </div>
               <p className="text-[13.5px] text-text-soft mb-4">
                 Copy rows from Google Sheets or Excel and paste below. Columns
-                can be in any order — we&apos;ll auto-detect them.
+                can be in any order — we&apos;ll auto-detect them. Open the
+                sample in your spreadsheet app to see the expected format.
               </p>
               <textarea
                 spellCheck={false}

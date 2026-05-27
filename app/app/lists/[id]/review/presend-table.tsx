@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Mail,
   MessageSquare,
@@ -47,7 +48,11 @@ export function PresendTable({
   const [rows, setRows] = useState(initialRows);
   const [filter, setFilter] = useState<Filter>("all");
   const [, startTransition] = useTransition();
-  const [sendNotice, setSendNotice] = useState<string | null>(null);
+  type SendNotice =
+    | { kind: "billing" }
+    | { kind: "generic"; message: string }
+    | null;
+  const [sendNotice, setSendNotice] = useState<SendNotice>(null);
   const [savingDraft, setSavingDraft] = useState(false);
   const [sending, setSending] = useState(false);
 
@@ -342,6 +347,31 @@ export function PresendTable({
         </table>
       </div>
 
+      {/* BILLING-REQUIRED BANNER — shown when every send failed because the
+          location's subscription isn't active. Pattern-matched on the
+          per-customer error string from the server. */}
+      {sendNotice?.kind === "billing" && (
+        <div className="mb-5 flex flex-wrap items-start gap-4 rounded-2xl border border-alert/30 bg-alert/[0.05] px-5 py-4">
+          <TriangleAlert className="h-5 w-5 flex-shrink-0 text-alert mt-0.5" />
+          <div className="flex-1 min-w-[280px]">
+            <p className="text-[14px] font-semibold text-ink mb-1">
+              Billing required for this location
+            </p>
+            <p className="text-[12.5px] text-text-soft leading-relaxed">
+              No emails went out — this location doesn&apos;t have an active
+              subscription yet, so review-request sends are blocked. Set up
+              billing and the same list will send next time.
+            </p>
+          </div>
+          <Link
+            href="/app/billing"
+            className="shrink-0 rounded-lg bg-forest px-4 py-2 text-[13px] font-medium text-cream hover:bg-forest-dark"
+          >
+            Set up billing →
+          </Link>
+        </div>
+      )}
+
       {/* STICKY SEND BAR */}
       <div className="fixed bottom-0 left-[270px] right-0 z-40 flex flex-wrap items-center justify-between gap-4 border-t border-border-base bg-paper/95 px-10 py-4 backdrop-blur">
         <div className="flex items-center gap-6">
@@ -370,9 +400,9 @@ export function PresendTable({
           </span>
         </div>
         <div className="flex items-center gap-2.5">
-          {sendNotice && (
+          {sendNotice?.kind === "generic" && (
             <span className="text-[12.5px] text-warn font-medium mr-2">
-              {sendNotice}
+              {sendNotice.message}
             </span>
           )}
           <button
@@ -406,11 +436,24 @@ export function PresendTable({
                   );
                 } else {
                   setSending(false);
-                  setSendNotice(
-                    res.error ??
-                      (res.errors && res.errors[0]) ??
-                      "Send failed.",
-                  );
+                  // Detect the most common systemic failure — billing not
+                  // set up for this location. Every per-customer error in
+                  // that case starts with "Billing required …", so a single
+                  // substring match catches them all and we can present a
+                  // dedicated, actionable banner with a direct link instead
+                  // of a cryptic "No sends succeeded" wrapper.
+                  const firstSpecific = (res.errors && res.errors[0]) ?? "";
+                  if (firstSpecific.includes("Billing required")) {
+                    setSendNotice({ kind: "billing" });
+                  } else {
+                    setSendNotice({
+                      kind: "generic",
+                      message:
+                        firstSpecific ||
+                        res.error ||
+                        "Send failed.",
+                    });
+                  }
                 }
               });
             }}
