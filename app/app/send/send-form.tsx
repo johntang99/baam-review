@@ -106,11 +106,13 @@ export function SendForm({
   const [bodyTouched, setBodyTouched] = useState(false);
 
   // AI rewrite state — history stack so the user can undo back through
-  // previous drafts after multiple regenerations.
+  // previous drafts after multiple regenerations. For email each history
+  // entry tracks subject+body together (since rewrites change both).
   type Tone = "warm" | "brief" | "professional" | "casual";
+  type RewriteSnapshot = { subject: string; body: string };
   const [tone, setTone] = useState<Tone>("warm");
   const [rewriting, setRewriting] = useState(false);
-  const [bodyHistory, setBodyHistory] = useState<string[]>([]);
+  const [rewriteHistory, setRewriteHistory] = useState<RewriteSnapshot[]>([]);
   const [rewriteError, setRewriteError] = useState<string | null>(null);
 
   async function rewriteBodyWithAI() {
@@ -123,20 +125,30 @@ export function SendForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           currentBody: body,
+          currentSubject: channel === "email" ? subject : undefined,
           businessName: currentLocation.display_name,
           language: previewLang,
           tone,
           channel,
         }),
       });
-      const json = (await res.json()) as { ok: boolean; body?: string; error?: string };
+      const json = (await res.json()) as {
+        ok: boolean;
+        body?: string;
+        subject?: string;
+        error?: string;
+      };
       if (!json.ok || !json.body) {
         setRewriteError(json.error ?? "Rewrite failed");
         return;
       }
-      setBodyHistory((h) => [...h, body]);
+      setRewriteHistory((h) => [...h, { subject, body }]);
       setBody(json.body);
       setBodyTouched(true);
+      if (channel === "email" && json.subject) {
+        setSubject(json.subject);
+        setSubjectTouched(true);
+      }
     } catch (e) {
       setRewriteError(e instanceof Error ? e.message : "Network error");
     } finally {
@@ -145,10 +157,11 @@ export function SendForm({
   }
 
   function undoRewrite() {
-    if (bodyHistory.length === 0) return;
-    const previous = bodyHistory[bodyHistory.length - 1];
-    setBodyHistory((h) => h.slice(0, -1));
-    setBody(previous);
+    if (rewriteHistory.length === 0) return;
+    const previous = rewriteHistory[rewriteHistory.length - 1];
+    setRewriteHistory((h) => h.slice(0, -1));
+    setBody(previous.body);
+    if (channel === "email") setSubject(previous.subject);
     setRewriteError(null);
   }
 
@@ -475,7 +488,7 @@ export function SendForm({
                     </>
                   )}
                 </select>
-                {bodyHistory.length > 0 && (
+                {rewriteHistory.length > 0 && (
                   <button
                     type="button"
                     onClick={undoRewrite}

@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
 
   let body: {
     currentBody?: string;
+    currentSubject?: string;
     businessName?: string;
     language?: string;
     tone?: string;
@@ -39,7 +40,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { currentBody, businessName, language, tone, channel } = body;
+  const { currentBody, currentSubject, businessName, language, tone, channel } =
+    body;
 
   if (
     typeof currentBody !== "string" ||
@@ -60,6 +62,8 @@ export async function POST(request: NextRequest) {
 
   const result = await rewriteReviewRequestBody({
     currentBody,
+    currentSubject:
+      typeof currentSubject === "string" ? currentSubject : undefined,
     businessName,
     language: language as RewriteLang,
     tone: tone as RewriteTone,
