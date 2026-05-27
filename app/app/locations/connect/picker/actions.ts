@@ -126,6 +126,17 @@ export async function createLocationFromGoogle(formData: FormData) {
 
   const slug = buildLocationSlug(title);
 
+  // Snapshot the Google email currently authorized for this user — at the
+  // moment they're clicking "Use this location". The OAuth row gets
+  // overwritten if they ever re-auth with a different Google account, so
+  // we copy it onto the location so the audit trail survives.
+  const { data: tokenRow } = await service
+    .from("google_oauth_tokens")
+    .select("google_email")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const connectedViaGoogleEmail = tokenRow?.google_email ?? null;
+
   const { data: inserted, error } = await supabase
     .from("locations")
     .insert({
@@ -159,6 +170,7 @@ export async function createLocationFromGoogle(formData: FormData) {
       // gets credit for this location forever, even after they assign
       // account managers to handle the daily ops.
       connected_by_user_id: user.id,
+      connected_via_google_email: connectedViaGoogleEmail,
     })
     .select("id, slug, display_name")
     .single();

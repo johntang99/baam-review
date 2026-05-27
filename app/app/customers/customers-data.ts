@@ -44,6 +44,7 @@ export interface CustomerRow {
   createdAt: string;
   connectedByUserId: string | null;
   connectedByName: string | null;
+  connectedViaGoogleEmail: string | null;
   managers: Array<{ user_id: string; full_name: string | null; email: string }>;
   /** Convenience flag the table uses to gate the inline "Connect GBP" action. */
   canConnectGbp: boolean;
@@ -125,6 +126,7 @@ export async function fetchCustomers(
     display_name: string;
     address: string | null;
     connected_by_user_id: string | null;
+    connected_via_google_email: string | null;
     customer_record_id: string | null;
     created_at: string;
     account_id: string;
@@ -134,7 +136,7 @@ export async function fetchCustomers(
     let q = service
       .from("locations")
       .select(
-        "id, slug, display_name, address, connected_by_user_id, customer_record_id, created_at, account_id",
+        "id, slug, display_name, address, connected_by_user_id, connected_via_google_email, customer_record_id, created_at, account_id",
       )
       .eq("account_id", opsId);
     if (visibleIds !== null) {
@@ -308,6 +310,7 @@ export async function fetchCustomers(
       connectedByName: l.connected_by_user_id
         ? connectorNameById.get(l.connected_by_user_id) ?? null
         : null,
+      connectedViaGoogleEmail: l.connected_via_google_email,
       managers: assignmentsByLoc.get(l.id) ?? [],
       canConnectGbp: false,
     });
@@ -329,6 +332,7 @@ export async function fetchCustomers(
       createdAt: cr.created_at,
       connectedByUserId: null,
       connectedByName: null,
+      connectedViaGoogleEmail: null,
       managers: [],
       canConnectGbp:
         internal.opsRole === "admin" ||
@@ -353,6 +357,7 @@ export async function fetchCustomers(
       createdAt: a.created_at,
       connectedByUserId: null,
       connectedByName: null,
+      connectedViaGoogleEmail: null,
       managers: [],
       canConnectGbp: false,
     });

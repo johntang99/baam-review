@@ -218,9 +218,16 @@ export function CustomersTable({
                   {/* Sales */}
                   <td className="px-3.5 py-3 hidden xl:table-cell">
                     {c.connectedByName ? (
-                      <span className="text-[12.5px] text-ink">
-                        {c.connectedByName}
-                      </span>
+                      <div className="flex flex-col leading-tight">
+                        <span className="text-[12.5px] text-ink">
+                          {c.connectedByName}
+                        </span>
+                        {c.connectedViaGoogleEmail && (
+                          <span className="text-[11px] text-text-muted">
+                            via {c.connectedViaGoogleEmail}
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-text-muted text-[12px]">—</span>
                     )}

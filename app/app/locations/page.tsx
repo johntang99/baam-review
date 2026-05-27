@@ -130,7 +130,7 @@ export default async function LocationsPage({
   let locsQuery = supabase
     .from("locations")
     .select(
-      "id, slug, display_name, address, business_type, brand_color, logo_url, connected_by_user_id, created_at, reviews_synced_at",
+      "id, slug, display_name, address, business_type, brand_color, logo_url, connected_by_user_id, connected_via_google_email, created_at, reviews_synced_at",
     );
   if (baseVisibleIds !== null) {
     if (baseVisibleIds.length === 0) {
@@ -240,6 +240,7 @@ export default async function LocationsPage({
       connected_by_name: l.connected_by_user_id
         ? connectorById.get(l.connected_by_user_id) ?? null
         : null,
+      connected_via_google_email: l.connected_via_google_email,
       plan: billing?.accountPlan ?? null,
       billing_status: status,
       contract_start: contractDates.start,

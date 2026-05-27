@@ -262,6 +262,7 @@ export interface Database {
           reward_config: RewardConfig;
           customer_record_id: string | null;
           connected_by_user_id: string | null;
+          connected_via_google_email: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -303,6 +304,7 @@ export interface Database {
           reward_config?: RewardConfig;
           customer_record_id?: string | null;
           connected_by_user_id?: string | null;
+          connected_via_google_email?: string | null;
           created_at?: string;
           updated_at?: string;
         };

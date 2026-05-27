@@ -25,6 +25,7 @@ export interface LocationRow {
   logo_url: string | null;
   connected_by_user_id: string | null;
   connected_by_name: string | null;
+  connected_via_google_email: string | null;
   plan: "self_service" | "full_service" | null;
   billing_status:
     | "trialing"
@@ -345,12 +346,19 @@ export function LocationsTable({
                   {/* Connected by */}
                   <td className="px-3.5 py-3 hidden xl:table-cell">
                     {loc.connected_by_name ? (
-                      <span
-                        className="text-[12px] text-ink"
-                        title={loc.connected_by_user_id ?? ""}
-                      >
-                        {loc.connected_by_name}
-                      </span>
+                      <div className="flex flex-col leading-tight">
+                        <span
+                          className="text-[12px] text-ink"
+                          title={loc.connected_by_user_id ?? ""}
+                        >
+                          {loc.connected_by_name}
+                        </span>
+                        {loc.connected_via_google_email && (
+                          <span className="text-[11px] text-text-muted">
+                            via {loc.connected_via_google_email}
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-text-muted text-[12px]">—</span>
                     )}
