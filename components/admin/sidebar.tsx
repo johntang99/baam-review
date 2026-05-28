@@ -1,6 +1,8 @@
 import Link from "next/link";
 import {
   LayoutDashboard,
+  LayoutGrid,
+  Plus,
   Send,
   ClipboardCheck,
   Star,
@@ -57,6 +59,8 @@ interface WorkspaceItem {
 
 const workspaceItems: WorkspaceItem[] = [
   { href: "/app", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/app/locations", label: "Manage all locations", icon: LayoutGrid },
+  { href: "/api/auth/google/start", label: "Connect a new location", icon: Plus },
   { href: "/app/send", label: "Request a Review", icon: Send },
   { href: "/app/lists", label: "Bulk Review Requests", icon: ClipboardCheck, badgeKey: "lists" },
   { href: "/app/reviews", label: "Reviews Reply & Share", icon: Star },

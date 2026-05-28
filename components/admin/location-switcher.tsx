@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
-import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { ChevronDown, Check, Plus, LayoutGrid } from "lucide-react";
+import { ChevronDown, Check, LayoutGrid } from "lucide-react";
 
 export interface LocationSwitcherLocation {
   id: string;
@@ -144,34 +143,11 @@ export function LocationSwitcher({
             </button>
           ))}
 
-          {locations.length > 0 && (
-            <div className="my-1 h-px bg-cream/10" />
-          )}
-
-          <Link
-            href="/api/auth/google/start"
-            onClick={() => setOpen(false)}
-            className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[13px] text-cream/85 hover:bg-cream/[0.06] hover:text-cream"
-          >
-            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-gold/15 text-gold">
-              <Plus className="h-3.5 w-3.5" />
-            </span>
-            <span className="flex-1">Connect a new location</span>
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => pick(null)}
-            className="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[13px] text-cream/85 hover:bg-cream/[0.06] hover:text-cream"
-          >
-            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-cream/10 text-cream/70">
-              <LayoutGrid className="h-3.5 w-3.5" />
-            </span>
-            <span className="flex-1">Manage all locations</span>
-            {displayedId === null && (
-              <Check className="h-3.5 w-3.5 text-gold flex-shrink-0" />
-            )}
-          </button>
+          {/* "Connect a new location" and "Manage all locations" used to
+              live here, but they're now top-level sidebar items under
+              Workspace — that scales better when users have 20+ locations
+              (the dropdown becomes unusable as a navigation surface). The
+              switcher is now purely about switching the active location. */}
         </div>
       )}
     </div>

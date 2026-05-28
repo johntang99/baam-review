@@ -1,8 +1,18 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { Save, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import {
+  Save,
+  Trash2,
+  BookOpen,
+  Palette,
+  Globe,
+  FileText,
+  Mail,
+  LinkIcon,
+} from "lucide-react";
 import type { Database } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,16 +50,51 @@ const CUSTOM_URL_LABEL_PLACEHOLDERS = {
   es: "Dejar una reseña en nuestro sitio",
 };
 
+type TabId = "branding" | "languages" | "review" | "email" | "links";
+
+const TABS: Array<{
+  id: TabId;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}> = [
+  { id: "branding", label: "Branding", icon: Palette },
+  { id: "languages", label: "Languages", icon: Globe },
+  { id: "review", label: "Review form", icon: FileText },
+  { id: "email", label: "Email", icon: Mail },
+  { id: "links", label: "Links", icon: LinkIcon },
+];
+
+const VALID_TAB_IDS = new Set<TabId>(TABS.map((t) => t.id));
+
+function isValidTab(s: string | null): s is TabId {
+  return s !== null && VALID_TAB_IDS.has(s as TabId);
+}
+
 export function SettingsForm({
   location,
   accountId,
   defaultFromAddress,
 }: SettingsFormProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [pending, startTransition] = useTransition();
   const [deletePending, setDeletePending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
+
+  // Active tab is driven by the URL (?tab=email) so it's bookmarkable,
+  // survives refreshes, and a saved-deep-link from another team member
+  // lands on the right tab.
+  const tabFromUrl = searchParams.get("tab");
+  const activeTab: TabId = isValidTab(tabFromUrl) ? tabFromUrl : "branding";
+
+  function setTab(next: TabId) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", next);
+    // replace (not push) so clicking through tabs doesn't pollute browser history.
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
 
   const welcomeInitial = (location.welcome_message ?? {}) as Record<string, string>;
   const customLabelInitial = (location.custom_url_label ?? {}) as Record<string, string>;
@@ -88,6 +133,42 @@ export function SettingsForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-0">
+      {/* TAB NAVIGATION
+          Sticky so it stays visible while saving / scrolling within a tab. */}
+      <div className="sticky top-0 z-10 -mx-10 mb-8 border-b border-border-base bg-cream/95 px-10 pt-1 backdrop-blur">
+        <nav className="flex gap-1 overflow-x-auto" role="tablist">
+          {TABS.map((t) => {
+            const Icon = t.icon;
+            const active = activeTab === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setTab(t.id)}
+                className={`relative inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-[13.5px] font-medium transition-colors ${
+                  active
+                    ? "text-ink"
+                    : "text-text-soft hover:text-ink"
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {t.label}
+                {active && (
+                  <span className="absolute inset-x-3 -bottom-px h-[2px] bg-forest" />
+                )}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* All sections stay mounted (just hidden when their tab is inactive)
+          so the form submit picks up every field in one go. Switching tabs
+          is purely a CSS toggle — no remount, no lost typed-in values. */}
+
+      <div className={activeTab === "branding" ? "" : "hidden"}>
       <Section
         title="Branding"
         description="What customers see when they land on the public review page."
@@ -145,7 +226,9 @@ export function SettingsForm({
           />
         </Field>
       </Section>
+      </div>
 
+      <div className={activeTab === "languages" ? "" : "hidden"}>
       <Section
         title="Languages"
         description="Pick which languages your customers can review in. Each gets its own welcome message below."
@@ -170,7 +253,9 @@ export function SettingsForm({
           )}
         </LanguageFields>
       </Section>
+      </div>
 
+      <div className={activeTab === "links" ? "" : "hidden"}>
       <Section
         title="External links"
         description="Optional alternatives shown alongside Google on the public review page."
@@ -214,7 +299,9 @@ export function SettingsForm({
 
         <CustomLabelField initialLabels={customLabelInitial} location={location} />
       </Section>
+      </div>
 
+      <div className={activeTab === "review" ? "" : "hidden"}>
       <Section
         title="Post-review actions"
         description="Drives the “While you're here” card on the thank-you page after a customer is sent to Google. Leave blank to hide the matching CTA."
@@ -233,7 +320,9 @@ export function SettingsForm({
           />
         </Field>
       </Section>
+      </div>
 
+      <div className={activeTab === "links" ? "" : "hidden"}>
       <Section
         title="Social handles"
         description="Used on the post-review “Follow us” strip. Leave blank to hide the row."
@@ -279,11 +368,29 @@ export function SettingsForm({
           />
         </Field>
       </Section>
+      </div>
 
+      <div className={activeTab === "email" ? "" : "hidden"}>
       <Section
         title="Email sender"
         description="Configure how review-request emails for this location appear in the recipient's inbox. Sending from your own domain is the single biggest lever for landing in Primary instead of Promotions."
       >
+        <div className="flex items-start gap-2.5 rounded-xl border border-forest/20 bg-forest/[0.05] px-3.5 py-3 text-[12.5px] text-text">
+          <BookOpen className="h-4 w-4 mt-0.5 flex-shrink-0 text-forest" />
+          <p className="leading-relaxed">
+            <span className="font-medium text-ink">Setup guide:</span>{" "}
+            <Link
+              href="/app/docs/custom-sender-setup"
+              target="_blank"
+              className="text-forest underline hover:no-underline"
+            >
+              How to set up a custom sender domain (DNS, SPF, DKIM, MX) →
+            </Link>{" "}
+            Step-by-step SOP covering subdomain vs root, DNS records, Resend
+            verification, and troubleshooting.
+          </p>
+        </div>
+
         <SenderFields
           initialEmail={location.sender_email}
           initialName={location.sender_name}
@@ -291,7 +398,9 @@ export function SettingsForm({
           defaultFromAddress={defaultFromAddress}
         />
       </Section>
+      </div>
 
+      <div className={activeTab === "review" ? "" : "hidden"}>
       <Section
         title="Review prompts"
         description="Customize the chip options shown on your public review page. One option per line. Leave blank to use the defaults for your business type."
@@ -330,6 +439,7 @@ export function SettingsForm({
           />
         </Field>
       </Section>
+      </div>
 
       <div className="flex items-center justify-between border-t border-border-base pt-6 mt-2">
         <button

@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Database, Json, SocialHandles } from "@/lib/database.types";
+import {
+  domainFromEmail,
+  isDomainVerifiedInResend,
+} from "@/lib/messaging/resend-domains";
 
 type LocationUpdate = Database["public"]["Tables"]["locations"]["Update"];
 
@@ -60,21 +64,23 @@ export async function updateLocation(locationId: string, formData: FormData) {
   const senderEmail = getString(formData, "sender_email")?.toLowerCase() ?? null;
   const senderName = getString(formData, "sender_name");
 
-  // If sender_email changed, reset verification so BAAM Studio admin re-verifies
-  // in Resend before sends use it. Look up current to compare.
-  let resetSenderVerification = false;
+  // Decide what to write to sender_verified_at. The previous logic only
+  // ever set this column to null — it relied on a hypothetical admin
+  // workflow to set the timestamp, which never existed in code. So custom
+  // sender addresses were saved but never used at send time, even after
+  // the domain had been verified in Resend.
+  //
+  // New behavior: on save, check Resend's domain list live. If the email's
+  // domain is verified there, write NOW(). If not (or no email), write null.
+  // The dashboard remains the source of truth for verification — we just
+  // mirror it onto the location row so the send-time gate works.
+  let nextVerifiedAt: string | null = null;
   if (senderEmail !== null) {
-    const { data: current } = await supabase
-      .from("locations")
-      .select("sender_email")
-      .eq("id", locationId)
-      .maybeSingle();
-    if (current && current.sender_email !== senderEmail) {
-      resetSenderVerification = true;
+    const domain = domainFromEmail(senderEmail);
+    if (domain) {
+      const verified = await isDomainVerifiedInResend(domain);
+      if (verified) nextVerifiedAt = new Date().toISOString();
     }
-  } else {
-    // Cleared the sender email; clear verification too.
-    resetSenderVerification = true;
   }
 
   const socialHandles = collectSocialHandles(formData);
@@ -96,9 +102,9 @@ export async function updateLocation(locationId: string, formData: FormData) {
     custom_url_label: getJsonbPerLang(formData, "custom_url_label", supported),
     sender_email: senderEmail,
     sender_name: senderName,
+    sender_verified_at: nextVerifiedAt,
     booking_url: getString(formData, "booking_url"),
     social_handles: socialHandles,
-    ...(resetSenderVerification ? { sender_verified_at: null } : {}),
   };
 
   const { error } = await supabase
