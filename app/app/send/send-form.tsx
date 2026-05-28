@@ -130,6 +130,10 @@ export function SendForm({
           language: previewLang,
           tone,
           channel,
+          // Pass the name from the form so the API can expand {name} → first
+          // name before returning. Without this the preview would show
+          // "Hi {name}," literally, which is confusing for staff.
+          recipientName: previewName,
         }),
       });
       const json = (await res.json()) as {

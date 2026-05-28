@@ -30,6 +30,12 @@ export async function POST(request: NextRequest) {
     language?: string;
     tone?: string;
     channel?: string;
+    /** Single-send only: the recipient's name from the form. When provided,
+     * the API substitutes {name} → first name before returning so the
+     * preview shows the actual recipient's name, not the placeholder.
+     * For bulk list-variant generation this is omitted — the placeholder
+     * must survive so it can be substituted per-customer at send time. */
+    recipientName?: string;
   };
   try {
     body = await request.json();
@@ -40,8 +46,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { currentBody, currentSubject, businessName, language, tone, channel } =
-    body;
+  const {
+    currentBody,
+    currentSubject,
+    businessName,
+    language,
+    tone,
+    channel,
+    recipientName,
+  } = body;
 
   if (
     typeof currentBody !== "string" ||
@@ -69,6 +82,17 @@ export async function POST(request: NextRequest) {
     tone: tone as RewriteTone,
     channel,
   });
+
+  // Substitute {name} → recipient's first name for single-send callers.
+  // Bulk list-variant generation omits recipientName so the placeholder
+  // survives the round-trip and gets expanded per-customer at send time.
+  if (result.ok && typeof recipientName === "string" && recipientName.trim()) {
+    const first =
+      recipientName.trim().split(/\s+/)[0] || recipientName.trim();
+    if (result.body) result.body = result.body.replaceAll("{name}", first);
+    if (result.subject)
+      result.subject = result.subject.replaceAll("{name}", first);
+  }
 
   return NextResponse.json(result);
 }

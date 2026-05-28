@@ -131,11 +131,19 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
   // The form sends user-editable subject + body. Variables in the preview
   // were the rendered values for a placeholder URL — at send time we
   // substitute the real <slug>/<token> placeholders with the actual link.
+  // Also substitute {name} as a safety net: list-variant generation uses
+  // {name} as a per-customer placeholder, and AI rewrites are instructed
+  // to use it too. If anything reaches here with an unresolved {name},
+  // expand it to the recipient's first name so the email never ships
+  // with a literal "Hi {name}," in production.
   const locSlug = location.slug;
+  const recipientFirst =
+    recipientName.trim().split(/\s+/)[0] || recipientName.trim();
   const applyVars = (s: string) =>
     s
       .replaceAll("<slug>", locSlug)
-      .replaceAll("<token>", token);
+      .replaceAll("<token>", token)
+      .replaceAll("{name}", recipientFirst);
 
   const overrideSubjectRaw = getString(formData, "message_subject");
   const overrideBodyRaw = getString(formData, "message_body");
