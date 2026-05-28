@@ -104,6 +104,29 @@ export default async function LocationsPage({
   // ── Visibility filter ─────────────────────────────────────────────────
   const internal = await getInternalContext(supabase, user.id);
 
+  // Self-service customers who connected a location but never picked a
+  // plan end up here with all billing columns showing "—" and no path
+  // forward. Detect this state so we can render a "Pick a plan" banner
+  // above the table. (Skip for BAAM internal users — they don't have a
+  // customer-style plan flow.)
+  let needsPlanSelection = false;
+  if (!internal) {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("account_id")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (profile?.account_id) {
+      const { data: acct } = await supabase
+        .from("accounts")
+        .select("review_plan, is_baam_internal")
+        .eq("id", profile.account_id)
+        .maybeSingle();
+      needsPlanSelection =
+        !acct?.is_baam_internal && acct?.review_plan === null;
+    }
+  }
+
   // Build the *base* set of visible location ids (before filters).
   let baseVisibleIds: string[] | null;
   if (!internal || internal.opsRole === null || internal.opsRole === "admin") {
@@ -126,8 +149,17 @@ export default async function LocationsPage({
 
   // ── Fetch every visible location's full data (we sort/filter in JS so
   //    we can express "Needs attention first" cleanly). Bounded set per
-  //    user, so JS-side handling is fine. ────────────────────────────────
-  let locsQuery = supabase
+  //    user, so JS-side handling is fine.
+  //
+  //    Internal admins use the SERVICE client so the query crosses tenant
+  //    boundaries — without this, RLS scopes to BAAM Ops only and the
+  //    self-service customers' locations stay hidden. Sales / account
+  //    managers also go through the service client since their
+  //    baseVisibleIds is already constrained by ownership/assignment.
+  //    Customers (internal=null) use the regular client so RLS keeps
+  //    them inside their own tenant. ────────────────────────────────────
+  const locsClient = internal ? createServiceClient() : supabase;
+  let locsQuery = locsClient
     .from("locations")
     .select(
       "id, slug, display_name, address, business_type, brand_color, logo_url, connected_by_user_id, connected_via_google_email, created_at, reviews_synced_at",
@@ -380,6 +412,33 @@ export default async function LocationsPage({
         >
           <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
           <p>{errorMessage}</p>
+        </div>
+      )}
+
+      {/* Self-service plan-selection prompt. Shown when a customer has
+          one or more locations but has not yet picked a plan — the
+          billing columns are all "—" in that state and there's no other
+          on-screen hint about what to do next. */}
+      {needsPlanSelection && total > 0 && (
+        <div className="flex flex-wrap items-start gap-4 rounded-2xl border border-gold/40 bg-gold/[0.08] px-5 py-4">
+          <AlertCircle className="h-5 w-5 flex-shrink-0 text-gold-dark mt-0.5" />
+          <div className="flex-1 min-w-[280px]">
+            <p className="text-[14px] font-semibold text-ink mb-1">
+              Pick a plan to start sending review requests
+            </p>
+            <p className="text-[12.5px] text-text-soft leading-relaxed">
+              Your locations are connected, but you haven&apos;t picked a
+              plan yet — so the Plan, Billing, and Contract columns below
+              are empty. Choose Self-Service or Full-Service to activate
+              sending.
+            </p>
+          </div>
+          <Link
+            href="/app/billing"
+            className="shrink-0 rounded-lg bg-forest px-4 py-2 text-[13px] font-medium text-cream hover:bg-forest-dark"
+          >
+            Choose a plan →
+          </Link>
         </div>
       )}
 

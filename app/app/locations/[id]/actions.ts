@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
+import { getInternalContext } from "@/lib/auth/staff";
 import type { Database, Json, SocialHandles } from "@/lib/database.types";
 import {
   domainFromEmail,
@@ -42,6 +44,13 @@ export async function updateLocation(locationId: string, formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  // BAAM internal staff need cross-tenant write access — they may be
+  // editing a self-service customer's location settings on the customer's
+  // behalf. Customer accounts continue to write through the RLS-scoped
+  // client so they can only touch their own tenant's rows.
+  const internal = await getInternalContext(supabase, user.id);
+  const writeClient = internal ? createServiceClient() : supabase;
 
   const supportedRaw = formData.getAll("supported_languages");
   const supported: Lang[] = supportedRaw
@@ -107,7 +116,7 @@ export async function updateLocation(locationId: string, formData: FormData) {
     social_handles: socialHandles,
   };
 
-  const { error } = await supabase
+  const { error } = await writeClient
     .from("locations")
     .update(update)
     .eq("id", locationId);

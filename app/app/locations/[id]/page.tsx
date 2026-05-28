@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, ExternalLink, QrCode, Code, Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import {
   getInternalContext,
   canAccessLocation,
@@ -49,7 +50,15 @@ export default async function LocationSettingsPage({
 
   // Fetch the active location + the full list (for the in-content picker)
   // in parallel.
-  let locationsQuery = supabase
+  //
+  // Internal staff use the service client so cross-tenant locations
+  // (e.g., self-service customers viewed by a BAAM admin) are reachable.
+  // canAccessLocation has already gated access by role above, so widening
+  // the data-fetch scope here doesn't expand who can SEE what. Customers
+  // keep going through the RLS-scoped client.
+  const locsClient = internal ? createServiceClient() : supabase;
+
+  let locationsQuery = locsClient
     .from("locations")
     .select("id, display_name, brand_color, logo_url")
     .order("created_at", { ascending: false });
@@ -62,7 +71,7 @@ export default async function LocationSettingsPage({
     );
   }
   const [{ data: location }, { data: locations }] = await Promise.all([
-    supabase.from("locations").select("*").eq("id", id).maybeSingle(),
+    locsClient.from("locations").select("*").eq("id", id).maybeSingle(),
     locationsQuery,
   ]);
 
