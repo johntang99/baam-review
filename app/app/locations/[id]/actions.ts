@@ -179,12 +179,25 @@ export async function deleteLocation(locationId: string) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { error } = await supabase
+  // Same cross-tenant rationale as updateLocation: BAAM internal staff
+  // may be deleting a self-service customer's location on the customer's
+  // behalf. Customers continue through RLS so they can only delete rows
+  // in their own tenant.
+  const internal = await getInternalContext(supabase, user.id);
+  const writeClient = internal ? createServiceClient() : supabase;
+
+  const { error, count } = await writeClient
     .from("locations")
-    .delete()
+    .delete({ count: "exact" })
     .eq("id", locationId);
 
   if (error) throw new Error(`Delete failed: ${error.message}`);
+  if (count === 0) {
+    // Defensive: if no row matched (e.g., already deleted, or the id is
+    // wrong), surface that loudly instead of redirecting to a page that
+    // still shows the location.
+    throw new Error("Delete failed: location not found.");
+  }
 
   redirect("/app/locations");
 }
