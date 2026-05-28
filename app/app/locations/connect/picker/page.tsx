@@ -13,6 +13,8 @@ import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
 import { classifyByGoogleCategory } from "@/lib/review/google-category-mapping";
 import { CATEGORY_LABELS } from "@/lib/review/industry-presets";
+import { getLocationBillingMap } from "@/lib/billing/access";
+import { BillingRequiredButton } from "../../billing-required-button";
 import { createLocationFromGoogle } from "./actions";
 
 export const metadata = {
@@ -62,15 +64,23 @@ export default async function PickerPage({
       ).data
     : null;
 
-  // Existing slugs so we can mark already-added places.
+  // Existing locations so we can mark already-added places AND surface a
+  // "Set up billing" CTA on rows that have no active subscription yet.
   const { data: existing } = await supabase
     .from("locations")
-    .select("google_place_id")
+    .select("id, google_place_id")
     .eq("account_id", profile.account_id);
-  const claimedPlaceIds = new Set(
-    (existing ?? [])
-      .map((r) => r.google_place_id)
-      .filter((v): v is string => !!v),
+  const claimedByPlaceId = new Map<string, string>(); // place_id → location_id
+  for (const r of existing ?? []) {
+    if (r.google_place_id) claimedByPlaceId.set(r.google_place_id, r.id);
+  }
+
+  // Look up billing state for each claimed location. Locations with no
+  // active subscription get the "Set up billing" button rendered next to
+  // their "Already added" badge so customers can pay right from this
+  // picker — saves a click vs. having to navigate back to /app/locations.
+  const billingMap = await getLocationBillingMap(
+    Array.from(claimedByPlaceId.values()),
   );
 
   let locations: GoogleLocation[] = [];
@@ -102,7 +112,7 @@ export default async function PickerPage({
     fatal = e instanceof Error ? e.message : "Unknown error";
   }
 
-  const claimedCount = claimedPlaceIds.size;
+  const claimedCount = claimedByPlaceId.size;
 
   return (
     <main className="px-10 py-10 space-y-8">
@@ -179,7 +189,7 @@ export default async function PickerPage({
         <ul className="grid gap-3 max-w-3xl">
           {locations.map((loc) => {
             const claimed =
-              loc.placeId !== null && claimedPlaceIds.has(loc.placeId);
+              loc.placeId !== null && claimedByPlaceId.has(loc.placeId);
             return (
               <li
                 key={loc.name}
@@ -221,11 +231,32 @@ export default async function PickerPage({
                       </a>
                     )}
                   </div>
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 flex items-center gap-2">
                     {claimed ? (
-                      <span className="inline-flex items-center rounded-md bg-sage-soft px-2.5 py-1 text-[11.5px] font-medium text-forest-dark">
-                        Already added
-                      </span>
+                      (() => {
+                        const locId = loc.placeId
+                          ? claimedByPlaceId.get(loc.placeId)
+                          : undefined;
+                        const billing = locId
+                          ? billingMap.get(locId)
+                          : undefined;
+                        const needsBilling =
+                          !!locId && (!billing || !billing.allowed);
+                        return (
+                          <>
+                            <span className="inline-flex items-center rounded-md bg-sage-soft px-2.5 py-1 text-[11.5px] font-medium text-forest-dark">
+                              Already added
+                            </span>
+                            {needsBilling && locId && (
+                              <BillingRequiredButton
+                                locationId={locId}
+                                label="Set up billing →"
+                                className="inline-flex items-center rounded-md bg-forest px-2.5 py-1 text-[11.5px] font-medium text-cream"
+                              />
+                            )}
+                          </>
+                        );
+                      })()
                     ) : !loc.placeId ? (
                       <span className="inline-flex items-center rounded-md bg-warn/10 px-2.5 py-1 text-[11.5px] font-medium text-warn">
                         No place ID
