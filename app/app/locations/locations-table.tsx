@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BillingRequiredButton } from "./billing-required-button";
 import {
   Settings,
   Star,
@@ -289,11 +288,13 @@ export function LocationsTable({
                   {/* Billing */}
                   <td className="px-3.5 py-3">
                     {loc.billing_status === "required" ? (
-                      <BillingRequiredButton
-                        locationId={loc.id}
-                        label={BILLING_LABEL.required}
-                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11.5px] font-medium ${BILLING_CLS.required}`}
-                      />
+                      <Link
+                        href={`/app/billing#location-${loc.id}`}
+                        title="Set up billing for this location — pick monthly or annual and a payment method"
+                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11.5px] font-medium ${BILLING_CLS.required} cursor-pointer hover:brightness-95`}
+                      >
+                        {BILLING_LABEL.required}
+                      </Link>
                     ) : loc.billing_status ? (
                       <span
                         className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11.5px] font-medium ${BILLING_CLS[loc.billing_status]}`}

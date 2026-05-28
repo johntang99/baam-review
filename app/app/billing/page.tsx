@@ -169,7 +169,8 @@ export default async function BillingPage({
                     return (
                       <li
                         key={l.id}
-                        className="flex flex-wrap items-center justify-between gap-3 py-4"
+                        id={`location-${l.id}`}
+                        className="flex flex-wrap items-center justify-between gap-3 py-4 target:bg-gold/[0.08] target:rounded-lg target:px-3"
                       >
                         <div>
                           <div className="text-[14px] text-ink">

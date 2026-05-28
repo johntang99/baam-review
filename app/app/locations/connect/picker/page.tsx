@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { classifyByGoogleCategory } from "@/lib/review/google-category-mapping";
 import { CATEGORY_LABELS } from "@/lib/review/industry-presets";
 import { getLocationBillingMap } from "@/lib/billing/access";
-import { BillingRequiredButton } from "../../billing-required-button";
 import { createLocationFromGoogle } from "./actions";
 
 export const metadata = {
@@ -248,11 +247,12 @@ export default async function PickerPage({
                               Already added
                             </span>
                             {needsBilling && locId && (
-                              <BillingRequiredButton
-                                locationId={locId}
-                                label="Set up billing →"
-                                className="inline-flex items-center rounded-md bg-forest px-2.5 py-1 text-[11.5px] font-medium text-cream"
-                              />
+                              <Link
+                                href={`/app/billing#location-${locId}`}
+                                className="inline-flex items-center rounded-md bg-forest px-2.5 py-1 text-[11.5px] font-medium text-cream hover:bg-forest-dark"
+                              >
+                                Set up billing →
+                              </Link>
                             )}
                           </>
                         );
