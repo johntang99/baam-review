@@ -9,7 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "./password-input";
 
-export function SignupForm() {
+export function SignupForm({
+  preferredPlan,
+}: {
+  /** Plan the user picked on the marketing page (?plan=self/full). Stored
+   * in user_metadata and auto-applied on first dashboard visit so the user
+   * doesn't have to re-pick after email confirmation. */
+  preferredPlan?: "self_service" | "full_service" | null;
+}) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +35,12 @@ export function SignupForm() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: {
+          full_name: fullName,
+          // Persisted on auth.users so it survives email confirmation
+          // and is available on every subsequent login.
+          ...(preferredPlan ? { preferred_plan: preferredPlan } : {}),
+        },
         emailRedirectTo: `${origin}/auth/callback?next=/app`,
       },
     });

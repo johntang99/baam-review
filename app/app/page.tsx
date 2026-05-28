@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import {
   getInternalContext,
@@ -50,13 +51,35 @@ export default async function DashboardPage() {
     .eq("id", user!.id)
     .maybeSingle();
 
-  const { data: account } = profile?.account_id
+  let { data: account } = profile?.account_id
     ? await supabase
         .from("accounts")
-        .select("name, subscription_tier")
+        .select("name, subscription_tier, review_plan")
         .eq("id", profile.account_id)
         .maybeSingle()
     : { data: null };
+
+  // Apply the plan the user picked on the marketing page (?plan=self) if
+  // it hasn't been applied yet. The choice is stashed in user_metadata at
+  // signup time and survives the email-confirmation roundtrip — without
+  // this auto-apply step the choice was being silently lost, leaving new
+  // users to pick again on /app/billing as if they had never chosen.
+  if (
+    profile?.account_id &&
+    account &&
+    !account.review_plan &&
+    user?.user_metadata?.preferred_plan
+  ) {
+    const preferred = user.user_metadata.preferred_plan;
+    if (preferred === "self_service" || preferred === "full_service") {
+      const svc = createServiceClient();
+      await svc
+        .from("accounts")
+        .update({ review_plan: preferred })
+        .eq("id", profile.account_id);
+      account = { ...account, review_plan: preferred };
+    }
+  }
 
   const sinceIso = new Date(
     Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000,
@@ -395,7 +418,11 @@ export default async function DashboardPage() {
       </header>
 
       {!hasData ? (
-        <EmptyDashboard />
+        <EmptyDashboard
+          stage={
+            (locations ?? []).length === 0 ? "no-locations" : "no-activity"
+          }
+        />
       ) : (
         <>
           {/* SERVICE RECOVERY ALERT */}
@@ -1090,7 +1117,65 @@ function OfferPreviewCard({
   );
 }
 
-function EmptyDashboard() {
+function EmptyDashboard({
+  stage,
+}: {
+  stage: "no-locations" | "no-activity";
+}) {
+  if (stage === "no-locations") {
+    return (
+      <div className="rounded-2xl border border-forest/30 bg-forest/[0.04] p-10 max-w-3xl space-y-6">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-forest/10 px-2.5 py-1 text-[11.5px] font-medium text-forest">
+            <Sparkles className="h-3 w-3" />
+            Welcome to BAAM Review
+          </div>
+          <h2 className="font-display text-[24px] text-ink leading-tight">
+            Step 1 — Connect your Google Business Profile
+          </h2>
+          <p className="text-[14px] text-text-soft leading-relaxed">
+            BAAM Review needs to know which business you&apos;re collecting
+            reviews for. Click below (or use{" "}
+            <strong className="text-ink">Connect a new location</strong> in
+            the left sidebar) to sign in with Google and pick your business.
+            We&apos;ll set up the public review page, QR poster, and email
+            sender automatically.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2.5">
+          <Link
+            href="/api/auth/google/start"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-forest text-cream px-4 py-2.5 text-[13.5px] font-medium hover:bg-forest-dark"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Connect Google Business Profile →
+          </Link>
+          <Link
+            href="/app/help"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-paper border border-border-base px-3.5 py-2 text-[13.5px] font-medium text-text hover:bg-hover"
+          >
+            Setup guides
+          </Link>
+        </div>
+
+        <div className="border-t border-border-base pt-5 space-y-1.5">
+          <p className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted font-medium">
+            What happens after you connect
+          </p>
+          <ol className="space-y-1 text-[13px] text-text-soft leading-relaxed list-decimal pl-5">
+            <li>Pick a plan and set up billing (Self-Service or Full-Service)</li>
+            <li>Send your first review request — single or bulk</li>
+            <li>Review responses, Google reviews, and revenue impact appear here</li>
+          </ol>
+        </div>
+      </div>
+    );
+  }
+
+  // stage === "no-activity" — has at least one connected location, just no
+  // review-request activity yet. Show the original "send your first request"
+  // empty state.
   return (
     <div className="rounded-2xl border border-dashed border-border-base bg-paper/60 p-10 max-w-3xl space-y-5">
       <div className="space-y-1">
