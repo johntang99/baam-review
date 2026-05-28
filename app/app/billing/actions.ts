@@ -214,9 +214,10 @@ async function locationHasLiveSub(locationId: string): Promise<boolean> {
 
 /**
  * Count of active/trialing/past_due location subs on the account. Used to
- * decide whether a new location is the FIRST (promotional $89 for
- * self-service) or an ADDITIONAL ($79 for self-service). Full-service is
- * flat $299 regardless, but we still count to keep the logic uniform.
+ * decide which Stripe Price ID to apply for a new location. Current
+ * pricing is a flat $99/mo per location on self-service (the first-vs-
+ * additional distinction is now functionally a no-op but kept in code so
+ * we can re-introduce tiered pricing later without restructuring).
  */
 async function activeLocationSubCount(accountId: string): Promise<number> {
   const { count } = await createServiceClient()
@@ -229,9 +230,11 @@ async function activeLocationSubCount(accountId: string): Promise<number> {
 
 /**
  * Per-location CARD subscription via Checkout (its own customer/card).
- * Price tier depends on the account plan:
- *   self_service: first location $89/mo · additional $79/mo
- *   full_service: every location $299/mo (flat)
+ * Current pricing:
+ *   self_service: $99/mo per location (flat)
+ *   full_service: $399/mo per location (flat)
+ * Resolved at runtime from STRIPE_PRICE_* env vars; this comment can
+ * drift from reality if Stripe Prices change without a re-deploy.
  * Every location gets a 30-day trial with card on file (no proration —
  * independent sub).
  */

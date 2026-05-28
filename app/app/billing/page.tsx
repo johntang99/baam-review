@@ -154,7 +154,7 @@ export default async function BillingPage({
               description={
                 plan === "full_service"
                   ? "Each business is billed separately (its own card or pay-by-check)."
-                  : "First location $89/mo · each additional $79/mo. Each location is its own subscription with its own card."
+                  : "$99/mo per location. Each location is its own subscription with its own card."
               }
             >
               {(locations ?? []).length === 0 ? (
