@@ -7,19 +7,23 @@
   --color-forest-light: #2A6B57;
   --color-sage: #87A899;
   --color-sage-soft: #C5D2CB;
-  --color-cream: #FAF7F2;
-  --color-cream-deep: #F0EBE0;
+  /* Option C+ palette — page background near-white with just enough
+   * warmth to keep the brand identity, all text darkened to read
+   * crisply. Calibrated against WCAG AAA where practical (≥7:1) and
+   * AA at minimum (≥4.5:1) on all secondary text. */
+  --color-cream: #FDFBF6;       /* page bg — near-white, hint of warmth */
+  --color-cream-deep: #E8E1D0;  /* hover / accent panels — more visible */
   --color-paper: #FFFFFF;
   --color-gold: #C9A961;
   --color-gold-soft: #E8D9B5;
   --color-gold-dark: #A88847;
 
-  --color-text: #1A1F1C;
-  --color-text-soft: #5A6660;
-  --color-text-muted: #8A938E;
-  --color-border-base: #E8E2D5;
-  --color-border-soft: #F0ECE1;
-  --color-hover: #F5F1E8;
+  --color-text: #131815;        /* body — 17:1 on cream (AAA, near-black with green tint) */
+  --color-text-soft: #2C3530;   /* secondary text — 9:1 (AAA) */
+  --color-text-muted: #4F5A55;  /* hints / labels — 6:1 (AA+ ; readable at small sizes) */
+  --color-border-base: #D2C9B2; /* card outline — clearly visible against bg */
+  --color-border-soft: #E2D9C2; /* hairline dividers */
+  --color-hover: #F0EBDC;
   --color-success: #2D7A5F;
   --color-success-soft: #DCEEE3;
   --color-alert: #B5443A;

@@ -28,6 +28,31 @@ export interface ActionResult {
   error?: string;
 }
 
+/**
+ * Build a post-Checkout return URL. Defaults to /app/billing (the page
+ * staff land on for self-serve plan management). Callers can override via
+ * a `return_url` FormData field to send Stripe back to whichever page the
+ * user originated from — e.g., the Locations table.
+ *
+ * Validation: the return_url must be a relative path on this app. Absolute
+ * URLs or anything that looks like an open-redirect attempt is rejected
+ * and the default is used instead.
+ */
+function buildReturnUrl(
+  base: string,
+  fd: FormData,
+  status: "success" | "cancelled",
+  includeSessionId: boolean,
+): string {
+  const raw = String(fd.get("return_url") ?? "").trim();
+  const safe = raw.startsWith("/") && !raw.startsWith("//") ? raw : "/app/billing";
+  const separator = safe.includes("?") ? "&" : "?";
+  const sessionParam = includeSessionId
+    ? "&session_id={CHECKOUT_SESSION_ID}"
+    : "";
+  return `${base}${safe}${separator}status=${status}${sessionParam}`;
+}
+
 async function appUrl(): Promise<string> {
   const h = await headers();
   const host = h.get("host");
@@ -280,8 +305,8 @@ export async function createLocationCheckoutSession(
       interval,
       kind: "location",
     },
-    success_url: `${base}/app/billing?status=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${base}/app/billing?status=cancelled`,
+    success_url: buildReturnUrl(base, fd, "success", true),
+    cancel_url: buildReturnUrl(base, fd, "cancelled", false),
   });
 
   // No pre-create: the webhook creates location_subscriptions on

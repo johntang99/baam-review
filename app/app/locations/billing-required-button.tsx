@@ -30,6 +30,11 @@ export function BillingRequiredButton({ locationId, label, className }: Props) {
     startTransition(async () => {
       const fd = new FormData();
       fd.set("location_id", locationId);
+      // Tell the action where to send Stripe's success/cancel redirects.
+      // Without this, both routes default to /app/billing — which is
+      // wrong for staff who started the flow from /app/locations.
+      const here = window.location.pathname + window.location.search;
+      fd.set("return_url", here);
       const res = await createLocationCheckoutSession(fd);
       if (!res.ok || !res.url) {
         setError(res.error ?? "Couldn't start billing setup.");

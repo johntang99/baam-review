@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   KeyRound,
   Building2,
+  BookOpen,
 } from "lucide-react";
 import { UserCard } from "./user-card";
 import { NavItem } from "./nav-item";
@@ -81,6 +82,13 @@ const rolesItem: WorkspaceItem = {
   label: "Roles & access",
   icon: KeyRound,
 };
+
+// Help section — all SOPs and setup guides. Visible to everyone.
+// One item for now ("Setup guides"); section can grow later (FAQ,
+// Contact support, Video tutorials, etc.) without re-architecting.
+const helpItems: WorkspaceItem[] = [
+  { href: "/app/help", label: "Setup guides", icon: BookOpen },
+];
 
 const customersItem: WorkspaceItem = {
   href: "/app/customers",
@@ -153,6 +161,7 @@ export function Sidebar({
         {operationsItems.length > 0 && (
           <NavSection label="BAAM Operations" items={operationsItems} />
         )}
+        <NavSection label="Help" items={helpItems} />
         <NavSection
           label="Account"
           items={accountSection}
