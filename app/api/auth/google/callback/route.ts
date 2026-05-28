@@ -4,6 +4,7 @@ import { createServiceClient } from "@/lib/supabase/service";
 import { exchangeCodeForTokens, fetchGoogleUserinfo } from "@/lib/google/oauth";
 
 const STATE_COOKIE = "g_oauth_state";
+const NEXT_COOKIE = "g_oauth_next";
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
@@ -85,10 +86,19 @@ export async function GET(request: NextRequest) {
     return redirectToConnect(request, "error=token_persist");
   }
 
-  const response = NextResponse.redirect(
-    new URL("/app/locations/connect/picker", request.url),
-  );
+  // Honor the post-OAuth ?next= URL the start route stashed in a cookie.
+  // Lets the Onboarding-queue flow preserve its customer_record param
+  // across the OAuth roundtrip — without this, the callback always
+  // landed on the bare picker URL and lost the binding info.
+  const nextFromCookie = request.cookies.get(NEXT_COOKIE)?.value ?? "";
+  const safeNext =
+    nextFromCookie.startsWith("/") && !nextFromCookie.startsWith("//")
+      ? nextFromCookie
+      : "/app/locations/connect/picker";
+
+  const response = NextResponse.redirect(new URL(safeNext, request.url));
   response.cookies.delete(STATE_COOKIE);
+  response.cookies.delete(NEXT_COOKIE);
   return response;
 }
 

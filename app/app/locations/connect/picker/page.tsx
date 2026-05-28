@@ -86,6 +86,25 @@ export default async function PickerPage({
   let fatal: string | null = null;
   let googleEmail: string | null = null;
 
+  // Pre-check the OAuth token row — if this user has never connected
+  // Google (or their token has been deleted), kick them through the
+  // OAuth flow now and bring them right back here with the
+  // customer_record param preserved. Catches the most common cause of
+  // the "Couldn't load locations from Google" empty-state.
+  const { data: existingToken } = await supabase
+    .from("google_oauth_tokens")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!existingToken) {
+    const here =
+      "/app/locations/connect/picker" +
+      (customerRecordIdParam
+        ? `?customer_record=${encodeURIComponent(customerRecordIdParam)}`
+        : "");
+    redirect(`/api/auth/google/start?next=${encodeURIComponent(here)}`);
+  }
+
   try {
     // Tokens are per-user (migration 0032). The picker uses the
     // logged-in user's gmail token, so they only see GBPs that *their*
