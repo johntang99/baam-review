@@ -75,7 +75,44 @@ export function NewListForm({
   ]);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Drag-and-drop handlers for the upload area. dragenter/dragover must
+  // each call preventDefault() so the browser allows the drop instead of
+  // navigating to the file. dragleave is tricky because it fires for
+  // every child element; the relatedTarget check filters out internal
+  // bubble-ups so the "I'm being dragged over" UI only flips off when
+  // the cursor actually leaves the drop zone.
+  function handleDragEnter(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.types.includes("Files")) setIsDragging(true);
+  }
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.types.includes("Files")) {
+      e.dataTransfer.dropEffect = "copy";
+      setIsDragging(true);
+    }
+  }
+
+  function handleDragLeave(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    const next = e.relatedTarget as Node | null;
+    if (!next || !e.currentTarget.contains(next)) setIsDragging(false);
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) onFile(file);
+  }
 
   // ---- Parse the active tab into RawRow[] ----
   const rawRows: RawRow[] = useMemo(() => {
@@ -336,19 +373,38 @@ export function NewListForm({
                 point: open it in Excel/Numbers, replace the rows with your
                 customers, save, and drop it back here.
               </p>
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full rounded-xl border-2 border-dashed border-border-base bg-cream py-12 text-center hover:border-forest transition-colors"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    fileInputRef.current?.click();
+                  }
+                }}
+                onDragEnter={handleDragEnter}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`w-full rounded-xl border-2 border-dashed py-12 text-center transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-forest/30 ${
+                  isDragging
+                    ? "border-forest bg-forest/[0.06]"
+                    : "border-border-base bg-cream hover:border-forest hover:bg-cream-deep/30"
+                }`}
               >
-                <Upload className="h-7 w-7 mx-auto text-text-muted mb-3" />
+                <Upload
+                  className={`h-7 w-7 mx-auto mb-3 transition-colors ${
+                    isDragging ? "text-forest" : "text-text-muted"
+                  }`}
+                />
                 <p className="text-[14px] text-text font-medium">
-                  Browse files
+                  {isDragging ? "Drop to upload" : "Drop file here or click to browse"}
                 </p>
                 <p className="text-[12.5px] text-text-muted mt-1">
                   .xlsx, .csv, or .tsv
                 </p>
-              </button>
+              </div>
               <input
                 ref={fileInputRef}
                 type="file"
