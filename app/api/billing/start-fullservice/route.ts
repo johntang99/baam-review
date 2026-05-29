@@ -128,8 +128,15 @@ export async function POST(request: Request) {
 
     billing_address_collection: "auto",
 
-    success_url: `${origin}/start/welcome?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/pricing#plans`,
+    // Signed-in users return to /app/billing where they can see their new
+    // trial status. Anonymous Start-Now visitors still land on the welcome
+    // page (designed to walk them through adding the GBP manager email).
+    success_url: user
+      ? `${origin}/app/billing?status=success&session_id={CHECKOUT_SESSION_ID}`
+      : `${origin}/start/welcome?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: user
+      ? `${origin}/app/billing?status=cancelled`
+      : `${origin}/pricing#plans`,
   });
 
   if (!session.url) {
