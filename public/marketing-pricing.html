@@ -956,33 +956,15 @@ footer a:hover { color: var(--cream); }
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
 
-  // "Start now" → Stripe Checkout. POSTs to /api/billing/start-fullservice
-  // and redirects to the hosted Stripe URL. Errors surface as an alert; we
-  // don't have a richer error UI here yet.
+  // "Start now" → sign up first, then we collect billing inside the app.
+  // This guarantees the email Stripe charges matches the BAAM Review
+  // account email (no typos, no orphaned customer_records rows). The
+  // billing checkout pre-fills the Stripe customer_email server-side
+  // once the user is signed in.
   document.querySelectorAll('[data-start-now-fullservice]').forEach((btn) => {
-    btn.addEventListener('click', async (e) => {
+    btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const button = e.currentTarget;
-      const original = button.textContent;
-      button.disabled = true;
-      button.textContent = 'Loading Stripe…';
-      try {
-        const res = await fetch('/api/billing/start-fullservice', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ interval: 'month' }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.url) {
-          throw new Error(data.error || 'Could not start checkout');
-        }
-        window.location.assign(data.url);
-      } catch (err) {
-        button.disabled = false;
-        button.textContent = original;
-        alert('Sorry — could not start checkout. Please try again, or email support@baamplatform.com.');
-        console.error(err);
-      }
+      window.location.assign('/signup?plan=full');
     });
   });
 </script>

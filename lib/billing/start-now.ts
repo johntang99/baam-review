@@ -124,6 +124,25 @@ export async function handleStartNowCheckoutSession(
     return;
   }
 
+  // Sign-up-first Full Service flow: if the customer was already
+  // signed into BAAM Review when they hit Stripe Checkout, the start-
+  // fullservice route tagged the session with signed_in_account_id.
+  // Mirror the Stripe customer id onto the account so the customer's
+  // dashboard shows their trial state immediately (no manual
+  // reconciliation needed). Best-effort: if the account is gone we
+  // still keep the customer_records row so staff can match by email.
+  const signedInAccountId = session.metadata?.signed_in_account_id;
+  if (signedInAccountId) {
+    await service
+      .from("accounts")
+      .update({
+        stripe_customer_id: customerId,
+        subscription_status: "trialing",
+        subscription_tier: "trial",
+      })
+      .eq("id", signedInAccountId);
+  }
+
   // Best-effort emails — a failed email must not roll back the insert.
   const data: StartNowSessionData = {
     email,

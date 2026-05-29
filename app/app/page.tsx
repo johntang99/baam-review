@@ -420,7 +420,12 @@ export default async function DashboardPage() {
       {!hasData ? (
         <EmptyDashboard
           stage={
-            (locations ?? []).length === 0 ? "no-locations" : "no-activity"
+            account?.review_plan === "full_service" &&
+            (locations ?? []).length === 0
+              ? "full-service-needs-billing"
+              : (locations ?? []).length === 0
+                ? "no-locations"
+                : "no-activity"
           }
         />
       ) : (
@@ -1120,8 +1125,58 @@ function OfferPreviewCard({
 function EmptyDashboard({
   stage,
 }: {
-  stage: "no-locations" | "no-activity";
+  stage: "no-locations" | "no-activity" | "full-service-needs-billing";
 }) {
+  if (stage === "full-service-needs-billing") {
+    return (
+      <div className="rounded-2xl border border-gold/50 bg-gold/[0.06] p-10 max-w-3xl space-y-6">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-2.5 py-1 text-[11.5px] font-medium text-gold-dark">
+            <Sparkles className="h-3 w-3" />
+            Full Service trial
+          </div>
+          <h2 className="font-display text-[24px] text-ink leading-tight">
+            Step 1 — Set up your Full Service trial
+          </h2>
+          <p className="text-[14px] text-text-soft leading-relaxed">
+            With Full Service, our team handles the day-to-day: connecting
+            your Google Business Profile, sending review requests on your
+            behalf, replying to reviews in your voice. Start with a 30-day
+            free trial — your card is saved but not charged until day 31.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2.5">
+          <Link
+            href="/app/billing"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-forest text-cream px-4 py-2.5 text-[13.5px] font-medium hover:bg-forest-dark"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Set up Full Service trial →
+          </Link>
+          <Link
+            href="/app/help"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-paper border border-border-base px-3.5 py-2 text-[13.5px] font-medium text-text hover:bg-hover"
+          >
+            Setup guides
+          </Link>
+        </div>
+
+        <div className="border-t border-border-base pt-5 space-y-1.5">
+          <p className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted font-medium">
+            What happens after you start the trial
+          </p>
+          <ol className="space-y-1 text-[13px] text-text-soft leading-relaxed list-decimal pl-5">
+            <li>Our team gets a notification and reaches out within 1 business day</li>
+            <li>We connect your Google Business Profile for you</li>
+            <li>We start sending review requests to your recent customers</li>
+            <li>You watch the funnel, revenue, and reviews update right here</li>
+          </ol>
+        </div>
+      </div>
+    );
+  }
+
   if (stage === "no-locations") {
     return (
       <div className="rounded-2xl border border-forest/30 bg-forest/[0.04] p-10 max-w-3xl space-y-6">

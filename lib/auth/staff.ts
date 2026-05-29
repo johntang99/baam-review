@@ -131,3 +131,36 @@ export async function getInternalContext(
     opsRole: data.ops_role ?? null,
   };
 }
+
+/**
+ * True when the signed-in viewer is a customer on the Full Service plan.
+ * Used to gate operational pages (Bulk Review Requests, Request a Review)
+ * to read-only mode — these are tasks BAAM staff does on their behalf, so
+ * showing edit/send controls would be misleading.
+ *
+ * BAAM internal staff (any ops_role, or null role in the ops tenant) get
+ * full edit access regardless of the account's review_plan — they're
+ * operating on behalf of customers, not being one.
+ */
+export async function isFullServiceCustomerReadOnly(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+): Promise<boolean> {
+  // BAAM internal staff are never read-only.
+  const internal = await getInternalContext(supabase, userId);
+  if (internal) return false;
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("account_id")
+    .eq("id", userId)
+    .maybeSingle();
+  if (!profile?.account_id) return false;
+
+  const { data: acct } = await supabase
+    .from("accounts")
+    .select("review_plan")
+    .eq("id", profile.account_id)
+    .maybeSingle();
+  return acct?.review_plan === "full_service";
+}

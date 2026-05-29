@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { isFullServiceCustomerReadOnly } from "@/lib/auth/staff";
 import { PresendTable, type PresendCustomer } from "./presend-table";
 import { VariantsPanel, type ListVariant } from "./variants-panel";
 
@@ -25,6 +26,8 @@ export default async function ReviewPage({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/app/lists/${id}/review`);
+
+  const readOnly = await isFullServiceCustomerReadOnly(supabase, user.id);
 
   const { data: list } = await supabase
     .from("lists")
@@ -130,9 +133,14 @@ export default async function ReviewPage({
             ? "sms"
             : "email"
         }
+        readOnly={readOnly}
       />
 
-      <PresendTable listId={list.id} initialRows={rows} />
+      <PresendTable
+        listId={list.id}
+        initialRows={rows}
+        readOnly={readOnly}
+      />
     </main>
   );
 }

@@ -12,7 +12,11 @@ import {
   reconcileCheckoutSession,
   reconcileAccountSubscriptions,
 } from "@/lib/billing/sync";
-import { PlanChooser, LocationActions } from "./billing-client";
+import {
+  PlanChooser,
+  LocationActions,
+  StartFullServiceTrialButton,
+} from "./billing-client";
 
 export const metadata = { title: "Billing — BAAM Review" };
 
@@ -158,10 +162,22 @@ export default async function BillingPage({
               }
             >
               {(locations ?? []).length === 0 ? (
-                <p className="text-[13px] text-text-muted">
-                  No locations yet. Add one under Locations, then set up its
-                  billing here.
-                </p>
+                plan === "full_service" ? (
+                  <div className="space-y-3 max-w-2xl">
+                    <p className="text-[13.5px] text-text-soft leading-relaxed">
+                      Full Service includes a 30-day free trial. Your card is
+                      saved at checkout but not charged until day 31. After
+                      payment, our team will connect your Google Business
+                      Profile and start sending review requests for you.
+                    </p>
+                    <StartFullServiceTrialButton />
+                  </div>
+                ) : (
+                  <p className="text-[13px] text-text-muted">
+                    No locations yet. Add one under Locations, then set up its
+                    billing here.
+                  </p>
+                )
               ) : (
                 <ul className="divide-y divide-border-soft">
                   {(locations ?? []).map((l) => {

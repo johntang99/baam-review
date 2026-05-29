@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Sparkles } from "lucide-react";
 import {
   firstLocationCents,
   additionalLocationCents,
@@ -185,6 +186,57 @@ export function LocationActions({
       {error && (
         <p className="w-full text-[12px] text-red-600">{error}</p>
       )}
+    </div>
+  );
+}
+
+/**
+ * Full Service trial launcher — shown to signed-in customers whose account
+ * is review_plan=full_service but has no Stripe customer yet. POSTs to
+ * /api/billing/start-fullservice which creates a Checkout session with the
+ * user's email pre-filled and the account_id tagged in metadata so the
+ * webhook can link the resulting customer_records row to this account.
+ */
+export function StartFullServiceTrialButton({
+  interval = "month",
+}: {
+  interval?: "month" | "year";
+}) {
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function start() {
+    setError(null);
+    setPending(true);
+    try {
+      const res = await fetch("/api/billing/start-fullservice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Could not start checkout.");
+      }
+      window.location.assign(data.url);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not start checkout.");
+      setPending(false);
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <button
+        type="button"
+        onClick={start}
+        disabled={pending}
+        className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-4 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark disabled:opacity-50"
+      >
+        <Sparkles className="h-3.5 w-3.5" />
+        {pending ? "Opening Stripe…" : "Start Full Service trial →"}
+      </button>
+      {error && <p className="text-[12px] text-alert">{error}</p>}
     </div>
   );
 }

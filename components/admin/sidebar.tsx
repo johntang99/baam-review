@@ -49,6 +49,14 @@ interface SidebarProps {
    * (e.g. the Roles & access reference page).
    */
   isBaamInternal?: boolean;
+  /**
+   * True when the viewer is a Full-Service customer (not BAAM staff).
+   * Full Service customers don't operate the request/lists pipeline —
+   * BAAM staff does, on their behalf. Hides "Request a Review" entirely
+   * and locks Bulk Review Requests into a read-only showcase mode (see
+   * the page-level guards in /app/lists/* for the rest of the gating).
+   */
+  isFullServiceCustomer?: boolean;
 }
 
 interface WorkspaceItem {
@@ -124,7 +132,13 @@ export function Sidebar({
   listsBadge,
   opsRole,
   isBaamInternal,
+  isFullServiceCustomer,
 }: SidebarProps) {
+  // Filter operational items for Full-Service customers — they see lists
+  // (read-only) but not single-send (BAAM staff does both on their behalf).
+  const workspaceItemsForViewer = isFullServiceCustomer
+    ? workspaceItems.filter((i) => i.href !== "/app/send")
+    : workspaceItems;
   const operationsItems = operationsItemsForRole(opsRole);
   // Roles & access is for any internal staff (includes role=null legacy
   // users who haven't been assigned a role yet). Customers don't see it.
@@ -155,7 +169,7 @@ export function Sidebar({
       <nav className="flex-1 space-y-5 overflow-y-auto pr-1 -mr-1">
         <NavSection
           label="Workspace"
-          items={workspaceItems}
+          items={workspaceItemsForViewer}
           listsBadge={listsBadge}
         />
         {operationsItems.length > 0 && (

@@ -40,9 +40,14 @@ const LANG_PILL: Record<string, { text: string; cls: string }> = {
 export function PresendTable({
   listId,
   initialRows,
+  readOnly = false,
 }: {
   listId: string;
   initialRows: PresendCustomer[];
+  /** Full Service customers see the list as a showcase — no Send,
+   * no Save-as-draft, no inline row edits. They're watching BAAM
+   * staff's work, not operating it themselves. */
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [rows, setRows] = useState(initialRows);
@@ -400,24 +405,32 @@ export function PresendTable({
           </span>
         </div>
         <div className="flex items-center gap-2.5">
+          {readOnly && (
+            <span className="text-[12.5px] text-text-soft italic">
+              Your BAAM team is operating this list — read-only view.
+            </span>
+          )}
           {sendNotice?.kind === "generic" && (
             <span className="text-[12.5px] text-warn font-medium mr-2">
               {sendNotice.message}
             </span>
           )}
-          <button
-            type="button"
-            disabled={savingDraft}
-            onClick={() => {
-              setSavingDraft(true);
-              startTransition(async () => {
-                await saveListAsDraft(listId);
-              });
-            }}
-            className="rounded-lg border border-border-base bg-paper px-4 py-2.5 text-[13.5px] font-medium text-text hover:bg-cream-deep disabled:opacity-50"
-          >
-            {savingDraft ? "Saving…" : "Save as draft"}
-          </button>
+          {!readOnly && (
+            <button
+              type="button"
+              disabled={savingDraft}
+              onClick={() => {
+                setSavingDraft(true);
+                startTransition(async () => {
+                  await saveListAsDraft(listId);
+                });
+              }}
+              className="rounded-lg border border-border-base bg-paper px-4 py-2.5 text-[13.5px] font-medium text-text hover:bg-cream-deep disabled:opacity-50"
+            >
+              {savingDraft ? "Saving…" : "Save as draft"}
+            </button>
+          )}
+          {!readOnly && (
           <button
             type="button"
             disabled={sending || selectedCount === 0}
@@ -463,6 +476,7 @@ export function PresendTable({
               ? "Sending…"
               : `Send to ${selectedCount} customer${selectedCount === 1 ? "" : "s"}`}
           </button>
+          )}
         </div>
       </div>
     </>

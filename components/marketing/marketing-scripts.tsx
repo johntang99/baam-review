@@ -58,46 +58,20 @@ export function MarketingScripts() {
       recalc();
     }
 
-    // "Start now" → Stripe Checkout. POSTs to /api/billing/start-fullservice
-    // and redirects to the hosted Stripe URL. The inline <script> in
-    // marketing-pricing.html is stripped at render time (see
-    // lib/marketing/render.ts), so the handler lives here.
-    //
-    // Event-delegated on `document` rather than attached per-button.
-    // The buttons live inside `dangerouslySetInnerHTML` content and the
-    // DOM can come/go between hydration and SPA navigation — a global
-    // delegated listener fires regardless of when the button mounts.
-    // Guarded by a module-level flag so HMR / unmount-remount cycles
-    // don't double-attach the listener (which would fire the POST twice).
-    const onStartNow = async (e: Event) => {
+    // "Start now" → signup first, then collect billing inside the app.
+    // This guarantees the email Stripe charges matches the BAAM Review
+    // account email (no typos, no orphaned customer_records rows). The
+    // billing checkout pre-fills the Stripe customer_email server-side
+    // once the user is signed in. Event-delegated so it survives SPA
+    // navigation between marketing pages.
+    const onStartNow = (e: Event) => {
       const target = e.target as HTMLElement | null;
       const button = target?.closest<HTMLButtonElement>(
         "[data-start-now-fullservice]",
       );
-      if (!button || button.disabled) return;
+      if (!button) return;
       e.preventDefault();
-      const original = button.textContent;
-      button.disabled = true;
-      button.textContent = "Loading Stripe…";
-      try {
-        const res = await fetch("/api/billing/start-fullservice", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ interval: "month" }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.url) {
-          throw new Error(data.error || "Could not start checkout");
-        }
-        window.location.assign(data.url);
-      } catch (err) {
-        button.disabled = false;
-        button.textContent = original;
-        alert(
-          "Sorry — could not start checkout. Please try again, or email support@baamplatform.com.",
-        );
-        console.error(err);
-      }
+      window.location.assign("/signup?plan=full");
     };
     document.addEventListener("click", onStartNow);
 

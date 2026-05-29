@@ -27,6 +27,10 @@ interface VariantsPanelProps {
   listId: string;
   initialVariants: ListVariant[] | null;
   channel: "email" | "sms";
+  /** When true, hide Generate/Regenerate/Clear/Edit controls and render
+   * the variants as a read-only showcase. Used for Full Service customers
+   * who see what BAAM is doing on their behalf without operational levers. */
+  readOnly?: boolean;
 }
 
 const TONE_LABEL: Record<string, string> = {
@@ -40,6 +44,7 @@ export function VariantsPanel({
   listId,
   initialVariants,
   channel,
+  readOnly = false,
 }: VariantsPanelProps) {
   const [variants, setVariants] = useState<ListVariant[] | null>(initialVariants);
   const [expanded, setExpanded] = useState(false);
@@ -123,28 +128,32 @@ export function VariantsPanel({
                 )}
                 {expanded ? "Hide" : "Preview"}
               </button>
-              <button
-                type="button"
-                onClick={generate}
-                disabled={pending}
-                className="inline-flex items-center gap-1 rounded-lg border border-border-base bg-paper px-3 py-1.5 text-[12.5px] font-medium text-text hover:bg-cream-deep disabled:opacity-50"
-              >
-                <RefreshCw className={`h-3.5 w-3.5 ${pending ? "animate-spin" : ""}`} />
-                {pending ? "Regenerating…" : "Regenerate"}
-              </button>
-              <button
-                type="button"
-                onClick={clear}
-                disabled={pending}
-                title="Remove AI variants and send the default template instead"
-                className="inline-flex items-center gap-1 rounded-lg border border-border-base bg-paper px-3 py-1.5 text-[12.5px] font-medium text-text-soft hover:bg-cream-deep disabled:opacity-50"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                Clear
-              </button>
+              {!readOnly && (
+                <>
+                  <button
+                    type="button"
+                    onClick={generate}
+                    disabled={pending}
+                    className="inline-flex items-center gap-1 rounded-lg border border-border-base bg-paper px-3 py-1.5 text-[12.5px] font-medium text-text hover:bg-cream-deep disabled:opacity-50"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 ${pending ? "animate-spin" : ""}`} />
+                    {pending ? "Regenerating…" : "Regenerate"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clear}
+                    disabled={pending}
+                    title="Remove AI variants and send the default template instead"
+                    className="inline-flex items-center gap-1 rounded-lg border border-border-base bg-paper px-3 py-1.5 text-[12.5px] font-medium text-text-soft hover:bg-cream-deep disabled:opacity-50"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Clear
+                  </button>
+                </>
+              )}
             </>
           )}
-          {!hasVariants && (
+          {!hasVariants && !readOnly && (
             <button
               type="button"
               onClick={generate}
@@ -178,6 +187,7 @@ export function VariantsPanel({
               index={i}
               variant={v}
               channel={channel}
+              readOnly={readOnly}
               onSaved={(next) =>
                 setVariants((prev) =>
                   prev
@@ -204,12 +214,14 @@ function VariantRow({
   index,
   variant,
   channel,
+  readOnly,
   onSaved,
 }: {
   listId: string;
   index: number;
   variant: ListVariant;
   channel: "email" | "sms";
+  readOnly: boolean;
   onSaved: (next: { subject: string; body: string }) => void;
 }) {
   const [editing, setEditing] = useState(false);
@@ -259,14 +271,16 @@ function VariantRow({
           </span>
         </div>
         {!editing ? (
-          <button
-            type="button"
-            onClick={startEdit}
-            className="inline-flex items-center gap-1 text-[11.5px] text-text-soft hover:text-ink"
-          >
-            <Pencil className="h-3 w-3" />
-            Edit
-          </button>
+          !readOnly && (
+            <button
+              type="button"
+              onClick={startEdit}
+              className="inline-flex items-center gap-1 text-[11.5px] text-text-soft hover:text-ink"
+            >
+              <Pencil className="h-3 w-3" />
+              Edit
+            </button>
+          )
         ) : (
           <div className="flex items-center gap-1.5">
             <button

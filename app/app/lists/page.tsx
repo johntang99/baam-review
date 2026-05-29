@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Plus, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { isFullServiceCustomerReadOnly } from "@/lib/auth/staff";
 import {
   getInternalContext,
   getVisibleLocationIds,
@@ -72,6 +73,7 @@ export default async function ListsPage({
   if (!user) redirect("/login?next=/app/lists");
 
   const internal = await getInternalContext(supabase, user.id);
+  const readOnly = await isFullServiceCustomerReadOnly(supabase, user.id);
   const visibleIds = await getVisibleLocationIds(supabase, internal);
   const idFilter =
     visibleIds === null
@@ -253,13 +255,15 @@ export default async function ListsPage({
         <p className="text-[12px] uppercase tracking-[0.08em] text-text-muted font-medium">
           Workspace · Bulk Review Requests
         </p>
-        <Link
-          href="/app/lists/new"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-4 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          New list
-        </Link>
+        {!readOnly && (
+          <Link
+            href="/app/lists/new"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-4 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New list
+          </Link>
+        )}
       </div>
 
       {/* PAGE HEADER */}
@@ -349,7 +353,7 @@ export default async function ListsPage({
 
       {/* LIST CARDS */}
       {visibleLists.length === 0 ? (
-        <EmptyState filtered={filter !== "all"} />
+        <EmptyState filtered={filter !== "all"} readOnly={readOnly} />
       ) : (
         <div className="flex flex-col gap-3.5">
           {visibleLists.map((l) => {
@@ -561,24 +565,34 @@ function NextActionPill({
   );
 }
 
-function EmptyState({ filtered }: { filtered: boolean }) {
+function EmptyState({
+  filtered,
+  readOnly,
+}: {
+  filtered: boolean;
+  readOnly: boolean;
+}) {
   return (
     <div className="rounded-2xl border border-dashed border-border-base bg-paper/60 p-12 text-center">
       <p className="font-display text-[18px] text-ink mb-1.5">
         {filtered ? "No lists match this filter." : "No lists yet."}
       </p>
       <p className="text-[14px] text-text-soft mb-6">
-        {filtered
-          ? "Try a different filter, or create a new batch."
-          : "Click New list to import your first batch of customers."}
+        {readOnly
+          ? "Your BAAM team will start sending review requests soon. Lists will appear here as they go out."
+          : filtered
+            ? "Try a different filter, or create a new batch."
+            : "Click New list to import your first batch of customers."}
       </p>
-      <Link
-        href="/app/lists/new"
-        className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-4 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark"
-      >
-        <Plus className="h-3.5 w-3.5" />
-        New list
-      </Link>
+      {!readOnly && (
+        <Link
+          href="/app/lists/new"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-4 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          New list
+        </Link>
+      )}
     </div>
   );
 }

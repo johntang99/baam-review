@@ -65,35 +65,16 @@ export function MarketingZhScripts() {
     // Event-delegated so it survives mid-page DOM changes and SPA
     // navigation — attaching per-button via querySelectorAll on mount
     // missed clicks when the button rendered after the effect ran.
-    const onStartNow = async (e: Event) => {
+    // 「立即开始」 → 先注册账号,再在系统内收款。保证 Stripe 扣款邮箱
+    // 与 BAAM Review 账号邮箱一致,避免输入错误造成的孤立记录。
+    const onStartNow = (e: Event) => {
       const target = e.target as HTMLElement | null;
       const button = target?.closest<HTMLButtonElement>(
         "[data-start-now-fullservice]",
       );
-      if (!button || button.disabled) return;
+      if (!button) return;
       e.preventDefault();
-      const original = button.textContent;
-      button.disabled = true;
-      button.textContent = "正在跳转 Stripe…";
-      try {
-        const res = await fetch("/api/billing/start-fullservice", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ interval: "month" }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.url) {
-          throw new Error(data.error || "Could not start checkout");
-        }
-        window.location.assign(data.url);
-      } catch (err) {
-        button.disabled = false;
-        button.textContent = original;
-        alert(
-          "暂时无法启动结账,请稍后再试,或写信至 support@baamplatform.com。",
-        );
-        console.error(err);
-      }
+      window.location.assign("/signup?plan=full");
     };
     document.addEventListener("click", onStartNow);
     cleanups.push(() => document.removeEventListener("click", onStartNow));

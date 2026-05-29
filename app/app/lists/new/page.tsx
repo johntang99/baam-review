@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isFullServiceCustomerReadOnly } from "@/lib/auth/staff";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import { NewListForm } from "./new-list-form";
 
@@ -15,6 +16,12 @@ export default async function NewListPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/app/lists/new");
+
+  // Full Service customers don't build lists themselves — BAAM staff does.
+  // Send them back to the read-only Bulk Review Requests showcase.
+  if (await isFullServiceCustomerReadOnly(supabase, user.id)) {
+    redirect("/app/lists");
+  }
 
   const { data: locations } = await supabase
     .from("locations")

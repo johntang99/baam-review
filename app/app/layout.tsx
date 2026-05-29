@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/admin/sidebar";
+import { isFullServiceCustomerReadOnly } from "@/lib/auth/staff";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import {
   getInternalContext,
@@ -81,6 +82,10 @@ export default async function AppLayout({
         listsBadge={listsBadge ?? 0}
         opsRole={internal?.opsRole ?? null}
         isBaamInternal={internal !== null}
+        isFullServiceCustomer={await isFullServiceCustomerReadOnly(
+          supabase,
+          user.id,
+        )}
       />
       <div className="flex min-h-screen flex-col">{children}</div>
     </div>
