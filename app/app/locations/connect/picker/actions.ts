@@ -291,3 +291,37 @@ async function sendCustomerLiveEmail(opts: {
     from,
   });
 }
+
+/**
+ * "Use a different Google account" — used when staff needs to switch the
+ * Google identity the picker queries. Common case: an Onboarding-queue
+ * customer's GBP isn't managed by whichever team Gmail is currently
+ * OAuth'd to this staff user. After switching, the next picker visit
+ * shows GBPs from the newly-chosen Google account.
+ *
+ * Implementation: delete the existing google_oauth_tokens row, then
+ * redirect through the OAuth start route (which preserves the
+ * customer_record param via the next cookie). The picker's missing-token
+ * check at the top will see no row → kick off OAuth → Google account
+ * picker (since prompt=consent + no existing session-bound token) →
+ * callback writes the new token → picker shows the new account's GBPs.
+ */
+export async function switchGoogleAccount(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/app/locations");
+
+  const customerRecordId = formData.get("customer_record") ?? "";
+
+  const service = createServiceClient();
+  await service.from("google_oauth_tokens").delete().eq("user_id", user.id);
+
+  const here =
+    "/app/locations/connect/picker" +
+    (typeof customerRecordId === "string" && customerRecordId
+      ? `?customer_record=${encodeURIComponent(customerRecordId)}`
+      : "");
+  redirect(`/api/auth/google/start?next=${encodeURIComponent(here)}`);
+}

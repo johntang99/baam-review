@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { classifyByGoogleCategory } from "@/lib/review/google-category-mapping";
 import { CATEGORY_LABELS } from "@/lib/review/industry-presets";
 import { getLocationBillingMap } from "@/lib/billing/access";
-import { createLocationFromGoogle } from "./actions";
+import { createLocationFromGoogle, switchGoogleAccount } from "./actions";
 
 export const metadata = {
   title: "Pick a location — BAAM Review",
@@ -164,6 +164,18 @@ export default async function PickerPage({
               : "Add as many locations as you'd like — tap \"Use this location\" on each one."
           }
         >
+          <form action={switchGoogleAccount}>
+            {customerRecordIdParam && (
+              <input
+                type="hidden"
+                name="customer_record"
+                value={customerRecordIdParam}
+              />
+            )}
+            <Button type="submit" variant="ghost" size="sm">
+              Use a different Google account →
+            </Button>
+          </form>
           {claimedCount > 0 && (
             <Link href="/app/locations">
               <Button variant="secondary">
