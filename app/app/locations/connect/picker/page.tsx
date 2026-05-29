@@ -2,7 +2,11 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, AlertCircle, UserCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { isUserBaamInternal } from "@/lib/auth/staff";
+import { createServiceClient } from "@/lib/supabase/service";
+import {
+  isUserBaamInternal,
+  isFullServiceCustomerReadOnly,
+} from "@/lib/auth/staff";
 import {
   getValidAccessToken,
   listGoogleAccounts,
@@ -34,6 +38,14 @@ export default async function PickerPage({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/app/locations");
+
+  // Full Service customers don't connect their own GBP — BAAM staff does.
+  // Send them to /app/billing where the trial card explains the current
+  // state ("BAAM is connecting your GBP — we'll reach out within 1
+  // business day").
+  if (await isFullServiceCustomerReadOnly(supabase, user.id)) {
+    redirect("/app/billing");
+  }
 
   const { data: profile } = await supabase
     .from("users")
@@ -89,11 +101,18 @@ export default async function PickerPage({
   // Pre-check the OAuth token row — if this user has never connected
   // Google (or their token has been deleted), kick them through the
   // OAuth flow now and bring them right back here with the
-  // customer_record param preserved. Catches the most common cause of
-  // the "Couldn't load locations from Google" empty-state.
-  const { data: existingToken } = await supabase
+  // customer_record param preserved.
+  //
+  // IMPORTANT: must use the SERVICE client. The callback writes
+  // google_oauth_tokens via the service client (to bypass RLS on the
+  // insert), and reads via the RLS-scoped client can return null even
+  // when the row exists. Mixing clients here was producing an infinite
+  // OAuth loop: pick account → callback writes token → picker reads
+  // (RLS) → null → redirect back to OAuth → repeat forever.
+  const tokenService = createServiceClient();
+  const { data: existingToken } = await tokenService
     .from("google_oauth_tokens")
-    .select("user_id")
+    .select("user_id, google_email")
     .eq("user_id", user.id)
     .maybeSingle();
   if (!existingToken) {
@@ -110,13 +129,7 @@ export default async function PickerPage({
     // logged-in user's gmail token, so they only see GBPs that *their*
     // email is a manager of.
     const accessToken = await getValidAccessToken(user.id);
-
-    const { data: tokenRow } = await supabase
-      .from("google_oauth_tokens")
-      .select("google_email")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    googleEmail = tokenRow?.google_email ?? null;
+    googleEmail = existingToken.google_email ?? null;
 
     const accounts = await listGoogleAccounts(accessToken);
     const collected: GoogleLocation[] = [];

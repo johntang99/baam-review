@@ -134,10 +134,17 @@ export function Sidebar({
   isBaamInternal,
   isFullServiceCustomer,
 }: SidebarProps) {
-  // Filter operational items for Full-Service customers — they see lists
-  // (read-only) but not single-send (BAAM staff does both on their behalf).
+  // Filter operational items for Full-Service customers — BAAM staff
+  // does the operational work on their behalf, so these items are hidden:
+  //   • "Request a Review" (/app/send) — single-send is BAAM's job
+  //   • "Connect a new location" — BAAM connects the GBP for them; once
+  //     connected, the location appears under "Manage all locations"
+  const hiddenForFullService = new Set([
+    "/app/send",
+    "/api/auth/google/start",
+  ]);
   const workspaceItemsForViewer = isFullServiceCustomer
-    ? workspaceItems.filter((i) => i.href !== "/app/send")
+    ? workspaceItems.filter((i) => !hiddenForFullService.has(i.href))
     : workspaceItems;
   const operationsItems = operationsItemsForRole(opsRole);
   // Roles & access is for any internal staff (includes role=null legacy

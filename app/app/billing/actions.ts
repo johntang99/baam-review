@@ -424,6 +424,104 @@ export async function createLocationInvoiceSubscription(
   return { ok: true };
 }
 
+/**
+ * Full Service trial via INVOICE (pay by check), pre-location variant.
+ *
+ * Companion to /api/billing/start-fullservice (which uses Stripe Checkout
+ * + card). For customers who already signed up and want to pay by check
+ * instead of card:
+ *
+ *  1. Create a Stripe customer from their signed-in email
+ *  2. Create a subscription with collection_method='send_invoice', 30-day
+ *     trial, account_id tagged in metadata
+ *  3. Finalize the first invoice immediately (default is a 1h delay)
+ *  4. Mirror trial state onto the account so the dashboard reflects it
+ *     without waiting on a webhook
+ *
+ * The first invoice is sent automatically by Stripe at trial end (day 31)
+ * with 30-day net terms. BAAM staff marks each invoice paid in Stripe
+ * when the check clears.
+ *
+ * Returns ok:true on success — caller refreshes /app/billing where the
+ * dashboard + billing page now show the trial.
+ */
+export async function startFullServiceTrialByInvoice(
+  fd: FormData,
+): Promise<ActionResult> {
+  if (!isStripeConfigured())
+    return { ok: false, error: "Billing is not configured." };
+  const account = await currentAccount();
+  if (!account) return { ok: false, error: "No account." };
+  if (account.review_plan !== "full_service")
+    return {
+      ok: false,
+      error: "Invoice/check billing is Full-service only.",
+    };
+  if (!account.primary_email)
+    return {
+      ok: false,
+      error: "Add an account email before using invoice/check billing.",
+    };
+
+  const interval = readInterval(fd);
+  const stripe = getStripe();
+  const service = createServiceClient();
+
+  const customer = await stripe.customers.create({
+    name: account.name ?? undefined,
+    email: account.primary_email,
+    metadata: { account_id: account.id, kind: "fullservice_trial" },
+  });
+
+  const ref = locationPriceRef("full_service", true);
+  const sub = await stripe.subscriptions.create({
+    customer: customer.id,
+    items: [{ price: resolvePriceId(ref.plan, ref.component, interval) }],
+    ...(PLAN_HAS_TRIAL.full_service
+      ? { trial_period_days: TRIAL_DAYS }
+      : {}),
+    collection_method: "send_invoice",
+    days_until_due: 30,
+    metadata: {
+      account_id: account.id,
+      plan: "full_service",
+      interval,
+      kind: "fullservice_trial",
+      signed_in_account_id: account.id,
+    },
+  });
+
+  // Force-finalize the first (likely $0 trial) invoice so the customer
+  // can see a real document in Stripe right away. For trial-mode subs
+  // the first real invoice arrives at day 31; this finalize is purely
+  // about UX clarity.
+  const invId =
+    typeof sub.latest_invoice === "string"
+      ? sub.latest_invoice
+      : sub.latest_invoice?.id;
+  if (invId) {
+    try {
+      await stripe.invoices.finalizeInvoice(invId);
+    } catch {
+      // Trial-mode invoices are often \$0 — finalize sometimes errors.
+      // Non-fatal; Stripe will retry.
+    }
+  }
+
+  await service
+    .from("accounts")
+    .update({
+      stripe_customer_id: customer.id,
+      subscription_status: "trialing",
+      subscription_tier: "trial",
+    })
+    .eq("id", account.id);
+
+  revalidatePath("/app/billing");
+  revalidatePath("/app");
+  return { ok: true };
+}
+
 /** Stripe Customer Portal for a single location's own customer. */
 export async function createLocationPortalSession(
   fd: FormData,

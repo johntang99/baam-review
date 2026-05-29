@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { randomBytes } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
+import { isFullServiceCustomerReadOnly } from "@/lib/auth/staff";
 import { buildConsentUrl } from "@/lib/google/oauth";
 
 const STATE_COOKIE = "g_oauth_state";
@@ -29,6 +30,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(
       new URL("/login?next=/app/locations", request.url),
     );
+  }
+
+  // Full Service customers don't connect their own GBP — BAAM staff does
+  // it on their behalf. Bounce them to billing where they can see the
+  // trial status and the next-step message.
+  if (await isFullServiceCustomerReadOnly(supabase, user.id)) {
+    return NextResponse.redirect(new URL("/app/billing", request.url));
   }
 
   const state = randomBytes(24).toString("base64url");

@@ -73,9 +73,21 @@ export default async function BillingPage({
 
   const { data: account } = await supabase
     .from("accounts")
-    .select("review_plan")
+    .select(
+      "review_plan, stripe_customer_id, subscription_status, current_period_end",
+    )
     .eq("id", profile.account_id)
     .maybeSingle();
+
+  // Trial state: the customer paid (Stripe customer exists, sub is in a
+  // live state) but hasn't had a location connected yet. We show a
+  // "waiting on BAAM to connect GBP" card instead of the start-trial
+  // button in this window — otherwise the page invites them to pay again.
+  const trialStarted =
+    !!account?.stripe_customer_id &&
+    (account?.subscription_status === "trialing" ||
+      account?.subscription_status === "active" ||
+      account?.subscription_status === "past_due");
 
   // Role-based visibility: admin sees every client in the ops tenant;
   // sales sees clients they connected; account_manager sees clients
@@ -163,15 +175,41 @@ export default async function BillingPage({
             >
               {(locations ?? []).length === 0 ? (
                 plan === "full_service" ? (
-                  <div className="space-y-3 max-w-2xl">
-                    <p className="text-[13.5px] text-text-soft leading-relaxed">
-                      Full Service includes a 30-day free trial. Your card is
-                      saved at checkout but not charged until day 31. After
-                      payment, our team will connect your Google Business
-                      Profile and start sending review requests for you.
-                    </p>
-                    <StartFullServiceTrialButton />
-                  </div>
+                  trialStarted ? (
+                    <div className="rounded-2xl border border-success/40 bg-success-soft/30 p-5 max-w-2xl space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-success/15 text-success">
+                          ✓
+                        </span>
+                        <p className="text-[14.5px] font-semibold text-ink">
+                          Trial active — BAAM is connecting your Google Business Profile
+                        </p>
+                      </div>
+                      <p className="text-[13px] text-text-soft leading-relaxed pl-9">
+                        Your card is saved.
+                        {account?.subscription_status === "trialing"
+                          ? " You won't be charged until the trial ends."
+                          : ""}{" "}
+                        Our team has received your payment and will reach out
+                        within 1 business day to connect your GBP. Once
+                        connected, your location will appear here.
+                      </p>
+                      <p className="pl-9 text-[12px] text-text-muted italic">
+                        Questions? Reply to your welcome email or contact
+                        support@baamplatform.com.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 max-w-2xl">
+                      <p className="text-[13.5px] text-text-soft leading-relaxed">
+                        Full Service includes a 30-day free trial. Your card is
+                        saved at checkout but not charged until day 31. After
+                        payment, our team will connect your Google Business
+                        Profile and start sending review requests for you.
+                      </p>
+                      <StartFullServiceTrialButton />
+                    </div>
+                  )
                 ) : (
                   <p className="text-[13px] text-text-muted">
                     No locations yet. Add one under Locations, then set up its
