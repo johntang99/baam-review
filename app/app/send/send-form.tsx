@@ -12,6 +12,10 @@ import {
   Info,
   Sparkles,
   Undo2,
+  Eye,
+  Copy,
+  Check,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +28,7 @@ import { sendReviewRequest, type SendResult } from "./actions";
 
 interface LocationOption {
   id: string;
+  slug: string;
   display_name: string;
   default_language: string;
   supported_languages: string[];
@@ -70,6 +75,7 @@ export function SendForm({
 
   const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<SendResult | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const currentLocation = locations.find((l) => l.id === locationId);
   const billingBlocked = blockedLocationIds.includes(locationId);
@@ -553,13 +559,46 @@ export function SendForm({
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-3 border-t border-border-base pt-5">
-          <Button type="submit" size="lg" disabled={pending || billingBlocked}>
-            <Send className="h-4 w-4" />
-            {pending ? "Sending…" : `Send via ${channel === "sms" ? "SMS" : "email"}`}
-          </Button>
+        <div className="border-t border-border-base pt-5 space-y-3">
+          <p className="text-[12.5px] text-text-soft leading-relaxed">
+            <span className="font-medium text-ink">Tip:</span> Want it to feel
+            personal? Click{" "}
+            <span className="font-medium text-ink">
+              Preview &amp; send via your email
+            </span>{" "}
+            to open the message in your own mail app — recipient still lands on
+            your review page.
+          </p>
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              onClick={() => setPreviewOpen(true)}
+              disabled={!currentLocation}
+            >
+              <Eye className="h-4 w-4" />
+              Preview &amp; send via your email
+            </Button>
+            <Button type="submit" size="lg" disabled={pending || billingBlocked}>
+              <Send className="h-4 w-4" />
+              {pending ? "Sending…" : `Send via ${channel === "sms" ? "SMS" : "email"}`}
+            </Button>
+          </div>
         </div>
       </form>
+
+      {previewOpen && currentLocation && (
+        <PreviewModal
+          channel={channel}
+          to={channel === "sms" ? phone : email}
+          subject={subject}
+          body={body}
+          slug={currentLocation.slug}
+          businessName={currentLocation.display_name}
+          onClose={() => setPreviewOpen(false)}
+        />
+      )}
 
       {result?.ok && result.trackingUrl && (
         <SuccessCard
@@ -567,6 +606,228 @@ export function SendForm({
           flagged={!!result.flagged}
         />
       )}
+    </div>
+  );
+}
+
+/**
+ * Renders the actual subject/body that will go out, with the template
+ * variables resolved against the current location:
+ *   • <slug>  → location.slug
+ *   • ?t=<token> stripped entirely (untracked link — works for the
+ *     recipient without a per-request token)
+ *
+ * Used by the preview modal so staff sees the same words their recipient
+ * will see, and so the "copy + send from my own email" path produces a
+ * working link.
+ */
+function renderForCopy(text: string, slug: string): string {
+  return text.replace(/\?t=<token>/g, "").replace(/<slug>/g, slug);
+}
+
+function PreviewModal({
+  channel,
+  to,
+  subject,
+  body,
+  slug,
+  businessName,
+  onClose,
+}: {
+  channel: "sms" | "email";
+  to: string;
+  subject: string;
+  body: string;
+  slug: string;
+  businessName: string;
+  onClose: () => void;
+}) {
+  const [copied, setCopied] = useState<"none" | "subject" | "body" | "all">(
+    "none",
+  );
+
+  const renderedSubject = renderForCopy(subject, slug);
+  const renderedBody = renderForCopy(body, slug);
+
+  async function copy(text: string, which: "subject" | "body" | "all") {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(which);
+      setTimeout(() => setCopied("none"), 1600);
+    } catch {
+      // Clipboard API can be blocked (insecure context, perm denied) —
+      // surface nothing; the user can still select-and-copy by hand.
+    }
+  }
+
+  // mailto: / sms: handoff to the user's default app. Encode body+subject
+  // so newlines and ampersands survive intact.
+  const mailtoHref =
+    channel === "email"
+      ? `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(renderedSubject)}&body=${encodeURIComponent(renderedBody)}`
+      : "";
+  const smsHref =
+    channel === "sms"
+      ? `sms:${encodeURIComponent(to)}?body=${encodeURIComponent(renderedBody)}`
+      : "";
+
+  const allText =
+    channel === "email"
+      ? `To: ${to}\nSubject: ${renderedSubject}\n\n${renderedBody}`
+      : `To: ${to}\n\n${renderedBody}`;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Message preview"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="w-full max-w-2xl rounded-2xl bg-paper shadow-2xl">
+        <div className="flex items-start justify-between px-6 pt-5 pb-3 border-b border-border-base">
+          <div>
+            <h2 className="font-display text-[19px] text-ink leading-tight">
+              Preview &amp; copy
+            </h2>
+            <p className="text-[12.5px] text-text-soft mt-0.5">
+              For {businessName}. Variables are filled with real data.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="text-text-muted hover:text-ink p-1 -m-1"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="px-6 py-5 space-y-4 max-h-[60vh] overflow-y-auto">
+          <PreviewRow label="To" value={to || "(no recipient entered)"} />
+          {channel === "email" && (
+            <PreviewRow
+              label="Subject"
+              value={renderedSubject}
+              onCopy={() => copy(renderedSubject, "subject")}
+              copied={copied === "subject"}
+            />
+          )}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[11.5px] uppercase tracking-[0.08em] text-text-muted font-medium">
+                Body
+              </span>
+              <button
+                type="button"
+                onClick={() => copy(renderedBody, "body")}
+                className="inline-flex items-center gap-1 text-[12px] text-forest hover:underline"
+              >
+                {copied === "body" ? (
+                  <>
+                    <Check className="h-3 w-3" /> Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3 w-3" /> Copy body
+                  </>
+                )}
+              </button>
+            </div>
+            <pre className="whitespace-pre-wrap rounded-lg border border-border-base bg-cream-deep/30 px-3.5 py-3 text-[13px] text-ink font-sans leading-relaxed">
+              {renderedBody}
+            </pre>
+          </div>
+        </div>
+
+        <div className="border-t border-border-base px-6 py-4 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => copy(allText, "all")}
+            >
+              {copied === "all" ? (
+                <>
+                  <Check className="h-3.5 w-3.5" /> Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3.5 w-3.5" /> Copy entire message
+                </>
+              )}
+            </Button>
+            {channel === "email" ? (
+              <a href={mailtoHref}>
+                <Button type="button" size="sm">
+                  <Mail className="h-3.5 w-3.5" />
+                  Open in my mail app →
+                </Button>
+              </a>
+            ) : (
+              <a href={smsHref}>
+                <Button type="button" size="sm">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  Open in my messages app →
+                </Button>
+              </a>
+            )}
+          </div>
+          <p className="text-[11.5px] text-text-muted leading-relaxed">
+            Sending from your own {channel === "email" ? "mail app" : "messages app"}{" "}
+            makes it feel personal — recipient still lands on your review page.
+            Note: BAAM delivery tracking only works when you use{" "}
+            <strong>Send via {channel === "email" ? "email" : "SMS"}</strong>{" "}
+            above.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PreviewRow({
+  label,
+  value,
+  onCopy,
+  copied,
+}: {
+  label: string;
+  value: string;
+  onCopy?: () => void;
+  copied?: boolean;
+}) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[11.5px] uppercase tracking-[0.08em] text-text-muted font-medium">
+          {label}
+        </span>
+        {onCopy && (
+          <button
+            type="button"
+            onClick={onCopy}
+            className="inline-flex items-center gap-1 text-[12px] text-forest hover:underline"
+          >
+            {copied ? (
+              <>
+                <Check className="h-3 w-3" /> Copied
+              </>
+            ) : (
+              <>
+                <Copy className="h-3 w-3" /> Copy
+              </>
+            )}
+          </button>
+        )}
+      </div>
+      <p className="rounded-lg border border-border-base bg-cream-deep/30 px-3.5 py-2 text-[13px] text-ink break-all">
+        {value}
+      </p>
     </div>
   );
 }

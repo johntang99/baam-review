@@ -22,6 +22,7 @@ better for these scenarios:
 | Customer just walked out | Send within an hour while the experience is fresh — best response rate |
 | High-value customer (long-term patient, big spender) | Worth crafting a personal message; bulk variants are still generic |
 | Owner wants to send themselves from their phone | The send page works on mobile; no list creation needed |
+| You want the email to come from *your* address | Use **Preview & send via your email** — opens the draft in Gmail / Apple Mail / Outlook with everything pre-filled. Looks friend-to-friend. |
 | Re-send after a bounce / fix | One customer at a time is cleaner |
 
 ---
@@ -132,9 +133,58 @@ After AI rewrite (or with the default template), check:
 
 ### Step 5 — Send
 
-Click the green **Send via email** button. The send happens immediately;
-the customer should receive the email within 30 seconds. You'll see a
-success toast with a link to view tracking.
+You have two paths to send. Pick whichever fits the relationship.
+
+#### Path A — Send via email (default)
+
+Click the green **Send via email** button. The send happens through
+Resend on the location's custom sender domain. The customer should
+receive the email within 30 seconds. You'll see a success toast with
+a link to view tracking.
+
+**Tracked end-to-end**: delivered → opened (if pixel enabled) →
+clicked → reviewed. This is the right choice for most sends.
+
+#### Path B — Preview & send via your email
+
+Click the secondary **Preview & send via your email** button instead.
+A preview opens showing the exact rendered To / Subject / Body with
+all variables filled in (real slug, recipient name, business name). From
+there you have three convenience actions:
+
+| Action | What happens |
+|---|---|
+| **Copy body** | Just the message body lands on your clipboard |
+| **Copy entire message** | `To: … / Subject: … / Body: …` block — paste into a fresh draft |
+| **Open in my mail app →** | A `mailto:` link opens Gmail (web or app), Apple Mail, or Outlook with To, Subject, and Body already filled. One click to draft, one click to send. |
+
+For SMS the same modal exposes an **Open in my messages app →** button
+that uses `sms:` to launch the system's messaging app.
+
+**When to use Path B:**
+
+- The customer is a personal contact (long-term patient, repeat regular)
+  and a system-looking email would feel cold
+- You're an owner who prefers your business reviews come from your own
+  Gmail rather than `review@reviews.yourbiz.com`
+- You want to start a real reply thread with the customer (a Resend-sent
+  email has a sender they can't easily reply-to)
+
+**Tradeoffs of Path B:**
+
+- ❌ **No BAAM delivery tracking** — we never see the message hit Resend,
+  so `delivered` / `opened` / `clicked` won't appear on `/app/reviews`
+- ❌ **No AI variation tracking** — bulk-style spam-filter mitigations
+  don't apply because it's sent from your personal account
+- ✅ **Recipient still lands on your review page** — the link in the
+  copied body works without the per-request token (review page handles
+  the no-token case)
+- ✅ **Inbox placement is generally better** — personal accounts have
+  higher trust scores than bulk-sending domains
+
+Path B does NOT replace Path A. Use Path A for volume (post-visit nudges,
+re-engagements). Use Path B for the handful of customers per week where
+"this came from a system" would hurt the relationship.
 
 ---
 
@@ -324,10 +374,13 @@ the language matches the sender domain's typical content.
 □ Recipient consented to receive email
 □ Pick the correct language (recipient's language, not yours)
 □ Click "Rewrite with AI" — pick tone matching the customer's style
+□ Decide: Path A (Send via email — tracked) or Path B (Preview & send
+  via your email — personal but untracked)
 □ Verify preview: name + business name + ONE link, no spam-trigger words
-□ Verify From: shows custom domain, not "via BAAM Review"
-□ Click Send via email
-□ Confirm "delivered" appears within 30 seconds on /app/reviews
+□ Path A: verify From: shows custom domain, not "via BAAM Review"
+□ Click the send button you chose
+□ Path A: confirm "delivered" appears within 30 seconds on /app/reviews
+□ Path B: confirm the draft opened in your mail app, then send from there
 ```
 
 ---
@@ -338,3 +391,7 @@ the language matches the sender domain's typical content.
   with AI rewrite (4 tones, multilingual), custom sender domain
   expectations, and Promotions-tab mitigation strategies. Companion
   to BULK_REVIEW_REQUEST_SOP.md for batch sends.
+- **2026-05-29** — Added Path B: **Preview & send via your email**.
+  Documents the new modal (To/Subject/Body preview, Copy body, Copy
+  entire message, Open in my mail app/messages app), when to choose
+  it over the tracked send, and the no-tracking tradeoff.

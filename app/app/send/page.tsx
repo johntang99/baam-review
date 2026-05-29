@@ -26,7 +26,7 @@ export default async function SendPage() {
 
   let locationsQuery = supabase
     .from("locations")
-    .select("id, display_name, default_language, supported_languages")
+    .select("id, slug, display_name, default_language, supported_languages")
     .order("created_at", { ascending: false });
   if (visibleIds !== null) {
     locationsQuery = locationsQuery.in(
