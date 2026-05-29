@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, ExternalLink, QrCode, Code, Star } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
@@ -8,6 +8,7 @@ import {
   canAccessLocation,
   getVisibleLocationIds,
 } from "@/lib/auth/staff";
+import { getLocationBillingMap } from "@/lib/billing/access";
 import { PageHeader } from "@/components/admin/page-header";
 import { InContentLocationPicker } from "@/components/locations/in-content-location-picker";
 import { SettingsForm } from "./settings-form";
@@ -77,6 +78,19 @@ export default async function LocationSettingsPage({
 
   if (!location) notFound();
 
+  // Billing summary + interval for the Billing tab. Reuses the same helper
+  // that drives the badge on /app/locations, plus billing_interval pulled
+  // directly off location_subscriptions (not in the summary type).
+  const billingMap = await getLocationBillingMap([location.id]);
+  const billingSummary = billingMap.get(location.id) ?? null;
+  const svc = createServiceClient();
+  const { data: subRow } = await svc
+    .from("location_subscriptions")
+    .select("billing_interval")
+    .eq("location_id", location.id)
+    .maybeSingle();
+  const billingInterval = subRow?.billing_interval ?? null;
+
   const defaultFromAddress =
     process.env.RESEND_FROM ?? "no-reply@baamplatform.com";
 
@@ -103,49 +117,15 @@ export default async function LocationSettingsPage({
             eyebrow="Location settings"
             title={location.display_name}
             description={location.address ?? undefined}
-          >
-            <Link
-              href={`/app/locations/${location.id}/reviews`}
-              className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-forest hover:underline"
-            >
-              <Star className="h-3.5 w-3.5" />
-              Google reviews
-            </Link>
-            <Link
-              href={`/app/locations/${location.id}/qr`}
-              className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-forest hover:underline"
-            >
-              <QrCode className="h-3.5 w-3.5" />
-              QR poster
-            </Link>
-            <Link
-              href={`/app/locations/${location.id}/embed`}
-              className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-forest hover:underline"
-            >
-              <Code className="h-3.5 w-3.5" />
-              Embed
-            </Link>
-            {location.google_review_url && (
-              <a
-                href={location.google_review_url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-[12.5px] text-text-soft hover:text-forest"
-              >
-                Google review form
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            )}
-          </PageHeader>
-          <p className="mt-2 inline-block rounded-md bg-cream-deep px-2 py-0.5 text-[11.5px] text-text-soft font-mono">
-            /r/{location.slug}
-          </p>
+          />
         </div>
 
         <SettingsForm
           location={location}
           accountId={profile.account_id}
           defaultFromAddress={defaultFromAddress}
+          billingSummary={billingSummary}
+          billingInterval={billingInterval}
         />
       </div>
     </main>

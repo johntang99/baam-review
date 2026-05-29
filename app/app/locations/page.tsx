@@ -24,6 +24,7 @@ import {
   type PersonOption,
 } from "./locations-toolbar";
 import { LocationsTable, type LocationRow } from "./locations-table";
+import { BillingRequiredButton } from "./billing-required-button";
 
 export const metadata = {
   title: "Locations — BAAM Review",
@@ -384,6 +385,21 @@ export default async function LocationsPage({
 
   return (
     <main className="px-10 py-10 space-y-4">
+      {total > 0 && (
+        <div className="flex items-start gap-3 rounded-xl border border-forest/30 bg-forest/[0.05] px-4 py-3 text-[13px] text-text">
+          <Settings className="h-4 w-4 mt-0.5 flex-shrink-0 text-forest" />
+          <p className="leading-relaxed">
+            <span className="font-medium text-ink">
+              Don&apos;t forget to set up each location.
+            </span>{" "}
+            Open a location to configure logo &amp; brand color, email sender
+            domain, review form, and billing — click the{" "}
+            <Settings className="inline-block h-3 w-3 -translate-y-0.5" /> icon
+            in the Settings column below.
+          </p>
+        </div>
+      )}
+
       <PageHeader
         eyebrow={internal ? "BAAM Operations" : "Setup"}
         title="Locations"
@@ -560,7 +576,10 @@ function GridView({
                 </p>
               )}
               <div className="pt-1.5">
-                <GridBillingBadge summary={billingMap.get(loc.id)} />
+                <GridBillingBadge
+                  locationId={loc.id}
+                  summary={billingMap.get(loc.id)}
+                />
               </div>
             </div>
           </div>
@@ -590,8 +609,10 @@ function GridView({
 }
 
 function GridBillingBadge({
+  locationId,
   summary,
 }: {
+  locationId: string;
   summary: LocationBillingSummary | undefined;
 }) {
   const base =
@@ -605,9 +626,12 @@ function GridBillingBadge({
     summary.accountPlan === "self_service" ? "Self-service" : "Full-service";
   if (!summary.locStatus) {
     return (
-      <span className={`${base} bg-[#fbe6ec] text-[#a31a4f] ring-1 ring-inset ring-[#a31a4f]/20`}>
-        {planLabel} · Billing required
-      </span>
+      <BillingRequiredButton
+        locationId={locationId}
+        plan={summary.accountPlan}
+        label={`${planLabel} · Billing required`}
+        className={`${base} bg-[#fbe6ec] text-[#a31a4f] ring-1 ring-inset ring-[#a31a4f]/20`}
+      />
     );
   }
   const method = summary.locMethod === "invoice" ? " · check" : "";

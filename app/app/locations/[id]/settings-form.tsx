@@ -12,7 +12,11 @@ import {
   FileText,
   Mail,
   LinkIcon,
+  CreditCard,
 } from "lucide-react";
+import { BillingRequiredButton } from "../billing-required-button";
+import type { LocationBillingSummary } from "@/lib/billing/access";
+import { createLocationPortalSession } from "@/app/app/billing/actions";
 import type { Database } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +40,9 @@ interface SettingsFormProps {
   location: Location;
   accountId: string;
   defaultFromAddress: string;
+  billingSummary: LocationBillingSummary | null;
+  /** "month" | "year" — pulled from location_subscriptions, not on the summary type. */
+  billingInterval: string | null;
 }
 
 const WELCOME_PLACEHOLDERS = {
@@ -50,7 +57,13 @@ const CUSTOM_URL_LABEL_PLACEHOLDERS = {
   es: "Dejar una reseña en nuestro sitio",
 };
 
-type TabId = "branding" | "languages" | "review" | "email" | "links";
+type TabId =
+  | "branding"
+  | "languages"
+  | "review"
+  | "email"
+  | "links"
+  | "billing";
 
 const TABS: Array<{
   id: TabId;
@@ -60,8 +73,9 @@ const TABS: Array<{
   { id: "branding", label: "Branding", icon: Palette },
   { id: "languages", label: "Languages", icon: Globe },
   { id: "review", label: "Review form", icon: FileText },
-  { id: "email", label: "Email", icon: Mail },
+  { id: "email", label: "Email Sender", icon: Mail },
   { id: "links", label: "Links", icon: LinkIcon },
+  { id: "billing", label: "Billing", icon: CreditCard },
 ];
 
 const VALID_TAB_IDS = new Set<TabId>(TABS.map((t) => t.id));
@@ -74,6 +88,8 @@ export function SettingsForm({
   location,
   accountId,
   defaultFromAddress,
+  billingSummary,
+  billingInterval,
 }: SettingsFormProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -132,10 +148,11 @@ export function SettingsForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-0">
-      {/* TAB NAVIGATION
-          Sticky so it stays visible while saving / scrolling within a tab. */}
-      <div className="sticky top-0 z-10 -mx-10 mb-8 border-b border-border-base bg-cream/95 px-10 pt-1 backdrop-blur">
+    <form onSubmit={onSubmit} className="space-y-4">
+      {/* TAB NAVIGATION — solid pill bar so the menu reads as a real
+          chrome element instead of a faint underline strip. Sticks to the
+          top of the viewport while scrolling within a tab. */}
+      <div className="sticky top-2 z-10 rounded-xl border border-border-base bg-paper p-1.5 shadow-sm">
         <nav className="flex gap-1 overflow-x-auto" role="tablist">
           {TABS.map((t) => {
             const Icon = t.icon;
@@ -147,26 +164,24 @@ export function SettingsForm({
                 role="tab"
                 aria-selected={active}
                 onClick={() => setTab(t.id)}
-                className={`relative inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-[13.5px] font-medium transition-colors ${
+                className={`inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-3.5 py-2.5 text-[13.5px] font-semibold transition-all ${
                   active
-                    ? "text-ink"
-                    : "text-text-soft hover:text-ink"
+                    ? "bg-forest text-cream shadow-sm"
+                    : "text-text-soft hover:bg-cream-deep/40 hover:text-ink"
                 }`}
               >
-                <Icon className="h-3.5 w-3.5" />
+                <Icon className="h-4 w-4" />
                 {t.label}
-                {active && (
-                  <span className="absolute inset-x-3 -bottom-px h-[2px] bg-forest" />
-                )}
               </button>
             );
           })}
         </nav>
       </div>
 
-      {/* All sections stay mounted (just hidden when their tab is inactive)
-          so the form submit picks up every field in one go. Switching tabs
-          is purely a CSS toggle — no remount, no lost typed-in values. */}
+      {/* Content card — sits on top of the page bg so the active tab's
+          form lives in its own clearly-bounded surface. All sections stay
+          mounted (just hidden) so submit picks up every field in one go. */}
+      <div className="rounded-2xl border border-border-base bg-paper px-6 pt-2 pb-6 shadow-sm">
 
       <div className={activeTab === "branding" ? "" : "hidden"}>
       <Section
@@ -441,7 +456,23 @@ export function SettingsForm({
       </Section>
       </div>
 
-      <div className="flex items-center justify-between border-t border-border-base pt-6 mt-2">
+      <div className={activeTab === "billing" ? "" : "hidden"}>
+      <Section
+        title="Billing"
+        description="Subscription state for this location. Changes happen on /app/billing."
+      >
+        <BillingTabContent
+          locationId={location.id}
+          summary={billingSummary}
+          interval={billingInterval}
+        />
+      </Section>
+      </div>
+
+      {/* /content card */}
+      </div>
+
+      <div className="flex items-center justify-between rounded-2xl border border-border-base bg-paper px-6 py-4 shadow-sm">
         <button
           type="button"
           onClick={onDelete}
@@ -546,5 +577,183 @@ function ReviewCategorySelect({
         </optgroup>
       ))}
     </select>
+  );
+}
+
+function fmtDate(s: string | null) {
+  if (!s) return "—";
+  try {
+    return new Date(s).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch {
+    return "—";
+  }
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  trialing: "Trialing",
+  active: "Active",
+  past_due: "Past due",
+  canceled: "Canceled",
+  incomplete: "Incomplete",
+  incomplete_expired: "Expired",
+  unpaid: "Unpaid",
+};
+
+const STATUS_CLS: Record<string, string> = {
+  trialing: "bg-gold/15 text-gold-dark",
+  active: "bg-success/10 text-success",
+  past_due: "bg-alert/10 text-alert",
+  canceled: "bg-text-muted/10 text-text-muted",
+};
+
+function BillingTabContent({
+  locationId,
+  summary,
+  interval,
+}: {
+  locationId: string;
+  summary: LocationBillingSummary | null;
+  interval: string | null;
+}) {
+  // No plan picked at the account level yet — nothing to bill against.
+  if (!summary || !summary.accountPlan) {
+    return (
+      <p className="text-[13px] text-text-soft">
+        No plan chosen for the owning account yet.{" "}
+        <Link
+          href="/app/billing"
+          className="text-forest underline hover:no-underline"
+        >
+          Choose a plan →
+        </Link>
+      </p>
+    );
+  }
+
+  const planLabel =
+    summary.accountPlan === "self_service" ? "Self-service" : "Full-service";
+
+  // Subscription not set up — render the same modal trigger as on the
+  // Locations list so staff can pick interval + method right here.
+  if (!summary.locStatus) {
+    return (
+      <div className="space-y-3">
+        <p className="text-[13px] text-text-soft">
+          This location is on the {planLabel} plan but has no active
+          subscription yet.
+        </p>
+        <BillingRequiredButton
+          locationId={locationId}
+          plan={summary.accountPlan}
+          label="Set up billing →"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium bg-forest text-cream"
+        />
+      </div>
+    );
+  }
+
+  const statusLabel =
+    STATUS_LABELS[summary.locStatus] ?? summary.locStatus;
+  const statusCls =
+    STATUS_CLS[summary.locStatus] ?? "bg-hover text-text-soft";
+  const intervalLabel =
+    interval === "year" ? "Annual" : interval === "month" ? "Monthly" : "—";
+  const methodLabel =
+    summary.locMethod === "invoice"
+      ? "Check (invoice, net-30)"
+      : summary.locMethod === "card"
+        ? "Card (via Stripe)"
+        : "—";
+  const periodEndLabel = summary.canceling
+    ? `Ends ${fmtDate(summary.contractEnd)}`
+    : `Next charge ${fmtDate(summary.contractEnd)}`;
+
+  return (
+    <div className="space-y-4">
+      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Row label="Plan" value={planLabel} />
+        <Row
+          label="Status"
+          value={
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11.5px] font-medium ${statusCls}`}
+            >
+              {statusLabel}
+              {summary.canceling && " · canceling"}
+            </span>
+          }
+        />
+        <Row label="Billing cycle" value={intervalLabel} />
+        <Row label="Payment method" value={methodLabel} />
+        <Row label="Started" value={fmtDate(summary.contractStart)} />
+        <Row label="Period" value={periodEndLabel} />
+      </dl>
+
+      <div className="pt-2 border-t border-border-soft">
+        <ManageBillingButton locationId={locationId} />
+      </div>
+    </div>
+  );
+}
+
+function ManageBillingButton({ locationId }: { locationId: string }) {
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  function onClick() {
+    setError(null);
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set("location_id", locationId);
+      const res = await createLocationPortalSession(fd);
+      if (!res.ok || !res.url) {
+        setError(res.error ?? "Couldn't open billing portal.");
+        return;
+      }
+      window.location.href = res.url;
+    });
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        onClick={onClick}
+        disabled={pending}
+      >
+        {pending ? "Opening Stripe…" : "Manage card, plan, or cancel →"}
+      </Button>
+      <p className="text-[11.5px] text-text-muted">
+        Opens this location&apos;s Stripe Customer Portal in a new flow.
+      </p>
+      {error && (
+        <p className="text-[12px] text-alert" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function Row({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div>
+      <dt className="text-[11px] uppercase tracking-[0.08em] text-text-muted">
+        {label}
+      </dt>
+      <dd className="mt-0.5 text-[13.5px] text-ink">{value}</dd>
+    </div>
   );
 }

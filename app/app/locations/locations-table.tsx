@@ -13,6 +13,7 @@ import {
   type AccountManagerOption,
   type AssignedManager,
 } from "./assignments/assign-manager-modal";
+import { BillingRequiredButton } from "./billing-required-button";
 import type { SortOption } from "./locations-toolbar";
 
 export interface LocationRow {
@@ -172,6 +173,7 @@ export function LocationsTable({
                 >
                   Location
                 </SortHeader>
+                <th className="px-3.5 py-2.5 font-medium">Settings</th>
                 <SortHeader
                   current={sort}
                   asc={null}
@@ -215,7 +217,7 @@ export function LocationsTable({
             <tbody>
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center">
+                  <td colSpan={8} className="px-6 py-12 text-center">
                     <MapPin className="h-5 w-5 text-text-muted mx-auto mb-2" />
                     <p className="text-[14px] text-ink">
                       No locations match the current filters.
@@ -272,6 +274,18 @@ export function LocationsTable({
                     </div>
                   </td>
 
+                  {/* Settings — bold call-out so this isn't buried in Actions */}
+                  <td className="px-3.5 py-3">
+                    <Link
+                      href={`/app/locations/${loc.id}`}
+                      title="Open location settings"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-forest/30 bg-forest/[0.06] px-2.5 py-1 text-[12px] font-medium text-forest hover:bg-forest/[0.12]"
+                    >
+                      <Settings className="h-3.5 w-3.5" />
+                      Set up
+                    </Link>
+                  </td>
+
                   {/* Plan */}
                   <td className="px-3.5 py-3">
                     {loc.plan ? (
@@ -288,13 +302,12 @@ export function LocationsTable({
                   {/* Billing */}
                   <td className="px-3.5 py-3">
                     {loc.billing_status === "required" ? (
-                      <Link
-                        href={`/app/billing#location-${loc.id}`}
-                        title="Set up billing for this location — pick monthly or annual and a payment method"
-                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11.5px] font-medium ${BILLING_CLS.required} cursor-pointer hover:brightness-95`}
-                      >
-                        {BILLING_LABEL.required}
-                      </Link>
+                      <BillingRequiredButton
+                        locationId={loc.id}
+                        plan={loc.plan}
+                        label={BILLING_LABEL.required}
+                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11.5px] font-medium ${BILLING_CLS.required}`}
+                      />
                     ) : loc.billing_status ? (
                       <span
                         className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11.5px] font-medium ${BILLING_CLS[loc.billing_status]}`}
@@ -384,11 +397,6 @@ export function LocationsTable({
                         href={`/app/locations/${loc.id}/qr`}
                         label="QR poster"
                         icon={<QrCode className="h-3.5 w-3.5" />}
-                      />
-                      <ActionIconLink
-                        href={`/app/locations/${loc.id}`}
-                        label="Settings"
-                        icon={<Settings className="h-3.5 w-3.5" />}
                       />
                       {loc.canAssign && (
                         <AssignManagerModal
