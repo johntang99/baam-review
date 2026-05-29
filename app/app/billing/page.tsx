@@ -17,6 +17,7 @@ import {
   LocationActions,
   StartFullServiceTrialButton,
 } from "./billing-client";
+import { BillingRequiredButton } from "../locations/billing-required-button";
 
 export const metadata = { title: "Billing — BAAM Review" };
 
@@ -35,6 +36,38 @@ function fmtDate(s: string | null) {
         day: "numeric",
       })
     : "—";
+}
+
+type SubRow = {
+  subscription_status: string | null;
+  cancel_at_period_end: boolean | null;
+} | undefined;
+
+function statusChipFor(sub: SubRow): { label: string; cls: string } {
+  if (!sub) {
+    return {
+      label: "Needs billing",
+      cls: "bg-[#fbe6ec] text-[#a31a4f] ring-1 ring-inset ring-[#a31a4f]/20",
+    };
+  }
+  if (sub.cancel_at_period_end) {
+    return { label: "Canceling", cls: "bg-alert/10 text-alert" };
+  }
+  switch (sub.subscription_status) {
+    case "trialing":
+      return { label: "Trialing", cls: "bg-gold/15 text-gold-dark" };
+    case "active":
+      return { label: "Active", cls: "bg-success/10 text-success" };
+    case "past_due":
+      return { label: "Past due", cls: "bg-alert/10 text-alert" };
+    case "canceled":
+      return { label: "Canceled", cls: "bg-text-muted/10 text-text-muted" };
+    default:
+      return {
+        label: sub.subscription_status ?? "—",
+        cls: "bg-hover text-text-soft",
+      };
+  }
 }
 
 export default async function BillingPage({
@@ -134,7 +167,7 @@ export default async function BillingPage({
 
   return (
     <main className="px-10 py-10">
-      <div className="max-w-3xl space-y-2">
+      <div className="max-w-6xl space-y-2">
         <PageHeader
           eyebrow="Billing"
           title="Plan & billing"
@@ -163,16 +196,7 @@ export default async function BillingPage({
           )}
 
           {(plan === "self_service" || plan === "full_service") && (
-            <Section
-              title={
-                plan === "full_service" ? "Client businesses" : "Locations"
-              }
-              description={
-                plan === "full_service"
-                  ? "Each business is billed separately (its own card or pay-by-check)."
-                  : "$99/mo per location. Each location is its own subscription with its own card."
-              }
-            >
+            <div className="pt-2">
               {(locations ?? []).length === 0 ? (
                 plan === "full_service" ? (
                   trialStarted ? (
@@ -217,57 +241,109 @@ export default async function BillingPage({
                   </p>
                 )
               ) : (
-                <ul className="divide-y divide-border-soft">
-                  {(locations ?? []).map((l) => {
-                    const s = subByLoc.get(l.id);
-                    return (
-                      <li
-                        key={l.id}
-                        id={`location-${l.id}`}
-                        className="flex flex-wrap items-center justify-between gap-3 py-4 target:bg-gold/[0.08] target:rounded-lg target:px-3"
-                      >
-                        <div>
-                          <div className="text-[14px] text-ink">
-                            {l.display_name}
-                          </div>
-                          <div
-                            className={`text-[12px] ${
-                              s?.cancel_at_period_end
-                                ? "text-alert"
-                                : "text-text-soft"
-                            }`}
-                          >
-                            {s
-                              ? `${s.subscription_status ?? "—"}${
-                                  s.cancel_at_period_end ? " · canceling" : ""
-                                } · ${
-                                  s.billing_interval === "year"
-                                    ? "annual"
-                                    : "monthly"
-                                } · ${
-                                  s.collection_method === "invoice"
-                                    ? "invoice (check)"
-                                    : "card"
-                                } · ${
-                                  s.cancel_at_period_end ? "ends" : "next"
-                                } ${fmtDate(s.current_period_end ?? null)}`
-                              : "No billing set up"}
-                          </div>
-                        </div>
-                        <LocationActions
-                          locationId={l.id}
-                          accountPlan={plan}
-                          hasSub={
+                <div className="rounded-2xl border border-border-base bg-paper overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[13px]">
+                      <thead className="bg-cream-deep/40 text-left text-[11px] uppercase tracking-[0.08em] text-text-muted">
+                        <tr>
+                          <th className="px-3.5 py-2.5 font-medium">
+                            {plan === "full_service" ? "Business" : "Location"}
+                          </th>
+                          <th className="px-3.5 py-2.5 font-medium">Status</th>
+                          <th className="px-3.5 py-2.5 font-medium">Cycle</th>
+                          <th className="px-3.5 py-2.5 font-medium">Payment</th>
+                          <th className="px-3.5 py-2.5 font-medium">Period</th>
+                          <th className="px-3.5 py-2.5 font-medium text-right">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(locations ?? []).map((l, idx) => {
+                          const s = subByLoc.get(l.id);
+                          const hasSub =
                             Boolean(s) &&
-                            s?.subscription_status !== "canceled"
-                          }
-                        />
-                      </li>
-                    );
-                  })}
-                </ul>
+                            s?.subscription_status !== "canceled";
+                          const statusInfo = statusChipFor(s);
+                          const cycleLabel =
+                            s?.billing_interval === "year"
+                              ? "Annual"
+                              : s?.billing_interval === "month"
+                                ? "Monthly"
+                                : "—";
+                          const paymentLabel =
+                            s?.collection_method === "invoice"
+                              ? "Check"
+                              : s?.collection_method === "card"
+                                ? "Card"
+                                : "—";
+                          return (
+                            <tr
+                              key={l.id}
+                              id={`location-${l.id}`}
+                              className={`border-t border-border-soft ${
+                                idx % 2 === 1
+                                  ? "bg-cream-deep/[0.18]"
+                                  : ""
+                              } target:bg-gold/[0.08]`}
+                            >
+                              <td className="px-3.5 py-3 text-ink font-medium">
+                                {l.display_name}
+                              </td>
+                              <td className="px-3.5 py-3">
+                                <span
+                                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11.5px] font-medium ${statusInfo.cls}`}
+                                >
+                                  {statusInfo.label}
+                                </span>
+                              </td>
+                              <td className="px-3.5 py-3 text-text">
+                                {cycleLabel}
+                              </td>
+                              <td className="px-3.5 py-3 text-text">
+                                {paymentLabel}
+                              </td>
+                              <td className="px-3.5 py-3">
+                                {s ? (
+                                  <span
+                                    className={`text-[12.5px] ${
+                                      s.cancel_at_period_end
+                                        ? "text-alert"
+                                        : "text-text-soft"
+                                    }`}
+                                  >
+                                    {s.cancel_at_period_end ? "Ends " : "Next "}
+                                    {fmtDate(s.current_period_end ?? null)}
+                                  </span>
+                                ) : (
+                                  <span className="text-text-muted">—</span>
+                                )}
+                              </td>
+                              <td className="px-3.5 py-3 text-right">
+                                {hasSub ? (
+                                  <LocationActions
+                                    locationId={l.id}
+                                    accountPlan={plan}
+                                    hasSub={true}
+                                  />
+                                ) : (
+                                  <BillingRequiredButton
+                                    locationId={l.id}
+                                    plan={plan}
+                                    label="Set up billing →"
+                                    className="inline-flex items-center gap-1.5 rounded-md bg-forest px-3 py-1.5 text-[12px] font-medium text-cream"
+                                  />
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
-            </Section>
+            </div>
           )}
         </div>
       </div>
