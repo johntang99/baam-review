@@ -227,6 +227,18 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     });
     providerId = r.providerId;
     sendError = r.error;
+    if (sendError) {
+      // Resend rejects synchronously — log the exact payload (sans body
+      // text) so we can diagnose address-length / header-encoding bugs
+      // without having to reproduce locally.
+      console.error("[send] Resend rejected single send", {
+        from,
+        to: recipientEmail,
+        subjectLen: subjectText.length,
+        replyTo: user.email ?? null,
+        error: sendError,
+      });
+    }
   }
 
   if (sendError) {
@@ -318,7 +330,26 @@ function formatFromHeader(name: string, email: string): string {
   // RFC 5322: quote display name when it contains characters like commas,
   // colons, semicolons, etc. Stripping these is simplest.
   const safe = name.replace(/["<>]/g, "").trim();
-  return safe ? `${safe} <${email}>` : email;
+  // Bound the display name so Resend's RFC 2047 encoding doesn't blow
+  // past their 320-char "address length" cap. Non-ASCII chars get
+  // base64-encoded and wrapped, which roughly doubles the byte count;
+  // a long Chinese / Cyrillic / Arabic business name + " via BAAM
+  // Review" easily exceeds the limit. Inbox previews only show ~25
+  // chars anyway, so truncating loses nothing visible.
+  const capped = capDisplayName(safe);
+  return capped ? `${capped} <${email}>` : email;
+}
+
+function capDisplayName(name: string): string {
+  if (!name) return "";
+  // ASCII-only: cap at 64 chars (still well under any address limit).
+  const isAscii = /^[\x00-\x7F]*$/.test(name);
+  const limit = isAscii ? 64 : 32;
+  if (name.length <= limit) return name;
+  // Cut at a word boundary if possible so we don't truncate mid-word.
+  const cut = name.slice(0, limit);
+  const lastSpace = cut.lastIndexOf(" ");
+  return lastSpace > limit / 2 ? cut.slice(0, lastSpace) : cut;
 }
 
 function extractEmail(s: string): string | null {
