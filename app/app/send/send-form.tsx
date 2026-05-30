@@ -12,8 +12,6 @@ import {
   Info,
   Sparkles,
   Undo2,
-  Eye,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,7 +81,12 @@ export function SendForm({
 
   const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<SendResult | null>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const [openingGmail, startOpenGmailTransition] = useTransition();
+  const [gmailError, setGmailError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{
+    name?: string;
+    email?: string;
+  }>({});
 
   const currentLocation = locations.find((l) => l.id === locationId);
   const currentGmailSender = asEmailOrEmpty(
@@ -224,6 +227,7 @@ export function SendForm({
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setResult(null);
+    setGmailError(null);
     const fd = new FormData(e.currentTarget);
     startTransition(async () => {
       const r = await sendReviewRequest(fd);
@@ -232,6 +236,80 @@ export function SendForm({
         setName("");
         setPhone("");
         setEmail("");
+      }
+    });
+  }
+
+  function validateEmailRequiredFields(): boolean {
+    const next: { name?: string; email?: string } = {};
+    if (!name.trim()) next.name = "Customer name is required.";
+    if (channel === "email") {
+      const trimmedEmail = email.trim();
+      if (!trimmedEmail) {
+        next.email = "Email address is required.";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        next.email = "Enter a valid email address.";
+      }
+    }
+    setFieldErrors(next);
+    return Object.keys(next).length === 0;
+  }
+
+  function openGmailDirectly() {
+    setResult(null);
+    setGmailError(null);
+
+    if (channel !== "email") {
+      setGmailError("Switch to Email to open Gmail.");
+      return;
+    }
+    if (!currentLocation) return;
+    if (!validateEmailRequiredFields()) return;
+
+    // Open immediately on user gesture so popup isn't blocked later.
+    // Don't use noopener here: we need a live Window handle to navigate
+    // this exact tab after async draft preparation finishes.
+    const popup = window.open("", "_blank");
+    startOpenGmailTransition(async () => {
+      try {
+        const fd = new FormData();
+        fd.set("location_id", currentLocation.id);
+        fd.set("recipient_name", name.trim());
+        fd.set("recipient_email", email.trim());
+        fd.set("language", language);
+        fd.set("message_subject", subject);
+        fd.set("message_body", body);
+
+        const draft = await createGmailDraftRequest(fd);
+        if (!draft.ok || !draft.subject || !draft.body || !draft.trackingUrl) {
+          setGmailError(
+            draft.error || "Could not prepare Gmail draft. Please try again.",
+          );
+          popup?.close();
+          return;
+        }
+
+        const href = buildGmailComposeHref({
+          to: email.trim(),
+          subject: draft.subject,
+          body: draft.body,
+          senderGmail: currentGmailSender,
+        });
+
+        if (popup && !popup.closed) {
+          popup.location.assign(href);
+          popup.focus();
+        } else {
+          // Fallback if popup handle was lost by browser policy.
+          window.open(href, "_blank");
+        }
+      } catch (error) {
+        setGmailError(
+          error instanceof Error
+            ? error.message
+            : "Could not open Gmail right now.",
+        );
+        popup?.close();
       }
     });
   }
@@ -335,8 +413,21 @@ export function SendForm({
             required
             autoComplete="name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (fieldErrors.name) {
+                setFieldErrors((prev) => ({ ...prev, name: undefined }));
+              }
+            }}
+            className={
+              fieldErrors.name
+                ? "border-alert focus:border-alert focus:ring-alert/20"
+                : ""
+            }
           />
+          {fieldErrors.name && (
+            <p className="text-[12px] text-alert">{fieldErrors.name}</p>
+          )}
         </Field>
 
         <div className="space-y-2">
@@ -424,8 +515,21 @@ export function SendForm({
               autoComplete="email"
               required={channel === "email"}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (fieldErrors.email) {
+                  setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                }
+              }}
+              className={
+                fieldErrors.email
+                  ? "border-alert focus:border-alert focus:ring-alert/20"
+                  : ""
+              }
             />
+            {fieldErrors.email && (
+              <p className="text-[12px] text-alert">{fieldErrors.email}</p>
+            )}
           </Field>
         )}
 
@@ -622,18 +726,35 @@ export function SendForm({
               </Link>
             </p>
           )}
+          {gmailError && (
+            <p className="text-[12px] text-alert text-right">{gmailError}</p>
+          )}
           <div className="flex flex-wrap items-center justify-end gap-3">
             <Button
               type="button"
-              variant="secondary"
               size="lg"
-              onClick={() => setPreviewOpen(true)}
-              disabled={!currentLocation}
+              onClick={openGmailDirectly}
+              disabled={
+                !currentLocation ||
+                billingBlocked ||
+                openingGmail ||
+                channel !== "email"
+              }
             >
-              <Eye className="h-4 w-4" />
-              Preview &amp; open in Gmail
+              <Mail className="h-4 w-4" />
+              {openingGmail ? "Opening Gmail…" : "Preview &amp; open in Gmail"}
             </Button>
-            <Button type="submit" size="lg" disabled={pending || billingBlocked}>
+            <Button
+              type="submit"
+              size="lg"
+              variant={channel === "email" ? "secondary" : "primary"}
+              disabled={pending || billingBlocked}
+              onClick={(e) => {
+                if (!validateEmailRequiredFields()) {
+                  e.preventDefault();
+                }
+              }}
+            >
               <Send className="h-4 w-4" />
               {pending ? "Sending…" : `Send via ${channel === "sms" ? "SMS" : "email"}`}
             </Button>
@@ -641,258 +762,12 @@ export function SendForm({
         </div>
       </form>
 
-      {previewOpen && currentLocation && (
-        <PreviewModal
-          channel={channel}
-          to={channel === "sms" ? phone : email}
-          locationId={currentLocation.id}
-          recipientName={name.trim()}
-          language={language}
-          subject={subject}
-          body={body}
-          slug={currentLocation.slug}
-          businessName={currentLocation.display_name}
-          senderGmail={currentGmailSender}
-          onClose={() => setPreviewOpen(false)}
-        />
-      )}
-
       {result?.ok && result.trackingUrl && (
         <SuccessCard
           trackingUrl={result.trackingUrl}
           flagged={!!result.flagged}
         />
       )}
-    </div>
-  );
-}
-
-/**
- * Renders the preview subject/body shown in modal, with the template
- * variables resolved against the current location:
- *   • <slug>  → location.slug
- *   • ?t=<token> stripped in preview mode so the text is readable
- *
- * The actual "Open in Gmail" click prepares a tracked draft server-side
- * (real token + request row) before opening compose.
- */
-function renderForCopy(text: string, slug: string): string {
-  return text.replace(/\?t=<token>/g, "").replace(/<slug>/g, slug);
-}
-
-function PreviewModal({
-  channel,
-  to,
-  locationId,
-  recipientName,
-  language,
-  subject,
-  body,
-  slug,
-  businessName,
-  senderGmail,
-  onClose,
-}: {
-  channel: "sms" | "email";
-  to: string;
-  locationId: string;
-  recipientName: string;
-  language: string;
-  subject: string;
-  body: string;
-  slug: string;
-  businessName: string;
-  senderGmail: string;
-  onClose: () => void;
-}) {
-  const [openingGmail, startOpenGmailTransition] = useTransition();
-  const [openError, setOpenError] = useState<string | null>(null);
-  const [cachedDraft, setCachedDraft] = useState<{
-    signature: string;
-    href: string;
-  } | null>(null);
-
-  const renderedSubject = renderForCopy(subject, slug);
-  const renderedBody = renderForCopy(body, slug);
-  const hasRecipient = Boolean(to.trim());
-  const draftSignature = JSON.stringify({
-    locationId,
-    recipientName,
-    to: to.trim().toLowerCase(),
-    language,
-    subject,
-    body,
-  });
-  const smsHref =
-    channel === "sms"
-      ? `sms:${encodeURIComponent(to)}?body=${encodeURIComponent(renderedBody)}`
-      : "";
-
-  function openGmailWithTrackingDraft() {
-    if (!hasRecipient || channel !== "email") return;
-    setOpenError(null);
-
-    startOpenGmailTransition(async () => {
-      if (cachedDraft && cachedDraft.signature === draftSignature) {
-        window.open(cachedDraft.href, "_blank", "noopener,noreferrer");
-        return;
-      }
-
-      const fd = new FormData();
-      fd.set("location_id", locationId);
-      fd.set("recipient_name", recipientName);
-      fd.set("recipient_email", to.trim());
-      fd.set("language", language);
-      fd.set("message_subject", subject);
-      fd.set("message_body", body);
-
-      const draft = await createGmailDraftRequest(fd);
-      if (!draft.ok || !draft.subject || !draft.body || !draft.trackingUrl) {
-        setOpenError(
-          draft.error ||
-            "Could not prepare tracked Gmail draft. Please try again.",
-        );
-        return;
-      }
-
-      const href = buildGmailComposeHref({
-        to: to.trim(),
-        subject: draft.subject,
-        body: draft.body,
-        senderGmail,
-      });
-      setCachedDraft({ signature: draftSignature, href });
-      window.open(href, "_blank", "noopener,noreferrer");
-    });
-  }
-
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Message preview"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="w-full max-w-2xl rounded-2xl bg-paper shadow-2xl">
-        <div className="flex items-start justify-between px-6 pt-5 pb-3 border-b border-border-base">
-          <div>
-            <h2 className="font-display text-[19px] text-ink leading-tight">
-              Preview &amp; send
-            </h2>
-            <p className="text-[12.5px] text-text-soft mt-0.5">
-              For {businessName}. Variables are filled with real data.
-            </p>
-            {channel === "email" && (
-              <p className="text-[12px] text-text-soft mt-1">
-                Gmail sender preset:{" "}
-                <span className="font-medium text-ink">
-                  {senderGmail || "(not set — uses currently signed-in Gmail)"}
-                </span>
-              </p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="text-text-muted hover:text-ink p-1 -m-1"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        <div className="px-6 py-5 space-y-4 max-h-[60vh] overflow-y-auto">
-          <PreviewRow label="To" value={to || "(no recipient entered)"} />
-          {channel === "email" && <PreviewRow label="Subject" value={renderedSubject} />}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11.5px] uppercase tracking-[0.08em] text-text-muted font-medium">
-                Body
-              </span>
-            </div>
-            <pre className="whitespace-pre-wrap rounded-lg border border-border-base bg-cream-deep/30 px-3.5 py-3 text-[13px] text-ink font-sans leading-relaxed">
-              {renderedBody}
-            </pre>
-          </div>
-        </div>
-
-        <div className="border-t border-border-base px-6 py-4 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            {channel === "email" ? (
-              hasRecipient ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={openGmailWithTrackingDraft}
-                  disabled={openingGmail}
-                >
-                  <Mail className="h-3.5 w-3.5" />
-                  {openingGmail ? "Preparing Gmail draft…" : "Open in Gmail →"}
-                </Button>
-              ) : (
-                <Button type="button" size="sm" disabled>
-                  <Mail className="h-3.5 w-3.5" />
-                  Enter recipient email first
-                </Button>
-              )
-            ) : (
-              <a href={smsHref}>
-                <Button type="button" size="sm">
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  Open in my messages app →
-                </Button>
-              </a>
-            )}
-          </div>
-          <p className="text-[11.5px] text-text-muted leading-relaxed">
-            {channel === "email"
-              ? `This opens Gmail web with To / Subject / Body prefilled${
-                  senderGmail ? ` and targets sender account ${senderGmail}` : ""
-                } so you can send in a few clicks.`
-              : "This opens your messages app with the body prefilled."}{" "}
-            Note: BAAM delivery tracking only works when you use{" "}
-            <strong>Send via {channel === "email" ? "email" : "SMS"}</strong> above.
-          </p>
-          {openError && (
-            <p className="text-[11.5px] text-alert leading-relaxed">
-              {openError}
-            </p>
-          )}
-          {channel === "email" && (
-            <p className="text-[11.5px] text-text-muted leading-relaxed">
-              Gmail decides the real <strong>From</strong> based on the signed-in
-              account (or that account&apos;s &quot;Send mail as&quot; settings). If
-              it still sends from another address, sign in/switch to{" "}
-              <strong>{senderGmail || "the intended sender account"}</strong> in
-              this browser first.
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PreviewRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[11.5px] uppercase tracking-[0.08em] text-text-muted font-medium">
-          {label}
-        </span>
-      </div>
-      <p className="rounded-lg border border-border-base bg-cream-deep/30 px-3.5 py-2 text-[13px] text-ink break-all">
-        {value}
-      </p>
     </div>
   );
 }

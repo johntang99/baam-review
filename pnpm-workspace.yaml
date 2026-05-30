@@ -1,7 +1,8 @@
 allowBuilds:
-  puppeteer: set this to true or false
+  puppeteer: true
   sharp: true
   unrs-resolver: true
 onlyBuiltDependencies:
+  - puppeteer
   - sharp
   - unrs-resolver
