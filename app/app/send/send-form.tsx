@@ -13,8 +13,6 @@ import {
   Sparkles,
   Undo2,
   Eye,
-  Copy,
-  Check,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,9 +20,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/ui/section";
 import { cn } from "@/lib/utils";
+import {
+  asEmailOrEmpty,
+  buildGmailComposeHref,
+} from "@/lib/messaging/gmail-compose";
 import { buildSmsBody, buildEmail } from "@/lib/messaging/templates";
 import type { Language } from "@/lib/i18n/review";
-import { sendReviewRequest, type SendResult } from "./actions";
+import {
+  sendReviewRequest,
+  createGmailDraftRequest,
+  type SendResult,
+} from "./actions";
 
 interface LocationOption {
   id: string;
@@ -32,6 +38,8 @@ interface LocationOption {
   display_name: string;
   default_language: string;
   supported_languages: string[];
+  gmail_sender_email?: string | null;
+  connected_via_google_email?: string | null;
 }
 
 interface SendFormProps {
@@ -78,6 +86,11 @@ export function SendForm({
   const [previewOpen, setPreviewOpen] = useState(false);
 
   const currentLocation = locations.find((l) => l.id === locationId);
+  const currentGmailSender = asEmailOrEmpty(
+    currentLocation?.gmail_sender_email ||
+      currentLocation?.connected_via_google_email ||
+      "",
+  );
   const billingBlocked = blockedLocationIds.includes(locationId);
   const supported = currentLocation?.supported_languages ?? ["en"];
   const missingLangs = ALL_LANGS.filter((l) => !supported.includes(l));
@@ -274,23 +287,45 @@ export function SendForm({
       <form onSubmit={onSubmit} className="space-y-5 rounded-2xl border border-border-base bg-paper p-5 sm:p-6 shadow-sm">
         {locations.length > 1 && (
           <Field label="Location" htmlFor="location_id">
-            <select
-              id="location_id"
-              name="location_id"
-              value={locationId}
-              onChange={(e) => onLocationChange(e.target.value)}
-              className="flex h-10 w-full rounded-lg border border-border-base bg-paper px-3 text-sm focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15"
-            >
-              {locations.map((loc) => (
-                <option key={loc.id} value={loc.id}>
-                  {loc.display_name}
-                </option>
-              ))}
-            </select>
+            <div className="space-y-2">
+              <select
+                id="location_id"
+                name="location_id"
+                value={locationId}
+                onChange={(e) => onLocationChange(e.target.value)}
+                className="flex h-10 w-full rounded-lg border border-border-base bg-paper px-3 text-sm focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15"
+              >
+                {locations.map((loc) => (
+                  <option key={loc.id} value={loc.id}>
+                    {loc.display_name}
+                  </option>
+                ))}
+              </select>
+              <SenderBadge
+                sender={currentGmailSender}
+                locationId={currentLocation?.id || ""}
+              />
+            </div>
           </Field>
         )}
         {locations.length === 1 && (
-          <input type="hidden" name="location_id" value={locationId} />
+          <>
+            <input type="hidden" name="location_id" value={locationId} />
+            <div className="rounded-lg border border-border-soft bg-cream/30 px-3 py-2">
+              <p className="text-[12px] text-text-soft">
+                Location:{" "}
+                <span className="font-medium text-ink">
+                  {currentLocation?.display_name ?? "Current location"}
+                </span>
+              </p>
+              <div className="mt-1.5">
+                <SenderBadge
+                  sender={currentGmailSender}
+                  locationId={currentLocation?.id || ""}
+                />
+              </div>
+            </div>
+          </>
         )}
 
         <Field label="Customer name" htmlFor="recipient_name">
@@ -564,11 +599,29 @@ export function SendForm({
             <span className="font-medium text-ink">Tip:</span> Want it to feel
             personal? Click{" "}
             <span className="font-medium text-ink">
-              Preview &amp; send via your email
+              Preview &amp; Open in Gmail
             </span>{" "}
-            to open the message in your own mail app — recipient still lands on
+            to open a prefilled draft in Gmail web — recipient still lands on
             your review page.
           </p>
+          <p className="text-[12px] text-text-soft">
+            Sender Gmail preset for this location:{" "}
+            <span className="font-medium text-ink">
+              {currentGmailSender || "(not set — uses currently signed-in Gmail)"}
+            </span>
+            . You can update it in Location Settings → Email Sender.
+          </p>
+          {!currentGmailSender && currentLocation && (
+            <p className="text-[12px] text-alert">
+              Sender not set for this location.{" "}
+              <Link
+                href={`/app/locations/${currentLocation.id}?tab=email`}
+                className="font-medium underline hover:no-underline"
+              >
+                Set Gmail sender preset →
+              </Link>
+            </p>
+          )}
           <div className="flex flex-wrap items-center justify-end gap-3">
             <Button
               type="button"
@@ -578,7 +631,7 @@ export function SendForm({
               disabled={!currentLocation}
             >
               <Eye className="h-4 w-4" />
-              Preview &amp; send via your email
+              Preview &amp; open in Gmail
             </Button>
             <Button type="submit" size="lg" disabled={pending || billingBlocked}>
               <Send className="h-4 w-4" />
@@ -592,10 +645,14 @@ export function SendForm({
         <PreviewModal
           channel={channel}
           to={channel === "sms" ? phone : email}
+          locationId={currentLocation.id}
+          recipientName={name.trim()}
+          language={language}
           subject={subject}
           body={body}
           slug={currentLocation.slug}
           businessName={currentLocation.display_name}
+          senderGmail={currentGmailSender}
           onClose={() => setPreviewOpen(false)}
         />
       )}
@@ -611,15 +668,13 @@ export function SendForm({
 }
 
 /**
- * Renders the actual subject/body that will go out, with the template
+ * Renders the preview subject/body shown in modal, with the template
  * variables resolved against the current location:
  *   • <slug>  → location.slug
- *   • ?t=<token> stripped entirely (untracked link — works for the
- *     recipient without a per-request token)
+ *   • ?t=<token> stripped in preview mode so the text is readable
  *
- * Used by the preview modal so staff sees the same words their recipient
- * will see, and so the "copy + send from my own email" path produces a
- * working link.
+ * The actual "Open in Gmail" click prepares a tracked draft server-side
+ * (real token + request row) before opening compose.
  */
 function renderForCopy(text: string, slug: string): string {
   return text.replace(/\?t=<token>/g, "").replace(/<slug>/g, slug);
@@ -628,53 +683,88 @@ function renderForCopy(text: string, slug: string): string {
 function PreviewModal({
   channel,
   to,
+  locationId,
+  recipientName,
+  language,
   subject,
   body,
   slug,
   businessName,
+  senderGmail,
   onClose,
 }: {
   channel: "sms" | "email";
   to: string;
+  locationId: string;
+  recipientName: string;
+  language: string;
   subject: string;
   body: string;
   slug: string;
   businessName: string;
+  senderGmail: string;
   onClose: () => void;
 }) {
-  const [copied, setCopied] = useState<"none" | "subject" | "body" | "all">(
-    "none",
-  );
+  const [openingGmail, startOpenGmailTransition] = useTransition();
+  const [openError, setOpenError] = useState<string | null>(null);
+  const [cachedDraft, setCachedDraft] = useState<{
+    signature: string;
+    href: string;
+  } | null>(null);
 
   const renderedSubject = renderForCopy(subject, slug);
   const renderedBody = renderForCopy(body, slug);
-
-  async function copy(text: string, which: "subject" | "body" | "all") {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(which);
-      setTimeout(() => setCopied("none"), 1600);
-    } catch {
-      // Clipboard API can be blocked (insecure context, perm denied) —
-      // surface nothing; the user can still select-and-copy by hand.
-    }
-  }
-
-  // mailto: / sms: handoff to the user's default app. Encode body+subject
-  // so newlines and ampersands survive intact.
-  const mailtoHref =
-    channel === "email"
-      ? `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(renderedSubject)}&body=${encodeURIComponent(renderedBody)}`
-      : "";
+  const hasRecipient = Boolean(to.trim());
+  const draftSignature = JSON.stringify({
+    locationId,
+    recipientName,
+    to: to.trim().toLowerCase(),
+    language,
+    subject,
+    body,
+  });
   const smsHref =
     channel === "sms"
       ? `sms:${encodeURIComponent(to)}?body=${encodeURIComponent(renderedBody)}`
       : "";
 
-  const allText =
-    channel === "email"
-      ? `To: ${to}\nSubject: ${renderedSubject}\n\n${renderedBody}`
-      : `To: ${to}\n\n${renderedBody}`;
+  function openGmailWithTrackingDraft() {
+    if (!hasRecipient || channel !== "email") return;
+    setOpenError(null);
+
+    startOpenGmailTransition(async () => {
+      if (cachedDraft && cachedDraft.signature === draftSignature) {
+        window.open(cachedDraft.href, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      const fd = new FormData();
+      fd.set("location_id", locationId);
+      fd.set("recipient_name", recipientName);
+      fd.set("recipient_email", to.trim());
+      fd.set("language", language);
+      fd.set("message_subject", subject);
+      fd.set("message_body", body);
+
+      const draft = await createGmailDraftRequest(fd);
+      if (!draft.ok || !draft.subject || !draft.body || !draft.trackingUrl) {
+        setOpenError(
+          draft.error ||
+            "Could not prepare tracked Gmail draft. Please try again.",
+        );
+        return;
+      }
+
+      const href = buildGmailComposeHref({
+        to: to.trim(),
+        subject: draft.subject,
+        body: draft.body,
+        senderGmail,
+      });
+      setCachedDraft({ signature: draftSignature, href });
+      window.open(href, "_blank", "noopener,noreferrer");
+    });
+  }
 
   return (
     <div
@@ -690,11 +780,19 @@ function PreviewModal({
         <div className="flex items-start justify-between px-6 pt-5 pb-3 border-b border-border-base">
           <div>
             <h2 className="font-display text-[19px] text-ink leading-tight">
-              Preview &amp; copy
+              Preview &amp; send
             </h2>
             <p className="text-[12.5px] text-text-soft mt-0.5">
               For {businessName}. Variables are filled with real data.
             </p>
+            {channel === "email" && (
+              <p className="text-[12px] text-text-soft mt-1">
+                Gmail sender preset:{" "}
+                <span className="font-medium text-ink">
+                  {senderGmail || "(not set — uses currently signed-in Gmail)"}
+                </span>
+              </p>
+            )}
           </div>
           <button
             type="button"
@@ -708,34 +806,12 @@ function PreviewModal({
 
         <div className="px-6 py-5 space-y-4 max-h-[60vh] overflow-y-auto">
           <PreviewRow label="To" value={to || "(no recipient entered)"} />
-          {channel === "email" && (
-            <PreviewRow
-              label="Subject"
-              value={renderedSubject}
-              onCopy={() => copy(renderedSubject, "subject")}
-              copied={copied === "subject"}
-            />
-          )}
+          {channel === "email" && <PreviewRow label="Subject" value={renderedSubject} />}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11.5px] uppercase tracking-[0.08em] text-text-muted font-medium">
                 Body
               </span>
-              <button
-                type="button"
-                onClick={() => copy(renderedBody, "body")}
-                className="inline-flex items-center gap-1 text-[12px] text-forest hover:underline"
-              >
-                {copied === "body" ? (
-                  <>
-                    <Check className="h-3 w-3" /> Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3 w-3" /> Copy body
-                  </>
-                )}
-              </button>
             </div>
             <pre className="whitespace-pre-wrap rounded-lg border border-border-base bg-cream-deep/30 px-3.5 py-3 text-[13px] text-ink font-sans leading-relaxed">
               {renderedBody}
@@ -745,29 +821,23 @@ function PreviewModal({
 
         <div className="border-t border-border-base px-6 py-4 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => copy(allText, "all")}
-            >
-              {copied === "all" ? (
-                <>
-                  <Check className="h-3.5 w-3.5" /> Copied
-                </>
-              ) : (
-                <>
-                  <Copy className="h-3.5 w-3.5" /> Copy entire message
-                </>
-              )}
-            </Button>
             {channel === "email" ? (
-              <a href={mailtoHref}>
-                <Button type="button" size="sm">
+              hasRecipient ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={openGmailWithTrackingDraft}
+                  disabled={openingGmail}
+                >
                   <Mail className="h-3.5 w-3.5" />
-                  Open in my mail app →
+                  {openingGmail ? "Preparing Gmail draft…" : "Open in Gmail →"}
                 </Button>
-              </a>
+              ) : (
+                <Button type="button" size="sm" disabled>
+                  <Mail className="h-3.5 w-3.5" />
+                  Enter recipient email first
+                </Button>
+              )
             ) : (
               <a href={smsHref}>
                 <Button type="button" size="sm">
@@ -778,12 +848,28 @@ function PreviewModal({
             )}
           </div>
           <p className="text-[11.5px] text-text-muted leading-relaxed">
-            Sending from your own {channel === "email" ? "mail app" : "messages app"}{" "}
-            makes it feel personal — recipient still lands on your review page.
+            {channel === "email"
+              ? `This opens Gmail web with To / Subject / Body prefilled${
+                  senderGmail ? ` and targets sender account ${senderGmail}` : ""
+                } so you can send in a few clicks.`
+              : "This opens your messages app with the body prefilled."}{" "}
             Note: BAAM delivery tracking only works when you use{" "}
-            <strong>Send via {channel === "email" ? "email" : "SMS"}</strong>{" "}
-            above.
+            <strong>Send via {channel === "email" ? "email" : "SMS"}</strong> above.
           </p>
+          {openError && (
+            <p className="text-[11.5px] text-alert leading-relaxed">
+              {openError}
+            </p>
+          )}
+          {channel === "email" && (
+            <p className="text-[11.5px] text-text-muted leading-relaxed">
+              Gmail decides the real <strong>From</strong> based on the signed-in
+              account (or that account&apos;s &quot;Send mail as&quot; settings). If
+              it still sends from another address, sign in/switch to{" "}
+              <strong>{senderGmail || "the intended sender account"}</strong> in
+              this browser first.
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -793,13 +879,9 @@ function PreviewModal({
 function PreviewRow({
   label,
   value,
-  onCopy,
-  copied,
 }: {
   label: string;
   value: string;
-  onCopy?: () => void;
-  copied?: boolean;
 }) {
   return (
     <div>
@@ -807,23 +889,6 @@ function PreviewRow({
         <span className="text-[11.5px] uppercase tracking-[0.08em] text-text-muted font-medium">
           {label}
         </span>
-        {onCopy && (
-          <button
-            type="button"
-            onClick={onCopy}
-            className="inline-flex items-center gap-1 text-[12px] text-forest hover:underline"
-          >
-            {copied ? (
-              <>
-                <Check className="h-3 w-3" /> Copied
-              </>
-            ) : (
-              <>
-                <Copy className="h-3 w-3" /> Copy
-              </>
-            )}
-          </button>
-        )}
       </div>
       <p className="rounded-lg border border-border-base bg-cream-deep/30 px-3.5 py-2 text-[13px] text-ink break-all">
         {value}
@@ -867,6 +932,38 @@ function ChannelToggle({
       <span className="font-medium">{label}</span>
       {hint && <span className="text-[11px] text-text-muted ml-auto">{hint}</span>}
     </button>
+  );
+}
+
+function SenderBadge({
+  sender,
+  locationId,
+}: {
+  sender: string;
+  locationId: string;
+}) {
+  const hasSender = Boolean(sender);
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span
+        className={cn(
+          "inline-flex items-center rounded-full border px-2.5 py-1 text-[11.5px] font-medium",
+          hasSender
+            ? "border-success/35 bg-success/10 text-success"
+            : "border-alert/35 bg-alert/10 text-alert",
+        )}
+      >
+        Sender: {hasSender ? sender : "Not set"}
+      </span>
+      {!hasSender && locationId && (
+        <Link
+          href={`/app/locations/${locationId}?tab=email`}
+          className="text-[11.5px] text-alert underline hover:no-underline"
+        >
+          Set now →
+        </Link>
+      )}
+    </div>
   );
 }
 

@@ -20,6 +20,167 @@ export interface SendResult {
   trackingUrl?: string;
 }
 
+export interface GmailDraftResult {
+  ok: boolean;
+  error?: string;
+  requestId?: string;
+  flagged?: boolean;
+  trackingUrl?: string;
+  subject?: string;
+  body?: string;
+}
+
+export async function createGmailDraftRequest(
+  formData: FormData,
+): Promise<GmailDraftResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("account_id")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile?.account_id) {
+    return { ok: false, error: "No account for current user." };
+  }
+
+  const { data: account } = await supabase
+    .from("accounts")
+    .select("suspended_at, name")
+    .eq("id", profile.account_id)
+    .maybeSingle();
+  if (account?.suspended_at) {
+    return { ok: false, error: "This account is currently suspended." };
+  }
+
+  const locationId = getString(formData, "location_id");
+  const recipientName = getString(formData, "recipient_name");
+  const recipientEmail = getString(formData, "recipient_email");
+  const langRaw = getString(formData, "language");
+  const language: Language = isLanguage(langRaw) ? langRaw : "en";
+
+  if (!locationId) return { ok: false, error: "Pick a location." };
+  if (!recipientName) return { ok: false, error: "Customer name is required." };
+  if (!recipientEmail) return { ok: false, error: "Email is required." };
+
+  const { data: location } = await supabase
+    .from("locations")
+    .select("id, slug, display_name, default_language, supported_languages")
+    .eq("id", locationId)
+    .maybeSingle();
+  if (!location) return { ok: false, error: "Location not found." };
+
+  const gate = await getLocationBillingState(location.id);
+  if (!gate.allowed) {
+    return {
+      ok: false,
+      error:
+        "Billing required — set up billing for this location to send review requests.",
+    };
+  }
+
+  const suppressionClient = createServiceClient();
+  const { data: suppressed } = await suppressionClient
+    .from("opt_outs")
+    .select("id")
+    .eq("location_id", location.id)
+    .eq("contact", recipientEmail)
+    .eq("channel", "email")
+    .maybeSingle();
+  if (suppressed) {
+    return {
+      ok: false,
+      error:
+        "This contact has unsubscribed or previously bounced — not opening Gmail draft.",
+    };
+  }
+
+  const velocity = await checkVelocity(location.id);
+  if (velocity.kind === "block") {
+    return {
+      ok: false,
+      error: `Send blocked: too many requests (${velocity.current}/${velocity.limit} in the last ${velocity.reason === "velocity:hourly" ? "hour" : "24h"}). Slow down and try again later.`,
+    };
+  }
+
+  const token = generateTrackingToken();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:4001";
+  const trackingUrl = `${appUrl}/r/${location.slug}?t=${token}`;
+  const unsubscribeUrl = `${appUrl}/api/unsubscribe?t=${token}`;
+  const recipientFirst =
+    recipientName.trim().split(/\s+/)[0] || recipientName.trim();
+  const applyVars = (s: string) =>
+    s
+      .replaceAll("<slug>", location.slug)
+      .replaceAll("<token>", token)
+      .replaceAll("{name}", recipientFirst);
+
+  const overrideSubjectRaw = getString(formData, "message_subject");
+  const overrideBodyRaw = getString(formData, "message_body");
+  const vars = {
+    name: recipientName,
+    businessName: location.display_name,
+    link: trackingUrl,
+    unsubscribeUrl,
+  };
+  const defaultEmail = buildEmail(language, vars);
+  const subjectText = overrideSubjectRaw
+    ? applyVars(overrideSubjectRaw)
+    : defaultEmail.subject;
+  const bodyText = overrideBodyRaw ? applyVars(overrideBodyRaw) : defaultEmail.body;
+  const now = new Date().toISOString();
+  const flaggedAt =
+    velocity.kind === "flag" ? now : null;
+  const flagReason = velocity.kind === "flag" ? velocity.reason : null;
+
+  const service = createServiceClient();
+  const { data: inserted, error: insertErr } = await service
+    .from("review_requests")
+    .insert({
+      location_id: location.id,
+      recipient_name: recipientName,
+      recipient_email: recipientEmail,
+      recipient_phone: null,
+      language,
+      channel: "email",
+      tracking_token: token,
+      message_sent: bodyText,
+      // Gmail manual flow: draft opened now, actual send happens outside BAAM.
+      sent_at: null,
+      delivered_at: null,
+      flagged_at: flaggedAt,
+      flag_reason: flagReason,
+      created_by: user.id,
+    })
+    .select("id")
+    .single();
+
+  if (insertErr) {
+    console.error("Failed to insert Gmail draft review_request", insertErr);
+    return {
+      ok: false,
+      error:
+        "Could not prepare tracked Gmail draft. Please try again or use Send via email.",
+    };
+  }
+
+  revalidatePath("/app/send");
+  revalidatePath("/app");
+
+  return {
+    ok: true,
+    requestId: inserted.id,
+    flagged: velocity.kind === "flag",
+    trackingUrl,
+    subject: subjectText,
+    body: bodyText,
+  };
+}
+
 export async function sendReviewRequest(formData: FormData): Promise<SendResult> {
   const supabase = await createClient();
   const {

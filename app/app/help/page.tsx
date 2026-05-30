@@ -89,6 +89,13 @@ const CATEGORIES: Category[] = [
         icon: ClipboardCheck,
       },
       {
+        href: "/app/docs/gmail-sending-safety",
+        title: "Gmail sending safety",
+        blurb:
+          "Google sending rules, daily limits, safe pacing, and AI-content guardrails for manual and bulk Gmail workflows.",
+        icon: Mail,
+      },
+      {
         title: "Reviews reply & share",
         blurb: "AI-drafted replies in EN/中文/Español; sharing best reviews.",
         icon: BookOpen,

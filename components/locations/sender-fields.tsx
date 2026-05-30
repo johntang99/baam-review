@@ -7,6 +7,8 @@ import { Field } from "@/components/ui/section";
 
 interface SenderFieldsProps {
   initialEmail: string | null;
+  initialGmailSenderEmail: string | null;
+  connectedViaGoogleEmail: string | null;
   initialName: string | null;
   verified: boolean;
   defaultFromAddress: string;
@@ -14,14 +16,43 @@ interface SenderFieldsProps {
 
 export function SenderFields({
   initialEmail,
+  initialGmailSenderEmail,
+  connectedViaGoogleEmail,
   initialName,
   verified,
   defaultFromAddress,
 }: SenderFieldsProps) {
   const [email, setEmail] = useState(initialEmail ?? "");
+  const [gmailSenderEmail, setGmailSenderEmail] = useState(
+    initialGmailSenderEmail ?? "",
+  );
   const [name, setName] = useState(initialName ?? "");
 
   const hasCustom = email.trim().length > 0;
+  const effectiveGmailPreset =
+    gmailSenderEmail.trim() || connectedViaGoogleEmail || "";
+  const hasGmailInput = gmailSenderEmail.trim().length > 0;
+  const gmailLooksValid =
+    !hasGmailInput ||
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(gmailSenderEmail.trim().toLowerCase());
+
+  function openGmailPresetTest() {
+    const trimmed = gmailSenderEmail.trim().toLowerCase();
+    if (!trimmed || !gmailLooksValid) return;
+    const composeBase =
+      "https://mail.google.com/mail/?view=cm&fs=1&tf=1" +
+      `&to=${encodeURIComponent(trimmed)}` +
+      `&su=${encodeURIComponent("BAAM sender account check")}` +
+      `&body=${encodeURIComponent(
+        "This is a quick test to confirm this Gmail account opens for BAAM preview sending.",
+      )}` +
+      `&authuser=${encodeURIComponent(trimmed)}`;
+    const href =
+      "https://accounts.google.com/AccountChooser" +
+      `?Email=${encodeURIComponent(trimmed)}` +
+      `&continue=${encodeURIComponent(composeBase)}`;
+    window.open(href, "_blank", "noopener,noreferrer");
+  }
 
   return (
     <>
@@ -53,6 +84,52 @@ export function SenderFields({
           placeholder={`reviews@yourdomain.com  ·  default: ${defaultFromAddress}`}
         />
       </Field>
+
+      <Field
+        label="Gmail sender preset (Preview flow)"
+        htmlFor="gmail_sender_email"
+        hint='Used only for "Preview & Open in Gmail" on /app/send. Set the Gmail account that staff should send from for this location.'
+      >
+        <div className="space-y-2">
+          <Input
+            id="gmail_sender_email"
+            name="gmail_sender_email"
+            type="email"
+            value={gmailSenderEmail}
+            onChange={(e) => setGmailSenderEmail(e.target.value)}
+            placeholder="drhuangclinic@gmail.com"
+          />
+          {!gmailLooksValid && (
+            <p className="text-[12px] text-alert">
+              Please enter a valid email format (example: name@gmail.com or
+              name@company.com).
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={openGmailPresetTest}
+            disabled={!hasGmailInput || !gmailLooksValid}
+            className="inline-flex items-center rounded-md border border-border-base bg-paper px-2.5 py-1.5 text-[12px] text-text-soft hover:bg-cream-deep/30 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Test open this Gmail account →
+          </button>
+        </div>
+      </Field>
+
+      <div className="rounded-xl border border-border-base bg-cream-deep/30 px-3.5 py-3 text-[12.5px] text-text">
+        <p>
+          <strong className="text-ink">How it works:</strong> when staff clicks{" "}
+          <span className="font-medium text-ink">Preview &amp; Open in Gmail</span>,
+          BAAM opens Gmail compose with this account as the target sender.
+        </p>
+        <p className="mt-1 text-text-soft">
+          The browser still requires login access to that Gmail account on this
+          device.
+          {effectiveGmailPreset
+            ? ` Current preset: ${effectiveGmailPreset}.`
+            : " No preset set yet."}
+        </p>
+      </div>
 
       {hasCustom &&
         (verified ? (

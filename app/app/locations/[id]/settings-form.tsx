@@ -181,7 +181,7 @@ export function SettingsForm({
       {/* Content card — sits on top of the page bg so the active tab's
           form lives in its own clearly-bounded surface. All sections stay
           mounted (just hidden) so submit picks up every field in one go. */}
-      <div className="rounded-2xl border border-border-base bg-paper px-6 pt-2 pb-6 shadow-sm">
+      <div className="rounded-2xl border border-border-base bg-cream/45 px-6 pt-2 pb-6 shadow-sm">
 
       <div className={activeTab === "branding" ? "" : "hidden"}>
       <Section
@@ -408,6 +408,8 @@ export function SettingsForm({
 
         <SenderFields
           initialEmail={location.sender_email}
+          initialGmailSenderEmail={location.gmail_sender_email}
+          connectedViaGoogleEmail={location.connected_via_google_email}
           initialName={location.sender_name}
           verified={!!location.sender_verified_at}
           defaultFromAddress={defaultFromAddress}
@@ -565,7 +567,7 @@ function ReviewCategorySelect({
       id={name}
       name={name}
       defaultValue={value}
-      className="flex h-10 w-full rounded-lg border border-border-base bg-paper px-3 py-2 text-sm text-text focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15"
+      className="flex h-10 w-full rounded-lg border border-border-base bg-white px-3 py-2 text-sm text-text shadow-sm focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15"
     >
       {[...byParent.entries()].map(([parent, keys]) => (
         <optgroup key={parent} label={parent}>

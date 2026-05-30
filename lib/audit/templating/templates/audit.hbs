@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="{{language}}">
+<head>
+<meta charset="UTF-8">
+<title>BAAM Review Audit · {{business_name}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>{{{styles}}}</style>
+</head>
+<body>
+
+<!-- ====================== PAGE 1 — COVER + SECTION 1 ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">{{doc_header_subtitle_left}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{#if (eq language "zh")}}第 I 卷 · 第 001 號{{else}}Vol. I · No. 001{{/if}}</strong></div>
+      <div>{{#if (eq language "zh")}}{{audit_date_display}}{{else}}Prepared {{audit_date_display}}{{/if}}</div>
+    </div>
+  </header>
+
+  <div class="cover-hero">
+    <div class="cover-eyebrow">{{t.cover_eyebrow}}</div>
+    <h1 class="cover-title">{{{t.cover_title_html}}}</h1>
+    <p class="cover-subtitle">{{t.cover_subtitle}}</p>
+  </div>
+
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">{{t.cover_meta_labels.business}}</div>
+      <div class="cover-meta-value">{{business_name}}{{#if business_name_secondary}}<br><span class="mono" style="font-size:13px; color:var(--ink-mute);">{{business_name_secondary}}</span>{{/if}}</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">{{t.cover_meta_labels.location}}</div>
+      <div class="cover-meta-value">{{business_address_line_1}}<br><span class="mono" style="font-size:13px; color:var(--ink-mute);">{{business_address_line_2}}</span></div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">{{t.cover_meta_labels.vertical}}</div>
+      <div class="cover-meta-value">{{vertical_display_name}}<br><span class="mono" style="font-size:13px; color:var(--ink-mute);">{{vertical_subtype}}</span></div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">{{t.cover_meta_labels.audit_id}}</div>
+      <div class="cover-meta-value mono" style="font-size:18px;">{{audit_id}}<br><span style="color:var(--ink-mute); font-size:11px;">{{t.cover_meta_subtitle}}</span></div>
+    </div>
+  </div>
+
+  <div class="hook-quote">
+    <p>{{{t.hook_quote_html}}}</p>
+  </div>
+
+  <div class="ornament">§</div>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 01</span>
+    <span class="section-marker-title">{{t.section_titles.[01]}}</span>
+  </div>
+
+  <h2 class="section-headline">{{{t.section_headlines.[01]}}}</h2>
+  <p class="section-deck">{{t.section_decks.[01]}}</p>
+
+  <div class="fact-grid">
+    <div class="fact">
+      <div class="fact-num">01</div>
+      <div class="fact-stat">16–20<span class="unit">%</span></div>
+      <div class="fact-body">{{#if (eq language "zh")}}Google 本地搜索排名權重中，現在有此比例來自評論信號 —— 比五年前的約 11% 顯著上升，且每年持續增長。{{else}}Of Google's Local Pack ranking weight now comes from review signals — up from ~11% five years ago. The share rises every year.{{/if}}</div>
+      <div class="fact-source">Whitespark · 2026 {{#if (eq language "zh")}}本地排名因素報告{{else}}Local Ranking Factors{{/if}}</div>
+    </div>
+    <div class="fact">
+      <div class="fact-num">02</div>
+      <div class="fact-stat">81<span class="unit">%</span></div>
+      <div class="fact-body">{{#if (eq language "zh")}}的消費者使用 Google 查看本地評論。也是唯一仍在增長的主流平台 — Yelp、Facebook、BBB 皆呈下降趨勢。{{else}}Of consumers use Google for local reviews. It's the only major platform whose usage is rising — Yelp, Facebook, and BBB are all declining.{{/if}}</div>
+      <div class="fact-source">BrightLocal · 2026 {{#if (eq language "zh")}}本地消費者評論調查{{else}}Local Consumer Review Survey{{/if}}</div>
+    </div>
+    <div class="fact">
+      <div class="fact-num">03</div>
+      <div class="fact-stat">+25<span class="unit">%</span></div>
+      <div class="fact-body">{{#if (eq language "zh")}}實體店每提高 0.1 星評分帶來的轉化率提升。4.0 星是關鍵門檻 — 70% 消費者會以此為篩選條件。{{else}}Conversion lift from a single 0.1-star rating increase in brick-and-mortar businesses. The 4.0 threshold is binary — 70% of consumers filter by it.{{/if}}</div>
+      <div class="fact-source">Uberall · {{#if (eq language "zh")}}透過 BrightLocal 發布{{else}}via BrightLocal{{/if}}</div>
+    </div>
+    <div class="fact">
+      <div class="fact-num">04</div>
+      <div class="fact-stat">5–9<span class="unit">%</span></div>
+      <div class="fact-body">{{#if (eq language "zh")}}每提升 1 星評分帶來的營收增長。哈佛商學院研究證實為因果關係，並非相關性。獨立企業見此區間高端，醫療與法律行業更高。{{else}}Revenue increase per 1-star rating bump. Causal, not correlational. Independent businesses see the upper end of this range; medical and legal even higher.{{/if}}</div>
+      <div class="fact-source">Luca · {{#if (eq language "zh")}}哈佛商學院{{else}}Harvard Business School{{/if}}</div>
+    </div>
+    <div class="fact" style="grid-column: span 2;">
+      <div class="fact-num">05</div>
+      <div class="fact-stat" style="font-size:42px;">{{#if (eq language "zh")}}AI 搜索現在會閱讀您的評論{{else}}AI search now reads your reviews.{{/if}}</div>
+      <div class="fact-body" style="max-width:680px;">{{#if (eq language "zh")}}ChatGPT、Perplexity、Claude 與 Google AI Overviews 都會從評論內容與評分中提取資訊，回答「附近最好的[服務]」這類問題。沒有強而有力的評論，AI 在客戶詢問時根本不會提到您的店家。{{else}}ChatGPT, Perplexity, Claude, and Google's AI Overviews pull directly from review content and ratings to answer "best [service] near me" questions. Without strong reviews, AI will literally not mention you when a customer asks.{{/if}}</div>
+      <div class="fact-source">Google {{#if (eq language "zh")}}透明度報告{{else}}Transparency Report{{/if}} · 2024–2026</div>
+    </div>
+  </div>
+
+  <p class="closing-line">{{#if (eq language "zh")}}優秀本身已經不夠，<em>能被看見</em>才決定客戶會走進誰的店門{{else}}Excellence isn't enough anymore. <em>Visibility</em> decides who walks through your door.{{/if}}</p>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_1}}</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 2 — SECTION 2 SNAPSHOT ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">§ 02 · {{t.section_titles.[02]}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{business_name}}</strong></div>
+      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 02</span>
+    <span class="section-marker-title">{{t.section_titles.[02]}}</span>
+  </div>
+
+  <h2 class="section-headline">{{{t.section_headlines.[02]}}}</h2>
+  <p class="section-deck">{{t.section_decks.[02]}}</p>
+
+  <table class="snapshot-table">
+    <thead>
+      <tr>
+        <th>{{t.snapshot_table_headers.platform}}</th>
+        <th>{{t.snapshot_table_headers.rating}}</th>
+        <th>{{t.snapshot_table_headers.reviews}}</th>
+        <th>{{t.snapshot_table_headers.last_review}}</th>
+        <th>{{t.snapshot_table_headers.health}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">{{snapshot_google.icon}}</div>
+            <div>
+              <div class="platform-meta-strong">{{snapshot_google.name}}</div>
+              <div class="platform-meta-sub">{{snapshot_google.meta_sub}}</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating">{{{snapshot_google.rating_stars_html}}} <span class="mono" style="font-size:15px;">{{snapshot_google.rating_value}}</span></div></td>
+        <td><div class="review-count">{{snapshot_google.review_count}}</div></td>
+        <td><div class="last-review{{#if snapshot_google.last_review_is_stale}} stale{{/if}}">{{snapshot_google.last_review_label}}</div></td>
+        <td><div class="health-dot {{snapshot_google.health_class}}">{{snapshot_google.health_label}}</div></td>
+      </tr>
+      {{#unless is_paid}}
+      <tr>
+        <td colspan="5" style="padding: 24px 0; color: var(--ink-mute); font-style: italic; text-align: center;">
+          {{t.paid_only_row}}
+        </td>
+      </tr>
+      {{/unless}}
+    </tbody>
+  </table>
+
+  <div class="insight-callout">
+    {{{insight_callout_html}}}
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_2}}</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 3 — SECTION 3 SCORE + DO-NOTHING ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">§ 03 · {{t.section_titles.[03]}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{business_name}}</strong></div>
+      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 03</span>
+    <span class="section-marker-title">{{t.section_titles.[03]}}</span>
+  </div>
+
+  <div class="score-hero">
+    <div class="score-number">{{score_total}}</div>
+    <div class="score-grade-block">
+      <div class="score-grade-label">{{#if (eq language "zh")}}等級 · {{score_grade}} 級{{else}}Grade · Tier {{score_grade}}{{/if}}</div>
+      <div class="score-grade-letter">{{score_grade}}</div>
+      <div class="score-grade-diagnosis">{{score_grade_diagnosis}}</div>
+    </div>
+  </div>
+
+  <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 14px;">{{#if (eq language "zh")}}分數細項 · 為何是這個數字{{else}}Score breakdown · Why your number is what it is{{/if}}</div>
+
+  <div class="subscores">
+    {{#each subscore_rows}}
+      {{> subscore-row}}
+    {{/each}}
+  </div>
+
+  <div class="methodology-footer">
+    <span class="methodology-eyebrow">{{t.methodology_eyebrow}}</span>
+    <p>{{{t.methodology_text_html}}}</p>
+  </div>
+
+  <p style="margin-top: 32px; font-style: italic; font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1.35; color: var(--ink); max-width: 640px;">
+    {{{t.velocity_drag_line_html}}}
+  </p>
+
+  <div class="projection-block">
+    <div class="projection-eyebrow">{{t.forecast_eyebrow}}</div>
+    <h3 class="projection-title">{{{t.projection_title_html}}}</h3>
+    <p class="projection-deck">{{t.projection_deck}}</p>
+
+    <div class="projection-chart-frame">
+      <div class="projection-svg-wrap">
+        {{{projection_svg}}}
+      </div>
+
+      <div class="projection-legend">
+        {{#each t.projection_legend_lines}}<div class="legend-item">{{{this}}}</div>{{/each}}
+      </div>
+    </div>
+
+    <div class="projection-impact">
+      <div class="impact-cell">
+        <div class="impact-label">{{t.projection_impact_labels.score}}</div>
+        <div class="impact-value">{{projection_six_month_drop_display}}</div>
+        <div class="impact-sub">{{projection_floor_blurb}}</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">{{t.projection_impact_labels.ranking}}</div>
+        <div class="impact-value">{{projection_ranking_drop_display}}</div>
+        <div class="impact-sub">{{#if (eq language "zh")}}預估本地搜尋包排名下滑 · 競爭對手持續複利擴大差距{{else}}Estimated Local Pack drop · competitors compounding the gap{{/if}}</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">{{t.projection_impact_labels.revenue}}</div>
+        <div class="impact-value">{{projection_revenue_loss_display}}</div>
+        <div class="impact-sub">{{#if (eq language "zh")}}6 個月機會成本 · 行業每則評論價值 × 錯失的評論數{{else}}6-month opportunity cost · vertical per-review value × missed reviews{{/if}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grade-scale-block">
+    <div class="grade-scale-eyebrow">{{t.grade_scale_eyebrow}}</div>
+    <h3 class="grade-scale-headline">{{{t.grade_scale_headline_html}}}</h3>
+    <table class="grade-scale-table">
+      <thead>
+        <tr>
+          <th>{{t.grade_scale_headers.range}}</th>
+          <th class="center">{{t.grade_scale_headers.grade}}</th>
+          <th>{{t.grade_scale_headers.meaning}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each t.grade_scale_table}}
+        <tr{{#if (eq grade ../score_grade)}} class="current"{{/if}}>
+          <td><span class="score-range">{{range}}</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill {{class}}">{{grade}}</span></td>
+          <td><span class="grade-meaning">{{meaning}}{{#if (eq grade ../score_grade)}}<span class="you-here-pill">{{../t.you_tag}} · {{../score_total}}</span>{{/if}}</span></td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_3}}</span>
+  </div>
+</section>
+
+{{#if is_paid}}
+<!-- ====================== PAGE 4 — SECTION 4 BENCHMARKS ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">§ 04 · {{t.section_titles.[04]}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{business_name}}</strong></div>
+      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 04</span>
+    <span class="section-marker-title">{{t.section_titles.[04]}}</span>
+  </div>
+
+  <h2 class="section-headline">{{{t.section_4_headline_html}}}</h2>
+  <p class="section-deck">{{t.section_4_deck}}</p>
+
+  <div class="benchmark-split">
+    <div class="benchmark-panel">
+      <div class="benchmark-panel-eyebrow">{{t.benchmark_panel_a_eyebrow}}</div>
+      <h3 class="benchmark-panel-title">{{t.benchmark_panel_a_title}}</h3>
+      <div class="benchmark-value-big">{{per_review_value_median_display}}</div>
+      <div class="benchmark-value-range">{{#if (eq language "zh")}}範圍：{{else}}range: {{/if}}{{per_review_value_range_display}} · {{#if (eq language "zh")}}24 個月時程{{else}}24-month horizon{{/if}}</div>
+      <p class="benchmark-detail">{{{t.benchmark_panel_a_detail_html}}}</p>
+      <p style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-mute); margin-top: 14px; letter-spacing: 0.05em;">{{t.benchmark_panel_a_methodology}}</p>
+    </div>
+
+    <div class="benchmark-panel">
+      <div class="benchmark-panel-eyebrow">{{t.benchmark_panel_b_eyebrow}}</div>
+      <h3 class="benchmark-panel-title">{{t.benchmark_panel_b_title_html}}</h3>
+      <div class="velocity-gauge">
+        <div class="velocity-band silent">{{velocity_band_silent}}</div>
+        <div class="velocity-band min">{{velocity_band_min}}</div>
+        <div class="velocity-band optimal">{{velocity_band_optimal}}</div>
+        <div class="velocity-band aggressive">{{velocity_band_aggressive}}</div>
+      </div>
+      <div class="velocity-pointer-wrap">
+        <div class="velocity-pointer" style="left: {{velocity_pointer_pct}}%;">
+          <div class="velocity-pointer-label">{{velocity_pointer_label}}</div>
+        </div>
+      </div>
+      <p class="benchmark-detail" style="margin-top: 22px;">{{{t.benchmark_panel_b_detail_html}}}</p>
+    </div>
+  </div>
+
+  <div class="money-on-table">
+    <div class="money-on-table-eyebrow">{{t.money_on_table_eyebrow}}</div>
+    <p class="money-on-table-text">{{{money_on_table_html}}}</p>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_4}}</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 5 — SECTION 5 COMPETITORS ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">§ 05 · {{t.section_titles.[05]}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{business_name}}</strong></div>
+      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 05</span>
+    <span class="section-marker-title">{{t.section_titles.[05]}}</span>
+  </div>
+
+  <h2 class="section-headline">{{{t.section_5_headline_html}}}</h2>
+  <p class="section-deck">{{t.section_5_deck}}</p>
+
+  <table class="competitor-table">
+    <thead>
+      <tr>
+        <th>{{t.competitor_table_headers.business}}</th>
+        <th>{{t.competitor_table_headers.score}}</th>
+        <th>{{t.competitor_table_headers.rating}}</th>
+        <th>{{t.competitor_table_headers.total}}</th>
+        <th>{{t.competitor_table_headers.last_30d}}</th>
+        <th>{{t.competitor_table_headers.last_90d}}</th>
+        <th>{{t.competitor_table_headers.trend}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each competitor_rows}}
+        {{> competitor-row}}
+      {{/each}}
+    </tbody>
+  </table>
+
+  <p class="competitor-diagnosis">{{{competitor_diagnosis_html}}}</p>
+
+  <div class="ornament">§</div>
+
+  <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.45; color: var(--ink-soft); text-align: center; max-width: 640px; margin: 0 auto;">
+    {{competitor_closing_line}}
+  </p>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_5}}</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 6 — SECTION 6 ACTION + CTA ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">§ 06 · {{t.section_titles.[06]}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{business_name}}</strong></div>
+      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 06</span>
+    <span class="section-marker-title">{{t.section_titles.[06]}}</span>
+  </div>
+
+  <h2 class="section-headline">{{{t.section_6_headline_html}}}</h2>
+  <p class="section-deck">{{t.section_6_deck}}</p>
+
+  <ol class="action-list">
+    {{#each action_items}}
+      {{> action-item}}
+    {{/each}}
+  </ol>
+
+  <div style="margin-top: 24px; padding: 20px 24px; background: var(--cream-deep); border-left: 3px solid var(--sage);">
+    <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.4; color: var(--ink);">
+      {{{t.summary_block_html}}}
+    </p>
+  </div>
+
+  <div class="cta-block">
+    <div class="cta-eyebrow">{{t.cta_eyebrow}}</div>
+    <h3 class="cta-headline">{{{t.cta_headline_html}}}</h3>
+
+    <div class="cta-paths">
+      <div class="cta-path">
+        <div class="cta-path-label">{{t.cta_self.label}}</div>
+        <h4 class="cta-path-title">{{t.cta_self.title}}</h4>
+        <div class="cta-path-price">{{t.cta_self.price}}</div>
+        <p class="cta-path-desc">{{t.cta_self.desc}}</p>
+      </div>
+      <div class="cta-path featured">
+        <div class="cta-path-label">{{t.cta_full.label}}</div>
+        <h4 class="cta-path-title">{{t.cta_full.title}}</h4>
+        <div class="cta-path-price">{{t.cta_full.price}}</div>
+        <p class="cta-path-desc">{{t.cta_full.desc}}</p>
+      </div>
+    </div>
+
+    <p class="promise-line">{{{t.cta_promise_html}}}</p>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_6}}</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 7 — APPENDIX ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">§ A · {{t.appendix_section_title}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{business_name}}</strong></div>
+      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ A</span>
+    <span class="section-marker-title">{{t.appendix_section_title}}</span>
+  </div>
+
+  <div class="appendix-intro">
+    <h2 class="section-headline">{{{t.appendix_section_headline_html}}}</h2>
+    <p class="section-deck">{{{t.appendix_section_deck_html}}}</p>
+  </div>
+
+  <div class="appendix-block">
+    <div class="appendix-eyebrow">{{t.appendix_a1_eyebrow}}</div>
+    <h3 class="appendix-title">{{t.appendix_a1_title}}</h3>
+    <p class="appendix-deck">{{t.appendix_a1_deck}}</p>
+    <table class="appendix-table">
+      <thead>
+        <tr>
+          <th>{{t.appendix_a1_headers.vertical}}</th>
+          <th>{{t.appendix_a1_headers.range}}</th>
+          <th>{{t.appendix_a1_headers.median}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each appendix_value_rows}}
+        <tr{{#if is_highlight}} class="highlight"{{/if}}>
+          <td>{{vertical_display}}</td>
+          <td>{{value_range_display}}</td>
+          <td>{{median_display}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="appendix-block">
+    <div class="appendix-eyebrow">{{t.appendix_a2_eyebrow}}</div>
+    <h3 class="appendix-title">{{t.appendix_a2_title}}</h3>
+    <p class="appendix-deck">{{t.appendix_a2_deck}}</p>
+    <table class="appendix-table">
+      <thead>
+        <tr>
+          <th>{{t.appendix_a2_headers.vertical}}</th>
+          <th>{{t.appendix_a2_headers.minimum}}</th>
+          <th>{{t.appendix_a2_headers.optimal}}</th>
+          <th>{{t.appendix_a2_headers.aggressive}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each appendix_velocity_rows}}
+        <tr{{#if is_highlight}} class="highlight"{{/if}}>
+          <td>{{vertical_display}}</td>
+          <td>{{minimum}}</td>
+          <td>{{optimal_display}}</td>
+          <td>{{aggressive_display}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="appendix-source">
+    {{{t.appendix_source_html}}}<br>
+    <span style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 14px; letter-spacing: 0; text-transform: none; color: var(--ink-mute);">{{#if (eq language "zh")}}完整引用於{{else}}Full citations at{{/if}} <a href="https://www.baamreview.com/review-value.html#sources" target="_blank">baamreview.com/review-value.html#sources</a></span>
+  </div>
+
+  <div class="ornament">§</div>
+
+  <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; line-height: 1.4; color: var(--ink); text-align: center; max-width: 640px; margin: 0 auto;">
+    {{{t.appendix_closing_quote_html}}}
+  </p>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_7}} · {{t.end_label}}</span>
+  </div>
+</section>
+{{/if}}
+
+{{#unless is_paid}}
+<!-- ====================== FREE TIER UPGRADE CTA ====================== -->
+<section class="page" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+  <div class="section-marker" style="border-bottom: none; margin-bottom: 24px;">
+    <span class="section-marker-num">{{t.upgrade_cta_section_num}}</span>
+    <span class="section-marker-title">{{t.upgrade_cta_title}}</span>
+  </div>
+
+  <h2 class="section-headline" style="max-width: 640px;">{{{t.upgrade_cta_headline_html}}}</h2>
+
+  <ul style="list-style: none; padding: 0; margin: 36px auto; max-width: 540px; text-align: left;">
+    {{#each t.upgrade_cta_items}}
+    <li style="padding: 12px 0; border-bottom: 1px solid var(--rule-soft);">{{{this}}}</li>
+    {{/each}}
+  </ul>
+
+  <p style="font-family: 'Instrument Serif', serif; font-size: 22px; font-style: italic; max-width: 580px; color: var(--ink); margin: 24px 0;">
+    {{{t.upgrade_cta_closing}}}
+  </p>
+
+  <div class="doc-footer" style="margin-top: auto;">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_4}}</span>
+  </div>
+</section>
+{{/unless}}
+
+</body>
+</html>

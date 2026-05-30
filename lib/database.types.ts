@@ -245,6 +245,7 @@ export interface Database {
           custom_url_label: Json;
           website_url: string | null;
           sender_email: string | null;
+          gmail_sender_email: string | null;
           sender_name: string | null;
           sender_verified_at: string | null;
           google_resource_name: string | null;
@@ -287,6 +288,7 @@ export interface Database {
           custom_url_label?: Json;
           website_url?: string | null;
           sender_email?: string | null;
+          gmail_sender_email?: string | null;
           sender_name?: string | null;
           sender_verified_at?: string | null;
           google_resource_name?: string | null;

@@ -4,7 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { sendReviewRequest } from "@/app/app/send/actions";
+import {
+  sendReviewRequest,
+  createGmailDraftRequest,
+} from "@/app/app/send/actions";
 import {
   validateRow,
   type Lang,
@@ -16,6 +19,10 @@ import {
   type ListVariant,
 } from "@/lib/ai/list-variants";
 import { buildEmail, buildSmsBody } from "@/lib/messaging/templates";
+import {
+  asEmailOrEmpty,
+  buildGmailComposeHref,
+} from "@/lib/messaging/gmail-compose";
 
 export interface CreateListInput {
   name: string;
@@ -159,6 +166,31 @@ export interface SendListResult {
   sent: number;
   failed: number;
   errors?: string[];
+  error?: string;
+}
+
+export interface PrepareGmailDraftsResult {
+  ok: boolean;
+  drafted: number;
+  failed: number;
+  senderGmail?: string;
+  drafts?: Array<{
+    customerId: string;
+    name: string;
+    href: string;
+  }>;
+  errors?: string[];
+  error?: string;
+}
+
+export interface PreparedGmailDraftQueueResult {
+  ok: boolean;
+  senderGmail?: string;
+  drafts: Array<{
+    customerId: string;
+    name: string;
+    href: string;
+  }>;
   error?: string;
 }
 
@@ -350,6 +382,329 @@ export async function sendList(listId: string): Promise<SendListResult> {
     failed,
     errors: errors.length > 0 ? errors : undefined,
   };
+}
+
+/**
+ * Bulk Gmail-assisted flow: create tracked review_request drafts for each
+ * selected email customer in the list, then return Gmail compose URLs so staff
+ * can send manually from Gmail with minimal copy/paste.
+ */
+export async function prepareGmailDraftsForList(
+  listId: string,
+): Promise<PrepareGmailDraftsResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: list } = await supabase
+    .from("lists")
+    .select("id, status, location_id, default_language, template_variants")
+    .eq("id", listId)
+    .maybeSingle();
+  if (!list) {
+    return { ok: false, drafted: 0, failed: 0, error: "List not found." };
+  }
+  if (list.status === "completed" || list.status === "archived") {
+    return {
+      ok: false,
+      drafted: 0,
+      failed: 0,
+      error: `List is ${list.status} — Gmail drafts can't be prepared anymore.`,
+    };
+  }
+
+  const { data: location } = await supabase
+    .from("locations")
+    .select("id, gmail_sender_email, connected_via_google_email")
+    .eq("id", list.location_id)
+    .maybeSingle();
+  if (!location) {
+    return { ok: false, drafted: 0, failed: 0, error: "Location not found." };
+  }
+  const senderGmail = asEmailOrEmpty(
+    location.gmail_sender_email || location.connected_via_google_email || "",
+  );
+
+  const { count: pendingSmsCount } = await supabase
+    .from("list_customers")
+    .select("id", { count: "exact", head: true })
+    .eq("list_id", listId)
+    .eq("selected", true)
+    .is("excluded_reason", null)
+    .eq("channel", "sms")
+    .eq("status", "pending");
+  if ((pendingSmsCount ?? 0) > 0) {
+    return {
+      ok: false,
+      drafted: 0,
+      failed: 0,
+      error:
+        "Gmail bulk flow supports email only. Switch selected SMS rows to Email or unselect them first.",
+    };
+  }
+
+  const { data: customers } = await supabase
+    .from("list_customers")
+    .select("id, name, email, language, channel, status")
+    .eq("list_id", listId)
+    .eq("selected", true)
+    .is("excluded_reason", null)
+    .eq("channel", "email")
+    .eq("status", "pending");
+
+  const targets = (customers ?? []).filter((c) => Boolean(c.email));
+  if (targets.length === 0) {
+    return {
+      ok: false,
+      drafted: 0,
+      failed: 0,
+      error: "No pending email customers to prepare.",
+    };
+  }
+
+  const variants: ListVariant[] | null = Array.isArray(list.template_variants)
+    ? (list.template_variants as unknown as ListVariant[])
+    : null;
+  const variantLang = list.default_language;
+
+  const eligibleIndices: number[] = [];
+  targets.forEach((c, i) => {
+    if (c.language === variantLang) eligibleIndices.push(i);
+  });
+  const customerVariant = new Map<number, number>();
+  if (variants && variants.length > 0 && eligibleIndices.length > 0) {
+    const ordered = eligibleIndices.map((_, k) => k % variants.length);
+    for (let i = ordered.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [ordered[i], ordered[j]] = [ordered[j], ordered[i]];
+    }
+    eligibleIndices.forEach((customerIdx, k) => {
+      customerVariant.set(customerIdx, ordered[k]);
+    });
+  }
+
+  const service = createServiceClient();
+
+  let drafted = 0;
+  const errors: string[] = [];
+  const drafts: PrepareGmailDraftsResult["drafts"] = [];
+
+  for (let idx = 0; idx < targets.length; idx++) {
+    const c = targets[idx];
+    const fd = new FormData();
+    fd.set("location_id", list.location_id);
+    fd.set("recipient_name", c.name);
+    fd.set("recipient_email", c.email || "");
+    fd.set("language", c.language);
+
+    let chosenIndex: number | null = null;
+    const assignedVariant = customerVariant.get(idx);
+    if (assignedVariant !== undefined && variants) {
+      chosenIndex = assignedVariant;
+      const v = variants[chosenIndex];
+      const personalized = personalizeVariant(v, c.name);
+      fd.set("message_subject", personalized.subject);
+      fd.set("message_body", personalized.body);
+    }
+
+    let draftResult;
+    try {
+      draftResult = await createGmailDraftRequest(fd);
+    } catch (e) {
+      draftResult = {
+        ok: false,
+        error: e instanceof Error ? e.message : "Draft creation failed",
+      };
+    }
+
+    if (
+      draftResult.ok &&
+      draftResult.requestId &&
+      draftResult.subject &&
+      draftResult.body
+    ) {
+      await supabase
+        .from("list_customers")
+        .update({
+          status: "sent",
+          touches: 1,
+          send_request_id: draftResult.requestId,
+          variant_index: chosenIndex,
+        })
+        .eq("id", c.id);
+
+      if (chosenIndex !== null) {
+        await service
+          .from("review_requests")
+          .update({ variant_index: chosenIndex })
+          .eq("id", draftResult.requestId);
+      }
+
+      await supabase.from("list_events").insert({
+        list_customer_id: c.id,
+        list_id: listId,
+        location_id: list.location_id,
+        event_type: "sent",
+        metadata: {
+          channel: "email",
+          touch_number: 1,
+          send_mode: "gmail_manual",
+        },
+      });
+
+      drafts?.push({
+        customerId: c.id,
+        name: c.name,
+        href: buildGmailComposeHref({
+          to: c.email || "",
+          subject: draftResult.subject,
+          body: draftResult.body,
+          senderGmail,
+        }),
+      });
+      drafted += 1;
+    } else {
+      errors.push(`${c.name}: ${draftResult.error ?? "draft failed"}`);
+    }
+  }
+
+  const failed = targets.length - drafted;
+  if (drafted === 0) {
+    return {
+      ok: false,
+      drafted: 0,
+      failed,
+      errors,
+      error: "No Gmail drafts prepared — list left as draft.",
+      senderGmail,
+    };
+  }
+
+  revalidatePath("/app/lists");
+  revalidatePath(`/app/lists/${listId}`);
+  revalidatePath(`/app/lists/${listId}/review`);
+
+  return {
+    ok: true,
+    drafted,
+    failed,
+    drafts,
+    senderGmail,
+    errors: errors.length > 0 ? errors : undefined,
+  };
+}
+
+/**
+ * Rebuild Gmail compose queue from already-prepared manual drafts.
+ * This lets staff continue after a refresh/tab close without preparing again.
+ */
+export async function getPreparedGmailDraftQueue(
+  listId: string,
+): Promise<PreparedGmailDraftQueueResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: list } = await supabase
+    .from("lists")
+    .select("id, location_id, default_language, template_variants")
+    .eq("id", listId)
+    .maybeSingle();
+  if (!list) return { ok: false, drafts: [], error: "List not found." };
+
+  const { data: location } = await supabase
+    .from("locations")
+    .select("id, slug, display_name, gmail_sender_email, connected_via_google_email")
+    .eq("id", list.location_id)
+    .maybeSingle();
+  if (!location) return { ok: false, drafts: [], error: "Location not found." };
+
+  const senderGmail = asEmailOrEmpty(
+    location.gmail_sender_email || location.connected_via_google_email || "",
+  );
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:4001";
+
+  const { data: rows } = await supabase
+    .from("list_customers")
+    .select("id, name, email, language, variant_index, send_request_id")
+    .eq("list_id", listId)
+    .eq("selected", true)
+    .is("excluded_reason", null)
+    .eq("channel", "email")
+    .eq("status", "sent")
+    .not("send_request_id", "is", null)
+    .order("updated_at", { ascending: true });
+
+  const prepared = rows ?? [];
+  if (prepared.length === 0) {
+    return { ok: true, drafts: [], senderGmail };
+  }
+
+  const requestIds = prepared
+    .map((r) => r.send_request_id)
+    .filter((id): id is string => Boolean(id));
+  const { data: requests } = await supabase
+    .from("review_requests")
+    .select(
+      "id, recipient_name, recipient_email, language, tracking_token, message_sent, sent_at",
+    )
+    .in("id", requestIds);
+
+  const reqById = new Map((requests ?? []).map((r) => [r.id, r]));
+  const variants: ListVariant[] | null = Array.isArray(list.template_variants)
+    ? (list.template_variants as unknown as ListVariant[])
+    : null;
+
+  const drafts: PreparedGmailDraftQueueResult["drafts"] = [];
+  for (const c of prepared) {
+    if (!c.send_request_id || !c.email) continue;
+    const rr = reqById.get(c.send_request_id);
+    if (!rr || rr.sent_at) continue;
+
+    const trackingUrl = `${appUrl}/r/${location.slug}?t=${rr.tracking_token}`;
+    const unsubscribeUrl = `${appUrl}/api/unsubscribe?t=${rr.tracking_token}`;
+    let subject = "";
+    if (
+      c.variant_index !== null &&
+      variants &&
+      variants[c.variant_index] &&
+      c.language === list.default_language
+    ) {
+      subject = personalizeVariant(variants[c.variant_index], c.name).subject;
+    } else {
+      subject = buildEmail(rr.language, {
+        name: c.name,
+        businessName: location.display_name,
+        link: trackingUrl,
+        unsubscribeUrl,
+      }).subject;
+    }
+    const body =
+      rr.message_sent ||
+      buildEmail(rr.language, {
+        name: c.name,
+        businessName: location.display_name,
+        link: trackingUrl,
+        unsubscribeUrl,
+      }).body;
+
+    drafts.push({
+      customerId: c.id,
+      name: c.name,
+      href: buildGmailComposeHref({
+        to: c.email,
+        subject,
+        body,
+        senderGmail,
+      }),
+    });
+  }
+
+  return { ok: true, drafts, senderGmail };
 }
 
 export interface GenerateVariantsResult {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -11,9 +11,16 @@ import {
   TriangleAlert,
   Clock,
   ChevronDown,
+  ExternalLink,
 } from "lucide-react";
 import { formatPhone } from "@/lib/lists/normalize";
-import { updateListCustomer, saveListAsDraft, sendList } from "../../actions";
+import {
+  updateListCustomer,
+  saveListAsDraft,
+  sendList,
+  prepareGmailDraftsForList,
+  getPreparedGmailDraftQueue,
+} from "../../actions";
 
 export interface PresendCustomer {
   id: string;
@@ -60,31 +67,66 @@ export function PresendTable({
   const [sendNotice, setSendNotice] = useState<SendNotice>(null);
   const [savingDraft, setSavingDraft] = useState(false);
   const [sending, setSending] = useState(false);
+  const [preparingGmail, setPreparingGmail] = useState(false);
+  const [gmailQueue, setGmailQueue] = useState<
+    Array<{ customerId: string; name: string; href: string }>
+  >([]);
+  const [gmailHint, setGmailHint] = useState<string | null>(null);
+  const [nextAllowedOpenAt, setNextAllowedOpenAt] = useState<number | null>(null);
+  const [nowMs, setNowMs] = useState<number>(Date.now());
 
   const counts = useMemo(
     () => ({
       all: rows.length,
-      ready: rows.filter((r) => !r.excludedReason && r.selected).length,
+      ready: rows.filter((r) => !r.excludedReason && r.selected && r.status === "pending").length,
       excluded: rows.filter((r) => r.excludedReason).length,
     }),
     [rows],
   );
 
   const visible = rows.filter((r) => {
-    if (filter === "ready") return !r.excludedReason && r.selected;
+    if (filter === "ready") return !r.excludedReason && r.selected && r.status === "pending";
     if (filter === "excluded") return !!r.excludedReason;
     return true;
   });
 
   const selectedCount = rows.filter(
-    (r) => r.selected && !r.excludedReason,
+    (r) => r.selected && !r.excludedReason && r.status === "pending",
   ).length;
   const emailCount = rows.filter(
-    (r) => r.selected && !r.excludedReason && r.channel === "email",
+    (r) => r.selected && !r.excludedReason && r.status === "pending" && r.channel === "email",
   ).length;
   const smsCount = rows.filter(
-    (r) => r.selected && !r.excludedReason && r.channel === "sms",
+    (r) => r.selected && !r.excludedReason && r.status === "pending" && r.channel === "sms",
   ).length;
+  const gmailBlockedBySms = smsCount > 0;
+  const waitSeconds = nextAllowedOpenAt
+    ? Math.max(0, Math.ceil((nextAllowedOpenAt - nowMs) / 1000))
+    : 0;
+
+  useEffect(() => {
+    const timer = setInterval(() => setNowMs(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    startTransition(async () => {
+      const resumed = await getPreparedGmailDraftQueue(listId);
+      if (!resumed.ok || resumed.drafts.length === 0) return;
+      setGmailQueue(resumed.drafts);
+      setGmailHint(
+        `Loaded ${resumed.drafts.length} prepared Gmail draft${
+          resumed.drafts.length === 1 ? "" : "s"
+        } from this list. ${
+          resumed.senderGmail
+            ? `Target Gmail: ${resumed.senderGmail}.`
+            : "No sender preset set; Gmail will use the currently signed-in account."
+        } Click "Open next Gmail draft" to continue.`,
+      );
+    });
+    // only on first mount for this list id
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listId]);
 
   function patch(
     id: string,
@@ -112,6 +154,17 @@ export function PresendTable({
       await Promise.all(
         targets.map((t) => updateListCustomer(t.id, { channel })),
       );
+    });
+  }
+
+  function openNextGmailDraft() {
+    if (waitSeconds > 0) return;
+    setGmailQueue((current) => {
+      if (current.length === 0) return current;
+      const [next, ...rest] = current;
+      window.open(next.href, "_blank", "noopener,noreferrer");
+      setNextAllowedOpenAt(Date.now() + 90_000);
+      return rest;
     });
   }
 
@@ -321,6 +374,10 @@ export function PresendTable({
                               ? "Opted out"
                               : "Excluded"}
                       </span>
+                    ) : r.status === "sent" ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-forest/10 px-2 py-0.5 text-[11px] font-medium text-forest">
+                        Draft prepared
+                      </span>
                     ) : !r.phone ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-warn-soft px-2 py-0.5 text-[11px] font-medium text-warn">
                         <TriangleAlert className="h-3 w-3" />
@@ -377,6 +434,29 @@ export function PresendTable({
         </div>
       )}
 
+      {gmailHint && (
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-forest/25 bg-forest/[0.06] px-5 py-4">
+          <p className="text-[12.5px] text-text">
+            <span className="font-medium text-ink">{gmailHint}</span>{" "}
+            Send each draft in Gmail, then come back for the next one. For safer
+            deliverability on new senders, keep roughly 90–180s between sends.
+          </p>
+          {gmailQueue.length > 0 && (
+            <button
+              type="button"
+              onClick={openNextGmailDraft}
+              disabled={waitSeconds > 0}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3.5 py-2 text-[12.5px] font-medium text-text hover:bg-cream-deep"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              {waitSeconds > 0
+                ? `Wait ${waitSeconds}s`
+                : `Open next Gmail draft (${gmailQueue.length} left)`}
+            </button>
+          )}
+        </div>
+      )}
+
       {/* STICKY SEND BAR */}
       <div className="fixed bottom-0 left-[270px] right-0 z-40 flex flex-wrap items-center justify-between gap-4 border-t border-border-base bg-paper/95 px-10 py-4 backdrop-blur">
         <div className="flex items-center gap-6">
@@ -415,6 +495,12 @@ export function PresendTable({
               {sendNotice.message}
             </span>
           )}
+          {!readOnly && gmailBlockedBySms && (
+            <span className="text-[12px] text-text-soft mr-2">
+              Gmail drafts only support email rows. Switch SMS rows to Email or
+              unselect them first.
+            </span>
+          )}
           {!readOnly && (
             <button
               type="button"
@@ -433,9 +519,10 @@ export function PresendTable({
           {!readOnly && (
           <button
             type="button"
-            disabled={sending || selectedCount === 0}
+            disabled={sending || preparingGmail || selectedCount === 0}
             onClick={() => {
               setSendNotice(null);
+              setGmailHint(null);
               setSending(true);
               startTransition(async () => {
                 const res = await sendList(listId);
@@ -476,6 +563,60 @@ export function PresendTable({
               ? "Sending…"
               : `Send to ${selectedCount} customer${selectedCount === 1 ? "" : "s"}`}
           </button>
+          )}
+          {!readOnly && (
+            <button
+              type="button"
+              disabled={
+                sending ||
+                preparingGmail ||
+                emailCount === 0 ||
+                gmailBlockedBySms
+              }
+              onClick={() => {
+                setSendNotice(null);
+                setGmailHint(null);
+                setPreparingGmail(true);
+                startTransition(async () => {
+                  const res = await prepareGmailDraftsForList(listId);
+                  setPreparingGmail(false);
+                  if (!res.ok) {
+                    setSendNotice({
+                      kind: "generic",
+                      message: res.error || "Could not prepare Gmail drafts.",
+                    });
+                    return;
+                  }
+
+                  const queue = res.drafts ?? [];
+                  setGmailQueue(queue);
+                  setNextAllowedOpenAt(null);
+
+                  setGmailHint(
+                    `Prepared ${res.drafted} tracked Gmail draft${
+                      res.drafted === 1 ? "" : "s"
+                    }${res.failed > 0 ? ` · ${res.failed} failed` : ""}. ${
+                      res.senderGmail
+                        ? `Target Gmail: ${res.senderGmail}.`
+                        : "No sender preset set; Gmail will use the currently signed-in account."
+                    } Click "Open next Gmail draft" to start.`,
+                  );
+                  if (res.failed > 0) {
+                    setSendNotice({
+                      kind: "generic",
+                      message:
+                        res.errors?.[0] ||
+                        `${res.failed} customer${res.failed === 1 ? "" : "s"} could not be prepared.`,
+                    });
+                  }
+                  router.refresh();
+                });
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-4 py-2.5 text-[13.5px] font-medium text-text hover:bg-cream-deep disabled:opacity-50"
+            >
+              <Mail className="h-4 w-4" />
+              {preparingGmail ? "Preparing Gmail drafts…" : "Prepare Gmail drafts"}
+            </button>
           )}
         </div>
       </div>

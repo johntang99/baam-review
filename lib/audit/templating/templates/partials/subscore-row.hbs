@@ -1,0 +1,22 @@
+<div class="subscore-row">
+  <div class="subscore-meta">
+    <div class="subscore-label">{{label}}</div>
+    <div class="subscore-raw">{{{raw_value_html}}}</div>
+    {{#if footnote}}<div class="subscore-meta-footnote">{{footnote}}</div>{{/if}}
+  </div>
+  <div class="subscore-bar-area">
+    <div class="subscore-bar-track">
+      <div class="subscore-bar-fill {{fill_class}}" style="width: {{fill_pct}}%;"></div>
+      {{#each marks}}<div class="subscore-mark" style="left: {{left_pct}}%;"></div>{{/each}}
+    </div>
+    <div class="subscore-scale">
+      {{#each scale_ticks}}
+        {{#if (eq position "anchor-left")}}<span class="subscore-scale-tick anchor-left">{{label}}</span>{{/if}}
+        {{#if (eq position "key")}}<span class="subscore-scale-tick key" style="left: {{left_pct}}%;">{{label}}</span>{{/if}}
+        {{#if (eq position "anchor-right")}}<span class="subscore-scale-tick anchor-right">{{label}}</span>{{/if}}
+      {{/each}}
+    </div>
+  </div>
+  <div class="subscore-value">{{score}}</div>
+  <div class="subscore-weight">{{weight_pct}}%</div>
+</div>

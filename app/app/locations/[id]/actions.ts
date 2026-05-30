@@ -71,6 +71,8 @@ export async function updateLocation(locationId: string, formData: FormData) {
   const promptQuestions = buildPromptQuestions(serviceChips, descriptorChips);
 
   const senderEmail = getString(formData, "sender_email")?.toLowerCase() ?? null;
+  const gmailSenderEmail =
+    getString(formData, "gmail_sender_email")?.toLowerCase() ?? null;
   const senderName = getString(formData, "sender_name");
 
   // Decide what to write to sender_verified_at. The previous logic only
@@ -110,6 +112,7 @@ export async function updateLocation(locationId: string, formData: FormData) {
     website_url: getString(formData, "website_url"),
     custom_url_label: getJsonbPerLang(formData, "custom_url_label", supported),
     sender_email: senderEmail,
+    gmail_sender_email: gmailSenderEmail,
     sender_name: senderName,
     sender_verified_at: nextVerifiedAt,
     booking_url: getString(formData, "booking_url"),

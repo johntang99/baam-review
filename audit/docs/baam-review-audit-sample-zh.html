@@ -1,0 +1,2281 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAAM 評論審計 · 黃醫師中醫針灸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E6;
+    --cream-light: #FAF7F0;
+    --cream-deep: #EBE3D2;
+    --ink: #1A1814;
+    --ink-soft: #3D3833;
+    --ink-mute: #6B6259;
+    --rule: #C9BFAE;
+    --rule-soft: #DDD3BF;
+    --amber: #D4882D;
+    --amber-deep: #B86E1A;
+    --rust: #A4452A;
+    --rust-deep: #842F1B;
+    --sage: #6B8E6E;
+    --sage-deep: #4F7253;
+    --sage-darkest: #2D4530;
+    --gold: #C9A227;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Noto Sans TC', 'Archivo', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 25% 15%, rgba(212, 136, 45, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 75% 85%, rgba(107, 142, 110, 0.03) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .page {
+    max-width: 920px;
+    margin: 0 auto;
+    background: var(--cream-light);
+    position: relative;
+    z-index: 2;
+    padding: 80px 80px 100px;
+    border-left: 1px solid var(--rule-soft);
+    border-right: 1px solid var(--rule-soft);
+    min-height: 100vh;
+  }
+
+  .page + .page { border-top: 1px solid var(--rule-soft); }
+
+  /* ============ TYPOGRAPHY ============ */
+  .display { font-family: 'Noto Serif TC', serif; font-weight: 400; }
+  .display-bold { font-family: 'Noto Serif TC', serif; font-weight: 700; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .body-sans { font-family: 'Noto Sans TC', 'Archivo', sans-serif; }
+
+  h1, h2, h3, h4 { letter-spacing: 0; line-height: 1.4; }
+
+  /* ============ DOC HEADER ============ */
+  .doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 56px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .doc-header-left { display: flex; flex-direction: column; gap: 4px; }
+  .doc-header-brand {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .doc-header-sub {
+    color: var(--ink-mute);
+    font-weight: 400;
+    font-size: 12px;
+  }
+  .doc-header-right { text-align: right; color: var(--ink-mute); font-weight: 400; font-size: 11px; }
+  .doc-header-right strong { color: var(--ink); font-weight: 500; }
+
+  /* ============ SECTION MARKER ============ */
+  .section-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-bottom: 36px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section-marker-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    color: var(--amber-deep);
+    font-weight: 600;
+  }
+  .section-marker-title {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* ============ COVER ============ */
+  .cover-hero { margin-bottom: 80px; }
+  .cover-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+    margin-bottom: 36px;
+  }
+  .cover-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 60px;
+    line-height: 1.15;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 24px;
+    letter-spacing: 0.01em;
+  }
+  .cover-title .accent {
+    color: var(--rust-deep);
+    font-weight: 700;
+  }
+  .cover-subtitle {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 24px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 700px;
+    font-weight: 400;
+  }
+
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    padding-top: 24px;
+    margin-bottom: 80px;
+  }
+  .cover-meta-item {
+    border-right: 1px solid var(--rule);
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+  .cover-meta-item:first-child { padding-left: 0; }
+  .cover-meta-item:last-child { border-right: none; padding-right: 0; }
+  .cover-meta-label {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .cover-meta-value {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 21px;
+    color: var(--ink);
+    line-height: 1.4;
+    font-weight: 400;
+  }
+  .cover-meta-value .sub {
+    display: block;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+  .cover-meta-value .sub-zh {
+    display: block;
+    margin-top: 4px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+  }
+
+  /* ============ HOOK QUOTE ============ */
+  .hook-quote {
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 56px 40px;
+    margin: 0 -20px;
+    text-align: center;
+  }
+  .hook-quote p {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 32px;
+    line-height: 1.7;
+    max-width: 780px;
+    margin: 0 auto;
+    color: var(--ink);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+  .hook-quote .accent {
+    color: var(--rust-deep);
+    font-weight: 700;
+  }
+
+  /* ============ SECTION HEADLINES ============ */
+  .section-headline {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 40px;
+    line-height: 1.3;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 14px;
+    letter-spacing: 0.01em;
+  }
+  .section-headline .accent {
+    color: var(--rust-deep);
+    font-weight: 700;
+  }
+  .section-deck {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 19px;
+    color: var(--ink-soft);
+    margin-bottom: 44px;
+    max-width: 680px;
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  /* ============ FACT GRID (SECTION 1) ============ */
+  .fact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+    margin-bottom: 32px;
+  }
+  .fact {
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 28px 28px 24px;
+  }
+  .fact-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--amber-deep);
+    margin-bottom: 14px;
+  }
+  .fact-stat {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .fact-stat .unit { font-size: 28px; color: var(--ink-mute); font-weight: 400; }
+  .fact-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+  .fact-source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    border-top: 1px solid var(--rule);
+    padding-top: 8px;
+  }
+  .closing-line {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 24px;
+    color: var(--ink);
+    text-align: center;
+    margin: 40px 0 0;
+    padding: 0 60px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+  .closing-line .accent { color: var(--rust-deep); font-weight: 700; }
+
+  /* ============ SNAPSHOT TABLE ============ */
+  .snapshot-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+    font-size: 14px;
+  }
+  .snapshot-table th {
+    text-align: left;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    font-weight: 600;
+    padding: 12px 16px 12px 0;
+    border-bottom: 1px solid var(--ink);
+  }
+  .snapshot-table th:not(:first-child) { text-align: right; padding: 12px 0 12px 16px; }
+  .snapshot-table td {
+    padding: 18px 16px 18px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: middle;
+  }
+  .snapshot-table td:not(:first-child) { text-align: right; padding: 18px 0 18px 16px; }
+  .platform-name {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .platform-icon {
+    width: 32px; height: 32px;
+    background: var(--cream-deep);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .platform-meta-strong { font-weight: 600; font-size: 15px; }
+  .platform-meta-sub {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+  }
+  .star-rating {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .star-rating .stars { color: var(--gold); letter-spacing: -0.05em; }
+  .review-count { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 500; }
+  .last-review { font-size: 13px; color: var(--ink-soft); }
+  .last-review.stale { color: var(--rust); font-weight: 600; }
+  .health-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+  }
+  .health-dot::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .health-dot.good { color: var(--sage-deep); }
+  .health-dot.good::before { background: var(--sage); }
+  .health-dot.warn { color: var(--amber-deep); }
+  .health-dot.warn::before { background: var(--amber); }
+  .health-dot.missing { color: var(--ink-mute); }
+  .health-dot.missing::before { background: var(--ink-mute); }
+
+  .insight-callout {
+    background: var(--cream-deep);
+    border-left: 3px solid var(--amber);
+    padding: 24px 28px;
+    margin-top: 24px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+  .insight-callout strong {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .insight-callout .accent { color: var(--rust-deep); font-weight: 700; }
+
+  /* ============ SCORE HERO ============ */
+  .score-hero {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 56px;
+    align-items: center;
+    padding: 24px 0 48px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 40px;
+  }
+  .score-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 200px;
+    font-weight: 300;
+    line-height: 0.85;
+    color: var(--ink);
+    letter-spacing: -0.04em;
+  }
+  .score-number::after {
+    content: '/100';
+    font-size: 24px;
+    color: var(--ink-mute);
+    font-weight: 400;
+    letter-spacing: 0;
+    margin-left: 4px;
+    vertical-align: top;
+  }
+  .score-grade-block { padding-left: 8px; }
+  .score-grade-label {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .score-grade-letter {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 96px;
+    line-height: 1;
+    color: var(--rust-deep);
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+  .score-grade-diagnosis {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 420px;
+    font-weight: 400;
+  }
+
+  /* ============ SUB-SCORES ============ */
+  .subscores {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 32px;
+  }
+  .subscore-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 72px 50px;
+    align-items: start;
+    gap: 24px;
+  }
+  .subscore-meta { padding-top: 2px; }
+  .subscore-label {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .subscore-raw {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.4;
+    font-weight: 400;
+  }
+  .subscore-raw .mono-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .subscore-meta-footnote {
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .subscore-bar-area { padding-top: 6px; }
+  .subscore-bar-track {
+    position: relative;
+    height: 12px;
+    background: var(--cream-deep);
+    border-radius: 1px;
+  }
+  .subscore-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--amber) 0%, var(--amber-deep) 100%);
+    border-radius: 1px;
+    z-index: 2;
+  }
+  .subscore-bar-fill.weak { background: linear-gradient(90deg, var(--rust) 0%, var(--rust-deep) 100%); }
+  .subscore-mark {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 1px;
+    background: var(--ink);
+    z-index: 3;
+    opacity: 0.55;
+  }
+  .subscore-scale {
+    position: relative;
+    margin-top: 11px;
+    height: 14px;
+  }
+  .subscore-scale-tick {
+    position: absolute;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    color: var(--ink-mute);
+    white-space: nowrap;
+  }
+  .subscore-scale-tick.key { color: var(--ink); font-weight: 500; }
+  .subscore-scale-tick.anchor-left { left: 0; transform: translateX(0); }
+  .subscore-scale-tick.anchor-right { left: 100%; transform: translateX(-100%); }
+  .subscore-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    text-align: right;
+    line-height: 1;
+  }
+  .subscore-weight {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-mute);
+    text-align: right;
+    padding-top: 8px;
+  }
+
+  .methodology-footer {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.75;
+  }
+  .methodology-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    color: var(--amber-deep);
+    margin-right: 12px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .methodology-footer strong { font-weight: 700; color: var(--ink); }
+  .methodology-footer .mono-band {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .methodology-footer a {
+    color: var(--rust-deep);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+  }
+
+  /* ============ PROJECTION ============ */
+  .projection-block {
+    margin-top: 32px;
+    padding-top: 40px;
+    border-top: 1px solid var(--ink);
+  }
+  .projection-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--rust-deep);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .projection-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 30px;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 14px;
+    font-weight: 400;
+  }
+  .projection-title .accent { color: var(--rust-deep); font-weight: 700; }
+  .projection-deck {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+    max-width: 680px;
+    line-height: 1.75;
+  }
+  .projection-chart-frame {
+    background: var(--cream-light);
+    border: 1px solid var(--rule);
+    padding: 24px 32px 32px;
+    position: relative;
+  }
+  .projection-legend {
+    display: flex;
+    gap: 32px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule-soft);
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .legend-swatch { width: 22px; height: 3px; }
+  .legend-swatch.red { background: var(--rust-deep); }
+  .legend-swatch.green { background: var(--sage-deep); }
+  .legend-item strong { color: var(--ink); font-weight: 700; }
+
+  .projection-impact {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    margin-top: 32px;
+  }
+  .impact-cell {
+    padding: 20px 24px;
+    border-right: 1px solid var(--rule);
+  }
+  .impact-cell:last-child { border-right: none; }
+  .impact-label {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .impact-value {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 30px;
+    color: var(--rust-deep);
+    line-height: 1.15;
+    font-weight: 700;
+  }
+  .impact-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    line-height: 1.6;
+  }
+
+  /* ============ GRADE SCALE ============ */
+  .grade-scale-block {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--ink);
+  }
+  .grade-scale-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--amber-deep);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .grade-scale-headline {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 26px;
+    line-height: 1.45;
+    color: var(--ink);
+    margin-bottom: 22px;
+    font-weight: 400;
+  }
+  .grade-scale-headline .accent { color: var(--rust-deep); font-weight: 700; }
+  .grade-scale-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .grade-scale-table th {
+    text-align: left;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--ink-mute);
+    font-weight: 600;
+    padding: 12px 16px 12px 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .grade-scale-table th.center { text-align: center; }
+  .grade-scale-table td {
+    padding: 18px 16px 18px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: middle;
+  }
+  .grade-scale-table tr.current { background: var(--cream-deep); }
+  .grade-scale-table tr.current td {
+    font-weight: 500;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .grade-scale-table .score-range {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .grade-scale-table .grade-cell { text-align: center; width: 80px; }
+  .grade-letter-pill {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 36px;
+    line-height: 1;
+    display: inline-block;
+    font-weight: 700;
+  }
+  .grade-letter-pill.g-a { color: var(--sage-deep); }
+  .grade-letter-pill.g-b { color: var(--sage); }
+  .grade-letter-pill.g-c { color: var(--rust-deep); }
+  .grade-letter-pill.g-d { color: var(--rust); }
+  .grade-letter-pill.g-f { color: var(--ink); opacity: 0.6; }
+  .grade-meaning {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .you-here-pill {
+    display: inline-block;
+    background: var(--rust-deep);
+    color: var(--cream-light);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    margin-left: 14px;
+    border-radius: 2px;
+    vertical-align: middle;
+    font-weight: 600;
+  }
+
+  /* ============ BENCHMARKS ============ */
+  .benchmark-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+    margin-bottom: 32px;
+  }
+  .benchmark-panel {
+    padding: 32px;
+    border-right: 1px solid var(--ink);
+  }
+  .benchmark-panel:last-child { border-right: none; }
+  .benchmark-panel-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--amber-deep);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .benchmark-panel-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 24px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .benchmark-value-big {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--rust-deep);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .benchmark-value-range {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+    margin-bottom: 14px;
+  }
+  .benchmark-detail {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--ink-soft);
+  }
+  .benchmark-detail strong { color: var(--ink); font-weight: 700; }
+
+  .velocity-gauge {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 18px 0 4px;
+    height: 36px;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+  .velocity-band {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+  .velocity-band.silent { background: var(--rust); color: white; flex: 1.5; }
+  .velocity-band.min { background: #D7B98A; color: var(--ink); flex: 1.2; }
+  .velocity-band.optimal { background: var(--sage); color: white; flex: 1.5; }
+  .velocity-band.aggressive { background: var(--sage-deep); color: white; flex: 1; }
+  .velocity-pointer-wrap {
+    position: relative;
+    height: 22px;
+    margin-top: 4px;
+  }
+  .velocity-pointer {
+    position: absolute;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  .velocity-pointer::before {
+    content: '▲';
+    color: var(--ink);
+    font-size: 12px;
+    display: block;
+  }
+  .velocity-pointer-label {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .money-on-table {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 36px 40px;
+    margin-top: 16px;
+  }
+  .money-on-table-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--amber);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .money-on-table-text {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 23px;
+    line-height: 1.7;
+    color: var(--cream-light);
+    font-weight: 400;
+  }
+  .money-on-table-text .accent { color: var(--amber); font-weight: 700; font-size: 1.1em; }
+  .money-on-table-text strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: white;
+    background: var(--rust-deep);
+    padding: 0 8px;
+  }
+
+  /* ============ COMPETITOR TABLE ============ */
+  .competitor-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+    font-size: 14px;
+  }
+  .competitor-table thead th {
+    text-align: left;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-mute);
+    font-weight: 600;
+    padding: 14px 12px;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .competitor-table th:not(:first-child) { text-align: right; }
+  .competitor-table td {
+    padding: 18px 12px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .competitor-table td:not(:first-child) { text-align: right; }
+  .competitor-table tr.you { background: var(--cream-deep); }
+  .competitor-table tr.you td {
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .competitor-name { display: flex; align-items: center; gap: 12px; }
+  .competitor-rank {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    width: 20px;
+  }
+  .you-tag {
+    display: inline-block;
+    background: var(--rust-deep);
+    color: var(--cream-light);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 2px 9px;
+    margin-left: 8px;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+  .trend-arrow { font-family: 'JetBrains Mono', monospace; font-size: 16px; }
+  .trend-arrow.up { color: var(--sage-deep); }
+  .trend-arrow.down { color: var(--rust-deep); }
+  .trend-arrow.flat { color: var(--ink-mute); }
+
+  .competitor-diagnosis {
+    background: var(--cream-deep);
+    padding: 28px 32px;
+    border-left: 3px solid var(--rust);
+    font-family: 'Noto Serif TC', serif;
+    font-size: 18px;
+    line-height: 1.75;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .competitor-diagnosis strong {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--rust-deep);
+    font-size: 14px;
+    font-weight: 500;
+    background: white;
+    padding: 1px 6px;
+  }
+  .competitor-diagnosis .accent {
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--rust-deep);
+    font-weight: 700;
+    font-style: normal;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ============ ACTION LIST ============ */
+  .action-list {
+    list-style: none;
+    border-top: 1px solid var(--ink);
+  }
+  .action-item {
+    display: grid;
+    grid-template-columns: 80px 1fr 220px;
+    gap: 28px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: start;
+  }
+  .action-number {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 44px;
+    line-height: 1;
+    color: var(--rust-deep);
+    font-weight: 700;
+  }
+  .action-body { padding-top: 6px; }
+  .action-title {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.55;
+  }
+  .action-why {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    font-weight: 400;
+  }
+  .action-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .action-result-block {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .action-result-label {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .action-result-value {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 19px;
+    color: var(--sage-darkest);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .action-owner-pill {
+    background: var(--cream-deep);
+    border: 1px solid var(--rule);
+    padding: 5px 11px;
+    border-radius: 2px;
+    color: var(--ink);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+  .action-owner-pill.baam {
+    background: var(--ink);
+    color: var(--amber);
+    border-color: var(--ink);
+    font-family: 'Archivo', sans-serif;
+    letter-spacing: 0.12em;
+  }
+  .action-value-block { padding-top: 8px; text-align: right; }
+  .action-value-amount {
+    font-family: 'Archivo', sans-serif;
+    font-size: 32px;
+    color: var(--sage-darkest);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .action-value-label {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--ink-mute);
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .action-value-calc {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    text-align: right;
+  }
+  .action-value-calc strong { color: var(--ink); font-weight: 500; }
+
+  /* ============ CTA ============ */
+  .cta-block {
+    margin-top: 56px;
+    padding: 48px 0 0;
+    border-top: 1px solid var(--ink);
+  }
+  .cta-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--amber-deep);
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .cta-headline {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 36px;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 28px;
+    max-width: 680px;
+    font-weight: 400;
+  }
+  .cta-headline .accent { color: var(--rust-deep); font-weight: 700; }
+  .cta-paths {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+  }
+  .cta-path { padding: 28px; border-right: 1px solid var(--ink); }
+  .cta-path:last-child { border-right: none; }
+  .cta-path-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--amber-deep);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .cta-path-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .cta-path-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin-bottom: 14px;
+  }
+  .cta-path-desc {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .cta-path.featured { background: var(--ink); color: var(--cream-light); }
+  .cta-path.featured .cta-path-title { color: var(--cream-light); }
+  .cta-path.featured .cta-path-label { color: var(--amber); }
+  .cta-path.featured .cta-path-price { color: var(--amber); }
+  .cta-path.featured .cta-path-desc { color: var(--cream); }
+  .promise-line {
+    margin-top: 32px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 17px;
+    text-align: center;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    font-weight: 400;
+  }
+  .promise-line strong { color: var(--ink); font-weight: 700; }
+
+  /* ============ APPENDIX ============ */
+  .appendix-intro { margin-bottom: 48px; }
+  .appendix-block { margin-bottom: 56px; }
+  .appendix-block:last-of-type { margin-bottom: 32px; }
+  .appendix-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--amber-deep);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .appendix-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 28px;
+    line-height: 1.45;
+    margin-bottom: 8px;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .appendix-deck {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+    line-height: 1.7;
+    max-width: 660px;
+    font-weight: 400;
+  }
+  .appendix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .appendix-table th {
+    text-align: left;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-mute);
+    font-weight: 600;
+    padding: 12px 16px 12px 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .appendix-table th:not(:first-child) { text-align: right; padding: 12px 0 12px 16px; }
+  .appendix-table td {
+    padding: 14px 16px 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    color: var(--ink);
+  }
+  .appendix-table td:not(:first-child) {
+    text-align: right;
+    padding: 14px 0 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .appendix-table tr.highlight { background: var(--cream-deep); }
+  .appendix-table tr.highlight td {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .appendix-table tr.highlight td:first-child::after {
+    content: '您的行業';
+    display: inline-block;
+    background: var(--rust-deep);
+    color: var(--cream-light);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    margin-left: 10px;
+    border-radius: 2px;
+    vertical-align: middle;
+    font-weight: 600;
+  }
+  .appendix-source {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .appendix-source a {
+    color: var(--rust-deep);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+  }
+  .appendix-source .zh {
+    display: block;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink-mute);
+    margin-top: 6px;
+  }
+
+  /* ============ DOC FOOTER ============ */
+  .doc-footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+
+  /* ============ ORNAMENT ============ */
+  .ornament {
+    text-align: center;
+    margin: 32px 0;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 24px;
+    color: var(--amber);
+    letter-spacing: 0.5em;
+  }
+
+  /* ============ PRINT ============ */
+  @media print {
+    body { background: white; }
+    body::before { display: none; }
+    .page { box-shadow: none; max-width: none; border: none; page-break-after: always; }
+  }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 720px) {
+    .page { padding: 40px 28px 60px; }
+    .cover-title { font-size: 40px; }
+    .cover-subtitle { font-size: 18px; }
+    .cover-meta { grid-template-columns: 1fr 1fr; }
+    .section-headline { font-size: 28px; }
+    .fact-grid { grid-template-columns: 1fr; }
+    .score-hero { grid-template-columns: 1fr; gap: 24px; }
+    .score-number { font-size: 120px; }
+    .benchmark-split { grid-template-columns: 1fr; }
+    .benchmark-panel { border-right: none; border-bottom: 1px solid var(--ink); }
+    .benchmark-panel:last-child { border-bottom: none; }
+    .competitor-table { font-size: 12px; }
+    .competitor-table td, .competitor-table th { padding: 12px 6px; }
+    .action-item { grid-template-columns: 1fr; gap: 12px; }
+    .action-value-block { text-align: left; }
+    .action-value-calc { text-align: left; }
+    .cta-paths { grid-template-columns: 1fr; }
+    .cta-path { border-right: none; border-bottom: 1px solid var(--ink); }
+    .cta-path:last-child { border-bottom: none; }
+    .projection-impact { grid-template-columns: 1fr; }
+    .impact-cell { border-right: none; border-bottom: 1px solid var(--rule); }
+    .impact-cell:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====================== PAGE 1 — COVER + SECTION 1 ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · 評論審計</div>
+      <div class="doc-header-sub">聲譽與營收診斷報告 · v3.0</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>第 I 卷 · 第 001 號</strong></div>
+      <div>2026 年 5 月 29 日</div>
+    </div>
+  </header>
+
+  <div class="cover-hero">
+    <div class="cover-eyebrow">為您量身定制的診斷報告 · 共 6 頁 · 為老闆而寫，非為工程師</div>
+    <h1 class="cover-title">您一直缺少的那份<span class="accent">聲譽報告</span></h1>
+    <p class="cover-subtitle">您的業務當前狀況、每月損失多少、以及未來 12 個月需要採取的五項行動</p>
+  </div>
+
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">商家</div>
+      <div class="cover-meta-value">黃醫師中醫針灸<span class="sub">Dr. Huang Acupuncture</span></div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">地址</div>
+      <div class="cover-meta-value">136-40 39th Ave<span class="sub-zh">紐約州法拉盛 · 11354</span></div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">行業</div>
+      <div class="cover-meta-value">中醫診所<span class="sub-zh">針灸 · 雙語服務</span></div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">審計編號</div>
+      <div class="cover-meta-value mono" style="font-size:18px;">BR-26-0512<span class="sub-zh">由 BAAM Studio 編製</span></div>
+    </div>
+  </div>
+
+  <div class="hook-quote">
+    <p>普通的企業因勤於累積評論而<span class="accent">蒸蒸日上</span>，<br>卓越的企業卻因忽視評論而<span class="accent">逐漸沉寂</span>。</p>
+  </div>
+
+  <div class="ornament">§</div>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 01</span>
+    <span class="section-marker-title">為何評論決定誰能勝出</span>
+  </div>
+
+  <h2 class="section-headline">被客戶找到的規則，<span class="accent">已經改變了</span></h2>
+  <p class="section-deck">關於本地搜索，現在有五件事實 —— 每項都有測量數據、每項都有出處引用、無一可以爭辯</p>
+
+  <div class="fact-grid">
+    <div class="fact">
+      <div class="fact-num">01</div>
+      <div class="fact-stat">16–20<span class="unit">%</span></div>
+      <div class="fact-body">Google 本地搜索排名權重中，現在有此比例來自評論信號 —— 比五年前的約 11% 顯著上升，且每年持續增長。</div>
+      <div class="fact-source">Whitespark · 2026 年本地排名因素報告</div>
+    </div>
+    <div class="fact">
+      <div class="fact-num">02</div>
+      <div class="fact-stat">81<span class="unit">%</span></div>
+      <div class="fact-body">的消費者使用 Google 查看本地評論。也是唯一仍在增長的主流平台 —— Yelp、Facebook、BBB 皆呈下降趨勢。</div>
+      <div class="fact-source">BrightLocal · 2026 年本地消費者評論調查</div>
+    </div>
+    <div class="fact">
+      <div class="fact-num">03</div>
+      <div class="fact-stat">+25<span class="unit">%</span></div>
+      <div class="fact-body">實體店每提高 0.1 星評分帶來的轉化率提升。4.0 星是關鍵門檻 —— 70% 消費者會以此為篩選條件。</div>
+      <div class="fact-source">Uberall · 透過 BrightLocal 發布</div>
+    </div>
+    <div class="fact">
+      <div class="fact-num">04</div>
+      <div class="fact-stat">5–9<span class="unit">%</span></div>
+      <div class="fact-body">每提升 1 星評分帶來的營收增長。哈佛商學院研究證實為因果關係，並非相關性。獨立企業見此區間高端，醫療與法律行業更高。</div>
+      <div class="fact-source">Luca · 哈佛商學院</div>
+    </div>
+    <div class="fact" style="grid-column: span 2;">
+      <div class="fact-num">05</div>
+      <div class="fact-stat" style="font-size:38px;">AI 搜索現在會閱讀您的評論</div>
+      <div class="fact-body" style="max-width:740px;">ChatGPT、Perplexity、Claude 與 Google AI Overviews 都會從評論內容與評分中提取資訊，回答「附近最好的[服務]」這類問題。沒有強而有力的評論，AI 在客戶詢問時根本不會提到您的店家。</div>
+      <div class="fact-source">Google 透明度報告 · 2024–2026</div>
+    </div>
+  </div>
+
+  <p class="closing-line">優秀本身已經不夠，<span class="accent">能被看見</span>才決定客戶會走進誰的店門</p>
+
+  <div class="doc-footer">
+    <span>BAAM 評論審計 · 黃醫師中醫針灸</span>
+    <span>第 01 頁 / 共 07 頁</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 2 — SECTION 2 SNAPSHOT ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · 評論審計</div>
+      <div class="doc-header-sub">§ 02 · 您目前的狀況概覽</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>黃醫師中醫針灸</strong></div>
+      <div>法拉盛, 紐約 · 2026 年 5 月 29 日</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 02</span>
+    <span class="section-marker-title">您目前的狀況概覽</span>
+  </div>
+
+  <h2 class="section-headline">五個平台 · <span class="accent">一張總覽圖</span></h2>
+  <p class="section-deck">對紐約都會區的中醫診所而言，這些是客戶在撥打電話前會實際查看的平台</p>
+
+  <table class="snapshot-table">
+    <thead>
+      <tr>
+        <th>平台</th>
+        <th>評分</th>
+        <th>評論數</th>
+        <th>最新評論</th>
+        <th>檔案健康度</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">G</div>
+            <div>
+              <div class="platform-meta-strong">Google 商家檔案</div>
+              <div class="platform-meta-sub">主要平台 · 涵蓋 81% 消費者觸及</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating"><span class="stars">★★★★</span>★ <span class="mono" style="font-size:15px;">4.4</span></div></td>
+        <td><div class="review-count">47</div></td>
+        <td><div class="last-review stale">22 天前</div></td>
+        <td><div class="health-dot good">已驗證</div></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">Y</div>
+            <div>
+              <div class="platform-meta-strong">Yelp</div>
+              <div class="platform-meta-sub">次要平台 · 紐約使用率高</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating"><span class="stars">★★★★</span>☆ <span class="mono" style="font-size:15px;">4.0</span></div></td>
+        <td><div class="review-count">12</div></td>
+        <td><div class="last-review stale">3 個月前</div></td>
+        <td><div class="health-dot warn">無照片</div></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">Z</div>
+            <div>
+              <div class="platform-meta-strong">Zocdoc</div>
+              <div class="platform-meta-sub">行業平台 · 醫療專屬</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating"><span class="stars">★★★★</span>★ <span class="mono" style="font-size:15px;">4.6</span></div></td>
+        <td><div class="review-count">8</div></td>
+        <td><div class="last-review">1 個月前</div></td>
+        <td><div class="health-dot good">完整</div></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">H</div>
+            <div>
+              <div class="platform-meta-strong">Healthgrades</div>
+              <div class="platform-meta-sub">行業平台 · 醫療專屬</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating" style="color:var(--ink-mute);">— —</div></td>
+        <td><div class="review-count" style="color:var(--ink-mute);">0</div></td>
+        <td><div class="last-review" style="color:var(--ink-mute);">從未</div></td>
+        <td><div class="health-dot missing">未認領</div></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">F</div>
+            <div>
+              <div class="platform-meta-strong">Facebook 主頁</div>
+              <div class="platform-meta-sub">次要平台 · 社群信任度</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating"><span class="stars">★★★★</span>★ <span class="mono" style="font-size:15px;">4.7</span></div></td>
+        <td><div class="review-count">19</div></td>
+        <td><div class="last-review stale">5 個月前</div></td>
+        <td><div class="health-dot warn">已停滯</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight-callout">
+    <strong>這代表什麼</strong>
+    您的 Google 檔案承擔最重要的份量 —— 但 4.4 星評分、最近 22 天才一則新評論，已開始下滑。Healthgrades 完全缺席，使您在醫療專屬搜索中<span class="accent">徹底隱形</span>。Yelp 與 Facebook 已陷入沉寂，向 Google 演算法傳遞「這是停滯中的店家」的負面信號。
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM 評論審計 · 黃醫師中醫針灸</span>
+    <span>第 02 頁 / 共 07 頁</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 3 — SECTION 3 SCORE + DO-NOTHING ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · 評論審計</div>
+      <div class="doc-header-sub">§ 03 · 您的 BAAM 評論分數</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>黃醫師中醫針灸</strong></div>
+      <div>法拉盛, 紐約 · 2026 年 5 月 29 日</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 03</span>
+    <span class="section-marker-title">您的 BAAM 評論分數</span>
+  </div>
+
+  <div class="score-hero">
+    <div class="score-number">62</div>
+    <div class="score-grade-block">
+      <div class="score-grade-label">等級 · C 級</div>
+      <div class="score-grade-letter">C</div>
+      <div class="score-grade-diagnosis">看得見 —— 但客戶正在選擇評論更強的競爭對手</div>
+    </div>
+  </div>
+
+  <div style="font-family: 'Noto Sans TC', sans-serif; font-size: 12px; letter-spacing: 0.05em; color: var(--ink-mute); margin-bottom: 16px; font-weight: 600;">分數構成 · 為什麼您的分數是這個數字</div>
+
+  <div class="subscores">
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">評分質量</div>
+        <div class="subscore-raw">綜合 <span class="mono-num">4.37 ★</span></div>
+        <div class="subscore-meta-footnote">G 4.4 · Y 4.0 · Z 4.6 加權</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill" style="width: 72%;"></div>
+          <div class="subscore-mark" style="left: 55%;"></div>
+          <div class="subscore-mark" style="left: 80%;"></div>
+          <div class="subscore-mark" style="left: 100%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">3.0★</span>
+          <span class="subscore-scale-tick key" style="left: 55%;">4.0★ · 55</span>
+          <span class="subscore-scale-tick key" style="left: 80%;">4.5★ · 80</span>
+          <span class="subscore-scale-tick anchor-right">5.0★ · 100</span>
+        </div>
+      </div>
+      <div class="subscore-value">72</div>
+      <div class="subscore-weight">25%</div>
+    </div>
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">評論數量</div>
+        <div class="subscore-raw">共 <span class="mono-num">47</span> 則評論</div>
+        <div class="subscore-meta-footnote">中醫診所中位數 · 60</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill weak" style="width: 48%;"></div>
+          <div class="subscore-mark" style="left: 50%;"></div>
+          <div class="subscore-mark" style="left: 70%;"></div>
+          <div class="subscore-mark" style="left: 85%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">0</span>
+          <span class="subscore-scale-tick key" style="left: 50%;">中位 · 50</span>
+          <span class="subscore-scale-tick key" style="left: 70%;">前 25% · 100</span>
+          <span class="subscore-scale-tick anchor-right">300+</span>
+        </div>
+      </div>
+      <div class="subscore-value">48</div>
+      <div class="subscore-weight">20%</div>
+    </div>
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">30 天速度</div>
+        <div class="subscore-raw"><span class="mono-num">1.0 / 月</span></div>
+        <div class="subscore-meta-footnote">過去 30 天 1 則評論</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill weak" style="width: 25%;"></div>
+          <div class="subscore-mark" style="left: 40%;"></div>
+          <div class="subscore-mark" style="left: 75%;"></div>
+          <div class="subscore-mark" style="left: 100%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">0</span>
+          <span class="subscore-scale-tick key" style="left: 40%;">最低 · 2/月</span>
+          <span class="subscore-scale-tick key" style="left: 75%;">理想 · 4/月</span>
+          <span class="subscore-scale-tick anchor-right">10+/月</span>
+        </div>
+      </div>
+      <div class="subscore-value">25</div>
+      <div class="subscore-weight">25%</div>
+    </div>
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">6 個月速度</div>
+        <div class="subscore-raw"><span class="mono-num">1.67 / 月</span> 平均</div>
+        <div class="subscore-meta-footnote">10 則評論 ÷ 6 個月</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill weak" style="width: 42%;"></div>
+          <div class="subscore-mark" style="left: 40%;"></div>
+          <div class="subscore-mark" style="left: 75%;"></div>
+          <div class="subscore-mark" style="left: 100%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">0</span>
+          <span class="subscore-scale-tick key" style="left: 40%;">最低 · 2/月</span>
+          <span class="subscore-scale-tick key" style="left: 75%;">理想 · 4/月</span>
+          <span class="subscore-scale-tick anchor-right">10+/月</span>
+        </div>
+      </div>
+      <div class="subscore-value">42</div>
+      <div class="subscore-weight">20%</div>
+    </div>
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">12 個月速度</div>
+        <div class="subscore-raw"><span class="mono-num">2.5 / 月</span> 平均</div>
+        <div class="subscore-meta-footnote">30 則評論 ÷ 12 個月</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill" style="width: 58%;"></div>
+          <div class="subscore-mark" style="left: 40%;"></div>
+          <div class="subscore-mark" style="left: 75%;"></div>
+          <div class="subscore-mark" style="left: 100%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">0</span>
+          <span class="subscore-scale-tick key" style="left: 40%;">最低 · 2/月</span>
+          <span class="subscore-scale-tick key" style="left: 75%;">理想 · 4/月</span>
+          <span class="subscore-scale-tick anchor-right">10+/月</span>
+        </div>
+      </div>
+      <div class="subscore-value">58</div>
+      <div class="subscore-weight">10%</div>
+    </div>
+
+  </div>
+
+  <div class="methodology-footer">
+    <span class="methodology-eyebrow">評分方法</span>
+    每項分數都對照已公開的行業基準衡量。<strong>評分質量</strong>採用非線性曲線，獎勵 4.0 星轉化門檻（70% 消費者以此為篩選條件）。<strong>評論數量</strong>對比紐約都會區中醫診所的中位數。<strong>速度</strong>採用 BAAM Review Research 為醫療診所制定的健康速率區間：<span class="mono-band">最低 2/月 · 理想 4–8/月 · 進取 10+/月</span>。每條進度條上的黑色刻度標記顯示這些標準在 0–100 分數軸上的位置。 <a href="https://www.baamreview.com/review-value.html" target="_blank">完整方法論 →</a>
+  </div>
+
+  <p style="margin-top: 32px; font-family: 'Noto Serif TC', serif; font-size: 22px; line-height: 1.7; color: var(--ink); max-width: 680px; font-weight: 400;">
+    拖累您分數的關鍵是<span style="color: var(--rust-deep); font-weight: 700;">速度</span> —— 而速度正是您從週一就能開始改變的事情。
+  </p>
+
+  <div class="projection-block">
+    <div class="projection-eyebrow">§ 03.5 · 未來預測</div>
+    <h3 class="projection-title">若您不採取行動，<span class="accent">六個月後</span>您的分數會是多少？</h3>
+    <p class="projection-deck">停止收集評論的企業，會被三股力量逐漸瓦解：速度衰減（機械性）、排名下滑（Sterling Sky 研究）、競爭對手累積擴大差距。此預測假設您保持當前努力不變，並假設競爭對手保持其當前的收集速度</p>
+
+    <div class="projection-chart-frame">
+      <div style="position: relative;">
+        <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+          <line x1="50" y1="30" x2="680" y2="30" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+          <line x1="50" y1="90" x2="680" y2="90" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+          <line x1="50" y1="150" x2="680" y2="150" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+          <line x1="50" y1="210" x2="680" y2="210" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+          <line x1="50" y1="270" x2="680" y2="270" stroke="#C9BFAE" stroke-width="1"/>
+
+          <text x="40" y="34" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">100</text>
+          <text x="40" y="94" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">80</text>
+          <text x="40" y="154" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">60</text>
+          <text x="40" y="214" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">40</text>
+          <text x="40" y="274" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">20</text>
+
+          <text x="50" y="295" text-anchor="middle" font-family="Noto Sans TC" font-size="11" fill="#6B6259" font-weight="600">現在</text>
+          <text x="155" y="295" text-anchor="middle" font-family="Noto Sans TC" font-size="11" fill="#6B6259" font-weight="600">+2月</text>
+          <text x="260" y="295" text-anchor="middle" font-family="Noto Sans TC" font-size="11" fill="#6B6259" font-weight="600">+4月</text>
+          <text x="365" y="295" text-anchor="middle" font-family="Noto Sans TC" font-size="11" fill="#6B6259" font-weight="600">+6月</text>
+          <text x="470" y="295" text-anchor="middle" font-family="Noto Sans TC" font-size="11" fill="#6B6259" font-weight="600">+8月</text>
+          <text x="575" y="295" text-anchor="middle" font-family="Noto Sans TC" font-size="11" fill="#6B6259" font-weight="600">+10月</text>
+          <text x="660" y="295" text-anchor="middle" font-family="Noto Sans TC" font-size="11" fill="#6B6259" font-weight="600">+12月</text>
+
+          <path d="M 50 144 L 102 138 L 155 123 L 207 108 L 260 96 L 312 87 L 365 78 L 417 72 L 470 66 L 522 63 L 575 60 L 627 57 L 660 54
+                   L 660 222 L 627 214 L 575 208 L 522 198 L 470 192 L 417 186 L 365 180 L 312 168 L 260 162 L 207 156 L 155 150 L 102 144 L 50 144 Z"
+                fill="url(#gapGradient)" opacity="0.18"/>
+
+          <defs>
+            <linearGradient id="gapGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#D4882D"/>
+              <stop offset="100%" stop-color="#A4452A"/>
+            </linearGradient>
+          </defs>
+
+          <path d="M 50 144 L 102 138 L 155 123 L 207 108 L 260 96 L 312 87 L 365 78 L 417 72 L 470 66 L 522 63 L 575 60 L 627 57 L 660 54"
+                stroke="#4F7253" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <path d="M 50 144 L 102 144 L 155 150 L 207 156 L 260 162 L 312 168 L 365 180 L 417 186 L 470 192 L 522 198 L 575 208 L 627 214 L 660 222"
+                stroke="#A4452A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
+
+          <circle cx="50" cy="144" r="5" fill="#1A1814"/>
+          <text x="50" y="135" text-anchor="middle" font-family="Noto Serif TC" font-size="14" fill="#1A1814" font-weight="700">62</text>
+
+          <circle cx="365" cy="180" r="4" fill="#A4452A"/>
+          <text x="365" y="200" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#A4452A" font-weight="500">41</text>
+
+          <circle cx="365" cy="78" r="4" fill="#4F7253"/>
+          <text x="365" y="68" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4F7253" font-weight="500">81</text>
+
+          <text x="660" y="50" font-family="Noto Serif TC" font-size="13" fill="#4F7253" font-weight="700" text-anchor="end">89 · A 級</text>
+          <text x="660" y="240" font-family="Noto Serif TC" font-size="13" fill="#A4452A" font-weight="700" text-anchor="end">36 · F 級</text>
+
+          <line x1="365" y1="30" x2="365" y2="270" stroke="#6B6259" stroke-width="0.5" stroke-dasharray="2,3"/>
+          <text x="365" y="22" text-anchor="middle" font-family="Noto Sans TC" font-size="10" fill="#6B6259" font-weight="600">六個月分界線</text>
+
+          <text x="500" y="135" text-anchor="middle" font-family="Noto Serif TC" font-size="15" fill="#1A1814" font-weight="400">— 兩條線的差距 —</text>
+          <text x="500" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#842F1B">$67,200 / 6 個月</text>
+        </svg>
+      </div>
+
+      <div class="projection-legend">
+        <div class="legend-item"><span class="legend-swatch red"></span> <strong>不採取行動</strong> · 依當前努力的預測軌跡</div>
+        <div class="legend-item"><span class="legend-swatch green"></span> <strong>使用 BAAM Review</strong> · 持續收集與回覆</div>
+      </div>
+    </div>
+
+    <div class="projection-impact">
+      <div class="impact-cell">
+        <div class="impact-label">6 個月後分數</div>
+        <div class="impact-value">62 → 41</div>
+        <div class="impact-sub">從 C 級降至 D 級 · 連續 60 天無新評論將觸發臨界門檻規則</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">排名位置</div>
+        <div class="impact-value">−3 至 −4</div>
+        <div class="impact-sub">「acupuncture Flushing」搜索的本地排名預估下滑位數 —— 競爭對手每月增加 8 則評論</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">營收損失</div>
+        <div class="impact-value">$67,200</div>
+        <div class="impact-sub">6 個月機會成本 · $1,400 中位數每評論價值 × 錯失的 48 則評論</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grade-scale-block">
+    <div class="grade-scale-eyebrow">完整等級表 · 每個等級的位置</div>
+    <h3 class="grade-scale-headline">您的 <span class="accent">C 級</span>在整體中的位置 —— 以及向上爬升所需要的努力</h3>
+    <table class="grade-scale-table">
+      <thead>
+        <tr>
+          <th>分數區間</th>
+          <th class="center">等級</th>
+          <th>白話解讀</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="score-range">90 – 100</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-a">A</span></td>
+          <td><span class="grade-meaning">稱霸您所在的本地市場。評論已成為您的競爭護城河。</span></td>
+        </tr>
+        <tr>
+          <td><span class="score-range">75 – 89</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-b">B</span></td>
+          <td><span class="grade-meaning">強勁 —— 但月復一月正被頂尖競爭對手拉開差距。</span></td>
+        </tr>
+        <tr class="current">
+          <td><span class="score-range">60 – 74</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-c">C</span></td>
+          <td><span class="grade-meaning">看得見 —— 但客戶正在選擇評論更強的競爭對手。<span class="you-here-pill">您 · 62</span></span></td>
+        </tr>
+        <tr>
+          <td><span class="score-range">40 – 59</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-d">D</span></td>
+          <td><span class="grade-meaning">每週都在流失客戶給評論更佳的競爭對手。</span></td>
+        </tr>
+        <tr>
+          <td><span class="score-range">0 – 39</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-f">F</span></td>
+          <td><span class="grade-meaning">實質上完全隱形。搜索引擎與 AI 都會直接跳過您。</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM 評論審計 · 黃醫師中醫針灸</span>
+    <span>第 03 頁 / 共 07 頁</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 4 — SECTION 4 BENCHMARKS ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · 評論審計</div>
+      <div class="doc-header-sub">§ 04 · 行業基準</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>黃醫師中醫針灸</strong></div>
+      <div>法拉盛, 紐約 · 2026 年 5 月 29 日</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 04</span>
+    <span class="section-marker-title">行業基準</span>
+  </div>
+
+  <h2 class="section-headline">用<span class="accent">美元</span>與<span class="accent">客戶數量</span>來衡量</h2>
+  <p class="section-deck">數據來自 BAAM Review Research 簡報，套用於您的具體類別 —— 中醫 / 針灸 / 診所</p>
+
+  <div class="benchmark-split">
+    <div class="benchmark-panel">
+      <div class="benchmark-panel-eyebrow">§ 04A · 每條評論的金錢價值</div>
+      <h3 class="benchmark-panel-title">一則優質的 Google 評論對中醫診所的價值…</h3>
+      <div class="benchmark-value-big">$1,400</div>
+      <div class="benchmark-value-range">區間 $400 — $2,400 · 以 24 個月為期</div>
+      <p class="benchmark-detail">
+        評論價值透過三個管道累積 —— Google 搜索排名、網站小工具信任度、口碑轉介紹。對於患者終身價值約 $600 的典型紐約都會區針灸診所，每評論中位數為 <strong>$1,400</strong>。療程關係較長的優秀診所可達 <strong>$2,400 以上</strong>。
+      </p>
+      <p style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-mute); margin-top: 14px;">
+        方法論：baamreview.com/review-value.html
+      </p>
+    </div>
+
+    <div class="benchmark-panel">
+      <div class="benchmark-panel-eyebrow">§ 04B · 健康的評論收集速度</div>
+      <h3 class="benchmark-panel-title">紐約都會區的醫療診所每月應收集…</h3>
+
+      <div class="velocity-gauge">
+        <div class="velocity-band silent">沉寂 · 0–1</div>
+        <div class="velocity-band min">最低 · 2–3</div>
+        <div class="velocity-band optimal">理想 · 4–8</div>
+        <div class="velocity-band aggressive">10+</div>
+      </div>
+      <div class="velocity-pointer-wrap">
+        <div class="velocity-pointer" style="left: 10%;">
+          <div class="velocity-pointer-label">您 · 1/月</div>
+        </div>
+      </div>
+      <p class="benchmark-detail" style="margin-top: 22px;">
+        根據 BrightLocal 研究，<strong>僅 9% 的企業</strong>能維持理想速度 —— 這也正是 Google 演算法真正獎勵的區間。您目前處於沉寂區。提升到理想區間（每月 5–6 則新評論）是本次審計中<strong>最大的單一改進槓桿</strong>。
+      </p>
+    </div>
+  </div>
+
+  <div class="money-on-table">
+    <div class="money-on-table-eyebrow">§ 流失的收入</div>
+    <p class="money-on-table-text">
+      法拉盛地區的針灸競爭對手平均<span class="accent">每月收集 8 則評論</span>，您平均<span class="accent">只有 1 則</span>。<br><br>
+      這 7 則的月度差距，使您每年損失約 <strong>$117,600</strong> 的客戶終身價值 —— 以中醫診所每評論中位價值計算。
+    </p>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM 評論審計 · 黃醫師中醫針灸</span>
+    <span>第 04 頁 / 共 07 頁</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 5 — SECTION 5 COMPETITORS ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · 評論審計</div>
+      <div class="doc-header-sub">§ 05 · 競爭對手對比</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>黃醫師中醫針灸</strong></div>
+      <div>法拉盛, 紐約 · 2026 年 5 月 29 日</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 05</span>
+    <span class="section-marker-title">競爭對手對比</span>
+  </div>
+
+  <h2 class="section-headline">客戶在看到您之前<span class="accent">先看到的五家診所</span></h2>
+  <p class="section-deck">根據 1.5 英里半徑內「acupuncture Flushing」搜索的 Google Maps 排名識別出來。我們替您挑選競爭對手 —— 老闆自己挑的對手幾乎總是錯的</p>
+
+  <table class="competitor-table">
+    <thead>
+      <tr>
+        <th>商家名稱</th>
+        <th>分數</th>
+        <th>評分</th>
+        <th>總評論數</th>
+        <th>近 30 天</th>
+        <th>近 90 天</th>
+        <th>趨勢</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="competitor-name"><span class="competitor-rank">01</span>魏林針灸<br><span style="font-size:12px;color:var(--ink-mute);">Wei Lin Acupuncture</span></div></td>
+        <td><strong>84</strong></td>
+        <td>4.8 ★</td>
+        <td>218</td>
+        <td>9</td>
+        <td>28</td>
+        <td><span class="trend-arrow up">↗</span></td>
+      </tr>
+      <tr>
+        <td><div class="competitor-name"><span class="competitor-rank">02</span>現代中醫中心<br><span style="font-size:12px;color:var(--ink-mute);">Modern TCM Center</span></div></td>
+        <td><strong>78</strong></td>
+        <td>4.7 ★</td>
+        <td>156</td>
+        <td>7</td>
+        <td>22</td>
+        <td><span class="trend-arrow up">↗</span></td>
+      </tr>
+      <tr class="you">
+        <td><div class="competitor-name"><span class="competitor-rank">03</span>黃醫師中醫針灸 <span class="you-tag">您</span></div></td>
+        <td><strong>62</strong></td>
+        <td>4.4 ★</td>
+        <td>47</td>
+        <td>1</td>
+        <td>4</td>
+        <td><span class="trend-arrow down">↘</span></td>
+      </tr>
+      <tr>
+        <td><div class="competitor-name"><span class="competitor-rank">04</span>法拉盛針灸中心<br><span style="font-size:12px;color:var(--ink-mute);">Flushing Acupuncture Center</span></div></td>
+        <td><strong>71</strong></td>
+        <td>4.6 ★</td>
+        <td>124</td>
+        <td>5</td>
+        <td>17</td>
+        <td><span class="trend-arrow up">↗</span></td>
+      </tr>
+      <tr>
+        <td><div class="competitor-name"><span class="competitor-rank">05</span>健康加成針灸<br><span style="font-size:12px;color:var(--ink-mute);">Health Plus Acupuncture</span></div></td>
+        <td><strong>55</strong></td>
+        <td>4.3 ★</td>
+        <td>38</td>
+        <td>0</td>
+        <td>2</td>
+        <td><span class="trend-arrow flat">→</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="competitor-diagnosis">
+    <span class="accent">觀察</span> 魏林針灸每月收集評論的速度是您的 <strong>9 倍</strong>。他們在 24 小時內回覆每則評論，且約 30% 的評論是中文撰寫 —— 完全捕捉到您在 Google 上完全錯失的客戶族群。按當前速度，您與他們之間的差距每 <strong>8 個月</strong>翻一倍。到 2027 年第四季，魏林針灸在 Google 本地搜索框中的星級顯示將比您高 0.4 星 —— 這在並排對比的搜索中相當於約 75% 的相對轉化率差異。
+  </p>
+
+  <div class="ornament">§</div>
+
+  <p style="font-family: 'Noto Serif TC', serif; font-size: 20px; line-height: 1.75; color: var(--ink-soft); text-align: center; max-width: 680px; margin: 0 auto; font-weight: 400;">
+    好消息是：今天您仍勝過此地兩家競爭對手。<br>難一點的消息是：若不改變，到第四季您將勝過任何一家都不剩。
+  </p>
+
+  <div class="doc-footer">
+    <span>BAAM 評論審計 · 黃醫師中醫針灸</span>
+    <span>第 05 頁 / 共 07 頁</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 6 — SECTION 6 ACTION + CTA ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · 評論審計</div>
+      <div class="doc-header-sub">§ 06 · 您的 12 個月行動計劃</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>黃醫師中醫針灸</strong></div>
+      <div>法拉盛, 紐約 · 2026 年 5 月 29 日</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 06</span>
+    <span class="section-marker-title">您的 12 個月行動計劃</span>
+  </div>
+
+  <h2 class="section-headline">五件事 · <span class="accent">不是三件，也不是十件</span></h2>
+  <p class="section-deck">按您審計中得分最低的子項排序。每項行動針對一個具體槓桿 —— 對應一個具體的金額</p>
+
+  <ol class="action-list">
+    <li class="action-item">
+      <div class="action-number">一</div>
+      <div class="action-body">
+        <div class="action-title">啟動就診後評論請求流程</div>
+        <div class="action-why">您目前完全沒有系統。在每次就診後 24–72 小時內，以客戶的母語發送請求 —— 這是本次審計中最大的單一改進槓桿。</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">預期結果</span>
+            <span class="action-result-value">+5 則評論 / 月</span>
+          </div>
+          <span class="action-owner-pill baam">BAAM Review</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$84,000</div>
+        <div class="action-value-label">12 個月價值 · 基本情境</div>
+        <div class="action-value-calc">60 則評論/年 × <strong>$1,400</strong><br>每評論價值</div>
+      </div>
+    </li>
+
+    <li class="action-item">
+      <div class="action-number">二</div>
+      <div class="action-body">
+        <div class="action-title">48 小時內回覆每則評論 · 負面評論 24 小時內回覆</div>
+        <div class="action-why">88% 的消費者會選擇回覆所有評論的店家，而非回覆者只有 47%。雙語回覆使效果加倍。</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">預期結果</span>
+            <span class="action-result-value">+12% 轉化率提升</span>
+          </div>
+          <span class="action-owner-pill baam">BAAM Review</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$14,400</div>
+        <div class="action-value-label">12 個月價值</div>
+        <div class="action-value-calc">+10 位患者 × <strong>$1,400</strong><br>患者終身價值</div>
+      </div>
+    </li>
+
+    <li class="action-item">
+      <div class="action-number">三</div>
+      <div class="action-body">
+        <div class="action-title">認領 Healthgrades · 重啟 Facebook 評論收集</div>
+        <div class="action-why">兩個檔案缺口正在拖累您的觸及率。Healthgrades 是醫療專屬平台，完全未認領（0 則評論）。Facebook 已沉寂五個月 —— Google 會將連續停滯解讀為「店家衰退」的負面信號。</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">預期結果</span>
+            <span class="action-result-value">+15% 本地搜索觸及</span>
+          </div>
+          <span class="action-owner-pill">您 + 員工</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$22,400</div>
+        <div class="action-value-label">12 個月價值</div>
+        <div class="action-value-calc">+16 位患者 × <strong>$1,400</strong><br>患者終身價值</div>
+      </div>
+    </li>
+
+    <li class="action-item">
+      <div class="action-number">四</div>
+      <div class="action-body">
+        <div class="action-title">補回 26 則未回應的 Google 評論</div>
+        <div class="action-why">由 AI 起草、您審核批准的個性化回覆，補回所有歷史評論。向 Google 與未來的客戶傳遞您真心在意 —— 而不需要造假。</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">預期結果</span>
+            <span class="action-result-value">+8% 排名信號強度</span>
+          </div>
+          <span class="action-owner-pill baam">BAAM Review</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$8,400</div>
+        <div class="action-value-label">12 個月價值</div>
+        <div class="action-value-calc">+6 位患者 × <strong>$1,400</strong><br>患者終身價值</div>
+      </div>
+    </li>
+
+    <li class="action-item">
+      <div class="action-number">五</div>
+      <div class="action-body">
+        <div class="action-title">在 drhuangclinic.com 嵌入即時評論小工具</div>
+        <div class="action-why">評論推動 SEO、SEO 推動流量、流量推動預約。同一批評論在兩個地方發揮作用。結構化數據標記讓評論有機會出現在 Google 富媒體搜索結果中。</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">預期結果</span>
+            <span class="action-result-value">+18% 網站轉化率</span>
+          </div>
+          <span class="action-owner-pill">BAAM 平台</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$10,200</div>
+        <div class="action-value-label">12 個月價值</div>
+        <div class="action-value-calc">+7 位患者 × <strong>$1,400</strong><br>患者終身價值</div>
+      </div>
+    </li>
+  </ol>
+
+  <div style="margin-top: 24px; padding: 22px 26px; background: var(--cream-deep); border-left: 3px solid var(--sage);">
+    <p style="font-family: 'Noto Serif TC', serif; font-size: 19px; line-height: 1.75; color: var(--ink); font-weight: 400;">
+      五項行動，持續執行 12 個月，模型預估帶來 <strong style="font-family:'Archivo', sans-serif; font-weight: 800; color: var(--sage-darkest);">+$139,400</strong> 的額外客戶終身價值 —— 相對於不採取行動的預計損失 <strong style="font-family:'Archivo', sans-serif; font-weight: 800; color: var(--rust-deep);">$67,200</strong>。
+    </p>
+  </div>
+
+  <div class="cta-block">
+    <div class="cta-eyebrow">兩種路徑 · 同一份計劃</div>
+    <h3 class="cta-headline">您不必<span class="accent">獨自完成這一切</span></h3>
+
+    <div class="cta-paths">
+      <div class="cta-path">
+        <div class="cta-path-label">路徑 A · 自助方案</div>
+        <h4 class="cta-path-title">您自己執行</h4>
+        <div class="cta-path-price">$99 / 月 · 單一門市 · 30 天免費試用</div>
+        <p class="cta-path-desc">登入後自行發送每週評論請求、自己回覆。您驅動系統運作；BAAM Review 提供平台、AI 草擬、與多語模板。上述五項行動中您執行三項；我們提供工具支援。</p>
+      </div>
+      <div class="cta-path featured">
+        <div class="cta-path-label">路徑 B · 全託管服務</div>
+        <h4 class="cta-path-title">我們替您執行</h4>
+        <div class="cta-path-price">$399 / 月 · 30 天免費試用 · 5 倍價值承諾</div>
+        <p class="cta-path-desc">您每週寄給我們客戶名單。我們處理其他所有步驟 —— 雙語發送、AI 輔助回覆、每月報告、上述完整 12 個月計劃。我們保證 12 個月內帶來 5 倍價值，以您行業的中位數為衡量基準。唯一前提是真實的客戶名單。</p>
+      </div>
+    </div>
+
+    <p class="promise-line">
+      對比 <strong>Birdeye</strong> 收費 $299/月 + $5,000 安裝費，或 <strong>Podium</strong> 收費 $399/月 + 入會費。BAAM Review 免費起步，月結付費。
+    </p>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM 評論審計 · 黃醫師中醫針灸</span>
+    <span>第 06 頁 / 共 07 頁</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 7 — APPENDIX ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · 評論審計</div>
+      <div class="doc-header-sub">§ A · 附錄 · 參考數據表</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>黃醫師中醫針灸</strong></div>
+      <div>法拉盛, 紐約 · 2026 年 5 月 29 日</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ A</span>
+    <span class="section-marker-title">附錄 · 參考數據表</span>
+  </div>
+
+  <div class="appendix-intro">
+    <h2 class="section-headline">完整的方法論，<span class="accent">兩張表格</span>說明</h2>
+    <p class="section-deck">本次審計中每個數字都能追溯至以下其中一項標準。您所屬的行業已用底色標示。完整研究簡報 —— 包含公式、15 項引用來源、與即時計算器 —— 詳見 <a href="https://www.baamreview.com/review-value.html" target="_blank" style="color: var(--rust-deep); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px;">baamreview.com/review-value.html</a></p>
+  </div>
+
+  <div class="appendix-block">
+    <div class="appendix-eyebrow">§ A.1 · 行業每評論價值</div>
+    <h3 class="appendix-title">各行業每條評論的金錢價值</h3>
+    <p class="appendix-deck">以 24 個月為期測算一則優質 Google 評論的價值。中位數即為本審計營收影響計算所採用的數值</p>
+    <table class="appendix-table">
+      <thead>
+        <tr>
+          <th>行業</th>
+          <th>每評論價值</th>
+          <th>中位數</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>咖啡 / 咖啡館</td><td>$30 – $180</td><td>$105</td></tr>
+        <tr><td>美容 / SPA</td><td>$120 – $600</td><td>$360</td></tr>
+        <tr><td>服飾 / 精品店</td><td>$80 – $700</td><td>$390</td></tr>
+        <tr><td>健康食品 / 保健品</td><td>$150 – $1,200</td><td>$675</td></tr>
+        <tr><td>保險代理</td><td>$300 – $1,800</td><td>$1,050</td></tr>
+        <tr class="highlight"><td>針灸 / 診所 / 牙醫</td><td>$400 – $2,400</td><td>$1,400</td></tr>
+        <tr><td>酒店 / 度假村</td><td>$300 – $2,800</td><td>$1,550</td></tr>
+        <tr><td>汽車經銷 / 維修</td><td>$500 – $5,000+</td><td>$2,750</td></tr>
+        <tr><td>承包商 / 屋頂 / 空調</td><td>$600 – $6,000+</td><td>$3,300</td></tr>
+        <tr><td>房地產經紀</td><td>$1,500 – $8,000+</td><td>$4,750</td></tr>
+        <tr><td>律師 / 移民</td><td>$1,200 – $12,000+</td><td>$6,600</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="appendix-block">
+    <div class="appendix-eyebrow">§ A.2 · 健康的評論收集速度</div>
+    <h3 class="appendix-title">各行業每月評論數量標準</h3>
+    <p class="appendix-deck">Google 本地排名演算法實際獎勵的速率區間。只有 9% 的企業能維持理想區間。高流量行業需要更快速度；高客單行業不必追求數量</p>
+    <table class="appendix-table">
+      <thead>
+        <tr>
+          <th>行業</th>
+          <th>最低</th>
+          <th>理想</th>
+          <th>進取</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>咖啡 / 咖啡館</td><td>4</td><td>10 – 15</td><td>20+</td></tr>
+        <tr><td>美容 / SPA</td><td>3</td><td>8 – 12</td><td>15+</td></tr>
+        <tr><td>服飾 / 精品店</td><td>3</td><td>6 – 10</td><td>12+</td></tr>
+        <tr><td>健康食品 / 保健品</td><td>2</td><td>4 – 7</td><td>8+</td></tr>
+        <tr><td>保險代理</td><td>1</td><td>3 – 5</td><td>6+</td></tr>
+        <tr class="highlight"><td>針灸 / 診所 / 牙醫</td><td>2</td><td>4 – 8</td><td>10+</td></tr>
+        <tr><td>酒店</td><td>6</td><td>12 – 20</td><td>25+</td></tr>
+        <tr><td>汽車</td><td>3</td><td>6 – 10</td><td>12+</td></tr>
+        <tr><td>承包商</td><td>2</td><td>5 – 8</td><td>10+</td></tr>
+        <tr><td>房地產</td><td>1</td><td>3 – 5</td><td>6+</td></tr>
+        <tr><td>律師 / 移民</td><td>1</td><td>3 – 5</td><td>6+</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="appendix-source">
+    資料來源 · 哈佛商學院 · BrightLocal · Whitespark · 紐約大學斯特恩商學院 · 聯邦貿易委員會 · Google 透明度報告
+    <span class="zh">完整引用：<a href="https://www.baamreview.com/review-value.html#sources" target="_blank">baamreview.com/review-value.html#sources</a></span>
+  </div>
+
+  <div class="ornament">§</div>
+
+  <p style="font-family: 'Noto Serif TC', serif; font-size: 22px; line-height: 1.75; color: var(--ink); text-align: center; max-width: 680px; margin: 0 auto; font-weight: 400;">
+    「評論不是終點。它們是<span style="color: var(--rust-deep); font-weight: 700;">原料</span> —— 用來建立信任、產出內容、推動 SEO、帶來轉介紹、最終轉化為營收。」
+  </p>
+
+  <div class="doc-footer">
+    <span>BAAM 評論審計 · 黃醫師中醫針灸</span>
+    <span>第 07 頁 / 共 07 頁 · 結束</span>
+  </div>
+</section>
+
+</body>
+</html>

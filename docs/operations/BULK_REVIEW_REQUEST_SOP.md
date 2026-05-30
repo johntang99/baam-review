@@ -9,6 +9,9 @@ healthy, and converting at the highest rate possible.
 list of people who finished therapy this month". For one-off sends use
 the [Single Review Request SOP](./SINGLE_REVIEW_REQUEST_SOP.md).
 
+For Gmail policy, daily limits, pacing, and AI-copy safety guardrails,
+see [Gmail Sending Safety SOP](./GMAIL_SENDING_SAFETY_SOP.md).
+
 **Audience**: BAAM Review staff doing operations work for Full Service
 customers, plus self-service customers using `/app/lists`.
 
@@ -54,6 +57,8 @@ that they got swept up in a campaign.
 - [ ] **List size is reasonable for this sending stage** (see
       [Volume guidelines](#volume-guidelines) below).
 - [ ] **AI variations have been generated and reviewed.**
+- [ ] **If using Gmail/manual Gmail-assisted sending**, apply the cadence
+      and volume controls in [Gmail Sending Safety SOP](./GMAIL_SENDING_SAFETY_SOP.md).
 
 ---
 
@@ -533,3 +538,5 @@ move, examine the failed sends individually via the list detail page.
   spam-classifier mitigation. Companion to SINGLE_REVIEW_REQUEST_SOP.md
   for one-off sends, and references CUSTOM_SENDER_DOMAIN_SETUP.md for
   per-client sender configuration.
+- **2026-05-30** — Added explicit cross-link to
+  GMAIL_SENDING_SAFETY_SOP.md for Gmail policy/limit/pacing guidance.

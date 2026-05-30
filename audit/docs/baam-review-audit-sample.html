@@ -1,0 +1,2327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAAM Review Audit · Dr. Huang Acupuncture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E6;
+    --cream-light: #FAF7F0;
+    --cream-deep: #EBE3D2;
+    --ink: #1A1814;
+    --ink-soft: #3D3833;
+    --ink-mute: #6B6259;
+    --rule: #C9BFAE;
+    --rule-soft: #DDD3BF;
+    --amber: #D4882D;
+    --amber-deep: #B86E1A;
+    --rust: #A4452A;
+    --rust-deep: #842F1B;
+    --sage: #6B8E6E;
+    --sage-deep: #4F7253;
+    --sage-darkest: #2D4530;
+    --gold: #C9A227;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Archivo', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 25% 15%, rgba(212, 136, 45, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 75% 85%, rgba(107, 142, 110, 0.03) 0%, transparent 40%);
+    background-attachment: fixed;
+    padding: 0;
+  }
+
+  /* Document grain texture */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .page {
+    max-width: 920px;
+    margin: 0 auto;
+    background: var(--cream-light);
+    position: relative;
+    z-index: 2;
+    padding: 80px 80px 100px;
+    border-left: 1px solid var(--rule-soft);
+    border-right: 1px solid var(--rule-soft);
+    min-height: 100vh;
+  }
+
+  .page + .page {
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  /* ============ TYPOGRAPHY ============ */
+  .display { font-family: 'Instrument Serif', serif; font-weight: 400; }
+  .display-i { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .body-sans { font-family: 'Archivo', sans-serif; }
+
+  h1, h2, h3, h4 { letter-spacing: -0.01em; }
+
+  /* ============ COVER / PAGE HEADER ============ */
+  .doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 56px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+
+  .doc-header-left { display: flex; flex-direction: column; gap: 4px; }
+  .doc-header-brand { font-weight: 700; letter-spacing: 0.22em; }
+  .doc-header-sub { color: var(--ink-mute); font-weight: 400; font-size: 10px; }
+  .doc-header-right { text-align: right; color: var(--ink-mute); font-weight: 400; font-size: 10px; }
+  .doc-header-right strong { color: var(--ink); font-weight: 500; }
+
+  .section-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-bottom: 36px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section-marker-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    color: var(--amber-deep);
+    font-weight: 600;
+  }
+  .section-marker-title {
+    font-family: 'Archivo', sans-serif;
+    font-size: 17px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* ============ COVER PAGE ============ */
+  .cover-hero {
+    margin-bottom: 80px;
+  }
+  .cover-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+    margin-bottom: 36px;
+  }
+  .cover-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 76px;
+    line-height: 0.95;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+  }
+  .cover-title em {
+    font-style: italic;
+    color: var(--rust-deep);
+  }
+  .cover-subtitle {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 28px;
+    line-height: 1.3;
+    color: var(--ink-soft);
+    max-width: 640px;
+    font-weight: 400;
+  }
+
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    padding-top: 24px;
+    margin-bottom: 80px;
+  }
+  .cover-meta-item {
+    border-right: 1px solid var(--rule);
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+  .cover-meta-item:first-child { padding-left: 0; }
+  .cover-meta-item:last-child { border-right: none; padding-right: 0; }
+  .cover-meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .cover-meta-value {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .cover-meta-value .mono { font-size: 16px; }
+
+  /* ============ HOOK / OPENING QUOTE ============ */
+  .hook-quote {
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 56px 0;
+    margin: 0 -20px;
+    text-align: center;
+  }
+  .hook-quote p {
+    font-family: 'Instrument Serif', serif;
+    font-size: 38px;
+    line-height: 1.2;
+    max-width: 720px;
+    margin: 0 auto;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .hook-quote em {
+    font-style: italic;
+    color: var(--rust-deep);
+  }
+
+  /* ============ SECTION 1 — FACT GRID ============ */
+  .section-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    line-height: 1.05;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 14px;
+    letter-spacing: -0.015em;
+  }
+  .section-headline em { font-style: italic; color: var(--rust-deep); }
+  .section-deck {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-soft);
+    margin-bottom: 44px;
+    max-width: 640px;
+    line-height: 1.35;
+  }
+
+  .fact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+    margin-bottom: 32px;
+  }
+  .fact {
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 28px 28px 24px;
+    position: relative;
+  }
+  .fact-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--amber-deep);
+    margin-bottom: 14px;
+  }
+  .fact-stat {
+    font-family: 'Instrument Serif', serif;
+    font-size: 56px;
+    line-height: 0.95;
+    color: var(--ink);
+    margin-bottom: 10px;
+    font-weight: 400;
+  }
+  .fact-stat .unit { font-size: 28px; color: var(--ink-mute); }
+  .fact-body {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+  .fact-source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    border-top: 1px solid var(--rule);
+    padding-top: 8px;
+  }
+
+  .closing-line {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 24px;
+    color: var(--ink);
+    text-align: center;
+    margin: 40px 0 0;
+    padding: 0 60px;
+    line-height: 1.4;
+  }
+  .closing-line em { color: var(--rust-deep); }
+
+  /* ============ SECTION 2 — PLATFORM SNAPSHOT ============ */
+  .snapshot-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+    font-size: 14px;
+  }
+  .snapshot-table th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    padding: 12px 16px 12px 0;
+    border-bottom: 1px solid var(--ink);
+  }
+  .snapshot-table th:not(:first-child) { text-align: right; padding: 12px 0 12px 16px; }
+  .snapshot-table td {
+    padding: 18px 16px 18px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: middle;
+  }
+  .snapshot-table td:not(:first-child) { text-align: right; padding: 18px 0 18px 16px; }
+
+  .platform-name {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .platform-icon {
+    width: 32px; height: 32px;
+    background: var(--cream-deep);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .platform-meta-strong { font-weight: 600; font-size: 15px; }
+  .platform-meta-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+  }
+  .star-rating {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    color: var(--ink);
+  }
+  .star-rating .stars { color: var(--gold); letter-spacing: -0.05em; }
+  .review-count { font-family: 'JetBrains Mono', monospace; font-size: 15px; }
+  .last-review {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .last-review.stale { color: var(--rust); font-weight: 500; }
+
+  .health-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .health-dot::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .health-dot.good { color: var(--sage-deep); }
+  .health-dot.good::before { background: var(--sage); }
+  .health-dot.warn { color: var(--amber-deep); }
+  .health-dot.warn::before { background: var(--amber); }
+  .health-dot.bad { color: var(--rust-deep); }
+  .health-dot.bad::before { background: var(--rust); }
+  .health-dot.missing { color: var(--ink-mute); }
+  .health-dot.missing::before { background: var(--ink-mute); }
+
+  .insight-callout {
+    background: var(--cream-deep);
+    border-left: 3px solid var(--amber);
+    padding: 24px 28px;
+    margin-top: 24px;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+  .insight-callout strong {
+    font-style: normal;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ============ SECTION 3 — SCORE ============ */
+  .score-hero {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 56px;
+    align-items: center;
+    padding: 24px 0 48px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 40px;
+  }
+  .score-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 200px;
+    font-weight: 300;
+    line-height: 0.85;
+    color: var(--ink);
+    letter-spacing: -0.04em;
+    position: relative;
+  }
+  .score-number::after {
+    content: '/100';
+    font-size: 24px;
+    color: var(--ink-mute);
+    font-weight: 400;
+    letter-spacing: 0;
+    margin-left: 4px;
+    vertical-align: top;
+  }
+  .score-grade-block { padding-left: 8px; }
+  .score-grade-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .score-grade-letter {
+    font-family: 'Instrument Serif', serif;
+    font-size: 96px;
+    line-height: 1;
+    color: var(--rust-deep);
+    margin-bottom: 12px;
+  }
+  .score-grade-diagnosis {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.3;
+    color: var(--ink);
+    max-width: 380px;
+  }
+
+  /* Sub-scores bar */
+  .subscores {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 32px;
+  }
+  .subscore-row {
+    display: grid;
+    grid-template-columns: 210px 1fr 72px 50px;
+    align-items: start;
+    gap: 24px;
+  }
+  .subscore-meta { padding-top: 2px; }
+  .subscore-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .subscore-raw {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .subscore-raw .mono-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .subscore-meta-footnote {
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .subscore-bar-area { padding-top: 6px; }
+  .subscore-bar-track {
+    position: relative;
+    height: 12px;
+    background: var(--cream-deep);
+    border-radius: 1px;
+  }
+  .subscore-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--amber) 0%, var(--amber-deep) 100%);
+    border-radius: 1px;
+    z-index: 2;
+  }
+  .subscore-bar-fill.weak { background: linear-gradient(90deg, var(--rust) 0%, var(--rust-deep) 100%); }
+  .subscore-bar-fill.strong { background: linear-gradient(90deg, var(--sage) 0%, var(--sage-deep) 100%); }
+  .subscore-mark {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 1px;
+    background: var(--ink);
+    z-index: 3;
+    opacity: 0.55;
+  }
+  .subscore-scale {
+    position: relative;
+    margin-top: 11px;
+    height: 14px;
+  }
+  .subscore-scale-tick {
+    position: absolute;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    color: var(--ink-mute);
+    white-space: nowrap;
+  }
+  .subscore-scale-tick.key {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .subscore-scale-tick.anchor-left { left: 0; transform: translateX(0); }
+  .subscore-scale-tick.anchor-right { left: 100%; transform: translateX(-100%); }
+  .subscore-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    text-align: right;
+    line-height: 1;
+    padding-top: 0;
+  }
+  .subscore-weight {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-mute);
+    text-align: right;
+    padding-top: 8px;
+  }
+
+  .methodology-footer {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .methodology-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    color: var(--amber-deep);
+    margin-right: 12px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .methodology-footer strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 11px;
+    color: var(--ink);
+  }
+  .methodology-footer a {
+    color: var(--rust-deep);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+  }
+
+  /* ============ DO-NOTHING PROJECTION ============ */
+  .projection-block {
+    margin-top: 32px;
+    padding-top: 40px;
+    border-top: 1px solid var(--ink);
+  }
+  .projection-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust-deep);
+    margin-bottom: 12px;
+  }
+  .projection-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 38px;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 14px;
+    max-width: 680px;
+  }
+  .projection-title em { font-style: italic; color: var(--rust-deep); }
+  .projection-deck {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+    max-width: 600px;
+    line-height: 1.55;
+  }
+
+  .projection-chart-frame {
+    background: var(--cream-light);
+    border: 1px solid var(--rule);
+    padding: 24px 32px 32px;
+    position: relative;
+  }
+  .projection-svg-wrap { position: relative; }
+
+  .projection-legend {
+    display: flex;
+    gap: 32px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule-soft);
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .legend-swatch {
+    width: 22px; height: 3px;
+  }
+  .legend-swatch.red { background: var(--rust-deep); }
+  .legend-swatch.green { background: var(--sage-deep); }
+  .legend-swatch.amber { background: var(--amber); }
+  .legend-item strong { color: var(--ink); font-weight: 600; }
+
+  .projection-impact {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    margin-top: 32px;
+  }
+  .impact-cell {
+    padding: 20px 24px;
+    border-right: 1px solid var(--rule);
+  }
+  .impact-cell:last-child { border-right: none; }
+  .impact-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 10px;
+  }
+  .impact-value {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    color: var(--rust-deep);
+    line-height: 1.05;
+  }
+  .impact-value.neutral { color: var(--ink); }
+  .impact-sub {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  /* ============ SECTION 4 — BENCHMARKS ============ */
+  .benchmark-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+    margin-bottom: 32px;
+  }
+  .benchmark-panel {
+    padding: 32px;
+    border-right: 1px solid var(--ink);
+  }
+  .benchmark-panel:last-child { border-right: none; }
+  .benchmark-panel-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+    margin-bottom: 14px;
+  }
+  .benchmark-panel-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    line-height: 1.15;
+    margin-bottom: 18px;
+    color: var(--ink);
+  }
+  .benchmark-value-big {
+    font-family: 'Instrument Serif', serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--rust-deep);
+    margin-bottom: 6px;
+  }
+  .benchmark-value-range {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
+  }
+  .benchmark-detail {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  .velocity-gauge {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 18px 0;
+    height: 36px;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+  .velocity-band {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .velocity-band.silent { background: var(--rust); color: white; flex: 1.5; }
+  .velocity-band.min { background: #D7B98A; color: var(--ink); flex: 1.2; }
+  .velocity-band.optimal { background: var(--sage); color: white; flex: 1.5; }
+  .velocity-band.aggressive { background: var(--sage-deep); color: white; flex: 1; }
+
+  .velocity-pointer-wrap {
+    position: relative;
+    height: 20px;
+    margin-top: 4px;
+  }
+  .velocity-pointer {
+    position: absolute;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  .velocity-pointer::before {
+    content: '▲';
+    color: var(--ink);
+    font-size: 12px;
+  }
+  .velocity-pointer-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 500;
+    white-space: nowrap;
+    margin-top: -2px;
+  }
+
+  .money-on-table {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 36px 40px;
+    margin-top: 16px;
+    position: relative;
+  }
+  .money-on-table-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 14px;
+  }
+  .money-on-table-text {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    line-height: 1.3;
+    color: var(--cream-light);
+  }
+  .money-on-table-text em {
+    font-style: italic;
+    color: var(--amber);
+    font-size: 1.15em;
+  }
+  .money-on-table-text strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: white;
+    background: var(--rust-deep);
+    padding: 0 8px;
+  }
+
+  /* ============ SECTION 5 — COMPETITORS ============ */
+  .competitor-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+    font-size: 14px;
+  }
+  .competitor-table thead th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    padding: 14px 12px;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .competitor-table th:not(:first-child) { text-align: right; }
+  .competitor-table td {
+    padding: 18px 12px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .competitor-table td:not(:first-child) { text-align: right; }
+  .competitor-table tr.you {
+    background: var(--cream-deep);
+  }
+  .competitor-table tr.you td {
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .competitor-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .competitor-rank {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    width: 20px;
+  }
+  .you-tag {
+    display: inline-block;
+    background: var(--rust-deep);
+    color: var(--cream-light);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    margin-left: 8px;
+    border-radius: 2px;
+  }
+  .trend-arrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+  }
+  .trend-arrow.up { color: var(--sage-deep); }
+  .trend-arrow.down { color: var(--rust-deep); }
+  .trend-arrow.flat { color: var(--ink-mute); }
+
+  .competitor-diagnosis {
+    background: var(--cream-deep);
+    padding: 28px 32px;
+    border-left: 3px solid var(--rust);
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .competitor-diagnosis strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    color: var(--rust-deep);
+    font-size: 15px;
+    font-weight: 500;
+    background: white;
+    padding: 1px 6px;
+  }
+
+  /* ============ SECTION 6 — ACTION PLAN ============ */
+  .action-list {
+    list-style: none;
+    border-top: 1px solid var(--ink);
+  }
+  .action-item {
+    display: grid;
+    grid-template-columns: 80px 1fr 200px;
+    gap: 28px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: start;
+  }
+  .action-number {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    line-height: 1;
+    color: var(--rust-deep);
+    font-style: italic;
+  }
+  .action-body { padding-top: 2px; }
+  .action-title {
+    font-family: 'Archivo', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  .action-why {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+  .action-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .action-result-block {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .action-result-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+  .action-result-value {
+    font-family: 'Archivo', sans-serif;
+    font-style: italic;
+    font-size: 21px;
+    color: var(--sage-darkest);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .action-owner-pill {
+    background: var(--cream-deep);
+    border: 1px solid var(--rule);
+    padding: 4px 10px;
+    border-radius: 2px;
+    color: var(--ink);
+    letter-spacing: 0.12em;
+  }
+  .action-owner-pill.baam {
+    background: var(--ink);
+    color: var(--amber);
+    border-color: var(--ink);
+  }
+  .action-value-block {
+    padding-top: 8px;
+    text-align: right;
+  }
+  .action-value-amount {
+    font-family: 'Archivo', sans-serif;
+    font-size: 32px;
+    color: var(--sage-darkest);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .action-value-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-top: 6px;
+  }
+  .action-value-calc {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+    text-align: right;
+  }
+  .action-value-calc strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ============ FINAL CTA ============ */
+  .cta-block {
+    margin-top: 56px;
+    padding: 48px 0 0;
+    border-top: 1px solid var(--ink);
+  }
+  .cta-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+    margin-bottom: 18px;
+  }
+  .cta-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 42px;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 28px;
+    max-width: 640px;
+  }
+  .cta-headline em { font-style: italic; color: var(--rust-deep); }
+  .cta-paths {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+  }
+  .cta-path {
+    padding: 28px;
+    border-right: 1px solid var(--ink);
+  }
+  .cta-path:last-child { border-right: none; }
+  .cta-path-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+    margin-bottom: 10px;
+  }
+  .cta-path-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .cta-path-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin-bottom: 14px;
+  }
+  .cta-path-desc {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .cta-path.featured {
+    background: var(--ink);
+    color: var(--cream-light);
+  }
+  .cta-path.featured .cta-path-title { color: var(--cream-light); }
+  .cta-path.featured .cta-path-label { color: var(--amber); }
+  .cta-path.featured .cta-path-price { color: var(--amber); }
+  .cta-path.featured .cta-path-desc { color: var(--cream); }
+
+  .promise-line {
+    margin-top: 32px;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    text-align: center;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .promise-line strong {
+    font-style: normal;
+    font-family: 'Archivo';
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ============ DOC FOOTER ============ */
+  .doc-footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  /* ============ DECORATIVE FLOURISHES ============ */
+  .ornament {
+    text-align: center;
+    margin: 32px 0;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 24px;
+    color: var(--amber);
+    letter-spacing: 0.5em;
+  }
+
+  /* ============ GRADE SCALE ============ */
+  .grade-scale-block {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--ink);
+  }
+  .grade-scale-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .grade-scale-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 22px;
+    max-width: 580px;
+  }
+  .grade-scale-headline em { font-style: italic; color: var(--rust-deep); }
+  .grade-scale-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .grade-scale-table th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    padding: 12px 16px 12px 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .grade-scale-table th.center { text-align: center; }
+  .grade-scale-table td {
+    padding: 18px 16px 18px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: middle;
+  }
+  .grade-scale-table tr.current {
+    background: var(--cream-deep);
+  }
+  .grade-scale-table tr.current td {
+    font-weight: 500;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .grade-scale-table .score-range {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .grade-scale-table .grade-cell {
+    text-align: center;
+    width: 80px;
+  }
+  .grade-letter-pill {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    line-height: 1;
+    display: inline-block;
+  }
+  .grade-letter-pill.g-a { color: var(--sage-deep); }
+  .grade-letter-pill.g-b { color: var(--sage); }
+  .grade-letter-pill.g-c { color: var(--rust-deep); }
+  .grade-letter-pill.g-d { color: var(--rust); }
+  .grade-letter-pill.g-f { color: var(--ink); opacity: 0.6; }
+  .grade-meaning {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .you-here-pill {
+    display: inline-block;
+    background: var(--rust-deep);
+    color: var(--cream-light);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    margin-left: 14px;
+    border-radius: 2px;
+    vertical-align: middle;
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  /* ============ APPENDIX ============ */
+  .appendix-intro {
+    margin-bottom: 48px;
+  }
+  .appendix-block {
+    margin-bottom: 56px;
+  }
+  .appendix-block:last-of-type { margin-bottom: 32px; }
+  .appendix-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .appendix-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 30px;
+    line-height: 1.15;
+    margin-bottom: 8px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .appendix-deck {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+    line-height: 1.35;
+    max-width: 620px;
+  }
+  .appendix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  .appendix-table th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    padding: 12px 16px 12px 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .appendix-table th:not(:first-child) {
+    text-align: right;
+    padding: 12px 0 12px 16px;
+  }
+  .appendix-table td {
+    padding: 14px 16px 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    color: var(--ink);
+  }
+  .appendix-table td:not(:first-child) {
+    text-align: right;
+    padding: 14px 0 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .appendix-table tr.highlight {
+    background: var(--cream-deep);
+  }
+  .appendix-table tr.highlight td {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .appendix-table tr.highlight td:first-child::after {
+    content: 'YOUR VERTICAL';
+    display: inline-block;
+    background: var(--rust-deep);
+    color: var(--cream-light);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    margin-left: 10px;
+    border-radius: 2px;
+    vertical-align: middle;
+    font-weight: 500;
+  }
+  .appendix-source {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    text-align: center;
+  }
+  .appendix-source a {
+    color: var(--rust-deep);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+  }
+
+  /* ============ PRINT ============ */
+  @media print {
+    body { background: white; }
+    body::before { display: none; }
+    .page { box-shadow: none; max-width: none; border: none; page-break-after: always; }
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .page { padding: 40px 28px 60px; }
+    .cover-title { font-size: 48px; }
+    .cover-subtitle { font-size: 20px; }
+    .cover-meta { grid-template-columns: 1fr 1fr; }
+    .section-headline { font-size: 32px; }
+    .fact-grid { grid-template-columns: 1fr; }
+    .score-hero { grid-template-columns: 1fr; gap: 24px; }
+    .score-number { font-size: 140px; }
+    .benchmark-split { grid-template-columns: 1fr; }
+    .benchmark-panel { border-right: none; border-bottom: 1px solid var(--ink); }
+    .benchmark-panel:last-child { border-bottom: none; }
+    .competitor-table { font-size: 12px; }
+    .competitor-table td, .competitor-table th { padding: 12px 6px; }
+    .action-item { grid-template-columns: 1fr; gap: 12px; }
+    .action-value-block { text-align: left; }
+    .action-value-calc { text-align: left; }
+    .cta-paths { grid-template-columns: 1fr; }
+    .cta-path { border-right: none; border-bottom: 1px solid var(--ink); }
+    .cta-path:last-child { border-bottom: none; }
+    .projection-impact { grid-template-columns: 1fr; }
+    .impact-cell { border-right: none; border-bottom: 1px solid var(--rule); }
+    .impact-cell:last-child { border-bottom: none; }
+    .grade-scale-table { font-size: 12px; }
+    .grade-scale-table td, .grade-scale-table th { padding: 12px 8px 12px 0; }
+    .grade-letter-pill { font-size: 28px; }
+    .grade-meaning { font-size: 14px; }
+    .appendix-table { font-size: 12px; }
+    .appendix-table td, .appendix-table th { padding: 10px 8px 10px 0; }
+    .appendix-table td:not(:first-child), .appendix-table th:not(:first-child) { padding: 10px 0 10px 8px; font-size: 11px; }
+    .appendix-table tr.highlight td:first-child::after { display: block; margin-left: 0; margin-top: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====================== PAGE 1 — COVER + SECTION 1 ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · Review Audit</div>
+      <div class="doc-header-sub">Reputation & Revenue Diagnostic · v3.0</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>Vol. I · No. 001</strong></div>
+      <div>Prepared 29 May 2026</div>
+    </div>
+  </header>
+
+  <div class="cover-hero">
+    <div class="cover-eyebrow">A personalized diagnostic · 6 pages · for the owner, not the developer</div>
+    <h1 class="cover-title">The reputation report you've been <em>missing.</em></h1>
+    <p class="cover-subtitle">Where your business stands today, what it costs you each month, and the five things to do in the next 12 months.</p>
+  </div>
+
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Business</div>
+      <div class="cover-meta-value">Dr. Huang Acupuncture<br><span class="mono" style="font-size:13px; color:var(--ink-mute);">黃醫師中醫針灸</span></div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Location</div>
+      <div class="cover-meta-value">136-40 39th Ave<br><span class="mono" style="font-size:13px; color:var(--ink-mute);">Flushing · Queens · NY 11354</span></div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Vertical</div>
+      <div class="cover-meta-value">TCM Clinic<br><span class="mono" style="font-size:13px; color:var(--ink-mute);">Acupuncture · Bilingual</span></div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Audit ID</div>
+      <div class="cover-meta-value mono" style="font-size:18px;">BR-26-0512<br><span style="color:var(--ink-mute); font-size:11px;">prepared by BAAM Studio</span></div>
+    </div>
+  </div>
+
+  <div class="hook-quote">
+    <p>Average businesses become <em>hot and popular</em> by building reviews relentlessly.<br>Excellent businesses become <em>invisible</em> because they ignore them.</p>
+  </div>
+
+  <div class="ornament">§</div>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 01</span>
+    <span class="section-marker-title">Why Reviews Decide Who Wins</span>
+  </div>
+
+  <h2 class="section-headline">The rules of getting found <em>changed.</em></h2>
+  <p class="section-deck">Five things that are now true about local search — each measured, each cited, none arguable.</p>
+
+  <div class="fact-grid">
+    <div class="fact">
+      <div class="fact-num">01</div>
+      <div class="fact-stat">16–20<span class="unit">%</span></div>
+      <div class="fact-body">Of Google's Local Pack ranking weight now comes from review signals — up from ~11% five years ago. The share rises every year.</div>
+      <div class="fact-source">Whitespark · 2026 Local Ranking Factors</div>
+    </div>
+    <div class="fact">
+      <div class="fact-num">02</div>
+      <div class="fact-stat">81<span class="unit">%</span></div>
+      <div class="fact-body">Of consumers use Google for local reviews. It's the only major platform whose usage is rising — Yelp, Facebook, and BBB are all declining.</div>
+      <div class="fact-source">BrightLocal · 2026 Local Consumer Review Survey</div>
+    </div>
+    <div class="fact">
+      <div class="fact-num">03</div>
+      <div class="fact-stat">+25<span class="unit">%</span></div>
+      <div class="fact-body">Conversion lift from a single 0.1-star rating increase in brick-and-mortar businesses. The 4.0 threshold is binary — 70% of consumers filter by it.</div>
+      <div class="fact-source">Uberall · via BrightLocal</div>
+    </div>
+    <div class="fact">
+      <div class="fact-num">04</div>
+      <div class="fact-stat">5–9<span class="unit">%</span></div>
+      <div class="fact-body">Revenue increase per 1-star rating bump. Causal, not correlational. Independent businesses see the upper end of this range; medical and legal even higher.</div>
+      <div class="fact-source">Luca · Harvard Business School</div>
+    </div>
+    <div class="fact" style="grid-column: span 2;">
+      <div class="fact-num">05</div>
+      <div class="fact-stat" style="font-size:42px;">AI search now reads your reviews.</div>
+      <div class="fact-body" style="max-width:680px;">ChatGPT, Perplexity, Claude, and Google's AI Overviews pull directly from review content and ratings to answer "best [service] near me" questions. Without strong reviews, AI will literally not mention you when a customer asks.</div>
+      <div class="fact-source">Google Transparency Report · 2024–2026</div>
+    </div>
+  </div>
+
+  <p class="closing-line">Excellence isn't enough anymore. <em>Visibility</em> decides who walks through your door.</p>
+
+  <div class="doc-footer">
+    <span>BAAM Review Audit · Dr. Huang Acupuncture</span>
+    <span>Page 01 / 07</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 2 — SECTION 2 SNAPSHOT ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · Review Audit</div>
+      <div class="doc-header-sub">§ 02 · Your Current Snapshot</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>Dr. Huang Acupuncture</strong></div>
+      <div>Flushing, NY · 29 May 2026</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 02</span>
+    <span class="section-marker-title">Your Current Snapshot</span>
+  </div>
+
+  <h2 class="section-headline">Six platforms. <em>One picture</em> of your reputation.</h2>
+  <p class="section-deck">For a TCM clinic in NY metro, these are the platforms customers actually check before they call.</p>
+
+  <table class="snapshot-table">
+    <thead>
+      <tr>
+        <th>Platform</th>
+        <th>Rating</th>
+        <th>Reviews</th>
+        <th>Last Review</th>
+        <th>Profile Health</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">G</div>
+            <div>
+              <div class="platform-meta-strong">Google Business Profile</div>
+              <div class="platform-meta-sub">Primary · 81% of consumer reach</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating"><span class="stars">★★★★</span>★ <span class="mono" style="font-size:15px;">4.4</span></div></td>
+        <td><div class="review-count">47</div></td>
+        <td><div class="last-review stale">22 days ago</div></td>
+        <td><div class="health-dot good">Verified</div></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">Y</div>
+            <div>
+              <div class="platform-meta-strong">Yelp</div>
+              <div class="platform-meta-sub">Secondary · Heavy use in NYC</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating"><span class="stars">★★★★</span>☆ <span class="mono" style="font-size:15px;">4.0</span></div></td>
+        <td><div class="review-count">12</div></td>
+        <td><div class="last-review stale">3 months ago</div></td>
+        <td><div class="health-dot warn">No photos</div></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">Z</div>
+            <div>
+              <div class="platform-meta-strong">Zocdoc</div>
+              <div class="platform-meta-sub">Vertical · Medical-specific</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating"><span class="stars">★★★★</span>★ <span class="mono" style="font-size:15px;">4.6</span></div></td>
+        <td><div class="review-count">8</div></td>
+        <td><div class="last-review">1 month ago</div></td>
+        <td><div class="health-dot good">Complete</div></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">H</div>
+            <div>
+              <div class="platform-meta-strong">Healthgrades</div>
+              <div class="platform-meta-sub">Vertical · Medical-specific</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating" style="color:var(--ink-mute);">— —</div></td>
+        <td><div class="review-count" style="color:var(--ink-mute);">0</div></td>
+        <td><div class="last-review" style="color:var(--ink-mute);">never</div></td>
+        <td><div class="health-dot missing">Not Claimed</div></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">F</div>
+            <div>
+              <div class="platform-meta-strong">Facebook Page</div>
+              <div class="platform-meta-sub">Secondary · Community trust</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating"><span class="stars">★★★★</span>★ <span class="mono" style="font-size:15px;">4.7</span></div></td>
+        <td><div class="review-count">19</div></td>
+        <td><div class="last-review stale">5 months ago</div></td>
+        <td><div class="health-dot warn">Stale</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight-callout">
+    <strong>What this means</strong><br><br>
+    Your Google profile carries the weight, and it's the one that matters most — but at 4.4 stars and one review in the last 22 days, it's slipping. Healthgrades is entirely missing — leaving you invisible in medical-specific search. Yelp and Facebook have gone silent, weakening signals to Google's algorithm that <em>this is an active, growing business.</em>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM Review Audit · Dr. Huang Acupuncture</span>
+    <span>Page 02 / 07</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 3 — SECTION 3 SCORE + DO-NOTHING ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · Review Audit</div>
+      <div class="doc-header-sub">§ 03 · Your BAAM Review Score</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>Dr. Huang Acupuncture</strong></div>
+      <div>Flushing, NY · 29 May 2026</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 03</span>
+    <span class="section-marker-title">Your BAAM Review Score</span>
+  </div>
+
+  <div class="score-hero">
+    <div class="score-number">62</div>
+    <div class="score-grade-block">
+      <div class="score-grade-label">Grade · Tier C</div>
+      <div class="score-grade-letter">C</div>
+      <div class="score-grade-diagnosis">Visible — but customers are choosing competitors with stronger reviews.</div>
+    </div>
+  </div>
+
+  <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 14px;">Score breakdown · Why your number is what it is</div>
+
+  <div class="subscores">
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">Rating Quality</div>
+        <div class="subscore-raw">composite <span class="mono-num">4.37 ★</span></div>
+        <div class="subscore-meta-footnote">G 4.4 · Y 4.0 · Z 4.6 weighted</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill" style="width: 72%;"></div>
+          <div class="subscore-mark" style="left: 55%;"></div>
+          <div class="subscore-mark" style="left: 80%;"></div>
+          <div class="subscore-mark" style="left: 100%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">3.0★</span>
+          <span class="subscore-scale-tick key" style="left: 55%;">4.0★ · 55</span>
+          <span class="subscore-scale-tick key" style="left: 80%;">4.5★ · 80</span>
+          <span class="subscore-scale-tick anchor-right">5.0★ · 100</span>
+        </div>
+      </div>
+      <div class="subscore-value">72</div>
+      <div class="subscore-weight">25%</div>
+    </div>
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">Review Volume</div>
+        <div class="subscore-raw"><span class="mono-num">47</span> total reviews</div>
+        <div class="subscore-meta-footnote">vs TCM clinic median · 60</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill weak" style="width: 48%;"></div>
+          <div class="subscore-mark" style="left: 50%;"></div>
+          <div class="subscore-mark" style="left: 70%;"></div>
+          <div class="subscore-mark" style="left: 85%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">0</span>
+          <span class="subscore-scale-tick key" style="left: 50%;">MEDIAN · 50</span>
+          <span class="subscore-scale-tick key" style="left: 70%;">TOP 25% · 100</span>
+          <span class="subscore-scale-tick anchor-right">300+</span>
+        </div>
+      </div>
+      <div class="subscore-value">48</div>
+      <div class="subscore-weight">20%</div>
+    </div>
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">30-Day Velocity</div>
+        <div class="subscore-raw"><span class="mono-num">1.0 / mo</span></div>
+        <div class="subscore-meta-footnote">1 review past 30 days</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill weak" style="width: 25%;"></div>
+          <div class="subscore-mark" style="left: 40%;"></div>
+          <div class="subscore-mark" style="left: 75%;"></div>
+          <div class="subscore-mark" style="left: 100%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">0</span>
+          <span class="subscore-scale-tick key" style="left: 40%;">MIN · 2/mo</span>
+          <span class="subscore-scale-tick key" style="left: 75%;">OPTIMAL · 4/mo</span>
+          <span class="subscore-scale-tick anchor-right">10+/mo</span>
+        </div>
+      </div>
+      <div class="subscore-value">25</div>
+      <div class="subscore-weight">25%</div>
+    </div>
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">6-Month Velocity</div>
+        <div class="subscore-raw"><span class="mono-num">1.67 / mo</span> avg</div>
+        <div class="subscore-meta-footnote">10 reviews ÷ 6 months</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill weak" style="width: 42%;"></div>
+          <div class="subscore-mark" style="left: 40%;"></div>
+          <div class="subscore-mark" style="left: 75%;"></div>
+          <div class="subscore-mark" style="left: 100%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">0</span>
+          <span class="subscore-scale-tick key" style="left: 40%;">MIN · 2/mo</span>
+          <span class="subscore-scale-tick key" style="left: 75%;">OPTIMAL · 4/mo</span>
+          <span class="subscore-scale-tick anchor-right">10+/mo</span>
+        </div>
+      </div>
+      <div class="subscore-value">42</div>
+      <div class="subscore-weight">20%</div>
+    </div>
+
+    <div class="subscore-row">
+      <div class="subscore-meta">
+        <div class="subscore-label">12-Month Velocity</div>
+        <div class="subscore-raw"><span class="mono-num">2.5 / mo</span> avg</div>
+        <div class="subscore-meta-footnote">30 reviews ÷ 12 months</div>
+      </div>
+      <div class="subscore-bar-area">
+        <div class="subscore-bar-track">
+          <div class="subscore-bar-fill" style="width: 58%;"></div>
+          <div class="subscore-mark" style="left: 40%;"></div>
+          <div class="subscore-mark" style="left: 75%;"></div>
+          <div class="subscore-mark" style="left: 100%;"></div>
+        </div>
+        <div class="subscore-scale">
+          <span class="subscore-scale-tick anchor-left">0</span>
+          <span class="subscore-scale-tick key" style="left: 40%;">MIN · 2/mo</span>
+          <span class="subscore-scale-tick key" style="left: 75%;">OPTIMAL · 4/mo</span>
+          <span class="subscore-scale-tick anchor-right">10+/mo</span>
+        </div>
+      </div>
+      <div class="subscore-value">58</div>
+      <div class="subscore-weight">10%</div>
+    </div>
+
+  </div>
+
+  <div class="methodology-footer">
+    <span class="methodology-eyebrow">METHODOLOGY</span>
+    <p>Every score is measured against published vertical benchmarks. <strong>Rating Quality</strong> uses a non-linear curve that rewards the 4.0★ threshold (where 70% of consumers filter). <strong>Review Volume</strong> compares total count to the median for TCM clinics in NY metro. <strong>Velocity</strong> scores use the BAAM Review Research healthy-pace bands for medical clinics: <strong>Min 2/mo · Optimal 4–8/mo · Aggressive 10+/mo</strong>. The black tick marks on each bar show where these standards sit on the 0–100 scale. <a href="https://www.baamreview.com/review-value.html" target="_blank">Full methodology →</a></p>
+  </div>
+
+  <p style="margin-top: 32px; font-style: italic; font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1.35; color: var(--ink); max-width: 640px;">
+    The drag on your score is <em style="color: var(--rust-deep);">velocity</em> — and velocity is what you can change starting Monday.
+  </p>
+
+  <div class="projection-block">
+    <div class="projection-eyebrow">§ 03.5 · The Forecast</div>
+    <h3 class="projection-title">Your score in <em>six months</em> if you do nothing.</h3>
+    <p class="projection-deck">Three forces work against a business that stops collecting reviews: velocity decay (mechanical), ranking decline (Sterling Sky), and competitors compounding the gap. This projection holds your current effort constant — and holds your competitors at their measured pace.</p>
+
+    <div class="projection-chart-frame">
+      <div class="projection-svg-wrap">
+        <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+          <!-- Grid lines -->
+          <line x1="50" y1="30" x2="680" y2="30" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+          <line x1="50" y1="90" x2="680" y2="90" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+          <line x1="50" y1="150" x2="680" y2="150" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+          <line x1="50" y1="210" x2="680" y2="210" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+          <line x1="50" y1="270" x2="680" y2="270" stroke="#C9BFAE" stroke-width="1"/>
+
+          <!-- Y-axis labels -->
+          <text x="40" y="34" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">100</text>
+          <text x="40" y="94" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">80</text>
+          <text x="40" y="154" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">60</text>
+          <text x="40" y="214" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">40</text>
+          <text x="40" y="274" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">20</text>
+
+          <!-- X-axis labels -->
+          <text x="50" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">NOW</text>
+          <text x="155" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+2MO</text>
+          <text x="260" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+4MO</text>
+          <text x="365" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+6MO</text>
+          <text x="470" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+8MO</text>
+          <text x="575" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+10MO</text>
+          <text x="660" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+12MO</text>
+
+          <!-- Shaded gap between lines -->
+          <path d="M 50 144 L 102 138 L 155 123 L 207 108 L 260 96 L 312 87 L 365 78 L 417 72 L 470 66 L 522 63 L 575 60 L 627 57 L 660 54
+                   L 660 222 L 627 214 L 575 208 L 522 198 L 470 192 L 417 186 L 365 180 L 312 168 L 260 162 L 207 156 L 155 150 L 102 144 L 50 144 Z"
+                fill="url(#gapGradient)" opacity="0.18"/>
+
+          <defs>
+            <linearGradient id="gapGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#D4882D"/>
+              <stop offset="100%" stop-color="#A4452A"/>
+            </linearGradient>
+          </defs>
+
+          <!-- WITH BAAM line (sage, ascending) -->
+          <path d="M 50 144 L 102 138 L 155 123 L 207 108 L 260 96 L 312 87 L 365 78 L 417 72 L 470 66 L 522 63 L 575 60 L 627 57 L 660 54"
+                stroke="#4F7253" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- DO NOTHING line (rust, descending) -->
+          <path d="M 50 144 L 102 144 L 155 150 L 207 156 L 260 162 L 312 168 L 365 180 L 417 186 L 470 192 L 522 198 L 575 208 L 627 214 L 660 222"
+                stroke="#A4452A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
+
+          <!-- Starting point dot -->
+          <circle cx="50" cy="144" r="5" fill="#1A1814"/>
+          <text x="50" y="135" text-anchor="middle" font-family="Instrument Serif" font-size="14" fill="#1A1814" font-style="italic">62</text>
+
+          <!-- End points -->
+          <circle cx="365" cy="180" r="4" fill="#A4452A"/>
+          <text x="365" y="200" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#A4452A" font-weight="500">41</text>
+
+          <circle cx="365" cy="78" r="4" fill="#4F7253"/>
+          <text x="365" y="68" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4F7253" font-weight="500">81</text>
+
+          <!-- 12-month end labels -->
+          <text x="660" y="50" font-family="Instrument Serif" font-size="13" fill="#4F7253" font-style="italic" text-anchor="end">89 · Tier A</text>
+          <text x="660" y="240" font-family="Instrument Serif" font-size="13" fill="#A4452A" font-style="italic" text-anchor="end">36 · Tier F</text>
+
+          <!-- Vertical at 6-month line -->
+          <line x1="365" y1="30" x2="365" y2="270" stroke="#6B6259" stroke-width="0.5" stroke-dasharray="2,3"/>
+          <text x="365" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="9" letter-spacing="0.1em" fill="#6B6259">SIX MONTH MARK</text>
+
+          <!-- Gap value label -->
+          <text x="500" y="135" text-anchor="middle" font-family="Instrument Serif" font-size="16" fill="#1A1814" font-style="italic">— the gap —</text>
+          <text x="500" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#842F1B">$67,200 / 6 months</text>
+        </svg>
+      </div>
+
+      <div class="projection-legend">
+        <div class="legend-item"><span class="legend-swatch red"></span> <strong>Do nothing</strong> · projected trajectory at current effort</div>
+        <div class="legend-item"><span class="legend-swatch green"></span> <strong>With BAAM Review</strong> · sustained collection + response</div>
+        <div class="legend-item" style="color:var(--ink-mute);">— — — projected · — solid: trend through measured velocity</div>
+      </div>
+    </div>
+
+    <div class="projection-impact">
+      <div class="impact-cell">
+        <div class="impact-label">6-Month Score</div>
+        <div class="impact-value">62 → 41</div>
+        <div class="impact-sub">Drops from C to D · the critical floor rule triggers after 60 days of no new reviews</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">Ranking Position</div>
+        <div class="impact-value">−3 to −4</div>
+        <div class="impact-sub">Estimated Local Pack drop for "acupuncture Flushing" — competitors are gaining 8 reviews/month</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">Revenue Cost</div>
+        <div class="impact-value">$67,200</div>
+        <div class="impact-sub">6-month opportunity cost · $1,400 median per-review value × 48 missed reviews</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grade-scale-block">
+    <div class="grade-scale-eyebrow">The full scale · where each grade sits</div>
+    <h3 class="grade-scale-headline">Your <em>C</em> in context — and what it would take to climb.</h3>
+    <table class="grade-scale-table">
+      <thead>
+        <tr>
+          <th>Score Range</th>
+          <th class="center">Grade</th>
+          <th>What it means in plain English</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="score-range">90 – 100</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-a">A</span></td>
+          <td><span class="grade-meaning">Winning your local market. Reviews are a competitive moat.</span></td>
+        </tr>
+        <tr>
+          <td><span class="score-range">75 – 89</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-b">B</span></td>
+          <td><span class="grade-meaning">Strong — but losing ground to top competitors month over month.</span></td>
+        </tr>
+        <tr class="current">
+          <td><span class="score-range">60 – 74</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-c">C</span></td>
+          <td><span class="grade-meaning">Visible — but customers are choosing competitors with stronger reviews.<span class="you-here-pill">You · 62</span></span></td>
+        </tr>
+        <tr>
+          <td><span class="score-range">40 – 59</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-d">D</span></td>
+          <td><span class="grade-meaning">Bleeding customers to better-reviewed competitors every week.</span></td>
+        </tr>
+        <tr>
+          <td><span class="score-range">0 – 39</span></td>
+          <td class="grade-cell"><span class="grade-letter-pill g-f">F</span></td>
+          <td><span class="grade-meaning">Effectively invisible. Search and AI are skipping you entirely.</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM Review Audit · Dr. Huang Acupuncture</span>
+    <span>Page 03 / 07</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 4 — SECTION 4 BENCHMARKS ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · Review Audit</div>
+      <div class="doc-header-sub">§ 04 · Industry Benchmarks</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>Dr. Huang Acupuncture</strong></div>
+      <div>Flushing, NY · 29 May 2026</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 04</span>
+    <span class="section-marker-title">Industry Benchmarks</span>
+  </div>
+
+  <h2 class="section-headline">Translated into <em>dollars</em> and <em>customers.</em></h2>
+  <p class="section-deck">Numbers from the BAAM Review Research brief, applied to TCM / Acupuncture / Clinic — your specific category.</p>
+
+  <div class="benchmark-split">
+    <div class="benchmark-panel">
+      <div class="benchmark-panel-eyebrow">§ 04A · Per-Review Dollar Value</div>
+      <h3 class="benchmark-panel-title">One strong Google review is worth, for a TCM clinic…</h3>
+      <div class="benchmark-value-big">$1,400</div>
+      <div class="benchmark-value-range">range: $400 — $2,400 · 24-month horizon</div>
+      <p class="benchmark-detail">
+        Value compounds across three channels — Google search ranking, on-site widget trust, and friend-to-friend referral. For a typical NY-metro acupuncture clinic with $600 patient LTV, the median per-review value is <strong>$1,400</strong>. Strong-performing clinics with longer treatment relationships see <strong>$2,400+.</strong>
+      </p>
+      <p style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-mute); margin-top: 14px; letter-spacing: 0.05em;">
+        Methodology: baamreview.com/review-value.html
+      </p>
+    </div>
+
+    <div class="benchmark-panel">
+      <div class="benchmark-panel-eyebrow">§ 04B · Healthy Velocity Range</div>
+      <h3 class="benchmark-panel-title">A medical clinic in NY metro should be collecting…</h3>
+
+      <div class="velocity-gauge">
+        <div class="velocity-band silent">Silent · 0–1</div>
+        <div class="velocity-band min">Min · 2–3</div>
+        <div class="velocity-band optimal">Optimal · 4–8</div>
+        <div class="velocity-band aggressive">10+</div>
+      </div>
+      <div class="velocity-pointer-wrap">
+        <div class="velocity-pointer" style="left: 10%;">
+          <div class="velocity-pointer-label">You · 1/mo</div>
+        </div>
+      </div>
+      <p class="benchmark-detail" style="margin-top: 22px;">
+        Per BrightLocal, only <strong>9% of businesses</strong> sustain the optimal pace — the band Google's ranking algorithm actually rewards. You're currently in the Silent band. Moving to Optimal (5–6 reviews/month) is the single biggest lever in this audit.
+      </p>
+    </div>
+  </div>
+
+  <div class="money-on-table">
+    <div class="money-on-table-eyebrow">§ The Money on the Table</div>
+    <p class="money-on-table-text">
+      Competitors in Flushing acupuncture average <em>8 reviews per month.</em> You're averaging <em>1.</em><br><br>
+      The 7-review monthly gap costs you approximately <strong>$117,600 / year</strong> in lifetime customer value — calculated at the median per-review value for TCM clinics.
+    </p>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM Review Audit · Dr. Huang Acupuncture</span>
+    <span>Page 04 / 07</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 5 — SECTION 5 COMPETITORS ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · Review Audit</div>
+      <div class="doc-header-sub">§ 05 · Competitor Comparison</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>Dr. Huang Acupuncture</strong></div>
+      <div>Flushing, NY · 29 May 2026</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 05</span>
+    <span class="section-marker-title">Competitor Comparison</span>
+  </div>
+
+  <h2 class="section-headline">The five clinics customers <em>see before yours.</em></h2>
+  <p class="section-deck">Identified from Google Maps rankings for "acupuncture Flushing" within a 1.5-mile radius. We pick the competitors — owners almost always pick the wrong ones.</p>
+
+  <table class="competitor-table">
+    <thead>
+      <tr>
+        <th>Business</th>
+        <th>Score</th>
+        <th>Rating</th>
+        <th>Total Reviews</th>
+        <th>Last 30d</th>
+        <th>Last 90d</th>
+        <th>Trend</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="competitor-name"><span class="competitor-rank">01</span>Wei Lin Acupuncture<br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">魏林針灸</span></div></td>
+        <td><strong>84</strong></td>
+        <td>4.8 ★</td>
+        <td>218</td>
+        <td>9</td>
+        <td>28</td>
+        <td><span class="trend-arrow up">↗</span></td>
+      </tr>
+      <tr>
+        <td><div class="competitor-name"><span class="competitor-rank">02</span>Modern TCM Center</div></td>
+        <td><strong>78</strong></td>
+        <td>4.7 ★</td>
+        <td>156</td>
+        <td>7</td>
+        <td>22</td>
+        <td><span class="trend-arrow up">↗</span></td>
+      </tr>
+      <tr class="you">
+        <td><div class="competitor-name"><span class="competitor-rank">03</span>Dr. Huang Acupuncture <span class="you-tag">You</span></div></td>
+        <td><strong>62</strong></td>
+        <td>4.4 ★</td>
+        <td>47</td>
+        <td>1</td>
+        <td>4</td>
+        <td><span class="trend-arrow down">↘</span></td>
+      </tr>
+      <tr>
+        <td><div class="competitor-name"><span class="competitor-rank">04</span>Flushing Acupuncture Center</div></td>
+        <td><strong>71</strong></td>
+        <td>4.6 ★</td>
+        <td>124</td>
+        <td>5</td>
+        <td>17</td>
+        <td><span class="trend-arrow up">↗</span></td>
+      </tr>
+      <tr>
+        <td><div class="competitor-name"><span class="competitor-rank">05</span>Health Plus Acupuncture</div></td>
+        <td><strong>55</strong></td>
+        <td>4.3 ★</td>
+        <td>38</td>
+        <td>0</td>
+        <td>2</td>
+        <td><span class="trend-arrow flat">→</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="competitor-diagnosis">
+    <strong>OBSERVED</strong> Wei Lin is gaining <strong>9× more reviews per month</strong> than you. They respond to every review within 24 hours, and roughly 30% of their reviews are in Chinese — capturing a customer segment you're missing on Google entirely. At current pace, the gap between your profiles doubles every <strong>8 months</strong>. By Q4 2027, Wei Lin's rating display in Google's Local Pack will likely show a 0.4-star advantage — which corresponds to roughly 75% relative conversion difference in side-by-side searches.
+  </p>
+
+  <div class="ornament">§</div>
+
+  <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.45; color: var(--ink-soft); text-align: center; max-width: 640px; margin: 0 auto;">
+    The good news: you're better than two competitors in your area today. The harder news: by Q4, you'll be better than none of them if nothing changes.
+  </p>
+
+  <div class="doc-footer">
+    <span>BAAM Review Audit · Dr. Huang Acupuncture</span>
+    <span>Page 05 / 07</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 6 — SECTION 6 ACTION + CTA ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · Review Audit</div>
+      <div class="doc-header-sub">§ 06 · Your 12-Month Action Plan</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>Dr. Huang Acupuncture</strong></div>
+      <div>Flushing, NY · 29 May 2026</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 06</span>
+    <span class="section-marker-title">Your 12-Month Action Plan</span>
+  </div>
+
+  <h2 class="section-headline">Five things. <em>Not three. Not ten.</em></h2>
+  <p class="section-deck">Prioritized by the lowest sub-scores in your audit. Each action targets a specific lever — and a specific dollar number.</p>
+
+  <ol class="action-list">
+    <li class="action-item">
+      <div class="action-number">i</div>
+      <div class="action-body">
+        <div class="action-title">Activate a post-visit review request workflow</div>
+        <div class="action-why">You currently have no system. Sending a request 24–72 hours after every visit, in the customer's language, is the single biggest lever in this audit.</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">Result</span>
+            <span class="action-result-value">+5 reviews / month</span>
+          </div>
+          <span class="action-owner-pill baam">BAAM Review</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$84,000</div>
+        <div class="action-value-label">12-month value · base case</div>
+        <div class="action-value-calc">60 reviews/yr × <strong>$1,400</strong><br>per-review value</div>
+      </div>
+    </li>
+
+    <li class="action-item">
+      <div class="action-number">ii</div>
+      <div class="action-body">
+        <div class="action-title">Respond to every review within 48 hours · negatives within 24</div>
+        <div class="action-why">88% of consumers will choose a business that responds to all reviews vs. 47% for non-responders. Bilingual responses double the effect.</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">Result</span>
+            <span class="action-result-value">+12% conversion lift</span>
+          </div>
+          <span class="action-owner-pill baam">BAAM Review</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$14,400</div>
+        <div class="action-value-label">12-month value</div>
+        <div class="action-value-calc">+10 patients × <strong>$1,400</strong><br>patient LTV</div>
+      </div>
+    </li>
+
+    <li class="action-item">
+      <div class="action-number">iii</div>
+      <div class="action-body">
+        <div class="action-title">Claim Healthgrades · revive Facebook review collection</div>
+        <div class="action-why">Two profile gaps cost reach. Healthgrades is medical-specific and entirely missing (0 reviews). Facebook has been silent five months — Google reads continuous stale-period as a "weakening business" signal.</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">Result</span>
+            <span class="action-result-value">+15% local search reach</span>
+          </div>
+          <span class="action-owner-pill">You + Staff</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$22,400</div>
+        <div class="action-value-label">12-month value</div>
+        <div class="action-value-calc">+16 patients × <strong>$1,400</strong><br>patient LTV</div>
+      </div>
+    </li>
+
+    <li class="action-item">
+      <div class="action-number">iv</div>
+      <div class="action-body">
+        <div class="action-title">Recover the 26 unanswered Google reviews</div>
+        <div class="action-why">Personalized, AI-drafted, owner-approved responses to your historical reviews. Signals to Google and to future readers that you care — without faking it.</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">Result</span>
+            <span class="action-result-value">+8% ranking signal</span>
+          </div>
+          <span class="action-owner-pill baam">BAAM Review</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$8,400</div>
+        <div class="action-value-label">12-month value</div>
+        <div class="action-value-calc">+6 patients × <strong>$1,400</strong><br>patient LTV</div>
+      </div>
+    </li>
+
+    <li class="action-item">
+      <div class="action-number">v</div>
+      <div class="action-body">
+        <div class="action-title">Embed live review widget on drhuangclinic.com</div>
+        <div class="action-why">Reviews drive SEO; SEO drives traffic; traffic drives bookings. Same reviews working twice. Schema markup makes them eligible for Google rich results.</div>
+        <div class="action-tag-row">
+          <div class="action-result-block">
+            <span class="action-result-label">Result</span>
+            <span class="action-result-value">+18% on-site conversion</span>
+          </div>
+          <span class="action-owner-pill">BAAM Platform</span>
+        </div>
+      </div>
+      <div class="action-value-block">
+        <div class="action-value-amount">+$10,200</div>
+        <div class="action-value-label">12-month value</div>
+        <div class="action-value-calc">+7 patients × <strong>$1,400</strong><br>patient LTV</div>
+      </div>
+    </li>
+  </ol>
+
+  <div style="margin-top: 24px; padding: 20px 24px; background: var(--cream-deep); border-left: 3px solid var(--sage);">
+    <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.4; color: var(--ink);">
+      Five actions, executed steadily for 12 months, modeled at <strong style="font-family:'JetBrains Mono', monospace; font-style: normal; font-weight: 500;">+$139,400</strong> in additional lifetime customer value — versus a projected loss of <strong style="font-family:'JetBrains Mono', monospace; font-style: normal; font-weight: 500;">$67,200</strong> if nothing changes.
+    </p>
+  </div>
+
+  <div class="cta-block">
+    <div class="cta-eyebrow">Two paths · same plan</div>
+    <h3 class="cta-headline">You don't have to do this <em>alone.</em></h3>
+
+    <div class="cta-paths">
+      <div class="cta-path">
+        <div class="cta-path-label">Path A · Self-Serve</div>
+        <h4 class="cta-path-title">Run it yourself</h4>
+        <div class="cta-path-price">$99 / month · single location · 30-day free trial</div>
+        <p class="cta-path-desc">Log in, send your weekly review requests, reply yourself. You drive the system; BAAM Review provides the platform, AI drafting, and multilingual templates. You execute three of the five actions above; we power the tooling.</p>
+      </div>
+      <div class="cta-path featured">
+        <div class="cta-path-label">Path B · Full Service</div>
+        <h4 class="cta-path-title">We run it for you</h4>
+        <div class="cta-path-price">$399 / month · 30-day free trial · 5× value promise</div>
+        <p class="cta-path-desc">Send us your weekly customer list. We handle every other step — bilingual sends, AI-assisted responses, monthly reports, the 12-month plan above. We guarantee 5× the value within 12 months, measured against your vertical's median. The only precondition is a real customer list.</p>
+      </div>
+    </div>
+
+    <p class="promise-line">
+      Compare with <strong>Birdeye</strong> at $299/mo + $5,000 setup, or <strong>Podium</strong> at $399/mo + onboarding. BAAM Review starts free and bills monthly.
+    </p>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM Review Audit · Dr. Huang Acupuncture</span>
+    <span>Page 06 / 07</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 7 — APPENDIX ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · Review Audit</div>
+      <div class="doc-header-sub">§ A · Appendix · Reference Tables</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>Dr. Huang Acupuncture</strong></div>
+      <div>Flushing, NY · 29 May 2026</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ A</span>
+    <span class="section-marker-title">Appendix · Reference Tables</span>
+  </div>
+
+  <div class="appendix-intro">
+    <h2 class="section-headline">The full methodology, <em>in two tables.</em></h2>
+    <p class="section-deck">Every number in this audit traces to one of the standards below. Your vertical is highlighted. The complete research brief — including the formula, the 15 cited sources, and a live calculator — lives at <a href="https://www.baamreview.com/review-value.html" target="_blank" style="color: var(--rust-deep); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px;">baamreview.com/review-value.html</a>.</p>
+  </div>
+
+  <div class="appendix-block">
+    <div class="appendix-eyebrow">§ A.1 · Industry Per-Review Value</div>
+    <h3 class="appendix-title">Per-Review Dollar Value, by Vertical</h3>
+    <p class="appendix-deck">Modeled value of one strong Google review over a 24-month horizon. The median is what this audit uses in revenue impact calculations.</p>
+    <table class="appendix-table">
+      <thead>
+        <tr>
+          <th>Vertical</th>
+          <th>Per-Review Value</th>
+          <th>Median</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Coffee / Café</td><td>$30 – $180</td><td>$105</td></tr>
+        <tr><td>Salon / Spa</td><td>$120 – $600</td><td>$360</td></tr>
+        <tr><td>Apparel / Boutique</td><td>$80 – $700</td><td>$390</td></tr>
+        <tr><td>Health Food / Supplements</td><td>$150 – $1,200</td><td>$675</td></tr>
+        <tr><td>Insurance Agent</td><td>$300 – $1,800</td><td>$1,050</td></tr>
+        <tr class="highlight"><td>Acupuncture / Clinic / Dental</td><td>$400 – $2,400</td><td>$1,400</td></tr>
+        <tr><td>Hotel / Resort</td><td>$300 – $2,800</td><td>$1,550</td></tr>
+        <tr><td>Auto Dealer / Repair</td><td>$500 – $5,000+</td><td>$2,750</td></tr>
+        <tr><td>Contractor / Roofing / HVAC</td><td>$600 – $6,000+</td><td>$3,300</td></tr>
+        <tr><td>Real Estate Agent</td><td>$1,500 – $8,000+</td><td>$4,750</td></tr>
+        <tr><td>Lawyer / Immigration</td><td>$1,200 – $12,000+</td><td>$6,600</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="appendix-block">
+    <div class="appendix-eyebrow">§ A.2 · Healthy Velocity Standards</div>
+    <h3 class="appendix-title">Reviews Per Month, by Vertical</h3>
+    <p class="appendix-deck">The pace bands Google's local ranking algorithm actually rewards. Only 9% of businesses sustain the Optimal range. Higher-volume verticals need faster pace; high-consideration verticals shouldn't chase volume.</p>
+    <table class="appendix-table">
+      <thead>
+        <tr>
+          <th>Vertical</th>
+          <th>Minimum</th>
+          <th>Optimal</th>
+          <th>Aggressive</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Coffee / Café</td><td>4</td><td>10 – 15</td><td>20+</td></tr>
+        <tr><td>Salon / Spa</td><td>3</td><td>8 – 12</td><td>15+</td></tr>
+        <tr><td>Apparel / Boutique</td><td>3</td><td>6 – 10</td><td>12+</td></tr>
+        <tr><td>Health Food / Supplements</td><td>2</td><td>4 – 7</td><td>8+</td></tr>
+        <tr><td>Insurance Agent</td><td>1</td><td>3 – 5</td><td>6+</td></tr>
+        <tr class="highlight"><td>Acupuncture / Clinic / Dental</td><td>2</td><td>4 – 8</td><td>10+</td></tr>
+        <tr><td>Hotel</td><td>6</td><td>12 – 20</td><td>25+</td></tr>
+        <tr><td>Auto</td><td>3</td><td>6 – 10</td><td>12+</td></tr>
+        <tr><td>Contractor</td><td>2</td><td>5 – 8</td><td>10+</td></tr>
+        <tr><td>Real Estate</td><td>1</td><td>3 – 5</td><td>6+</td></tr>
+        <tr><td>Lawyer / Immigration</td><td>1</td><td>3 – 5</td><td>6+</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="appendix-source">
+    Sources · Harvard Business School · BrightLocal · Whitespark · NYU Stern · Federal Trade Commission · Google Transparency Report<br>
+    <span style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 14px; letter-spacing: 0; text-transform: none; color: var(--ink-mute);">Full citations at <a href="https://www.baamreview.com/review-value.html#sources" target="_blank">baamreview.com/review-value.html#sources</a></span>
+  </div>
+
+  <div class="ornament">§</div>
+
+  <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; line-height: 1.4; color: var(--ink); text-align: center; max-width: 640px; margin: 0 auto;">
+    "Reviews are not the end goal. They are the <em style="color: var(--rust-deep);">raw material</em> for trust, content, SEO, referrals, and revenue."
+  </p>
+
+  <div class="doc-footer">
+    <span>BAAM Review Audit · Dr. Huang Acupuncture</span>
+    <span>Page 07 / 07 · End</span>
+  </div>
+</section>
+
+</body>
+</html>

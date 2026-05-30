@@ -7,6 +7,10 @@ inbox, sounds personal, and converts to an actual review.
 they just left, they're a VIP, the business owner is sitting next to you,
 etc. For week-of-visits batches use the [Bulk Review Request SOP](./BULK_REVIEW_REQUEST_SOP.md) instead.
 
+Before sending from Gmail/manual Gmail flow, review the
+[Gmail Sending Safety SOP](./GMAIL_SENDING_SAFETY_SOP.md) for policy,
+daily-limit, and pacing guardrails.
+
 **Audience**: BAAM Review staff (admin / sales / account_manager) or
 self-service customers using `/app/send`.
 
@@ -47,6 +51,9 @@ Before clicking Send, confirm:
 - [ ] **No duplicate sends.** Check the customer's history at `/app/reviews`
       — sending the same person two requests in 30 days looks pushy and
       tanks engagement.
+- [ ] **If using Gmail send path**, confirm the cadence follows
+      [Gmail Sending Safety SOP](./GMAIL_SENDING_SAFETY_SOP.md) (safe
+      interval, daily cap, and list-quality rules).
 
 ---
 
@@ -395,3 +402,5 @@ the language matches the sender domain's typical content.
   Documents the new modal (To/Subject/Body preview, Copy body, Copy
   entire message, Open in my mail app/messages app), when to choose
   it over the tracked send, and the no-tracking tradeoff.
+- **2026-05-30** — Added explicit cross-link to
+  GMAIL_SENDING_SAFETY_SOP.md for Gmail policy/limit/pacing guidance.

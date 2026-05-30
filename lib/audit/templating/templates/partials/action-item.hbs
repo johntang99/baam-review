@@ -1,0 +1,19 @@
+<li class="action-item">
+  <div class="action-number">{{numeral}}</div>
+  <div class="action-body">
+    <div class="action-title">{{title}}</div>
+    <div class="action-why">{{why}}</div>
+    <div class="action-tag-row">
+      <div class="action-result-block">
+        <span class="action-result-label">{{result_label}}</span>
+        <span class="action-result-value">{{result_value}}</span>
+      </div>
+      <span class="action-owner-pill{{#if owner_is_baam}} baam{{/if}}">{{owner_label}}</span>
+    </div>
+  </div>
+  <div class="action-value-block">
+    <div class="action-value-amount">{{value_amount_display}}</div>
+    <div class="action-value-label">{{value_label}}</div>
+    <div class="action-value-calc">{{{value_calc_html}}}</div>
+  </div>
+</li>

@@ -1,0 +1,21 @@
+query,ok,error,place_id,business_name,vertical,total_count,rating,last_review_days_ago,velocity_30d,reviews_30d,total_score,grade,rating_score,volume_score,velocity_30d_score,critical_floor,competitor_count,competitor_avg_velocity,is_chinese_business
+Datang Moxibustion Flushing NY,true,,ChIJedSLGABhwokRFeP5JVIZOSM,Datang Moxibustion(大唐艾灸）,tcm_clinic,73,5,84,0,0,80,B,100,59,0,false,5,0,true
+Bill Jiao Acupuncture Flushing NY,true,,ChIJmQbHmhBgwokRJlgoChBq7pk,Bill Jiao Acupuncture PLLC.,tcm_clinic,83,4.9,119,0,0,80,B,96,63,0,false,5,0,false
+HRT Best Acupuncture Flushing NY,true,,ChIJgZy3U75hwokRNaqGm5hFtRo,"HRT Best Acupuncture华仁堂-法拉盛针灸诊所 纽约中医诊所 物理治疗医生 李伟华中医师(Jason Yi Dipl.Ac, LAc) 脊椎病 物理治疗|尿频 尿急|失眠 PCOS 背痛 痛症诊所 最好的中医诊所 专家 推荐",tcm_clinic,97,5,102,0,0,84,B,100,69,0,false,5,0,true
+Regen Acupuncture PC Flushing NY,true,,ChIJgWBH_xlgwokRkWoVQFhuxlc,Regen Acupuncture PC,tcm_clinic,53,4.9,128,0,0,74,C,96,51,0,false,5,0,false
+Fay Acupuncture Herbal Medicine Flushing NY,true,,ChIJ1w3WAsdhwokRAkjeb1nS7xA,Fay Acupuncture & Herbal Medicine,tcm_clinic,112,5,90,0,0,86,B,100,72,0,false,5,0,false
+Natural Life Acupuncture Flushing NY,true,,ChIJL66aoN1hwokRLcm7zlzkaGk,"Natural Life Acupuncture, PC/自然堂中医针灸诊所",tcm_clinic,22,5,84,0,0,65,C,100,31,0,false,5,0,true
+Wholesome Acupuncture Center Flushing NY,true,,ChIJLbb66w1gwokRCI9M8F658vU,Wholesome Acupuncture Center 益康针灸中心,tcm_clinic,3,5,259,0,0,52,D,100,4,0,false,5,0,true
+Mindfulness Acupuncture Flushing NY,true,,ChIJiW_Ctzd_wokRd8aamh2Lga0,Mindfulness Acupuncture,tcm_clinic,33,5,473,0,0,70,C,100,40,0,false,5,0,false
+dental clinic Flushing NY,true,,ChIJgawSaj5gwokRA7BSfurvaeA,Preferred Dental Care - Flushing Dentist,dental,3118,4.8,97,0,0,96,A,92,100,0,false,5,0,false
+orthodontics Flushing NY,true,,ChIJdeUJKRBgwokR0pxJaXhm04M,Newsmile Orthodontics,dental,152,4.7,111,0,0,83,B,88,78,0,false,5,0,false
+Smile Dental Flushing NY,true,,ChIJeRt12BFgwokR2JZ5562qtbc,Flushing Smile Dental,dental,15,2.1,87,0,0,18,F,15,21,0,false,5,0,false
+Joe's Shanghai Flushing NY,true,,ChIJ2XIY-CZawokRokUjxBSl5hw,Joe's Shanghai,restaurant,6184,4.2,101,0,0,83,B,65,100,0,false,5,0,false
+Xi'an Famous Foods Flushing NY,true,,ChIJmTxuAhJgwokRZ8YGImWwpO0,Xi'an Famous Foods 西安名吃 | Main St. Flushing,restaurant,974,4.2,145,0,0,83,B,65,100,0,false,5,0,true
+Chen Du Tian Fu Flushing NY,true,,ChIJsVPeIl5hwokRJ9smxgZSeVs,"天府之国 TianFu King - Sichuan Stirfry, Cold/Hot Dishes, Box Lunch",restaurant,17,3.9,213,0,0,30,F,51,9,0,false,4,0,true
+immigration lawyer Flushing NY,true,,ChIJ2218KBBgwokR54hNYge2Qf4,ALFA - Alexandre Law Firm & Associates,legal_immigration,124,4.7,267,0,0,88,B,88,89,0,false,5,0,false
+law office Flushing NY,true,,ChIJ0RWa0hFgwokRJNFaNu8vyPo,Demidchik Law Firm: 安娜律师楼 (Flushing),legal_immigration,626,4.3,146,0,0,85,B,70,100,0,false,5,0,true
+hair salon Flushing NY,true,,ChIJrXWjZg5gwokRexHtaIH86qg,MG Artistic Hair Salon,salon_spa,2129,4.8,90,0,0,96,A,92,100,0,false,5,0.6,false
+beauty salon Flushing NY,true,,ChIJF3HFEwBhwokREHwfVJY24EM,Jing’s Beauty,salon_spa,41,5,16,3,3,64,C,100,29,40,false,5,0,false
+Sheraton LaGuardia Flushing NY,true,,ChIJe-xKRw5gwokRukjfSjSLA2o,Sheraton LaGuardia East Hotel,hotel,1714,4,103,0,0,78,B,55,100,0,false,5,0,false
+auto repair Flushing NY,true,,ChIJLSa2ES5gwokR55oUhHQ725A,Great Bear Auto Repair & Auto Body Shop,auto,601,4.4,88,0,0,88,B,75,100,0,false,5,0,false
