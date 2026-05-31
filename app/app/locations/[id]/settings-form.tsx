@@ -9,7 +9,6 @@ import {
   BookOpen,
   Palette,
   Globe,
-  FileText,
   Mail,
   LinkIcon,
   CreditCard,
@@ -60,7 +59,6 @@ const CUSTOM_URL_LABEL_PLACEHOLDERS = {
 type TabId =
   | "branding"
   | "languages"
-  | "review"
   | "email"
   | "links"
   | "billing";
@@ -70,10 +68,9 @@ const TABS: Array<{
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 }> = [
+  { id: "email", label: "Email Sender", icon: Mail },
   { id: "branding", label: "Branding", icon: Palette },
   { id: "languages", label: "Languages", icon: Globe },
-  { id: "review", label: "Review form", icon: FileText },
-  { id: "email", label: "Email Sender", icon: Mail },
   { id: "links", label: "Links", icon: LinkIcon },
   { id: "billing", label: "Billing", icon: CreditCard },
 ];
@@ -103,7 +100,7 @@ export function SettingsForm({
   // survives refreshes, and a saved-deep-link from another team member
   // lands on the right tab.
   const tabFromUrl = searchParams.get("tab");
-  const activeTab: TabId = isValidTab(tabFromUrl) ? tabFromUrl : "branding";
+  const activeTab: TabId = isValidTab(tabFromUrl) ? tabFromUrl : "email";
 
   function setTab(next: TabId) {
     const params = new URLSearchParams(searchParams.toString());
@@ -149,6 +146,27 @@ export function SettingsForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {/* Keep advanced review-form values stable even though that tab is hidden.
+          Without these hidden fields, saving from another tab would clear
+          booking_url + prompt chip overrides. */}
+      <input type="hidden" name="booking_url" defaultValue={location.booking_url ?? ""} />
+      {location.supported_languages.map((lang) => (
+        <input
+          key={`hidden-service-${lang}`}
+          type="hidden"
+          name={`service_chips_${lang}`}
+          defaultValue={serviceChipsInitial[lang] ?? ""}
+        />
+      ))}
+      {location.supported_languages.map((lang) => (
+        <input
+          key={`hidden-descriptor-${lang}`}
+          type="hidden"
+          name={`descriptor_chips_${lang}`}
+          defaultValue={descriptorChipsInitial[lang] ?? ""}
+        />
+      ))}
+
       {/* TAB NAVIGATION — solid pill bar so the menu reads as a real
           chrome element instead of a faint underline strip. Sticks to the
           top of the viewport while scrolling within a tab. */}
@@ -316,27 +334,6 @@ export function SettingsForm({
       </Section>
       </div>
 
-      <div className={activeTab === "review" ? "" : "hidden"}>
-      <Section
-        title="Post-review actions"
-        description="Drives the “While you're here” card on the thank-you page after a customer is sent to Google. Leave blank to hide the matching CTA."
-      >
-        <Field
-          label="Booking URL"
-          htmlFor="booking_url"
-          hint="Where the “Book your next visit” button opens. Vagaro, Calendly, Square, your own scheduler — anything."
-        >
-          <Input
-            id="booking_url"
-            name="booking_url"
-            type="url"
-            placeholder="https://book.example.com/..."
-            defaultValue={location.booking_url ?? ""}
-          />
-        </Field>
-      </Section>
-      </div>
-
       <div className={activeTab === "links" ? "" : "hidden"}>
       <Section
         title="Social handles"
@@ -414,47 +411,6 @@ export function SettingsForm({
           verified={!!location.sender_verified_at}
           defaultFromAddress={defaultFromAddress}
         />
-      </Section>
-      </div>
-
-      <div className={activeTab === "review" ? "" : "hidden"}>
-      <Section
-        title="Review prompts"
-        description="Customize the chip options shown on your public review page. One option per line. Leave blank to use the defaults for your business type."
-      >
-        <Field
-          label="Service options"
-          hint='Shown under "Service you received". e.g., Acupuncture, Massage, Cupping.'
-        >
-          <LocalizedField
-            name="service_chips"
-            languages={location.supported_languages}
-            initialValues={serviceChipsInitial}
-            placeholder={{
-              en: "Acupuncture\nMassage\nCupping",
-              zh: "针灸\n按摩\n拔罐",
-              es: "Acupuntura\nMasaje\nVentosas",
-            }}
-            rows={5}
-          />
-        </Field>
-
-        <Field
-          label="One-word descriptors"
-          hint='Shown under "In one word". e.g., Professional, Warm, Knowledgeable.'
-        >
-          <LocalizedField
-            name="descriptor_chips"
-            languages={location.supported_languages}
-            initialValues={descriptorChipsInitial}
-            placeholder={{
-              en: "Professional\nWarm\nKnowledgeable",
-              zh: "专业\n热情\n有经验",
-              es: "Profesional\nCálido\nExperto",
-            }}
-            rows={5}
-          />
-        </Field>
       </Section>
       </div>
 

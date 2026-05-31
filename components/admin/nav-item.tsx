@@ -16,16 +16,19 @@ interface NavItemProps {
   icon: React.ReactNode;
   /** Optional trailing count chip (e.g. active+pending Lists). Hidden when 0. */
   badge?: number;
+  /** Force exact pathname match (no startsWith matching). */
+  exact?: boolean;
 }
 
-export function NavItem({ href, label, icon, badge }: NavItemProps) {
+export function NavItem({ href, label, icon, badge, exact }: NavItemProps) {
   const pathname = usePathname();
 
   // Exact match for /app (dashboard) to avoid matching every /app/* path.
   // Prefix match for everything else (so e.g. /app/locations/[id]/reviews
   // highlights the parent "Reviews" item if you choose to nest).
-  const isActive =
-    href === "/app"
+  const isActive = exact
+    ? pathname === href
+    : href === "/app"
       ? pathname === "/app"
       : pathname === href || pathname.startsWith(`${href}/`);
 

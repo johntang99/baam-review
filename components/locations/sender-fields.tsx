@@ -57,38 +57,9 @@ export function SenderFields({
   return (
     <>
       <Field
-        label="Send-from name"
-        htmlFor="sender_name"
-        hint='Shown to the recipient. Usually the business name. e.g., "Dr. Huang Acupuncture".'
-      >
-        <Input
-          id="sender_name"
-          name="sender_name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Defaults to this location's display name"
-        />
-      </Field>
-
-      <Field
-        label="Send-from email"
-        htmlFor="sender_email"
-        hint="Use an address on the business's own domain so emails land in Primary instead of Promotions. Leave blank to use the shared BAAM Review address."
-      >
-        <Input
-          id="sender_email"
-          name="sender_email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder={`reviews@yourdomain.com  ·  default: ${defaultFromAddress}`}
-        />
-      </Field>
-
-      <Field
         label="Gmail sender preset (Preview flow)"
         htmlFor="gmail_sender_email"
-        hint='Used only for "Preview & Open in Gmail" on /app/send. Set the Gmail account that staff should send from for this location.'
+        hint='Used only for "Send in Gmail" on /app/send. Set the Gmail account that staff should send from for this location.'
       >
         <div className="space-y-2">
           <Input
@@ -119,8 +90,8 @@ export function SenderFields({
       <div className="rounded-xl border border-border-base bg-cream-deep/30 px-3.5 py-3 text-[12.5px] text-text">
         <p>
           <strong className="text-ink">How it works:</strong> when staff clicks{" "}
-          <span className="font-medium text-ink">Preview &amp; Open in Gmail</span>,
-          BAAM opens Gmail compose with this account as the target sender.
+          <span className="font-medium text-ink">Send in Gmail</span>, BAAM
+          opens Gmail compose with this account as the target sender.
         </p>
         <p className="mt-1 text-text-soft">
           The browser still requires login access to that Gmail account on this
@@ -130,6 +101,35 @@ export function SenderFields({
             : " No preset set yet."}
         </p>
       </div>
+
+      <Field
+        label="Send-from name"
+        htmlFor="sender_name"
+        hint='Shown to the recipient. Usually the business name. e.g., "Dr. Huang Acupuncture".'
+      >
+        <Input
+          id="sender_name"
+          name="sender_name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Defaults to this location's display name"
+        />
+      </Field>
+
+      <Field
+        label="Send-from email"
+        htmlFor="sender_email"
+        hint="Use an address on the business's own domain so emails land in Primary instead of Promotions. Leave blank to use the shared BAAM Review address."
+      >
+        <Input
+          id="sender_email"
+          name="sender_email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={`reviews@yourdomain.com  ·  default: ${defaultFromAddress}`}
+        />
+      </Field>
 
       {hasCustom &&
         (verified ? (

@@ -20,6 +20,7 @@ import {
 import { UserCard } from "./user-card";
 import { NavItem } from "./nav-item";
 import { SignOutNavItem } from "./sign-out-nav-item";
+import { LocationSetupNavItem } from "./location-setup-nav-item";
 import {
   LocationSwitcher,
   type LocationSwitcherLocation,
@@ -64,12 +65,25 @@ interface WorkspaceItem {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   badgeKey?: "lists";
+  kind?: "location_setup";
+  exact?: boolean;
 }
 
 const workspaceItems: WorkspaceItem[] = [
   { href: "/app", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/app/locations", label: "Manage all locations", icon: LayoutGrid },
   { href: "/api/auth/google/start", label: "Connect a new location", icon: Plus },
+  {
+    href: "/app/locations",
+    label: "Manage all locations",
+    icon: LayoutGrid,
+    exact: true,
+  },
+  {
+    href: "/app/locations",
+    label: "Location Setup",
+    icon: Settings,
+    kind: "location_setup",
+  },
   { href: "/app/send", label: "Request a Review", icon: Send },
   { href: "/app/lists", label: "Bulk Review Requests", icon: ClipboardCheck, badgeKey: "lists" },
   { href: "/app/reviews", label: "Reviews Reply & Share", icon: Star },
@@ -178,6 +192,8 @@ export function Sidebar({
           label="Workspace"
           items={workspaceItemsForViewer}
           listsBadge={listsBadge}
+          selectedLocationId={selectedLocationId}
+          locationsCount={locations.length}
         />
         {operationsItems.length > 0 && (
           <NavSection label="BAAM Operations" items={operationsItems} />
@@ -200,12 +216,16 @@ function NavSection({
   items,
   listsBadge,
   trailing,
+  selectedLocationId,
+  locationsCount,
 }: {
   label: string;
   items: WorkspaceItem[];
   listsBadge?: number;
   /** Optional non-link entry rendered at the end of the section (e.g. Sign out). */
   trailing?: React.ReactNode;
+  selectedLocationId?: string | null;
+  locationsCount?: number;
 }) {
   return (
     <div>
@@ -215,6 +235,18 @@ function NavSection({
       <ul className="space-y-0.5">
         {items.map((item) => {
           const Icon = item.icon;
+          if (item.kind === "location_setup") {
+            return (
+              <li key={`${item.href}:${item.label}`}>
+                <LocationSetupNavItem
+                  label={item.label}
+                  icon={<Icon className="h-4 w-4" />}
+                  selectedLocationId={selectedLocationId ?? null}
+                  locationsCount={locationsCount ?? 0}
+                />
+              </li>
+            );
+          }
           return (
             <li key={item.href}>
               <NavItem
@@ -222,6 +254,7 @@ function NavSection({
                 label={item.label}
                 icon={<Icon className="h-4 w-4" />}
                 badge={item.badgeKey === "lists" ? listsBadge : undefined}
+                exact={item.exact}
               />
             </li>
           );

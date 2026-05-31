@@ -14,7 +14,7 @@ import { InContentLocationPicker } from "@/components/locations/in-content-locat
 import { SettingsForm } from "./settings-form";
 
 export const metadata = {
-  title: "Location settings — BAAM Review",
+  title: "Location setup — BAAM Review",
 };
 
 export default async function LocationSettingsPage({
@@ -112,9 +112,11 @@ export default async function LocationSettingsPage({
           />
         </div>
 
-        <div>
+        <div className="space-y-1.5">
+          <p className="text-[16px] font-bold tracking-[0.03em] text-ink">
+            Location Setup
+          </p>
           <PageHeader
-            eyebrow="Location settings"
             title={location.display_name}
             description={location.address ?? undefined}
           />

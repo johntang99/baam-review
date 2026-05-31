@@ -199,6 +199,9 @@ export function SendForm({
             const e = buildEmail(previewLang, previewVars);
             return { subject: e.subject, body: e.body };
           })();
+    // This preview editor intentionally "re-seeds" untouched fields when
+    // template inputs change (language/channel/location/name).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!subjectTouched) setSubject(fresh.subject);
     if (!bodyTouched) setBody(fresh.body);
     // intentionally narrow deps — recompute on the inputs that drive the template
@@ -703,7 +706,7 @@ export function SendForm({
             <span className="font-medium text-ink">Tip:</span> Want it to feel
             personal? Click{" "}
             <span className="font-medium text-ink">
-              Preview &amp; Open in Gmail
+              Send in Gmail
             </span>{" "}
             to open a prefilled draft in Gmail web — recipient still lands on
             your review page.
@@ -742,7 +745,7 @@ export function SendForm({
               }
             >
               <Mail className="h-4 w-4" />
-              {openingGmail ? "Opening Gmail…" : "Preview &amp; open in Gmail"}
+              {openingGmail ? "Opening Gmail…" : "Send in Gmail"}
             </Button>
             <Button
               type="submit"
@@ -756,7 +759,9 @@ export function SendForm({
               }}
             >
               <Send className="h-4 w-4" />
-              {pending ? "Sending…" : `Send via ${channel === "sms" ? "SMS" : "email"}`}
+              {pending
+                ? "Sending…"
+                : `Send via ${channel === "sms" ? "SMS" : "BAAM email"}`}
             </Button>
           </div>
         </div>

@@ -11,6 +11,10 @@ import { sendEmailViaResend } from "@/lib/messaging/resend";
 import { checkVelocity } from "@/lib/messaging/velocity";
 import { getLocationBillingState } from "@/lib/billing/access";
 import { isLanguage, type Language } from "@/lib/i18n/review";
+import {
+  getValidGmailAccessTokenForLocation,
+  sendEmailViaGmailApi,
+} from "@/lib/google/gmail-api";
 
 export interface SendResult {
   ok: boolean;
@@ -28,6 +32,92 @@ export interface GmailDraftResult {
   trackingUrl?: string;
   subject?: string;
   body?: string;
+}
+
+export async function sendReviewRequestViaGmailApi(
+  formData: FormData,
+): Promise<SendResult> {
+  const channelRaw = getString(formData, "channel");
+  if (channelRaw !== "email") {
+    return { ok: false, error: "Gmail API send only supports Email channel." };
+  }
+  const locationId = getString(formData, "location_id");
+  const recipientEmail = getString(formData, "recipient_email");
+  if (!locationId) return { ok: false, error: "Pick a location." };
+  if (!recipientEmail) return { ok: false, error: "Email is required." };
+
+  const draft = await createGmailDraftRequest(formData);
+  if (!draft.ok) return draft;
+  if (!draft.requestId || !draft.subject || !draft.body || !draft.trackingUrl) {
+    return {
+      ok: false,
+      error: "Could not prepare Gmail API payload. Please try again.",
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  try {
+    const { accessToken } = await getValidGmailAccessTokenForLocation(locationId);
+    await sendEmailViaGmailApi({
+      accessToken,
+      to: recipientEmail,
+      subject: draft.subject,
+      body: draft.body,
+      replyTo: user.email ?? undefined,
+    });
+  } catch (err) {
+    const service = createServiceClient();
+    await service
+      .from("review_requests")
+      .delete()
+      .eq("id", draft.requestId)
+      .is("sent_at", null);
+    return {
+      ok: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Gmail API send failed. Please reconnect Gmail API or use manual Preview flow.",
+    };
+  }
+
+  const now = new Date().toISOString();
+  const service = createServiceClient();
+  const { error: markErr } = await service
+    .from("review_requests")
+    .update({
+      sent_at: now,
+      delivered_at: now,
+    })
+    .eq("id", draft.requestId);
+  if (markErr) {
+    console.error(
+      "Gmail API sent but failed to mark review_request timestamps",
+      markErr,
+    );
+    return {
+      ok: true,
+      requestId: draft.requestId,
+      flagged: !!draft.flagged,
+      trackingUrl: draft.trackingUrl,
+      error: "Message sent, but we couldn't log send timestamp. Please notify support.",
+    };
+  }
+
+  revalidatePath("/app/send");
+  revalidatePath("/app");
+
+  return {
+    ok: true,
+    requestId: draft.requestId,
+    flagged: !!draft.flagged,
+    trackingUrl: draft.trackingUrl,
+  };
 }
 
 export async function createGmailDraftRequest(

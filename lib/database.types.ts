@@ -979,6 +979,36 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["google_oauth_tokens"]["Insert"]>;
         Relationships: [];
       };
+      gmail_oauth_tokens: {
+        Row: {
+          id: string;
+          user_id: string;
+          location_id: string;
+          account_id: string;
+          access_token: string;
+          refresh_token: string;
+          expiry: string;
+          scope: string;
+          google_email: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          location_id: string;
+          account_id: string;
+          access_token: string;
+          refresh_token: string;
+          expiry: string;
+          scope: string;
+          google_email?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["gmail_oauth_tokens"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
