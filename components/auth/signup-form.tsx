@@ -2,12 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "./password-input";
+
+function sanitiseNext(raw: string | null): string {
+  if (!raw) return "/app";
+  if (!raw.startsWith("/")) return "/app";
+  return raw;
+}
 
 export function SignupForm({
   preferredPlan,
@@ -17,6 +24,9 @@ export function SignupForm({
    * doesn't have to re-pick after email confirmation. */
   preferredPlan?: "self_service" | "full_service" | null;
 }) {
+  const searchParams = useSearchParams();
+  const next = sanitiseNext(searchParams.get("next"));
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,7 +51,7 @@ export function SignupForm({
           // and is available on every subsequent login.
           ...(preferredPlan ? { preferred_plan: preferredPlan } : {}),
         },
-        emailRedirectTo: `${origin}/auth/callback?next=/app`,
+        emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     });
 
@@ -54,6 +64,9 @@ export function SignupForm({
     setSubmitted(true);
     setPending(false);
   }
+
+  const loginHref =
+    next === "/app" ? "/login" : `/login?next=${encodeURIComponent(next)}`;
 
   if (submitted) {
     return (
@@ -83,7 +96,7 @@ export function SignupForm({
         </ul>
         <div className="pt-2 text-center text-sm">
           <Link
-            href="/login"
+            href={loginHref}
             className="font-medium text-forest hover:underline"
           >
             Back to log in
@@ -144,7 +157,7 @@ export function SignupForm({
       <p className="text-center text-sm text-text-soft">
         Already have an account?{" "}
         <Link
-          href="/login"
+          href={loginHref}
           className="font-medium text-forest hover:underline"
         >
           Log in
