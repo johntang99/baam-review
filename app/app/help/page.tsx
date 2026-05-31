@@ -96,6 +96,13 @@ const CATEGORIES: Category[] = [
         icon: Mail,
       },
       {
+        href: "/app/docs/manual-gmail-send-in-gmail",
+        title: "Manual Gmail send SOP",
+        blurb:
+          "Step-by-step safe sending playbook for Send in Gmail: daily limits, pacing, stop rules, and recovery actions.",
+        icon: Mail,
+      },
+      {
         title: "Reviews reply & share",
         blurb: "AI-drafted replies in EN/中文/Español; sharing best reviews.",
         icon: BookOpen,

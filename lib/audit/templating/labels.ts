@@ -523,7 +523,7 @@ export const STRINGS: Record<
     benchmark_panel_b_detail_html:
       "Per BrightLocal, only <strong>9% of businesses</strong> sustain the Optimal pace — the band Google's ranking algorithm actually rewards.",
     money_on_table_eyebrow: "§ The Money on the Table",
-    section_5_headline_html: "The clinics customers <em>see before yours.</em>",
+    section_5_headline_html: "The names customers <em>see before yours.</em>",
     section_5_deck: "Identified from Google Maps rankings within your search radius. We pick the competitors — owners almost always pick the wrong ones.",
     competitor_table_headers: { business: "Business", score: "Score", rating: "Rating", total: "Total Reviews", last_30d: "Last 30d", last_90d: "Last 90d", trend: "Trend" },
     section_6_headline_html: "Five things. <em>Not three. Not ten.</em>",

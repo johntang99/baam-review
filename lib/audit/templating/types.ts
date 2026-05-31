@@ -1,6 +1,7 @@
 import type { AuditCompetitorsData } from "../competitors/types";
 import type { VerticalBenchmarks } from "../benchmarks/types";
 import type { AuditGoogleData } from "../google/types";
+import type { AuditPlatformsData } from "../platforms/types";
 import type { AuditProjection } from "../projection/types";
 import type { AuditScore } from "../scoring/types";
 
@@ -12,6 +13,7 @@ export interface RenderAuditInput {
   score: AuditScore;
   projection: AuditProjection;
   benchmarks: VerticalBenchmarks;
+  platforms?: AuditPlatformsData;
   tier: "free" | "paid";
   language?: AuditLanguage;
   audit_id?: string;
@@ -44,6 +46,7 @@ export interface AuditViewModel {
   is_paid: boolean;
 
   snapshot_google: PlatformRowVM;
+  snapshot_yelp: PlatformRowVM | null;
   insight_callout_html: string;
 
   score_total: number;

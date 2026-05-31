@@ -30,6 +30,11 @@ export interface DeliverAuditInput {
   send_email?: boolean;
   store_pdf?: boolean;
   write_audit_record?: boolean;
+  /** Override the generated UUID. Used by async generation to reuse the
+   * pending audit row created by startAuditGeneration. */
+  audit_id?: string;
+  /** Optional secondary-platform data (Yelp, etc) — surfaced in Section 2. */
+  platforms?: import("../platforms/types").AuditPlatformsData;
 }
 
 export interface DeliverAuditOutput {
@@ -53,7 +58,7 @@ export async function renderAndDeliverAudit(
   input: DeliverAuditInput,
 ): Promise<DeliverAuditOutput> {
   const t0 = Date.now();
-  const auditId = randomUUID();
+  const auditId = input.audit_id ?? randomUUID();
   const languages = decideLanguages(input.google, input.force_language);
 
   const sharedInput = {
@@ -62,6 +67,7 @@ export async function renderAndDeliverAudit(
     score: input.score,
     projection: input.projection,
     benchmarks: input.benchmarks,
+    platforms: input.platforms,
     tier: input.google.meta.tier,
     audit_id: auditId,
   };
@@ -90,6 +96,7 @@ export async function renderAndDeliverAudit(
   let email_error: string | undefined;
 
   if (input.send_email && input.customer?.email) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://review.baamplatform.com";
     const result = await sendAuditEmail({
       to: input.customer.email,
       recipient_name: input.customer.name,
@@ -97,6 +104,8 @@ export async function renderAndDeliverAudit(
       audit_id: auditId,
       total_score: input.score.total,
       grade: input.score.grade,
+      grade_diagnosis: input.score.grade_diagnosis,
+      dashboard_url: `${appUrl}/audit/${auditId}`,
       pdfs: rendered.map((r, i) => ({
         ...stored[i],
         pdf_buffer: r.result.pdf_buffer,

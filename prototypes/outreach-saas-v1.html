@@ -1,0 +1,1335 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BAAM Outreach SaaS - Prototype v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-soft: #eff6ff;
+      --success: #16a34a;
+      --success-soft: #f0fdf4;
+      --warning: #d97706;
+      --warning-soft: #fff7ed;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 10px;
+      --shadow: 0 8px 28px rgba(15, 23, 42, 0.07);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 248px 1fr;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: #0b1220;
+      color: #e2e8f0;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 14px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.15);
+    }
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .brand strong {
+      font-size: 14px;
+      letter-spacing: 0.01em;
+    }
+
+    .workspace {
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.65);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .workspace .name {
+      font-size: 13px;
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    .workspace .meta {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .group-title {
+      margin: 4px 8px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .menu {
+      display: grid;
+      gap: 3px;
+    }
+
+    .menu button {
+      border: 0;
+      background: transparent;
+      color: #cbd5e1;
+      text-align: left;
+      border-radius: 9px;
+      padding: 9px 10px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.14s ease, color 0.14s ease;
+    }
+
+    .menu button:hover {
+      background: rgba(148, 163, 184, 0.16);
+      color: #f8fafc;
+    }
+
+    .menu button.active {
+      background: rgba(37, 99, 235, 0.24);
+      color: #dbeafe;
+      font-weight: 600;
+    }
+
+    .count {
+      min-width: 18px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.3);
+      color: #dbeafe;
+      font-size: 10px;
+      text-align: center;
+      padding: 2px 6px;
+      font-weight: 700;
+    }
+
+    .side-health {
+      margin-top: auto;
+      display: grid;
+      gap: 8px;
+    }
+
+    .side-health-card {
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: var(--radius-sm);
+      padding: 9px;
+      background: rgba(15, 23, 42, 0.56);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      align-items: center;
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 64px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 20px;
+    }
+
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .crumbs strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .search {
+      min-width: 260px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .chip strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .view-switch {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .view-switch button {
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      color: var(--muted);
+      border-radius: 9px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .view-switch button.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .canvas {
+      padding: 18px 20px 24px;
+      overflow: auto;
+    }
+
+    .screen {
+      display: none;
+      gap: 12px;
+    }
+
+    .screen.active {
+      display: grid;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 880px;
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn.secondary {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .kpi {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: var(--surface);
+    }
+
+    .kpi .label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    .kpi .value {
+      margin-top: 6px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .kpi .meta {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 12px;
+    }
+
+    .title {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .item .name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .item .sub {
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .pill.ok {
+      color: var(--success);
+      border-color: #bbf7d0;
+      background: var(--success-soft);
+    }
+
+    .pill.warn {
+      color: var(--warning);
+      border-color: #fed7aa;
+      background: var(--warning-soft);
+    }
+
+    .pill.bad {
+      color: var(--danger);
+      border-color: #fecaca;
+      background: var(--danger-soft);
+    }
+
+    .mini-stepper {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .step {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-soft);
+      padding: 10px;
+    }
+
+    .step .step-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .step .step-value {
+      margin-top: 5px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 130px 1fr 46px;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead {
+      background: #f8fafc;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-size: 10px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: #0f172a;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .filter {
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 9px;
+      padding: 7px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 12px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+    }
+
+    .field label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .field textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .preview {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-soft);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .preview .row {
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .preview .row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .note {
+      border: 1px solid #bfdbfe;
+      background: var(--primary-soft);
+      border-radius: 10px;
+      padding: 10px;
+      color: #1d4ed8;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 310px;
+      gap: 12px;
+    }
+
+    .rail {
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 12px;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .rail h4 {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .plan {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      padding: 12px;
+    }
+
+    .plan h4 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .plan .price {
+      margin-top: 6px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .plan ul {
+      margin: 8px 0 0;
+      padding-left: 17px;
+      color: var(--muted);
+      font-size: 12px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .plan.featured {
+      border-color: #93c5fd;
+      background: #f8fbff;
+    }
+
+    .small {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1260px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .menu {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-2,
+      .two-col,
+      .split,
+      .pricing {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">BO</div>
+        <strong>BAAM Outreach</strong>
+      </div>
+
+      <div class="workspace">
+        <div class="name">Natural Life Acupuncture</div>
+        <div class="meta">Growth Plan - 4 seats - NYC</div>
+      </div>
+
+      <div>
+        <div class="group-title">Workspace</div>
+        <div class="menu" id="side-menu">
+          <button class="active" data-screen="onboarding">Onboarding</button>
+          <button data-screen="dashboard">Dashboard</button>
+          <button data-screen="single-send">Send One</button>
+          <button data-screen="bulk-send">Campaigns <span class="count">3</span></button>
+          <button data-screen="templates">Templates</button>
+          <button data-screen="contacts">Contacts</button>
+          <button data-screen="team-billing">Team & Billing</button>
+        </div>
+      </div>
+
+      <div class="side-health">
+        <div class="group-title">Safety</div>
+        <div class="side-health-card">
+          <div>
+            <div class="name">Daily budget</div>
+            <div class="small">42 / 100 recommended</div>
+          </div>
+          <span class="pill ok">Healthy</span>
+        </div>
+        <div class="side-health-card">
+          <div>
+            <div class="name">Suppression list</div>
+            <div class="small">109 contacts blocked</div>
+          </div>
+          <span class="pill warn">Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="crumbs">
+          Workspace
+          <span>/</span>
+          <strong>Natural Life Acupuncture</strong>
+          <span>/</span>
+          Outbound Platform
+        </div>
+        <div class="tools">
+          <div class="search">Search contacts, templates, campaigns...</div>
+          <span class="chip"><strong>Mode:</strong> Send in Gmail first</span>
+          <span class="chip"><strong>Role:</strong> Owner</span>
+        </div>
+      </div>
+
+      <div class="view-switch" id="top-tabs">
+        <button class="active" data-screen="onboarding">Onboarding</button>
+        <button data-screen="dashboard">Dashboard</button>
+        <button data-screen="single-send">Send One</button>
+        <button data-screen="bulk-send">Bulk</button>
+        <button data-screen="templates">Templates</button>
+        <button data-screen="contacts">Contacts</button>
+        <button data-screen="team-billing">Team/Billing</button>
+      </div>
+
+      <div class="canvas">
+        <section class="screen active" id="screen-onboarding">
+          <div class="panel">
+            <div class="header">
+              <div>
+                <h1>Checklist Onboarding</h1>
+                <p>
+                  Redesigned using modern SaaS onboarding patterns: non-linear checklist,
+                  high visibility status, and clear launch gates before first outbound send.
+                </p>
+              </div>
+              <div class="actions">
+                <button class="btn secondary">View setup guide</button>
+                <button class="btn primary">Resume setup</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mini-stepper">
+            <article class="step">
+              <div class="step-title">Step 1</div>
+              <div class="step-value">Workspace profile complete</div>
+            </article>
+            <article class="step">
+              <div class="step-title">Step 2</div>
+              <div class="step-value">Sender mailbox verified</div>
+            </article>
+            <article class="step">
+              <div class="step-title">Step 3</div>
+              <div class="step-value">138 contacts imported</div>
+            </article>
+            <article class="step">
+              <div class="step-title">Step 4</div>
+              <div class="step-value">First template approved</div>
+            </article>
+          </div>
+
+          <div class="grid-2">
+            <article class="panel">
+              <h3 class="title">Launch checklist</h3>
+              <div class="list">
+                <div class="item">
+                  <div>
+                    <div class="name">Campaign types configured</div>
+                    <div class="sub">Review request, product intro, event promotion</div>
+                  </div>
+                  <span class="pill ok">Done</span>
+                </div>
+                <div class="item">
+                  <div>
+                    <div class="name">Suppression seed imported</div>
+                    <div class="sub">Unsubscribes and prior bounce addresses loaded</div>
+                  </div>
+                  <span class="pill warn">Review</span>
+                </div>
+                <div class="item">
+                  <div>
+                    <div class="name">Safety policy acknowledged</div>
+                    <div class="sub">Hard cap 200/day + pacing window required</div>
+                  </div>
+                  <span class="pill ok">Done</span>
+                </div>
+                <div class="item">
+                  <div>
+                    <div class="name">Send test to your mailbox</div>
+                    <div class="sub">Validate rendering and primary placement</div>
+                  </div>
+                  <span class="pill bad">Pending</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel">
+              <h3 class="title">Quality gates</h3>
+              <div class="bar-row"><span>Auth setup</span><div class="bar"><span style="width:100%"></span></div><strong>100%</strong></div>
+              <div class="bar-row"><span>Template health</span><div class="bar"><span style="width:88%"></span></div><strong>88%</strong></div>
+              <div class="bar-row"><span>List quality</span><div class="bar"><span style="width:91%"></span></div><strong>91%</strong></div>
+              <div class="bar-row"><span>Pacing policy</span><div class="bar"><span style="width:76%"></span></div><strong>76%</strong></div>
+              <div class="note">
+                Recommendation for week 1: keep under 20 sends/day, prioritize "Send in Gmail",
+                and review role-email risk before each queue release.
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-dashboard">
+          <div class="panel">
+            <div class="header">
+              <div>
+                <h1>Operations Dashboard</h1>
+                <p>
+                  Structured for operator decisions: top-line metrics, immediate risk alerts,
+                  and campaign-level drill-down in a table-first layout.
+                </p>
+              </div>
+              <div class="actions">
+                <button class="btn secondary">Last 7 days</button>
+                <button class="btn primary">Create campaign</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <article class="kpi"><div class="label">Sent today</div><div class="value">42</div><div class="meta">/100 recommended</div></article>
+            <article class="kpi"><div class="label">Open rate</div><div class="value">61%</div><div class="meta">+6.4% WoW</div></article>
+            <article class="kpi"><div class="label">Reply rate</div><div class="value">17%</div><div class="meta">Stable in safe range</div></article>
+            <article class="kpi"><div class="label">Risk score</div><div class="value">Low</div><div class="meta">No hard-stop triggers</div></article>
+          </div>
+
+          <div class="grid-2">
+            <article class="panel">
+              <h3 class="title">Campaign mix</h3>
+              <div class="bar-row"><span>Review requests</span><div class="bar"><span style="width:56%"></span></div><strong>56%</strong></div>
+              <div class="bar-row"><span>Business intro</span><div class="bar"><span style="width:28%"></span></div><strong>28%</strong></div>
+              <div class="bar-row"><span>Product promo</span><div class="bar"><span style="width:11%"></span></div><strong>11%</strong></div>
+              <div class="bar-row"><span>Event invites</span><div class="bar"><span style="width:5%"></span></div><strong>5%</strong></div>
+            </article>
+
+            <article class="panel">
+              <h3 class="title">Immediate actions</h3>
+              <div class="list">
+                <div class="item">
+                  <div>
+                    <div class="name">Warm-up guardrail</div>
+                    <div class="sub">Keep this hour under 6 sends</div>
+                  </div>
+                  <span class="pill warn">Recommended</span>
+                </div>
+                <div class="item">
+                  <div>
+                    <div class="name">Role email check</div>
+                    <div class="sub">13 contacts flagged as info@ or office@</div>
+                  </div>
+                  <span class="pill warn">Review</span>
+                </div>
+                <div class="item">
+                  <div>
+                    <div class="name">Variant rotation</div>
+                    <div class="sub">Variant B has low recent usage</div>
+                  </div>
+                  <span class="pill ok">Info</span>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <h3 class="title">Campaign performance table</h3>
+            <div class="filters">
+              <div class="filter">Type: All campaigns</div>
+              <div class="filter">Status: Active</div>
+              <div class="filter">Date: Last 30 days</div>
+              <div class="filter">Owner: Any</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Campaign</th>
+                    <th>Audience</th>
+                    <th>Sent</th>
+                    <th>Open</th>
+                    <th>Reply</th>
+                    <th>Risk</th>
+                    <th>Owner</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>TCM Intro - NYC Batch A</strong></td><td>TCM NYC</td><td>138</td><td>65%</td><td>19%</td><td><span class="pill ok">Low</span></td><td>John</td></tr>
+                  <tr><td><strong>Dental Review Invite - May</strong></td><td>Dental Tri-state</td><td>92</td><td>59%</td><td>14%</td><td><span class="pill ok">Low</span></td><td>Ops</td></tr>
+                  <tr><td><strong>Webinar Follow-up</strong></td><td>Warm Leads</td><td>44</td><td>48%</td><td>9%</td><td><span class="pill warn">Med</span></td><td>John</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="screen" id="screen-single-send">
+          <div class="panel">
+            <div class="header">
+              <div>
+                <h1>Single Send Composer</h1>
+                <p>
+                  Two-panel workflow inspired by modern campaign tools:
+                  compose on the left, compliance and live preview on the right.
+                </p>
+              </div>
+              <div class="actions">
+                <button class="btn secondary">Save draft</button>
+                <button class="btn primary">Send in Gmail</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <article class="panel">
+              <div class="field-grid">
+                <div class="field">
+                  <label>Campaign type</label>
+                  <select>
+                    <option>Review request</option>
+                    <option>Business introduction</option>
+                    <option>Product promotion</option>
+                    <option>Event invitation</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Source segment</label>
+                  <select>
+                    <option>TCM prospects NYC</option>
+                    <option>Dental clinics tri-state</option>
+                    <option>Warm leads</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Recipient name</label>
+                  <input value="Dr. Lin" />
+                </div>
+                <div class="field">
+                  <label>Recipient email</label>
+                  <input value="drlin@example.com" />
+                </div>
+                <div class="field">
+                  <label>Template</label>
+                  <select>
+                    <option>TCM intro - concise</option>
+                    <option>Review invite - warm</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Tone</label>
+                  <select>
+                    <option>Professional</option>
+                    <option>Warm</option>
+                    <option>Brief</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Subject</label>
+                <input value="Dr. Lin, quick idea to improve review volume safely" />
+              </div>
+              <div class="field" style="margin-top:10px;">
+                <label>Body</label>
+                <textarea>Hi Dr. Lin,
+
+I work with NYC clinics that want more high-quality Google reviews without risky bulk-email behavior.
+
+If helpful, I can share a 10-minute walkthrough specifically for TCM practices this week.
+
+Best,
+John</textarea>
+              </div>
+            </article>
+
+            <aside class="panel">
+              <h3 class="title">Pre-send checks</h3>
+              <div class="list">
+                <div class="item"><div><div class="name">Suppression</div><div class="sub">No blocks found</div></div><span class="pill ok">Pass</span></div>
+                <div class="item"><div><div class="name">Cadence window</div><div class="sub">Interval policy respected</div></div><span class="pill ok">Pass</span></div>
+                <div class="item"><div><div class="name">Template risk</div><div class="sub">No spam trigger phrases</div></div><span class="pill ok">Pass</span></div>
+                <div class="item"><div><div class="name">Role email</div><div class="sub">Recipient is decision-maker mailbox</div></div><span class="pill ok">Pass</span></div>
+              </div>
+              <div class="preview" style="margin-top:10px;">
+                <div class="row"><strong>Preview sender:</strong> support@baamplatform.com</div>
+                <div class="row"><strong>Tracking:</strong> Open tracking on, unsubscribe token on</div>
+                <div class="row"><strong>Final action:</strong> Opens Gmail compose with fields prefilled</div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-bulk-send">
+          <div class="panel">
+            <div class="header">
+              <div>
+                <h1>Bulk Campaign Builder</h1>
+                <p>
+                  Step-based builder influenced by sequence tools: audience, message variants,
+                  pacing schedule, and review gates before queue activation.
+                </p>
+              </div>
+              <div class="actions">
+                <button class="btn secondary">Dry run</button>
+                <button class="btn primary">Prepare queue</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mini-stepper">
+            <article class="step"><div class="step-title">1. Audience</div><div class="step-value">500 rows selected</div></article>
+            <article class="step"><div class="step-title">2. Message</div><div class="step-value">3 variants ready</div></article>
+            <article class="step"><div class="step-title">3. Schedule</div><div class="step-value">100/day cap</div></article>
+            <article class="step"><div class="step-title">4. Review</div><div class="step-value">411 ready to queue</div></article>
+          </div>
+
+          <div class="split">
+            <article class="panel">
+              <div class="filters">
+                <div class="filter">Segment: TCM NYC prospects</div>
+                <div class="filter">Safety status: Show warnings</div>
+                <div class="filter">Planned slots: This week</div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Recipient</th>
+                      <th>Segment</th>
+                      <th>Variant</th>
+                      <th>Safety status</th>
+                      <th>Planned slot</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>Queens Acu Center</strong><br /><span class="small">owner@queensacu.com</span></td><td>TCM NYC</td><td>Intro A</td><td><span class="pill ok">Pass</span></td><td>Today 10:20</td></tr>
+                    <tr><td><strong>WellSpring Herbs</strong><br /><span class="small">contact@wellspringherbs.com</span></td><td>TCM NYC</td><td>Intro B</td><td><span class="pill warn">Role risk</span></td><td>Manual review</td></tr>
+                    <tr><td><strong>East River Therapy</strong><br /><span class="small">admin@eastrivertherapy.com</span></td><td>TCM NYC</td><td>Intro C</td><td><span class="pill bad">Suppressed</span></td><td>Excluded</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <aside class="rail">
+              <h4>Queue policy</h4>
+              <div class="small">Recommended daily: 100</div>
+              <div class="small">Hard cap: 200</div>
+              <div class="small">Jitter: 120-180 sec between sends</div>
+              <div class="small">Auto-pause on bounce or complaint threshold</div>
+              <div class="note">
+                This workflow keeps operators in control and prevents accidental blast behavior.
+                Every release requires a final confirmation.
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-templates">
+          <div class="panel">
+            <div class="header">
+              <div>
+                <h1>Template Studio</h1>
+                <p>
+                  Library + editor layout used by modern messaging products:
+                  choose a template, edit variables, manage compliance footer, and activate variants.
+                </p>
+              </div>
+              <div class="actions">
+                <button class="btn secondary">Duplicate</button>
+                <button class="btn primary">New template</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <article class="panel">
+              <h3 class="title">Template library</h3>
+              <div class="list">
+                <div class="item"><div><div class="name">TCM intro - concise</div><div class="sub">Business intro - EN - 3 variants</div></div><span class="pill ok">Active</span></div>
+                <div class="item"><div><div class="name">Review request - warm</div><div class="sub">Review flow - EN/ZH - 2 variants</div></div><span class="pill ok">Active</span></div>
+                <div class="item"><div><div class="name">Event invite - webinar</div><div class="sub">Event promotion - EN - 1 variant</div></div><span class="pill warn">Draft</span></div>
+              </div>
+            </article>
+
+            <article class="panel">
+              <h3 class="title">Selected template settings</h3>
+              <div class="field">
+                <label>Allowed variables</label>
+                <input value="{name}, {business_name}, {city}, {cta_link}" />
+              </div>
+              <div class="field" style="margin-top:10px;">
+                <label>Compliance footer</label>
+                <textarea style="min-height:100px;">You received this message because your business is publicly listed and relevant to this outreach.
+To stop future outreach, click {unsubscribe_link}.</textarea>
+              </div>
+              <div class="note" style="margin-top:10px;">
+                Promotional templates require unsubscribe token before activation.
+                Validation runs automatically on save.
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-contacts">
+          <div class="panel">
+            <div class="header">
+              <div>
+                <h1>Contacts & Lists</h1>
+                <p>
+                  Contact intelligence with table-first operations:
+                  segment filters, role-email detection, and suppression by default.
+                </p>
+              </div>
+              <div class="actions">
+                <button class="btn secondary">Import CSV</button>
+                <button class="btn primary">Create segment</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <article class="kpi"><div class="label">Total contacts</div><div class="value">1,284</div><div class="meta">9 active segments</div></article>
+            <article class="kpi"><div class="label">Suppressed</div><div class="value">109</div><div class="meta">Unsub + bounce protected</div></article>
+            <article class="kpi"><div class="label">Deliverable</div><div class="value">91.5%</div><div class="meta">After hygiene checks</div></article>
+            <article class="kpi"><div class="label">Role emails</div><div class="value">72</div><div class="meta">Manual decision needed</div></article>
+          </div>
+
+          <article class="panel">
+            <div class="filters">
+              <div class="filter">Industry: All</div>
+              <div class="filter">Location: New York</div>
+              <div class="filter">Source: CSV + Manual</div>
+              <div class="filter">Status: Deliverable only</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Segment</th>
+                    <th>Rule</th>
+                    <th>Count</th>
+                    <th>Last refresh</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>TCM NYC Prospects</strong></td><td>industry=TCM AND city=New York</td><td>500</td><td>2 hours ago</td><td><span class="pill ok">Ready</span></td></tr>
+                  <tr><td><strong>Dental Tri-State</strong></td><td>industry=Dental AND state in (NY,NJ,CT)</td><td>312</td><td>Yesterday</td><td><span class="pill ok">Ready</span></td></tr>
+                  <tr><td><strong>Event Warm List</strong></td><td>opened_last_30d=true</td><td>184</td><td>40 mins ago</td><td><span class="pill warn">Synced</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="screen" id="screen-team-billing">
+          <div class="panel">
+            <div class="header">
+              <div>
+                <h1>Team, Roles & Billing</h1>
+                <p>
+                  Stripe-style subscription section plus role-based workspace access controls.
+                  Built for multi-tenant self-serve SaaS operations.
+                </p>
+              </div>
+              <div class="actions">
+                <button class="btn secondary">Billing history</button>
+                <button class="btn primary">Invite teammate</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <article class="panel">
+              <h3 class="title">Members</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Last active</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>john@baamplatform.com</strong></td><td>Owner</td><td><span class="pill ok">Active</span></td><td>Now</td></tr>
+                    <tr><td><strong>ops@naturallife.com</strong></td><td>Operator</td><td><span class="pill ok">Active</span></td><td>2h ago</td></tr>
+                    <tr><td><strong>manager@naturallife.com</strong></td><td>Viewer</td><td><span class="pill warn">Invited</span></td><td>-</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="panel">
+              <h3 class="title">Current plan and limits</h3>
+              <div class="pricing">
+                <div class="plan">
+                  <h4>Starter</h4>
+                  <div class="price">$39</div>
+                  <ul>
+                    <li>1 seat</li>
+                    <li>100 sends/day</li>
+                    <li>Single send + templates</li>
+                  </ul>
+                </div>
+                <div class="plan featured">
+                  <h4>Growth</h4>
+                  <div class="price">$99</div>
+                  <ul>
+                    <li>5 seats</li>
+                    <li>200 sends/day</li>
+                    <li>Bulk campaigns + segmentation</li>
+                  </ul>
+                </div>
+                <div class="plan">
+                  <h4>Scale</h4>
+                  <div class="price">$249</div>
+                  <ul>
+                    <li>15 seats</li>
+                    <li>Custom policy thresholds</li>
+                    <li>Approvals + audit export</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="note" style="margin-top:10px;">
+                Entitlement checks run server-side on every send action:
+                seat cap, daily limit, mode permissions, and billing state.
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var navTargets = document.querySelectorAll("[data-screen]");
+      var screens = document.querySelectorAll(".screen");
+
+      function activate(screenId) {
+        navTargets.forEach(function (el) {
+          el.classList.toggle("active", el.dataset.screen === screenId);
+        });
+
+        screens.forEach(function (el) {
+          el.classList.toggle("active", el.id === "screen-" + screenId);
+        });
+      }
+
+      navTargets.forEach(function (el) {
+        el.addEventListener("click", function () {
+          activate(el.dataset.screen);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

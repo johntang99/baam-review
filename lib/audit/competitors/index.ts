@@ -37,7 +37,7 @@ export async function getCompetitorsData(
 ): Promise<AuditCompetitorsData> {
   const config = getAuditGoogleConfig();
 
-  const primary_keyword = resolvePrimaryKeyword(primary);
+  const primary_keyword = resolvePrimaryKeyword(primary, options.service_override);
   const radius_used_miles =
     options.radius_miles ?? resolveSearchRadiusMiles(primary.business.zip);
 

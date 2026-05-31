@@ -40,4 +40,7 @@ export interface GetCompetitorsOptions {
   count?: number;
   radius_miles?: number;
   exclude_place_ids?: string[];
+  /** Force a specific service keyword (e.g. "bridal boutique"). When set,
+   *  overrides the auto-detected service from Google types / name tokens. */
+  service_override?: string;
 }

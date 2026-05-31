@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAAM Review · The reputation audit for local businesses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E6;
+    --cream-light: #FAF7F0;
+    --cream-deep: #EBE3D2;
+    --ink: #1A1814;
+    --ink-soft: #3D3833;
+    --ink-mute: #6B6259;
+    --rule: #C9BFAE;
+    --rule-soft: #DDD3BF;
+    --amber: #D4882D;
+    --amber-deep: #B86E1A;
+    --rust: #A4452A;
+    --rust-deep: #842F1B;
+    --sage: #6B8E6E;
+    --sage-deep: #4F7253;
+    --sage-darkest: #2D4530;
+    --gold: #C9A227;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--cream-light);
+    color: var(--ink);
+    font-family: 'Archivo', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(212, 136, 45, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 90%, rgba(107, 142, 110, 0.02) 0%, transparent 50%);
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ============ TOP NAV ============ */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250, 247, 240, 0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 32px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .nav-brand-mark {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    color: var(--ink);
+  }
+  .nav-brand-sub {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-mute);
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+  .nav-link {
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .nav-link:hover { color: var(--rust-deep); }
+  .nav-cta {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 10px 20px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border-radius: 2px;
+  }
+  .nav-cta:hover { background: var(--rust-deep); }
+
+  /* ============ HERO ============ */
+  .hero {
+    padding: 120px 32px 100px;
+    position: relative;
+  }
+  .hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .hero-left {}
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+    margin-bottom: 28px;
+    font-weight: 600;
+  }
+  .hero-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 76px;
+    line-height: 1.02;
+    color: var(--ink);
+    margin-bottom: 24px;
+    letter-spacing: -0.01em;
+  }
+  .hero-headline em {
+    color: var(--rust-deep);
+    font-style: italic;
+  }
+  .hero-deck {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 540px;
+    margin-bottom: 40px;
+  }
+  .hero-cta-row {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .hero-cta-primary {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 19px 36px;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    display: inline-block;
+  }
+  .hero-cta-primary:hover { background: var(--rust-deep); }
+  .hero-cta-secondary {
+    font-family: 'Archivo', sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+  }
+  .hero-trust-row {
+    margin-top: 32px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .hero-trust-item {
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-trust-item::before {
+    content: '✓';
+    color: var(--sage-deep);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  /* Hero visual — preview of audit */
+  .hero-visual {
+    background: var(--cream-light);
+    border: 1px solid var(--ink);
+    padding: 36px 32px 32px;
+    aspect-ratio: 8.5 / 11;
+    position: relative;
+    box-shadow: 24px 24px 0 -1px var(--cream-deep), 25px 25px 0 0 var(--rule);
+  }
+  .hero-visual-header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 28px;
+    font-size: 10px;
+  }
+  .hero-visual-brand {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: var(--ink);
+  }
+  .hero-visual-meta {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-mute);
+    letter-spacing: 0.1em;
+  }
+  .hero-visual-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  .hero-visual-title em { color: var(--rust-deep); font-style: italic; }
+  .hero-visual-sub {
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px;
+    color: var(--ink-mute);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .hero-visual-score-block {
+    display: flex;
+    align-items: baseline;
+    gap: 32px;
+    padding: 22px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 24px;
+  }
+  .hero-visual-score-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 88px;
+    font-weight: 300;
+    line-height: 0.85;
+    color: var(--ink);
+  }
+  .hero-visual-score-grade-block {
+    flex: 1;
+  }
+  .hero-visual-score-label {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 600;
+    font-size: 10px;
+    color: var(--ink-mute);
+    letter-spacing: 0.12em;
+    margin-bottom: 4px;
+  }
+  .hero-visual-grade {
+    font-family: 'Instrument Serif', serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--rust-deep);
+  }
+  .hero-visual-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .hero-visual-bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 32px;
+    gap: 12px;
+    align-items: center;
+    font-size: 11px;
+    font-family: 'Archivo', sans-serif;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .hero-visual-bar {
+    height: 7px;
+    background: var(--cream-deep);
+    position: relative;
+  }
+  .hero-visual-bar::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    background: var(--amber);
+  }
+  .hero-visual-bar.b1::after { width: 72%; }
+  .hero-visual-bar.b2::after { width: 48%; background: var(--rust); }
+  .hero-visual-bar.b3::after { width: 25%; background: var(--rust); }
+  .hero-visual-bar.b4::after { width: 42%; background: var(--rust); }
+  .hero-visual-bar.b5::after { width: 58%; }
+  .hero-visual-bar-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    text-align: right;
+    font-weight: 500;
+  }
+
+  /* ============ HOOK SECTION ============ */
+  .hook {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 120px 32px;
+    text-align: center;
+    position: relative;
+  }
+  .hook-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .hook-mark {
+    font-family: 'Instrument Serif', serif;
+    font-size: 80px;
+    color: var(--amber);
+    line-height: 1;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+  .hook-quote {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    line-height: 1.35;
+    color: var(--cream-light);
+    margin-bottom: 32px;
+  }
+  .hook-quote em { color: var(--amber); font-style: italic; }
+  .hook-attribution {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  /* ============ WHAT YOU GET ============ */
+  .deliverable {
+    padding: 120px 32px;
+    background: var(--cream-deep);
+  }
+  .deliverable-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .deliverable-header {
+    margin-bottom: 64px;
+  }
+  .section-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--amber-deep);
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .section-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 64px;
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 20px;
+    max-width: 880px;
+  }
+  .section-headline em { color: var(--rust-deep); font-style: italic; }
+  .section-deck {
+    font-family: 'Instrument Serif', serif;
+    font-size: 21px;
+    color: var(--ink-soft);
+    max-width: 700px;
+    line-height: 1.55;
+  }
+  
+  .pages-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    margin-bottom: 56px;
+  }
+  .page-card {
+    background: var(--cream-light);
+    padding: 24px 18px;
+    border-right: 1px solid var(--ink);
+    aspect-ratio: 0.85;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.2s;
+  }
+  .page-card:last-child { border-right: none; }
+  .page-card:hover { background: white; }
+  .page-card-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--amber-deep);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .page-card-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 19px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 14px;
+    flex: 1;
+  }
+  .page-card-detail {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    color: var(--ink-mute);
+    line-height: 1.45;
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+  }
+
+  /* ============ HOW IT WORKS ============ */
+  .how {
+    padding: 120px 32px;
+    background: var(--cream-light);
+  }
+  .how-inner { max-width: 1200px; margin: 0 auto; }
+  .how-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    margin-top: 56px;
+  }
+  .how-step {
+    padding: 40px 32px 32px;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+  .how-step:last-child { border-right: none; }
+  .how-step-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 72px;
+    line-height: 1;
+    color: var(--rust-deep);
+    font-style: italic;
+    margin-bottom: 24px;
+  }
+  .how-step-title {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--ink);
+    margin-bottom: 12px;
+    letter-spacing: 0;
+  }
+  .how-step-body {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  /* ============ WHY FREE SECTION ============ */
+  .why-free {
+    padding: 120px 32px;
+    background: var(--cream-deep);
+  }
+  .why-free-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .why-free-left {}
+  .why-free-right {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 48px 40px;
+  }
+  .why-free-right-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    font-weight: 600;
+  }
+  .why-free-right-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    color: var(--cream-light);
+  }
+  .why-free-right-body {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--cream);
+    margin-bottom: 28px;
+  }
+  .why-free-pricing-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--ink-soft);
+    padding-top: 24px;
+    margin-bottom: 28px;
+  }
+  .why-free-tier {
+    padding-right: 20px;
+    border-right: 1px solid var(--ink-soft);
+  }
+  .why-free-tier:last-child { border-right: none; padding-right: 0; padding-left: 20px; }
+  .why-free-tier-name {
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .why-free-tier-price {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    color: var(--cream-light);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .why-free-tier-price-sub {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+  .why-free-tier-desc {
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    color: var(--cream);
+    margin-top: 10px;
+    line-height: 1.55;
+  }
+  .why-free-right-cta {
+    display: block;
+    background: var(--amber);
+    color: var(--ink);
+    padding: 16px;
+    text-align: center;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .why-free-quote {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-top: 24px;
+    font-style: italic;
+    max-width: 480px;
+  }
+  .why-free-quote em { color: var(--rust-deep); font-style: italic; }
+
+  /* ============ METHODOLOGY ============ */
+  .methodology {
+    padding: 120px 32px;
+    background: var(--cream-light);
+  }
+  .methodology-inner { max-width: 1200px; margin: 0 auto; }
+  .methodology-facts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    margin-top: 56px;
+  }
+  .method-fact {
+    padding: 28px 24px 32px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--ink);
+  }
+  .method-fact:last-child { border-right: none; }
+  .method-fact-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--amber-deep);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .method-fact-stat {
+    font-family: 'Instrument Serif', serif;
+    font-size: 54px;
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .method-fact-stat .unit { font-size: 26px; color: var(--ink-mute); }
+  .method-fact-body {
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .methodology-cite {
+    margin-top: 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .methodology-cite a {
+    color: var(--rust-deep);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* ============ FAQ ============ */
+  .faq {
+    padding: 120px 32px;
+    background: var(--cream-light);
+  }
+  .faq-inner { max-width: 820px; margin: 0 auto; }
+  .faq-list {
+    margin-top: 40px;
+  }
+  .faq-item {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .faq-item:first-of-type { border-top: 1px solid var(--ink); }
+  .faq-q {
+    font-family: 'Instrument Serif', serif;
+    font-size: 23px;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .faq-a {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+  .faq-a a {
+    color: var(--rust-deep);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* ============ FINAL CTA ============ */
+  .final-cta {
+    padding: 140px 32px;
+    background: var(--cream-deep);
+    text-align: center;
+  }
+  .final-cta-inner { max-width: 880px; margin: 0 auto; }
+  .final-cta-mark {
+    font-family: 'Instrument Serif', serif;
+    font-size: 64px;
+    color: var(--amber);
+    line-height: 1;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+  .final-cta-text {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 40px;
+  }
+  .final-cta-text em { color: var(--rust-deep); font-style: italic; }
+  .final-cta-button {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 20px 56px;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: inline-block;
+    border-radius: 2px;
+  }
+  .final-cta-button:hover { background: var(--rust-deep); }
+  .final-cta-sub {
+    margin-top: 24px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+
+  /* ============ FOOTER ============ */
+  .footer {
+    padding: 64px 32px 40px;
+    background: var(--ink);
+    color: var(--cream);
+  }
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 56px;
+  }
+  .footer-brand-mark {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.22em;
+    color: var(--cream-light);
+    margin-bottom: 14px;
+  }
+  .footer-brand-tagline {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-mute);
+    line-height: 1.5;
+    max-width: 320px;
+  }
+  .footer-column-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    font-weight: 600;
+  }
+  .footer-link-list {
+    list-style: none;
+  }
+  .footer-link-list li {
+    padding: 6px 0;
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+  }
+  .footer-link-list a { color: var(--cream); }
+  .footer-link-list a:hover { color: var(--amber); }
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 56px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-mute);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 56px; }
+    .hero-headline { font-size: 48px; }
+    .hero-deck { font-size: 18px; }
+    .hook-quote { font-size: 30px; }
+    .section-headline { font-size: 40px; }
+    .pages-grid { grid-template-columns: 1fr 1fr; }
+    .page-card:nth-child(2n) { border-right: none; }
+    .page-card { border-bottom: 1px solid var(--ink); }
+    .how-steps { grid-template-columns: 1fr; }
+    .how-step { border-right: none; border-bottom: 1px solid var(--rule); }
+    .why-free-inner { grid-template-columns: 1fr; gap: 40px; }
+    .methodology-facts { grid-template-columns: 1fr 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .final-cta-text { font-size: 32px; }
+    .nav-links { gap: 16px; }
+    .nav-links .nav-link:not(:last-child) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAVIGATION ============ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="nav-brand-mark">BAAM · REVIEW</span>
+      <span class="nav-brand-sub">the reputation audit</span>
+    </div>
+    <div class="nav-links">
+      <a href="/methodology" class="nav-link">Methodology</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/login" class="nav-link">Log in</a>
+      <a href="/signup" class="nav-cta">Get free audit</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">A reputation audit for local businesses · Vol. I · 2026</div>
+      <h1 class="hero-headline">The reputation report you've been <em>missing</em>.</h1>
+      <p class="hero-deck">Where your business stands today, what it costs you each month, and the five things to do in the next 12 months. Audited against your real local competitors. Free.</p>
+      <div class="hero-cta-row">
+        <a href="/signup" class="hero-cta-primary">Get your free audit</a>
+        <a href="/methodology" class="hero-cta-secondary">See our methodology →</a>
+      </div>
+      <div class="hero-trust-row">
+        <span class="hero-trust-item">No credit card required</span>
+        <span class="hero-trust-item">Delivered in under 10 seconds</span>
+        <span class="hero-trust-item">EN + 中文 for bilingual businesses</span>
+      </div>
+    </div>
+    
+    <div class="hero-visual">
+      <div class="hero-visual-header">
+        <span class="hero-visual-brand">BAAM · REVIEW AUDIT</span>
+        <span class="hero-visual-meta">VOL. I · 2026</span>
+      </div>
+      <div class="hero-visual-title">Your BAAM <em>Review</em> Score</div>
+      <div class="hero-visual-sub">Modern TCM Center · Flushing, NY</div>
+      
+      <div class="hero-visual-score-block">
+        <div class="hero-visual-score-num">62</div>
+        <div class="hero-visual-score-grade-block">
+          <div class="hero-visual-score-label">GRADE · TIER C</div>
+          <div class="hero-visual-grade">C</div>
+        </div>
+      </div>
+      
+      <div class="hero-visual-bars">
+        <div class="hero-visual-bar-row">
+          <span>Rating quality</span>
+          <div class="hero-visual-bar b1"></div>
+          <span class="hero-visual-bar-val">72</span>
+        </div>
+        <div class="hero-visual-bar-row">
+          <span>Review volume</span>
+          <div class="hero-visual-bar b2"></div>
+          <span class="hero-visual-bar-val">48</span>
+        </div>
+        <div class="hero-visual-bar-row">
+          <span>30-day velocity</span>
+          <div class="hero-visual-bar b3"></div>
+          <span class="hero-visual-bar-val">25</span>
+        </div>
+        <div class="hero-visual-bar-row">
+          <span>6-month velocity</span>
+          <div class="hero-visual-bar b4"></div>
+          <span class="hero-visual-bar-val">42</span>
+        </div>
+        <div class="hero-visual-bar-row">
+          <span>12-month velocity</span>
+          <div class="hero-visual-bar b5"></div>
+          <span class="hero-visual-bar-val">58</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOOK ============ -->
+<section class="hook">
+  <div class="hook-inner">
+    <div class="hook-mark">"</div>
+    <p class="hook-quote">Average businesses become popular by building reviews <em>relentlessly</em>. Excellent businesses become <em>invisible</em> because they ignore them.</p>
+    <div class="hook-attribution">— BAAM Review Research · 2026</div>
+  </div>
+</section>
+
+<!-- ============ WHAT YOU GET ============ -->
+<section class="deliverable">
+  <div class="deliverable-inner">
+    <div class="deliverable-header">
+      <div class="section-eyebrow">§ 01 · What you receive</div>
+      <h2 class="section-headline">A real audit. Not <em>"7 tips."</em></h2>
+      <p class="section-deck">Seven pages of analysis built specifically for your business, your vertical, and your local market. Delivered as a PDF you can share with partners, accountants, or investors.</p>
+    </div>
+    
+    <div class="pages-grid">
+      <div class="page-card">
+        <div class="page-card-num">PAGE 01</div>
+        <div class="page-card-title">Why reviews decide who wins</div>
+        <div class="page-card-detail">5 cited facts about local search, conversion, and AI-driven discovery.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">PAGE 02</div>
+        <div class="page-card-title">Your current snapshot</div>
+        <div class="page-card-detail">Your standing across Google, Yelp, and vertical-specific platforms.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">PAGE 03</div>
+        <div class="page-card-title">Your BAAM Review Score</div>
+        <div class="page-card-detail">0–100 score with transparent sub-score rubric and grade.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">PAGE 04</div>
+        <div class="page-card-title">Industry benchmarks</div>
+        <div class="page-card-detail">Per-review dollar value and velocity standards for your vertical.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">PAGE 05</div>
+        <div class="page-card-title">Competitor comparison</div>
+        <div class="page-card-detail">Your 5 real local competitors, side-by-side.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">PAGE 06</div>
+        <div class="page-card-title">12-month action plan</div>
+        <div class="page-card-detail">Five specific actions with dollar value per action.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">PAGE 07</div>
+        <div class="page-card-title">Reference appendix</div>
+        <div class="page-card-detail">Methodology, sources, and per-vertical reference tables.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="how">
+  <div class="how-inner">
+    <div class="section-eyebrow">§ 02 · How it works</div>
+    <h2 class="section-headline">Three steps. <em>Ten seconds</em>.</h2>
+    
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num">i</div>
+        <div class="how-step-title">Sign up</div>
+        <div class="how-step-body">Create your free account with email or Google. No credit card. We need to know where to send your audit.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">ii</div>
+        <div class="how-step-title">Enter your business</div>
+        <div class="how-step-body">Type your business name or paste your Google Maps URL. We find your profile, your reviews, and your real local competitors automatically.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">iii</div>
+        <div class="how-step-title">Receive your audit</div>
+        <div class="how-step-body">The 7-page PDF arrives in your inbox within seconds. View it anytime in your dashboard.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY FREE ============ -->
+<section class="why-free">
+  <div class="why-free-inner">
+    <div class="why-free-left">
+      <div class="section-eyebrow">§ 03 · Why this is free</div>
+      <h2 class="section-headline" style="font-size: 56px;">We give the audit. You decide if you want <em>help acting on it</em>.</h2>
+      <p class="section-deck">The audit shows you what to do. Some businesses can execute it themselves. Others want help.</p>
+      <p class="why-free-quote">"If you want help, that's where <em>BAAM Review service</em> comes in."</p>
+    </div>
+    
+    <div class="why-free-right">
+      <div class="why-free-right-label">BAAM Review · Service</div>
+      <div class="why-free-right-title">After your audit, we do the work.</div>
+      <p class="why-free-right-body">Review collection. Response writing. Monthly progress reports. Bilingual where you need it. Built on the same research that powers this audit.</p>
+      
+      <div class="why-free-pricing-row">
+        <div class="why-free-tier">
+          <div class="why-free-tier-name">Self-Serve</div>
+          <div class="why-free-tier-price">$99<span style="font-size:14px; color:var(--ink-mute); font-family: 'Archivo', sans-serif;">/mo</span></div>
+          <div class="why-free-tier-price-sub">Platform · single location</div>
+          <div class="why-free-tier-desc">You drive the workflow. We provide tools, AI drafts, multilingual templates.</div>
+        </div>
+        <div class="why-free-tier">
+          <div class="why-free-tier-name">Full Service</div>
+          <div class="why-free-tier-price">$399<span style="font-size:14px; color:var(--ink-mute); font-family: 'Archivo', sans-serif;">/mo</span></div>
+          <div class="why-free-tier-price-sub">Managed · we run it</div>
+          <div class="why-free-tier-desc">Send us your customer list weekly. We handle outreach, responses, reporting.</div>
+        </div>
+      </div>
+      
+      <a href="https://baamreview.com" class="why-free-right-cta">Learn about BAAM Review service →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ METHODOLOGY ============ -->
+<section class="methodology">
+  <div class="methodology-inner">
+    <div class="section-eyebrow">§ 04 · The methodology</div>
+    <h2 class="section-headline">Five facts that justify <em>every number</em> in the audit.</h2>
+    
+    <div class="methodology-facts">
+      <div class="method-fact">
+        <div class="method-fact-num">01</div>
+        <div class="method-fact-stat">16–20<span class="unit">%</span></div>
+        <div class="method-fact-body">Of Google's Local Pack ranking weight now comes from review signals — up from 11% five years ago.</div>
+      </div>
+      <div class="method-fact">
+        <div class="method-fact-num">02</div>
+        <div class="method-fact-stat">81<span class="unit">%</span></div>
+        <div class="method-fact-body">Of consumers use Google for local reviews — the only major platform still growing.</div>
+      </div>
+      <div class="method-fact">
+        <div class="method-fact-num">03</div>
+        <div class="method-fact-stat">+25<span class="unit">%</span></div>
+        <div class="method-fact-body">Conversion lift from a 0.1-star rating increase for brick-and-mortar businesses.</div>
+      </div>
+      <div class="method-fact">
+        <div class="method-fact-num">04</div>
+        <div class="method-fact-stat">5–9<span class="unit">%</span></div>
+        <div class="method-fact-body">Revenue increase per 1-star rating bump. Harvard Business School confirms it's causation.</div>
+      </div>
+    </div>
+    
+    <div class="methodology-cite">
+      Full methodology · 15 cited sources · <a href="/methodology">read the research →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq">
+  <div class="faq-inner">
+    <div class="section-eyebrow">§ 05 · Frequently asked</div>
+    <h2 class="section-headline" style="font-size: 48px; margin-bottom: 0;">Common <em>questions</em>.</h2>
+    
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Is the audit really free? What's the catch?</div>
+        <div class="faq-a">There's no catch. The audit is genuinely free. We're hoping that some businesses, after seeing the audit, will want help executing the action plan — that's what <a href="https://baamreview.com">BAAM Review service</a> is for. The audit alone has no cost and no obligation.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Why do I need to sign up if it's free?</div>
+        <div class="faq-a">So we can email your PDF and so you can come back to view past audits. We don't sell email lists. Unsubscribe from marketing emails anytime; transactional emails (your audit, your account) continue regardless.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How is this different from Birdeye or Podium?</div>
+        <div class="faq-a">Birdeye and Podium are review management platforms ($299+/month with setup fees). We're an audit (free) plus an optional follow-on service ($99–399/mo). The audit gives you the analysis before you commit to any ongoing software — including ours.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do you actually read my reviews, or just count them?</div>
+        <div class="faq-a">We analyze every review in the past 12 months across Google and vertical-specific platforms. Sentiment, themes, response rates, response timing. Counts alone don't tell you why your rating is what it is.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What if my business has no reviews yet?</div>
+        <div class="faq-a">The audit needs at least 5 Google reviews to produce meaningful analysis. Below that, results are unreliable. If you have fewer than 5, we recommend collecting some first, then coming back.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">My business is mainly in Chinese — does that work?</div>
+        <div class="faq-a">是。For Chinese-name businesses, we auto-detect and produce both English and Traditional Chinese versions of the audit. 對於主要服務華語客戶的企業，我們會自動生成中英雙語版本。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How many audits can I run?</div>
+        <div class="faq-a">Two audits per month, five audits lifetime. Generous enough to audit a few businesses you own; restrictive enough to prevent abuse. Need more? Email us and we'll review your case individually.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <div class="final-cta-mark">§</div>
+    <p class="final-cta-text">Your reputation is being audited by your customers <em>right now</em>.<br>The question is whether you've seen the report.</p>
+    <a href="/signup" class="final-cta-button">Get your free audit</a>
+    <div class="final-cta-sub">Free · No credit card · ~10 seconds</div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-mark">BAAM · REVIEW</div>
+      <div class="footer-brand-tagline">The reputation audit for local businesses. Built in New York. Published continuously.</div>
+    </div>
+    <div>
+      <div class="footer-column-title">Product</div>
+      <ul class="footer-link-list">
+        <li><a href="/signup">Free audit</a></li>
+        <li><a href="/methodology">Methodology</a></li>
+        <li><a href="https://baamreview.com">BAAM Review service</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-column-title">Company</div>
+      <ul class="footer-link-list">
+        <li><a href="/about">About BAAM Studio</a></li>
+        <li><a href="/methodology">Research</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-column-title">Legal</div>
+      <ul class="footer-link-list">
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 BAAM Studio · New York</span>
+    <span>Vol. I · No. 001</span>
+  </div>
+</footer>
+
+</body>
+</html>

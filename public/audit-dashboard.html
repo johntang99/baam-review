@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your audits · BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E6;
+    --cream-light: #FAF7F0;
+    --cream-deep: #EBE3D2;
+    --ink: #1A1814;
+    --ink-soft: #3D3833;
+    --ink-mute: #6B6259;
+    --rule: #C9BFAE;
+    --rule-soft: #DDD3BF;
+    --amber: #D4882D;
+    --amber-deep: #B86E1A;
+    --rust: #A4452A;
+    --rust-deep: #842F1B;
+    --sage: #6B8E6E;
+    --sage-deep: #4F7253;
+    --sage-darkest: #2D4530;
+    --gold: #C9A227;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--cream-light);
+    color: var(--ink);
+    font-family: 'Archivo', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ============ NAV ============ */
+  .nav {
+    background: var(--cream-light);
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 32px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .nav-brand-mark {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    color: var(--ink);
+  }
+  .nav-brand-sub {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-mute);
+  }
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+  }
+  .nav-link {
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .nav-link.active {
+    color: var(--ink);
+    font-weight: 700;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 2px;
+  }
+  .nav-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 24px;
+    border-left: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+
+  /* ============ DASHBOARD ============ */
+  .dashboard {
+    padding: 56px 32px 80px;
+  }
+  .dashboard-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* ============ HEADER ============ */
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 32px;
+  }
+  .dashboard-title-block {}
+  .dashboard-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--amber-deep);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .dashboard-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  .dashboard-title em { color: var(--rust-deep); font-style: italic; }
+  .dashboard-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .dashboard-quota {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+    text-align: right;
+  }
+  .dashboard-quota-strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .new-audit-btn {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 14px 28px;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+  .new-audit-btn:hover { background: var(--rust-deep); }
+  
+  /* ============ SERVICE UPSELL BANNER ============ */
+  .service-banner {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 28px 36px;
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 32px;
+    align-items: center;
+    position: relative;
+  }
+  .service-banner-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .service-banner-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    line-height: 1.3;
+    color: var(--cream-light);
+  }
+  .service-banner-headline em {
+    color: var(--amber);
+    font-style: italic;
+  }
+  .service-banner-prices {
+    text-align: right;
+    border-right: 1px solid var(--ink-soft);
+    padding-right: 32px;
+    margin-right: 0;
+  }
+  .service-banner-price-row {
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    color: var(--cream);
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+  }
+  .service-banner-price-row strong {
+    color: var(--amber);
+    font-weight: 700;
+  }
+  .service-banner-cta {
+    background: var(--amber);
+    color: var(--ink);
+    padding: 14px 24px;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+  }
+  .service-banner-dismiss {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+
+  /* ============ AUDIT LIST ============ */
+  .audit-list-header {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .audit-list {
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  
+  /* AUDIT CARD — COMPLETED */
+  .audit-card {
+    background: var(--cream-light);
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 32px;
+    align-items: center;
+    transition: background 0.15s;
+  }
+  .audit-card:hover { background: white; }
+  .audit-card.in-progress { background: var(--cream-deep); }
+  .audit-card.failed { background: #F5E8E0; }
+  
+  .audit-card-main {}
+  .audit-card-business {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    color: var(--ink);
+    margin-bottom: 4px;
+    line-height: 1.15;
+  }
+  .audit-card-business-zh {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px;
+    color: var(--ink-mute);
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .audit-card-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .audit-card-meta-divider {
+    width: 1px;
+    height: 11px;
+    background: var(--rule);
+  }
+  .audit-card-meta-strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .audit-card-vertical-pill {
+    background: var(--cream-deep);
+    color: var(--ink);
+    padding: 2px 9px;
+    border-radius: 2px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .audit-card-bilingual-pill {
+    background: var(--ink);
+    color: var(--amber);
+    padding: 2px 9px;
+    border-radius: 2px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  
+  .audit-card-score-block {
+    text-align: right;
+    padding-right: 28px;
+    border-right: 1px solid var(--rule);
+    min-width: 120px;
+  }
+  .audit-card-score-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .audit-card-score-grade {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    color: var(--rust-deep);
+    margin-top: 6px;
+    font-style: italic;
+  }
+  
+  .audit-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 200px;
+  }
+  .audit-card-btn {
+    padding: 10px 16px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    text-align: center;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    background: white;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .audit-card-btn:hover { background: var(--cream-deep); }
+  .audit-card-btn.primary {
+    background: var(--ink);
+    color: var(--cream-light);
+  }
+  .audit-card-btn.primary:hover {
+    background: var(--rust-deep);
+    border-color: var(--rust-deep);
+  }
+  .audit-card-btn.view {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    border: none;
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+    color: var(--ink-soft);
+    font-size: 13px;
+    text-transform: none;
+    background: transparent;
+    padding: 4px 0;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+  
+  /* AUDIT CARD — IN PROGRESS */
+  .audit-card.in-progress .audit-card-score-block,
+  .audit-card.in-progress .audit-card-actions {
+    display: none;
+  }
+  .audit-progress-block {
+    grid-column: 2 / span 2;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-left: 24px;
+    border-left: 1px solid var(--rule);
+  }
+  .audit-progress-bar {
+    width: 200px;
+    height: 5px;
+    background: var(--rule);
+    overflow: hidden;
+    position: relative;
+  }
+  .audit-progress-bar-fill {
+    height: 100%;
+    width: 65%;
+    background: var(--amber);
+    animation: progressShimmer 1.5s ease-in-out infinite;
+  }
+  @keyframes progressShimmer {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.65; }
+  }
+  .audit-progress-info {
+    flex: 1;
+  }
+  .audit-progress-stage {
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    margin-bottom: 2px;
+  }
+  .audit-progress-eta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+  }
+  
+  /* AUDIT CARD — FAILED */
+  .audit-card.failed .audit-card-score-block { display: none; }
+  .audit-fail-info {
+    grid-column: 2 / span 2;
+    padding: 0 0 0 24px;
+    border-left: 1px solid var(--rust);
+  }
+  .audit-fail-headline {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--rust-deep);
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .audit-fail-body {
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+  .audit-fail-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  /* ============ EMPTY STATE (alternate dashboard) ============ */
+  .empty-state {
+    background: var(--cream-light);
+    border: 1px dashed var(--rule);
+    padding: 80px 48px;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .empty-state-mark {
+    font-family: 'Instrument Serif', serif;
+    font-size: 56px;
+    color: var(--amber);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+  .empty-state-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .empty-state-headline em { color: var(--rust-deep); font-style: italic; }
+  .empty-state-body {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 440px;
+    margin: 0 auto 32px;
+    line-height: 1.55;
+  }
+  .empty-state-cta {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 16px 32px;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  /* ============ INSIGHT BANNER ============ */
+  .insight-banner {
+    background: var(--cream-deep);
+    padding: 32px 36px;
+    margin-top: 40px;
+    border-left: 3px solid var(--amber);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: center;
+  }
+  .insight-banner-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--amber-deep);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .insight-banner-text {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+  .insight-banner-text em { color: var(--rust-deep); font-style: italic; }
+  .insight-banner-cta {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 12px 24px;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .insight-banner-cta:hover {
+    background: var(--ink);
+    color: var(--cream-light);
+  }
+
+  /* ============ SECONDARY ACTIONS ============ */
+  .secondary-actions {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  .secondary-action {
+    padding: 20px 24px 20px 0;
+    border-right: 1px solid var(--rule);
+  }
+  .secondary-action:last-child { border-right: none; padding-left: 24px; padding-right: 0; }
+  .secondary-action:not(:first-child):not(:last-child) { padding-left: 24px; }
+  .secondary-action-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .secondary-action-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 19px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .secondary-action-title em { color: var(--rust-deep); font-style: italic; }
+  .secondary-action-body {
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .secondary-action-link {
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    color: var(--rust-deep);
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  /* ============ STATE LABELS ============ */
+  .demo-section {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid var(--ink);
+  }
+  .demo-section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--amber-deep);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+  .demo-section-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    color: var(--ink);
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 900px) {
+    .dashboard-header { flex-direction: column; gap: 16px; align-items: flex-start; }
+    .dashboard-actions { width: 100%; justify-content: space-between; }
+    .dashboard-title { font-size: 32px; }
+    .audit-card { grid-template-columns: 1fr; gap: 16px; }
+    .audit-card-score-block { border-right: none; padding-right: 0; text-align: left; border-bottom: 1px solid var(--rule); padding-bottom: 14px; }
+    .audit-card-actions { flex-direction: row; flex-wrap: wrap; min-width: 0; }
+    .audit-card-btn { flex: 1; min-width: 140px; }
+    .audit-progress-block { grid-column: 1; padding-left: 0; border-left: none; border-top: 1px solid var(--rule); padding-top: 16px; }
+    .audit-progress-bar { width: 100%; }
+    .audit-fail-info { grid-column: 1; padding-left: 0; border-left: none; border-top: 1px solid var(--rust); padding-top: 16px; }
+    .service-banner { grid-template-columns: 1fr; gap: 16px; padding: 24px; }
+    .service-banner-prices { text-align: left; border-right: none; padding-right: 0; }
+    .insight-banner { grid-template-columns: 1fr; }
+    .secondary-actions { grid-template-columns: 1fr; }
+    .secondary-action { border-right: none; border-bottom: 1px solid var(--rule); padding: 20px 0; }
+    .secondary-action:last-child { border-bottom: none; padding-left: 0; }
+    .nav-links .nav-link:not(.active):not(.nav-user-link) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="nav-brand-mark">BAAM · REVIEW</span>
+      <span class="nav-brand-sub">the reputation audit</span>
+    </div>
+    <div class="nav-links">
+      <a href="/audits" class="nav-link active">Audits</a>
+      <a href="/account" class="nav-link">Account</a>
+      <div class="nav-user">
+        <span>john@example.com</span>
+        <a href="/logout" class="nav-link">Log out</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ DASHBOARD ============ -->
+<div class="dashboard">
+  <div class="dashboard-inner">
+    
+    <!-- HEADER -->
+    <div class="dashboard-header">
+      <div class="dashboard-title-block">
+        <div class="dashboard-eyebrow">Your reputation audits · Vol. I</div>
+        <h1 class="dashboard-title">Three audits, ready to <em>review</em>.</h1>
+      </div>
+      <div class="dashboard-actions">
+        <div class="dashboard-quota">
+          <div><span class="dashboard-quota-strong">1 of 2</span> monthly audits used</div>
+          <div style="margin-top: 4px;">resets June 1, 2026</div>
+        </div>
+        <a href="/audits/new" class="new-audit-btn">+ New Audit</a>
+      </div>
+    </div>
+    
+    <!-- SERVICE UPSELL BANNER -->
+    <div class="service-banner">
+      <div class="service-banner-content">
+        <div class="service-banner-label">BAAM Review · Service</div>
+        <h2 class="service-banner-headline">Your audit shows what to do.<br><em>BAAM Review service</em> does the work.</h2>
+      </div>
+      <div class="service-banner-prices">
+        <div class="service-banner-price-row"><strong>Self-Serve</strong> · $99/mo · single location</div>
+        <div class="service-banner-price-row"><strong>Full Service</strong> · $399/mo · we run it</div>
+      </div>
+      <a href="https://baamreview.com" class="service-banner-cta">Learn more →</a>
+      <span class="service-banner-dismiss">Dismiss ✕</span>
+    </div>
+    
+    <!-- AUDIT LIST -->
+    <div class="audit-list-header">
+      <span>Audits · sorted newest first</span>
+      <span>3 audits · 5 lifetime remaining</span>
+    </div>
+    
+    <div class="audit-list">
+      
+      <!-- AUDIT 1 - COMPLETED, FREE (single language) -->
+      <div class="audit-card">
+        <div class="audit-card-main">
+          <h3 class="audit-card-business">Wei Lin Acupuncture</h3>
+          <div class="audit-card-business-zh">魏林針灸 · TCM clinic</div>
+          <div class="audit-card-meta">
+            <span class="audit-card-meta-strong">Audited May 29, 2026</span>
+            <span class="audit-card-meta-divider"></span>
+            <span>Flushing, NY</span>
+            <span class="audit-card-meta-divider"></span>
+            <span>BR-26-0512</span>
+            <span class="audit-card-meta-divider"></span>
+            <span class="audit-card-vertical-pill">TCM CLINIC</span>
+            <span class="audit-card-bilingual-pill">EN + 中文</span>
+          </div>
+        </div>
+        <div class="audit-card-score-block">
+          <div class="audit-card-score-num">84</div>
+          <div class="audit-card-score-grade">Grade B</div>
+        </div>
+        <div class="audit-card-actions">
+          <a href="/audits/26-0512" class="audit-card-btn primary">View Audit</a>
+          <a href="/api/audit/26-0512/pdf?lang=en" class="audit-card-btn">Download EN PDF</a>
+          <a href="/api/audit/26-0512/pdf?lang=zh" class="audit-card-btn">Download 中文 PDF</a>
+        </div>
+      </div>
+      
+      <!-- AUDIT 2 - COMPLETED, ENGLISH ONLY -->
+      <div class="audit-card">
+        <div class="audit-card-main">
+          <h3 class="audit-card-business">Bridge Street Dental</h3>
+          <div class="audit-card-meta">
+            <span class="audit-card-meta-strong">Audited May 25, 2026</span>
+            <span class="audit-card-meta-divider"></span>
+            <span>Brooklyn, NY</span>
+            <span class="audit-card-meta-divider"></span>
+            <span>BR-26-0498</span>
+            <span class="audit-card-meta-divider"></span>
+            <span class="audit-card-vertical-pill">DENTAL</span>
+          </div>
+        </div>
+        <div class="audit-card-score-block">
+          <div class="audit-card-score-num">71</div>
+          <div class="audit-card-score-grade">Grade C</div>
+        </div>
+        <div class="audit-card-actions">
+          <a href="/audits/26-0498" class="audit-card-btn primary">View Audit</a>
+          <a href="/api/audit/26-0498/pdf" class="audit-card-btn">Download PDF</a>
+          <a href="#" class="audit-card-btn view">Re-audit (available July 25)</a>
+        </div>
+      </div>
+      
+      <!-- AUDIT 3 - IN PROGRESS -->
+      <div class="audit-card in-progress">
+        <div class="audit-card-main">
+          <h3 class="audit-card-business">Flushing Acupuncture Center</h3>
+          <div class="audit-card-meta">
+            <span class="audit-card-meta-strong">Started 12 seconds ago</span>
+            <span class="audit-card-meta-divider"></span>
+            <span>Flushing, NY</span>
+            <span class="audit-card-meta-divider"></span>
+            <span>BR-26-0513</span>
+          </div>
+        </div>
+        <div class="audit-progress-block">
+          <div class="audit-progress-bar">
+            <div class="audit-progress-bar-fill"></div>
+          </div>
+          <div class="audit-progress-info">
+            <div class="audit-progress-stage">Calculating BAAM Review Score</div>
+            <div class="audit-progress-eta">step 3 of 5 · ~5s remaining</div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- INSIGHT BANNER (relevant call-to-action based on audit results) -->
+    <div class="insight-banner">
+      <div>
+        <div class="insight-banner-label">From your latest audit</div>
+        <p class="insight-banner-text">Your <em>30-day velocity</em> is dropping fastest. The first action of your 12-month plan would address this — <em>+$84,000</em> projected impact.</p>
+      </div>
+      <a href="https://baamreview.com" class="insight-banner-cta">Get help executing →</a>
+    </div>
+
+    <!-- SECONDARY ACTIONS -->
+    <div class="secondary-actions">
+      <div class="secondary-action">
+        <div class="secondary-action-eyebrow">More to do</div>
+        <h3 class="secondary-action-title">Audit <em>another business</em></h3>
+        <p class="secondary-action-body">You have 1 monthly audit and 5 lifetime audits remaining. Audit competitors, partner businesses, or other locations.</p>
+        <a href="/audits/new" class="secondary-action-link">Start new audit →</a>
+      </div>
+      <div class="secondary-action">
+        <div class="secondary-action-eyebrow">Read the research</div>
+        <h3 class="secondary-action-title">The <em>methodology</em> behind the score</h3>
+        <p class="secondary-action-body">15 cited studies on review economics, healthy velocity, and local search ranking. Every number in your audit traces here.</p>
+        <a href="/methodology" class="secondary-action-link">View methodology →</a>
+      </div>
+      <div class="secondary-action">
+        <div class="secondary-action-eyebrow">Get help</div>
+        <h3 class="secondary-action-title">Have <em>questions</em> about your audit?</h3>
+        <p class="secondary-action-body">Email us with any audit-specific questions. We typically respond within one business day.</p>
+        <a href="mailto:hello@baamreview.com" class="secondary-action-link">Contact support →</a>
+      </div>
+    </div>
+
+    <!-- DEMO: EMPTY STATE ALTERNATIVE -->
+    <div class="demo-section">
+      <div class="demo-section-title">↓ Alternate state · zero audits (first-time signup)</div>
+      <div class="empty-state">
+        <div class="empty-state-mark">§</div>
+        <h2 class="empty-state-headline">Ready for your <em>first audit</em>?</h2>
+        <p class="empty-state-body">Audits take about 10 seconds to generate. The PDF lands in your inbox and stays in your dashboard.</p>
+        <a href="/audits/new" class="empty-state-cta">Start your first audit</a>
+      </div>
+    </div>
+
+    <!-- DEMO: FAILED AUDIT STATE -->
+    <div class="demo-section">
+      <div class="demo-section-title">↓ Alternate state · audit failed (rare; auto-refunds quota)</div>
+      <div class="audit-list">
+        <div class="audit-card failed">
+          <div class="audit-card-main">
+            <h3 class="audit-card-business">Some Business Name</h3>
+            <div class="audit-card-meta">
+              <span class="audit-card-meta-strong">Attempted 2 minutes ago</span>
+              <span class="audit-card-meta-divider"></span>
+              <span>Failed</span>
+              <span class="audit-card-meta-divider"></span>
+              <span>BR-26-0514</span>
+            </div>
+          </div>
+          <div class="audit-fail-info">
+            <div class="audit-fail-headline">⚠ Generation failed</div>
+            <div class="audit-fail-body">"We couldn't reach Google's API. Quota refunded. Please retry."</div>
+            <div class="audit-fail-actions">
+              <a href="/audits/new?retry=BR-26-0514" class="audit-card-btn primary">Retry</a>
+              <a href="mailto:hello@baamreview.com" class="audit-card-btn">Contact support</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

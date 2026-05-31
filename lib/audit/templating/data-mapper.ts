@@ -48,6 +48,9 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
     is_paid: tier === "paid",
 
     snapshot_google: buildGooglePlatformRow(google, language),
+    snapshot_yelp: input.platforms?.yelp
+      ? buildYelpPlatformRow(input.platforms.yelp, language)
+      : null,
     insight_callout_html: buildInsightCallout(google, score, language),
 
     score_total: score.total,
@@ -301,6 +304,37 @@ function buildGooglePlatformRow(
     rating_value: rating.toFixed(1),
     review_count: total,
     last_review_label: formatLastReview(daysAgo, language),
+    last_review_is_stale: daysAgo == null || daysAgo > 60,
+    health_label: healthLabel,
+    health_class: healthClass,
+  };
+}
+
+function buildYelpPlatformRow(
+  yelp: import("../platforms/types").AuditPlatformData,
+  language: AuditLanguage,
+): PlatformRowVM {
+  const rating = yelp.rating ?? 0;
+  const daysAgo = yelp.last_review_days_ago;
+  const healthClass: "good" | "warn" | "missing" = yelp.profile_health.is_claimed
+    ? "good"
+    : "missing";
+  const healthLabel = yelp.profile_health.is_claimed
+    ? language === "zh"
+      ? "已認領"
+      : "Listed"
+    : language === "zh"
+      ? "未認領"
+      : "Not claimed";
+
+  return {
+    icon: "Y",
+    name: "Yelp",
+    meta_sub: language === "zh" ? "次要 · 紐約市常用" : "Secondary · heavy use in NYC",
+    rating_stars_html: rating > 0 ? renderStarsHtml(rating) : "<span class=\"stars\" style=\"opacity:.4;\">☆☆☆☆☆</span>",
+    rating_value: rating > 0 ? rating.toFixed(1) : "—",
+    review_count: yelp.total_count,
+    last_review_label: daysAgo != null ? formatLastReview(daysAgo, language) : language === "zh" ? "從未" : "never",
     last_review_is_stale: daysAgo == null || daysAgo > 60,
     health_label: healthLabel,
     health_class: healthClass,

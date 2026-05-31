@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start a new audit · BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E6;
+    --cream-light: #FAF7F0;
+    --cream-deep: #EBE3D2;
+    --ink: #1A1814;
+    --ink-soft: #3D3833;
+    --ink-mute: #6B6259;
+    --rule: #C9BFAE;
+    --rule-soft: #DDD3BF;
+    --amber: #D4882D;
+    --amber-deep: #B86E1A;
+    --rust: #A4452A;
+    --rust-deep: #842F1B;
+    --sage: #6B8E6E;
+    --sage-deep: #4F7253;
+    --sage-darkest: #2D4530;
+    --gold: #C9A227;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--cream-light);
+    color: var(--ink);
+    font-family: 'Archivo', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ============ NAV ============ */
+  .nav {
+    background: var(--cream-light);
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 32px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .nav-brand-mark {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    color: var(--ink);
+  }
+  .nav-brand-sub {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-mute);
+  }
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+  }
+  .nav-link {
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .nav-link.active {
+    color: var(--ink);
+    font-weight: 700;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 2px;
+  }
+  .nav-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 24px;
+    border-left: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+
+  /* ============ INTAKE PAGE LAYOUT ============ */
+  .intake-page {
+    min-height: calc(100vh - 60px);
+    padding: 56px 32px 80px;
+  }
+  .intake-inner {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  
+  .intake-header {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .intake-header-left {}
+  .intake-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--amber-deep);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .intake-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 44px;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  .intake-title em { color: var(--rust-deep); font-style: italic; }
+  .intake-quota-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+    text-align: right;
+  }
+  .intake-quota-display-strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  
+  /* ============ INPUT BLOCK — REDESIGNED WITH 3 FIELDS ============ */
+  .input-block {
+    background: var(--cream-light);
+    border: 1px solid var(--ink);
+    padding: 40px;
+    margin-bottom: 24px;
+  }
+  
+  .input-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .input-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 6px;
+    max-width: 620px;
+  }
+  .input-headline em { color: var(--rust-deep); font-style: italic; }
+  .input-sub {
+    font-family: 'Instrument Serif', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: var(--ink-mute);
+    margin-bottom: 32px;
+    line-height: 1.55;
+    max-width: 580px;
+  }
+
+  /* Field rows */
+  .field-row {
+    margin-bottom: 24px;
+  }
+  .field-row:last-of-type { margin-bottom: 0; }
+  
+  .field-label {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .field-required {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--rust-deep);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    text-transform: lowercase;
+  }
+  .field-optional {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-mute);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    text-transform: lowercase;
+  }
+  
+  .field-input-row {
+    display: flex;
+    gap: 0;
+  }
+  
+  .field-input {
+    flex: 1;
+    padding: 16px 18px;
+    border: 1px solid var(--rule);
+    background: white;
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 0;  /* prevents flex overflow */
+  }
+  .field-input:focus { border-color: var(--ink); }
+  .field-input::placeholder {
+    color: var(--ink-mute);
+    font-style: italic;
+  }
+  
+  /* Input with adjacent verify button */
+  .field-input-row .field-input {
+    border-right: none;
+  }
+  
+  .verify-button {
+    padding: 0 22px;
+    background: var(--cream-deep);
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .verify-button:hover {
+    background: var(--ink);
+    color: var(--cream-light);
+  }
+  .verify-button-arrow {
+    font-family: 'Instrument Serif', serif;
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1;
+    transform: translateY(1px);
+  }
+  
+  .field-helper {
+    margin-top: 8px;
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--ink-mute);
+    line-height: 1.5;
+  }
+
+  /* Submit button at bottom of input block */
+  .input-block-submit-row {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .input-block-submit-info {
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    color: var(--ink-mute);
+    font-style: italic;
+    flex: 1;
+    min-width: 200px;
+  }
+  .submit-btn-find {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 16px 32px;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .submit-btn-find:hover { background: var(--rust-deep); }
+  .submit-btn-find:disabled {
+    background: var(--rule);
+    color: var(--ink-mute);
+    cursor: not-allowed;
+  }
+  
+  /* ============ STATE: PARSING ============ */
+  .state-parsing {
+    margin-top: 20px;
+    padding: 24px 28px;
+    background: white;
+    border: 1px dashed var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .parsing-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--amber);
+    border-radius: 50%;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+  }
+  
+  /* ============ STATE: FOUND ============ */
+  .state-found {
+    margin-top: 20px;
+    background: white;
+    border: 1px solid var(--sage-deep);
+    padding: 32px;
+    position: relative;
+  }
+  .state-found::before {
+    content: '✓ FOUND · MATCH CONFIRMED';
+    position: absolute;
+    top: -10px;
+    left: 24px;
+    background: var(--sage-deep);
+    color: var(--cream-light);
+    padding: 4px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+  }
+  .found-business-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 30px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .found-business-name-secondary {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-mute);
+    margin-bottom: 16px;
+  }
+  .found-confirmation-grid {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 12px 20px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .found-confirmation-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    font-weight: 600;
+    padding-top: 2px;
+  }
+  .found-confirmation-value {
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .found-confirmation-value-match {
+    color: var(--sage-deep);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    margin-left: 8px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .found-confirmation-value-mismatch {
+    color: var(--rust-deep);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    margin-left: 8px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  
+  .detection-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    padding-top: 20px;
+    margin-bottom: 24px;
+  }
+  .detection-item {
+    padding-right: 24px;
+    border-right: 1px solid var(--rule);
+  }
+  .detection-item:last-child { border-right: none; padding-left: 24px; padding-right: 0; }
+  .detection-item-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .detection-item-value {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px;
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .detection-item-override {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    color: var(--rust-deep);
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .found-action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .found-action-edit {
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+  }
+  .found-action-edit:hover { color: var(--rust-deep); }
+  .found-action-generate {
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 14px 28px;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+  .found-action-generate:hover { background: var(--rust-deep); }
+
+  /* ============ STATE: NOT FOUND ============ */
+  .state-not-found {
+    margin-top: 20px;
+    background: white;
+    border: 1px solid var(--rust);
+    padding: 32px;
+    position: relative;
+  }
+  .state-not-found::before {
+    content: '✕ NOT FOUND ON GOOGLE';
+    position: absolute;
+    top: -10px;
+    left: 24px;
+    background: var(--rust-deep);
+    color: var(--cream-light);
+    padding: 4px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+  }
+  .not-found-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    color: var(--ink);
+    margin-bottom: 14px;
+    line-height: 1.3;
+  }
+  .not-found-suggestions {
+    font-family: 'Instrument Serif', serif;
+    font-size: 16px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+  .not-found-suggestions ul {
+    margin-top: 10px;
+    margin-left: 24px;
+  }
+  .not-found-suggestions li {
+    margin-bottom: 8px;
+  }
+  .not-found-suggestions strong {
+    font-family: 'Archivo', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  /* ============ STATE: MULTIPLE MATCHES ============ */
+  .state-multiple {
+    margin-top: 20px;
+    background: white;
+    border: 1px solid var(--amber);
+    padding: 32px;
+    position: relative;
+  }
+  .state-multiple::before {
+    content: '⚠ MULTIPLE MATCHES · PICK ONE';
+    position: absolute;
+    top: -10px;
+    left: 24px;
+    background: var(--amber-deep);
+    color: var(--cream-light);
+    padding: 4px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+  }
+  .multiple-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .multiple-sub {
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px;
+    color: var(--ink-mute);
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+  .multiple-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--rule);
+  }
+  .multiple-option {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+  }
+  .multiple-option:last-child { border-bottom: none; }
+  .multiple-option:hover { background: var(--cream-deep); }
+  .multiple-option-radio {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--rule);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .multiple-option.selected .multiple-option-radio {
+    border-color: var(--ink);
+    background: radial-gradient(circle, var(--ink) 50%, transparent 50%);
+  }
+  .multiple-option-info { flex: 1; }
+  .multiple-option-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .multiple-option-address {
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+  .multiple-option-meta {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+  .multiple-option-website {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--rust-deep);
+    margin-top: 2px;
+    display: block;
+  }
+
+  /* ============ STATE: QUOTA EXCEEDED ============ */
+  .state-quota {
+    margin-top: 20px;
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 32px;
+    position: relative;
+  }
+  .state-quota::before {
+    content: 'QUOTA REACHED';
+    position: absolute;
+    top: -10px;
+    left: 24px;
+    background: var(--amber);
+    color: var(--ink);
+    padding: 4px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+  }
+  .quota-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    color: var(--cream-light);
+    margin-bottom: 14px;
+    line-height: 1.3;
+  }
+  .quota-headline em { color: var(--amber); font-style: italic; }
+  .quota-body {
+    font-family: 'Instrument Serif', serif;
+    font-size: 16px;
+    color: var(--cream);
+    line-height: 1.65;
+    margin-bottom: 24px;
+  }
+  .quota-cta-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .quota-cta {
+    padding: 12px 22px;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .quota-cta.primary {
+    background: var(--amber);
+    color: var(--ink);
+  }
+  .quota-cta.secondary {
+    background: transparent;
+    color: var(--cream-light);
+    border: 1px solid var(--ink-mute);
+  }
+
+  /* ============ TIPS PANEL ============ */
+  .tips-panel {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+  }
+  .tips-panel-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .tips-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .tip-item {
+    padding: 22px 24px 22px 0;
+    border-right: 1px solid var(--rule);
+  }
+  .tip-item:last-child { border-right: none; padding-left: 24px; padding-right: 0; }
+  .tip-item:not(:first-child):not(:last-child) { padding-left: 24px; }
+  .tip-title {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: 0.01em;
+  }
+  .tip-body {
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  /* ============ STATE DEMO LABELS ============ */
+  .state-demo-label {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--cream-light);
+    padding: 4px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    margin: 28px 0 0;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .demo-divider {
+    margin: 56px 0 16px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .demo-divider::before, .demo-divider::after {
+    content: '· · ·';
+    margin: 0 16px;
+  }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 720px) {
+    .intake-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .intake-quota-display { text-align: left; }
+    .intake-title { font-size: 32px; }
+    .input-block { padding: 28px 20px; }
+    .input-headline { font-size: 22px; }
+    .field-input { font-size: 16px; padding: 13px 14px; }
+    .field-input-row { flex-direction: column; gap: 8px; }
+    .field-input-row .field-input { border-right: 1px solid var(--rule); }
+    .verify-button { width: 100%; justify-content: center; padding: 13px; }
+    .detection-row { grid-template-columns: 1fr; }
+    .detection-item { border-right: none; padding-left: 0; padding-right: 0; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+    .detection-item:last-child { border-bottom: none; padding-top: 14px; padding-bottom: 0; }
+    .input-block-submit-row { flex-direction: column; align-items: stretch; }
+    .submit-btn-find { width: 100%; }
+    .found-action-row { flex-direction: column; align-items: stretch; }
+    .found-action-generate { width: 100%; }
+    .tips-grid { grid-template-columns: 1fr; }
+    .tip-item { border-right: none; border-bottom: 1px solid var(--rule); padding: 20px 0; }
+    .tip-item:last-child { border-bottom: none; padding-left: 0; }
+    .nav-links .nav-link:not(.active) { display: none; }
+    .found-confirmation-grid { grid-template-columns: 1fr; gap: 4px 0; }
+    .found-confirmation-label { padding-top: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="nav-brand-mark">BAAM · REVIEW</span>
+      <span class="nav-brand-sub">the reputation audit</span>
+    </div>
+    <div class="nav-links">
+      <a href="/audits" class="nav-link active">Audits</a>
+      <a href="/account" class="nav-link">Account</a>
+      <div class="nav-user">
+        <span>john@example.com</span>
+        <a href="/logout" class="nav-link">Log out</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ INTAKE PAGE ============ -->
+<div class="intake-page">
+  <div class="intake-inner">
+    
+    <div class="intake-header">
+      <div class="intake-header-left">
+        <div class="intake-eyebrow">Start a new audit</div>
+        <h1 class="intake-title">Which business should we <em>audit</em>?</h1>
+      </div>
+      <div class="intake-quota-display">
+        <div><span class="intake-quota-display-strong">1 of 2</span> monthly audits used</div>
+        <div style="margin-top: 4px;">resets June 1, 2026</div>
+      </div>
+    </div>
+    
+    <!-- ============ THREE-FIELD INPUT BLOCK ============ -->
+    <div class="input-block">
+      <div class="input-label">Business identification</div>
+      <h2 class="input-headline">Three details. We use them to find your <em>exact business</em> on Google.</h2>
+      <p class="input-sub">Verify each field before submitting — the buttons let you confirm your input is correct in a new tab.</p>
+      
+      <!-- FIELD 1: Business Name -->
+      <div class="field-row">
+        <label class="field-label" for="business-name">
+          Business name
+          <span class="field-required">· required</span>
+        </label>
+        <input
+          type="text"
+          class="field-input"
+          id="business-name"
+          placeholder="e.g., Modern TCM Center"
+          autocomplete="organization"
+          autofocus
+        >
+        <div class="field-helper">Exact name as it appears on Google. Capitalization and punctuation matter.</div>
+      </div>
+      
+      <!-- FIELD 2: Business Address (with Google Maps verify) -->
+      <div class="field-row">
+        <label class="field-label" for="business-address">
+          Business address
+          <span class="field-required">· required</span>
+        </label>
+        <div class="field-input-row">
+          <input
+            type="text"
+            class="field-input"
+            id="business-address"
+            placeholder="e.g., 136-40 39th Avenue, Flushing NY 11354"
+            autocomplete="street-address"
+          >
+          <button type="button" class="verify-button" onclick="verifyAddress()">
+            View on Google Maps
+            <span class="verify-button-arrow">↗</span>
+          </button>
+        </div>
+        <div class="field-helper">Full street address including city, state, and zip. Click the button to open Google Maps in a new tab and confirm we've got the right place.</div>
+      </div>
+      
+      <!-- FIELD 3: Website (with open in new tab button) -->
+      <div class="field-row">
+        <label class="field-label" for="business-website">
+          Website
+          <span class="field-optional">· recommended</span>
+        </label>
+        <div class="field-input-row">
+          <input
+            type="text"
+            class="field-input"
+            id="business-website"
+            placeholder="e.g., modtcmcenter.com"
+            autocomplete="url"
+          >
+          <button type="button" class="verify-button" onclick="verifyWebsite()">
+            Open website
+            <span class="verify-button-arrow">↗</span>
+          </button>
+        </div>
+        <div class="field-helper">Helps us confirm we matched the right business. Skip if your business has no website — we'll match on name + address only.</div>
+      </div>
+      
+      <!-- Submit -->
+      <div class="input-block-submit-row">
+        <div class="input-block-submit-info">After we find your business, you'll confirm the match before the audit starts.</div>
+        <button type="button" class="submit-btn-find" onclick="submitFind()">Find my business →</button>
+      </div>
+    </div>
+
+    <!-- ============ STATE DEMOS FOR CLAUDE CODE REFERENCE ============ -->
+    
+    <!-- STATE: PARSING -->
+    <div class="state-demo-label">↓ STATE · PARSING</div>
+    <div class="state-parsing">
+      <span class="parsing-dot"></span>
+      <span>Matching your business on Google Maps...</span>
+    </div>
+
+    <!-- STATE: FOUND WITH FIELD-BY-FIELD CONFIRMATION -->
+    <div class="state-demo-label">↓ STATE · FOUND</div>
+    <div class="state-found">
+      <h3 class="found-business-name">Modern TCM Center</h3>
+      <div class="found-business-name-secondary">現代中醫中心</div>
+      
+      <!-- Field-by-field match confirmation -->
+      <div class="found-confirmation-grid">
+        <div class="found-confirmation-label">Name match</div>
+        <div class="found-confirmation-value">Modern TCM Center<span class="found-confirmation-value-match">✓ exact match</span></div>
+        
+        <div class="found-confirmation-label">Address match</div>
+        <div class="found-confirmation-value">136-40 39th Ave, Flushing NY 11354<span class="found-confirmation-value-match">✓ matches Google</span></div>
+        
+        <div class="found-confirmation-label">Website match</div>
+        <div class="found-confirmation-value">modtcmcenter.com<span class="found-confirmation-value-match">✓ matches Google</span></div>
+        
+        <div class="found-confirmation-label">Google rating</div>
+        <div class="found-confirmation-value">★ 4.4 · 47 reviews · last review 22 days ago</div>
+      </div>
+      
+      <!-- Auto-detected fields user can override -->
+      <div class="detection-row">
+        <div class="detection-item">
+          <div class="detection-item-label">Detected vertical</div>
+          <div class="detection-item-value">TCM / Acupuncture clinic</div>
+          <a href="#" class="detection-item-override">change vertical →</a>
+        </div>
+        <div class="detection-item">
+          <div class="detection-item-label">Detected language</div>
+          <div class="detection-item-value">Bilingual EN + 中文 · auto-bilingual audit</div>
+          <a href="#" class="detection-item-override">change language →</a>
+        </div>
+      </div>
+      
+      <!-- Confirm and generate -->
+      <div class="found-action-row">
+        <a href="#" class="found-action-edit">← Not the right business? Edit your details</a>
+        <button class="found-action-generate">Generate audit →</button>
+      </div>
+    </div>
+
+    <!-- DIVIDER FOR DEMO -->
+    <div class="demo-divider">other possible states</div>
+
+    <!-- STATE: FOUND WITH WEBSITE MISMATCH (partial match) -->
+    <div class="state-demo-label">↓ STATE · FOUND WITH MISMATCH WARNING</div>
+    <div class="state-found" style="border-color: var(--amber-deep);">
+      <h3 class="found-business-name">Modern TCM Center</h3>
+      
+      <div class="found-confirmation-grid">
+        <div class="found-confirmation-label">Name match</div>
+        <div class="found-confirmation-value">Modern TCM Center<span class="found-confirmation-value-match">✓ exact match</span></div>
+        
+        <div class="found-confirmation-label">Address match</div>
+        <div class="found-confirmation-value">136-40 39th Ave, Flushing NY 11354<span class="found-confirmation-value-match">✓ matches Google</span></div>
+        
+        <div class="found-confirmation-label">Website match</div>
+        <div class="found-confirmation-value" style="color: var(--rust-deep);">No website on Google profile<span class="found-confirmation-value-mismatch">⚠ you entered modtcmcenter.com</span></div>
+        
+        <div class="found-confirmation-label">Google rating</div>
+        <div class="found-confirmation-value">★ 4.4 · 47 reviews · last review 22 days ago</div>
+      </div>
+      
+      <div style="background: var(--cream-deep); padding: 16px 20px; margin-bottom: 24px; font-family: 'Instrument Serif', serif; font-size: 15px; font-style: italic; color: var(--ink-soft); line-height: 1.55;">
+        ⚠ The website you provided doesn't appear on this Google listing. This may still be the right business — Google profiles often have missing fields. Confirm before proceeding.
+      </div>
+      
+      <div class="found-action-row">
+        <a href="#" class="found-action-edit">← Edit your details</a>
+        <button class="found-action-generate">Yes, this is my business · generate audit →</button>
+      </div>
+    </div>
+
+    <!-- STATE: NOT FOUND -->
+    <div class="state-demo-label">↓ STATE · NOT FOUND</div>
+    <div class="state-not-found">
+      <h3 class="not-found-headline">We couldn't find a business on Google matching all three fields.</h3>
+      <div class="not-found-suggestions">
+        Common causes:
+        <ul>
+          <li><strong>Business name doesn't match Google exactly.</strong> Check capitalization, punctuation, and word order. The name on Google takes precedence.</li>
+          <li><strong>Address is incomplete or imprecise.</strong> Use the full street address from your Google listing — include city, state, and zip.</li>
+          <li><strong>Website is from a different business.</strong> If you entered a website that doesn't belong to this business, leave it blank.</li>
+          <li><strong>Business isn't on Google at all.</strong> If your business has never been claimed on Google Business Profile, we can't audit it yet. Create your listing first.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- STATE: MULTIPLE MATCHES -->
+    <div class="state-demo-label">↓ STATE · MULTIPLE MATCHES</div>
+    <div class="state-multiple">
+      <h3 class="multiple-headline">We found several businesses that could match.</h3>
+      <p class="multiple-sub">Pick the right one — we'll use Google data from that exact profile.</p>
+      <div class="multiple-options">
+        <div class="multiple-option selected">
+          <div class="multiple-option-radio"></div>
+          <div class="multiple-option-info">
+            <div class="multiple-option-name">Modern TCM Center</div>
+            <div class="multiple-option-address">136-40 39th Ave, Flushing NY 11354</div>
+            <span class="multiple-option-website">modtcmcenter.com</span>
+          </div>
+          <div class="multiple-option-meta">★ 4.4 · 47 reviews</div>
+        </div>
+        <div class="multiple-option">
+          <div class="multiple-option-radio"></div>
+          <div class="multiple-option-info">
+            <div class="multiple-option-name">Modern TCM Acupuncture</div>
+            <div class="multiple-option-address">42-09 Main St, Flushing NY 11355</div>
+            <span class="multiple-option-website">no website on listing</span>
+          </div>
+          <div class="multiple-option-meta">★ 4.7 · 22 reviews</div>
+        </div>
+        <div class="multiple-option">
+          <div class="multiple-option-radio"></div>
+          <div class="multiple-option-info">
+            <div class="multiple-option-name">Modern TCM Center NYC</div>
+            <div class="multiple-option-address">125 Lafayette St, New York NY 10013</div>
+            <span class="multiple-option-website">moderntcmnyc.com</span>
+          </div>
+          <div class="multiple-option-meta">★ 4.5 · 89 reviews</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATE: QUOTA EXCEEDED -->
+    <div class="state-demo-label">↓ STATE · QUOTA EXCEEDED</div>
+    <div class="state-quota">
+      <h3 class="quota-headline">You've used <em>2 of 2</em> monthly audits.</h3>
+      <p class="quota-body">Your quota refills on June 1, 2026. If you need more audits before then — managing multiple locations, evaluating clients for an agency, or auditing competitors — BAAM Review service includes unlimited audits.</p>
+      <div class="quota-cta-row">
+        <a href="https://baamreview.com" class="quota-cta primary">Learn about BAAM Review service →</a>
+        <a href="mailto:hello@baamreview.com" class="quota-cta secondary">Email us for more</a>
+      </div>
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips-panel">
+      <div class="tips-panel-eyebrow">Tips for an accurate match</div>
+      <div class="tips-grid">
+        <div class="tip-item">
+          <div class="tip-title">Verify your address with the button</div>
+          <div class="tip-body">Before clicking "Find my business," use the Google Maps button to confirm the address you entered points to your actual location. Typos in addresses are the #1 cause of match failures.</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-title">Match the name on Google exactly</div>
+          <div class="tip-body">If your Google listing says "Wei Lin Acupuncture, P.C." don't enter just "Wei Lin." Open your Google listing in a separate tab and copy the name exactly.</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-title">Website mismatch ≠ wrong business</div>
+          <div class="tip-body">Many Google listings have missing website fields. If we find a match by name and address but no website link, we'll flag it as a warning — you can still proceed.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ JS FOR VERIFY BUTTONS ============ -->
+<script>
+  function verifyAddress() {
+    const input = document.getElementById('business-address');
+    const address = input.value.trim();
+    if (!address) {
+      input.focus();
+      const originalBorder = input.style.borderColor;
+      input.style.borderColor = '#A4452A';
+      setTimeout(() => { input.style.borderColor = originalBorder; }, 1500);
+      return;
+    }
+    const encodedAddress = encodeURIComponent(address);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener');
+  }
+
+  function verifyWebsite() {
+    const input = document.getElementById('business-website');
+    let website = input.value.trim();
+    if (!website) {
+      input.focus();
+      const originalBorder = input.style.borderColor;
+      input.style.borderColor = '#A4452A';
+      setTimeout(() => { input.style.borderColor = originalBorder; }, 1500);
+      return;
+    }
+    // Add https:// if no protocol present
+    if (!website.match(/^https?:\/\//i)) {
+      website = 'https://' + website;
+    }
+    window.open(website, '_blank', 'noopener');
+  }
+
+  function submitFind() {
+    const name = document.getElementById('business-name').value.trim();
+    const address = document.getElementById('business-address').value.trim();
+    // const website = document.getElementById('business-website').value.trim();  // optional
+    
+    if (!name || !address) {
+      alert('Business name and address are required.');
+      return;
+    }
+    
+    // In production: POST to /api/business/lookup with { name, address, website }
+    // For demo: just scroll to the found state
+    document.querySelector('.state-found').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+</script>
+
+</body>
+</html>

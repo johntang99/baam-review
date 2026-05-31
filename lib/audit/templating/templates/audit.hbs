@@ -150,12 +150,31 @@
         <td><div class="last-review{{#if snapshot_google.last_review_is_stale}} stale{{/if}}">{{snapshot_google.last_review_label}}</div></td>
         <td><div class="health-dot {{snapshot_google.health_class}}">{{snapshot_google.health_label}}</div></td>
       </tr>
+      {{#if snapshot_yelp}}
+      <tr>
+        <td>
+          <div class="platform-name">
+            <div class="platform-icon">{{snapshot_yelp.icon}}</div>
+            <div>
+              <div class="platform-meta-strong">{{snapshot_yelp.name}}</div>
+              <div class="platform-meta-sub">{{snapshot_yelp.meta_sub}}</div>
+            </div>
+          </div>
+        </td>
+        <td><div class="star-rating">{{{snapshot_yelp.rating_stars_html}}} <span class="mono" style="font-size:15px;">{{snapshot_yelp.rating_value}}</span></div></td>
+        <td><div class="review-count">{{snapshot_yelp.review_count}}</div></td>
+        <td><div class="last-review{{#if snapshot_yelp.last_review_is_stale}} stale{{/if}}">{{snapshot_yelp.last_review_label}}</div></td>
+        <td><div class="health-dot {{snapshot_yelp.health_class}}">{{snapshot_yelp.health_label}}</div></td>
+      </tr>
+      {{/if}}
       {{#unless is_paid}}
+      {{#unless snapshot_yelp}}
       <tr>
         <td colspan="5" style="padding: 24px 0; color: var(--ink-mute); font-style: italic; text-align: center;">
           {{t.paid_only_row}}
         </td>
       </tr>
+      {{/unless}}
       {{/unless}}
     </tbody>
   </table>
