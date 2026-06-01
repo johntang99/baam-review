@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 const STAGES = [
   "Located your business on Google",
-  "Identified your 5 local competitors",
+  "Identified your 7 local competitors",
   "Calculated your BAAM Review Score",
   "Projected your 6-month trajectory",
   "Generated your PDF report",

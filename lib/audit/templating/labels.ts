@@ -505,7 +505,7 @@ export const STRINGS: Record<
     upgrade_cta_headline_html: "You've seen <em>where you stand.</em><br>Now see what it costs — and what to do.",
     upgrade_cta_items: [
       "<strong>Section 4 · Industry Benchmarks</strong> — your vertical's per-review dollar value, healthy velocity bands, what \"top 25%\" actually looks like.",
-      "<strong>Section 5 · Competitor Comparison</strong> — your 5 closest competitors, side-by-side, with the gap quantified.",
+      "<strong>Section 5 · Competitor Comparison</strong> — your 7 closest competitors, side-by-side, with the gap quantified.",
       "<strong>Section 6 · 12-Month Action Plan</strong> — five concrete moves, ranked by impact, with the dollar value of each.",
       "<strong>Sections 1–3 · Multi-platform extension</strong> — Yelp, Facebook, Zocdoc, Healthgrades scoring blended in.",
       "<strong>Section 7 · Appendix</strong> — the full reference tables.",
@@ -613,7 +613,7 @@ export const STRINGS: Record<
     upgrade_cta_headline_html: "您已看見<em>自己目前的位置</em>。<br>付費版本告訴您損失多少 · 該怎麼做。",
     upgrade_cta_items: [
       "<strong>第 4 章 · 行業基準</strong> — 您行業每則評論的美元價值、健康速率帶、「前 25%」實際的樣貌。",
-      "<strong>第 5 章 · 競爭對手比較</strong> — 您最近的 5 位競爭對手並排展示，量化差距。",
+      "<strong>第 5 章 · 競爭對手比較</strong> — 您最近的 7 位競爭對手並排展示，量化差距。",
       "<strong>第 6 章 · 12 個月行動計劃</strong> — 五項具體行動，按影響排序，每項都有明確的美元價值。",
       "<strong>第 1–3 章 · 多平台擴展</strong> — Yelp、Facebook、Zocdoc、Healthgrades 評分一併納入。",
       "<strong>第 7 章 · 附錄</strong> — 完整的參考數據表。",

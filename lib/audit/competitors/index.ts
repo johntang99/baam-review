@@ -26,7 +26,7 @@ export type {
   GetCompetitorsOptions,
 } from "./types";
 
-const DEFAULT_COMPETITOR_COUNT = 5;
+const DEFAULT_COMPETITOR_COUNT = 7;
 const MIN_REVIEWS_FOR_COMPETITOR = 10;
 const PLACE_DETAILS_COST_PER_CALL = 0.025;
 
