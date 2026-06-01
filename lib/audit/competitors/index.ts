@@ -101,9 +101,14 @@ async function fetchCompetitorsInParallel(
 
   const results = await Promise.allSettled(
     candidates.map(async (candidate, idx) => {
+      // Competitors honor the parent tier. Free tier returns 5 reviews
+      // in Google's non-chronological "relevance" order, which makes
+      // reviews_30d unreliable (typically reads 0 even for active
+      // businesses). Paid tier uses Outscraper's full chronological
+      // history → accurate velocity numbers for the comparison table.
       const data = await getGoogleBusinessData(
         { placeId: candidate.id },
-        "free",
+        tier,
       );
 
       const distance_miles =

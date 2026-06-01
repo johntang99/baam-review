@@ -344,10 +344,11 @@ function buildYelpPlatformRow(
 function renderStarsHtml(rating: number): string {
   const full = Math.floor(rating);
   const hasHalf = rating - full >= 0.5;
-  const stars = "★".repeat(full);
-  const half = hasHalf ? "★" : "☆";
-  const empty = "☆".repeat(Math.max(0, 5 - full - (hasHalf ? 1 : 0)));
-  return `<span class="stars">${stars}</span>${half}${empty}`;
+  const halfStar = hasHalf ? "★" : "";
+  const emptyCount = Math.max(0, 5 - full - (hasHalf ? 1 : 0));
+  const filled = "★".repeat(full);
+  const empty = "☆".repeat(emptyCount);
+  return `<span class="stars">${filled}</span>${halfStar}${empty}`;
 }
 
 function formatLastReview(daysAgo: number | null, language: AuditLanguage): string {
