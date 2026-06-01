@@ -1,39 +1,42 @@
+import {
+  URBAN_3DIGIT_PREFIXES,
+  URBAN_5DIGIT_OVERRIDES,
+  RURAL_3DIGIT_PREFIXES,
+} from "./zip-density-data";
+
 type Density = "urban" | "suburban" | "rural";
 
 const RADIUS_BY_DENSITY: Record<Density, number> = {
-  urban: 1.5,
+  urban: 3.0,
   suburban: 5.0,
   rural: 15.0,
 };
 
-const NYC_METRO_ZIP_PREFIXES_URBAN = [
-  "100", "101", "102",
-  "104",
-  "110", "111", "112", "113", "114",
-  "11354", "11355", "11356", "11357", "11358", "11361", "11362", "11363", "11364", "11365", "11366", "11367", "11368",
-  "11373", "11375", "11377",
-];
+// Destination retail / specialty services where customers travel further
+// than daily-need businesses. NYC brides cross Manhattan for the right
+// dress; a 1.5-mi urban radius misses Kleinfeld/Lovely Bride/Tribeca.
+const DESTINATION_KEYWORD_PATTERN =
+  /\b(bridal|wedding|gown|tuxedo|menswear|jewelry|jeweler|diamond|atelier|couture|luxury|gallery|antique|orthodontist|dermatolog|cosmetic surgeon|plastic surgeon|fertility|ivf|immigration|asylum|estate|hotel)\b/i;
 
-const NYC_METRO_ZIP_PREFIXES_SUBURBAN = [
-  "115", "116", "117", "118", "119",
-  "070", "071", "072", "073", "074", "075", "076", "077",
-];
+const DESTINATION_MULTIPLIER = 2.5;
 
-export function resolveSearchRadiusMiles(zip: string): number {
-  return RADIUS_BY_DENSITY[inferDensity(zip)];
+export function resolveSearchRadiusMiles(zip: string, keyword?: string): number {
+  const base = RADIUS_BY_DENSITY[inferDensity(zip)];
+  if (keyword && DESTINATION_KEYWORD_PATTERN.test(keyword)) {
+    return base * DESTINATION_MULTIPLIER;
+  }
+  return base;
 }
 
 function inferDensity(zip: string): Density {
   const z = zip.trim();
   if (!z) return "suburban";
 
-  for (const prefix of NYC_METRO_ZIP_PREFIXES_URBAN) {
-    if (z === prefix || z.startsWith(prefix)) return "urban";
-  }
+  if (URBAN_5DIGIT_OVERRIDES.has(z)) return "urban";
 
-  for (const prefix of NYC_METRO_ZIP_PREFIXES_SUBURBAN) {
-    if (z.startsWith(prefix)) return "suburban";
-  }
+  const prefix3 = z.substring(0, 3);
+  if (URBAN_3DIGIT_PREFIXES.has(prefix3)) return "urban";
+  if (RURAL_3DIGIT_PREFIXES.has(prefix3)) return "rural";
 
   return "suburban";
 }

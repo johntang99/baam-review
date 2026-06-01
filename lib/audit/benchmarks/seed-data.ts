@@ -12,9 +12,9 @@ const EFFECTIVE_FROM = "2026-05-01T00:00:00Z";
 
 const STANDARD_WEIGHTS = {
   rating_quality: 0.25,
-  review_volume: 0.2,
+  review_volume: 0.25,
   velocity_30d: 0.25,
-  velocity_180d: 0.2,
+  velocity_180d: 0.15,
   velocity_365d: 0.1,
 } as const;
 

@@ -15,6 +15,7 @@ export const AuditCompetitorsDataSchema = z.object({
   competitors: z.array(AuditCompetitorSchema),
   search_metadata: z.object({
     primary_keyword: z.string(),
+    keyword_variants: z.array(z.string()).optional(),
     radius_used_miles: z.number(),
     total_candidates_found: z.number().int().min(0),
     candidates_excluded: z.number().int().min(0),

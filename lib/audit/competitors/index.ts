@@ -7,7 +7,7 @@ import {
 import { getAuditGoogleConfig } from "../google/config";
 import { aggregateCompetitorStats } from "./aggregator";
 import { filterCandidates } from "./competitor-filter";
-import { resolvePrimaryKeyword } from "./keyword-resolver";
+import { resolvePrimaryKeywords } from "./keyword-resolver";
 import { resolveSearchRadiusMiles } from "./radius-resolver";
 import {
   haversineMiles,
@@ -37,9 +37,11 @@ export async function getCompetitorsData(
 ): Promise<AuditCompetitorsData> {
   const config = getAuditGoogleConfig();
 
-  const primary_keyword = resolvePrimaryKeyword(primary, options.service_override);
+  const keyword_variants = resolvePrimaryKeywords(primary, options.service_override);
+  const primary_keyword = keyword_variants[0];
   const radius_used_miles =
-    options.radius_miles ?? resolveSearchRadiusMiles(primary.business.zip);
+    options.radius_miles ??
+    resolveSearchRadiusMiles(primary.business.zip, primary_keyword);
 
   if (primary.business.lat == null || primary.business.lng == null) {
     throw new Error(
@@ -47,14 +49,29 @@ export async function getCompetitorsData(
     );
   }
 
-  const rawCandidates = await searchNearbyByKeyword({
-    keyword: primary_keyword,
-    centerLat: primary.business.lat,
-    centerLng: primary.business.lng,
-    radiusMiles: radius_used_miles,
-    maxResults: 20,
-    apiKey: config.googlePlacesApiKey,
-  });
+  // Multi-pass search: run each keyword variant in parallel, then merge by
+  // place_id. Catches famous competitors that rank under one synonym but
+  // not another (e.g. Kleinfeld appears for "wedding dress shop" but not
+  // "bridal boutique").
+  const variantResults = await Promise.all(
+    keyword_variants.map((kw) =>
+      searchNearbyByKeyword({
+        keyword: kw,
+        centerLat: primary.business.lat!,
+        centerLng: primary.business.lng!,
+        radiusMiles: radius_used_miles,
+        maxResults: 20,
+        apiKey: config.googlePlacesApiKey,
+      }),
+    ),
+  );
+  const mergedById = new Map<string, (typeof variantResults)[number][number]>();
+  for (const results of variantResults) {
+    for (const place of results) {
+      if (!mergedById.has(place.id)) mergedById.set(place.id, place);
+    }
+  }
+  const rawCandidates = Array.from(mergedById.values());
 
   const { kept, excludedCount } = filterCandidates(rawCandidates, {
     primaryPlaceId: primary.business.place_id,
@@ -62,8 +79,15 @@ export async function getCompetitorsData(
     minReviews: MIN_REVIEWS_FOR_COMPETITOR,
   });
 
+  // Sort by review count descending — favor famous/established competitors
+  // over near-but-tiny ones. These are the names "customers see before
+  // yours" so brand recognition > proximity.
+  const sortedKept = [...kept].sort(
+    (a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0),
+  );
+
   const wanted = options.count ?? DEFAULT_COMPETITOR_COUNT;
-  const topCandidates = kept.slice(0, wanted);
+  const topCandidates = sortedKept.slice(0, wanted);
 
   const competitors = await fetchCompetitorsInParallel(
     primary,
@@ -76,6 +100,7 @@ export async function getCompetitorsData(
     competitors,
     search_metadata: {
       primary_keyword,
+      keyword_variants,
       radius_used_miles,
       total_candidates_found: rawCandidates.length,
       candidates_excluded: excludedCount,
@@ -84,9 +109,10 @@ export async function getCompetitorsData(
     meta: {
       fetched_at: new Date().toISOString(),
       tier,
-      total_api_calls: 1 + competitors.length,
+      total_api_calls: keyword_variants.length + competitors.length,
       estimated_cost_usd:
-        PLACE_DETAILS_COST_PER_CALL * (1 + competitors.length),
+        PLACE_DETAILS_COST_PER_CALL *
+        (keyword_variants.length + competitors.length),
     },
   };
 }
