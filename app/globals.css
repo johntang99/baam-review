@@ -44,3 +44,291 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
+
+/* =================================================================
+   AUDIT TOP NAV — shared across /audit, /audits, /audit/new,
+   /audit/[id]. Lives in this file (not Tailwind utilities) because
+   it's a chunky reusable block with several variants per element
+   (active, secondary, user-chip). See [components/audit/audit-top-nav.tsx].
+   ================================================================= */
+.audit-nav {
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-border-base);
+  height: 64px;
+}
+
+.audit-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .audit-nav-inner { padding: 0 32px; }
+}
+
+.audit-nav-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+}
+.audit-nav-brand-mark {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--color-ink);
+}
+.audit-nav-brand-sub {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  display: none;
+}
+@media (min-width: 720px) {
+  .audit-nav-brand-sub { display: inline; }
+}
+
+.audit-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.audit-nav-link {
+  text-decoration: none;
+  color: var(--color-text-soft);
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: background 120ms, color 120ms;
+  white-space: nowrap;
+}
+.audit-nav-link:hover {
+  background: var(--color-hover);
+  color: var(--color-ink);
+}
+.audit-nav-link.active {
+  color: var(--color-ink);
+  background: var(--color-cream-deep);
+}
+
+.audit-nav-link-secondary {
+  color: var(--color-text-muted);
+  font-size: 12.5px;
+  border-left: 1px solid var(--color-border-soft);
+  margin-left: 4px;
+  padding: 8px 14px 8px 18px;
+  text-decoration: none;
+  border-radius: 0 6px 6px 0;
+  transition: background 120ms, color 120ms;
+  white-space: nowrap;
+}
+.audit-nav-link-secondary::before {
+  content: '↗';
+  margin-right: 4px;
+  font-size: 11px;
+  opacity: 0.6;
+}
+.audit-nav-link-secondary:hover {
+  background: var(--color-hover);
+  color: var(--color-ink);
+}
+
+.audit-nav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 14px;
+  margin-left: 4px;
+  border-left: 1px solid var(--color-border-soft);
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}
+.audit-nav-user-email {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-soft);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.audit-nav-logout {
+  text-decoration: none;
+  color: var(--color-text-muted);
+  font-size: 12.5px;
+  padding: 6px 10px;
+  border-radius: 5px;
+  transition: background 120ms, color 120ms;
+}
+.audit-nav-logout:hover {
+  color: var(--color-alert);
+  background: rgba(181, 68, 58, 0.06);
+}
+
+.audit-nav-cta {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  background: var(--color-forest);
+  color: var(--color-cream);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 10px 18px;
+  border-radius: 6px;
+  margin-left: 6px;
+  transition: background 120ms;
+}
+.audit-nav-cta:hover { background: var(--color-forest-dark); }
+
+/* Mobile: collapse some labels at narrow widths */
+@media (max-width: 720px) {
+  .audit-nav { height: 56px; }
+  .audit-nav-inner { padding: 0 12px; gap: 12px; }
+  .audit-nav-link { padding: 6px 10px; font-size: 12.5px; }
+  .audit-nav-user-email { display: none; }
+  .audit-nav-link-secondary { display: none; }
+}
+
+/* =================================================================
+   AUDIT RESULT SUB-BAR — sits under the primary nav on /audit/[id]
+   ================================================================= */
+.audit-subbar {
+  background: var(--color-cream);
+  border-bottom: 1px solid var(--color-border-soft);
+  min-height: 52px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.audit-subbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 52px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+  .audit-subbar-inner { padding: 0 32px; }
+}
+
+.audit-subbar-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  flex: 1;
+}
+.audit-subbar-back {
+  text-decoration: none;
+  color: var(--color-text-soft);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  transition: background 120ms, color 120ms;
+}
+.audit-subbar-back:hover {
+  background: var(--color-hover);
+  color: var(--color-ink);
+}
+
+.audit-subbar-context {
+  border-left: 1px solid var(--color-border-soft);
+  padding-left: 18px;
+  min-width: 0;
+}
+.audit-subbar-business {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.audit-subbar-meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.audit-subbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.audit-subbar-lang-toggle {
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding: 6px 10px;
+  border-radius: 5px;
+  transition: background 120ms, color 120ms;
+}
+.audit-subbar-lang-toggle:hover {
+  background: var(--color-hover);
+  color: var(--color-ink);
+}
+
+.audit-subbar-pdf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  background: var(--color-paper);
+  border: 1px solid var(--color-border-base);
+  color: var(--color-text);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 12px;
+  border-radius: 5px;
+  transition: background 120ms;
+}
+.audit-subbar-pdf-btn:hover { background: var(--color-hover); }
+
+.audit-subbar-new-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  background: var(--color-forest);
+  color: var(--color-cream);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 5px;
+  transition: background 120ms;
+}
+.audit-subbar-new-btn:hover { background: var(--color-forest-dark); }
+
+@media (max-width: 720px) {
+  .audit-subbar-inner { padding: 8px 12px; gap: 8px; }
+  .audit-subbar-context { display: none; }
+  .audit-subbar-pdf-btn { padding: 6px 8px; font-size: 11.5px; }
+}

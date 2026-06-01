@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { Download } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
+import { AuditTopNav } from "@/components/audit/audit-top-nav";
+import { AuditResultSubBar } from "@/components/audit/audit-result-subbar";
 import { AuditEmbed } from "./audit-embed";
 
 export const metadata = { title: "Your audit — BAAM Review Audit" };
@@ -18,9 +17,18 @@ interface AuditRow {
   pdf_urls: Record<string, string>;
   generated_at: string;
   google_data: {
-    business: { name: string; formatted_address: string };
+    business: {
+      name: string;
+      formatted_address: string;
+      city: string;
+      state: string;
+    };
     language: { is_chinese_business: boolean };
   };
+}
+
+function shortAuditId(id: string): string {
+  return `BR-${id.slice(0, 4)}-${id.slice(4, 8)}`.toUpperCase();
 }
 
 export default async function AuditResultPage(props: {
@@ -48,58 +56,22 @@ export default async function AuditResultPage(props: {
   if (error || !data) notFound();
 
   const business = data.google_data.business;
-  const enUrl = data.pdf_urls.en;
-  const zhUrl = data.pdf_urls.zh;
-  const hasBilingual = !!enUrl && !!zhUrl;
-  const otherLang = lang === "en" ? "zh" : "en";
 
   return (
     <main className="min-h-screen bg-cream">
-      <header className="sticky top-0 z-10 border-b border-border-base bg-paper/95 backdrop-blur">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center gap-4">
-          <Link href="/audits" className="text-text-soft hover:text-text text-sm shrink-0">
-            ← My audits
-          </Link>
-
-          <div className="hidden md:block flex-1 min-w-0">
-            <div className="text-sm font-medium text-text truncate">{business.name}</div>
-            <div className="text-[11px] text-text-muted truncate">
-              {business.formatted_address} · score {data.total_score}/{data.grade}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 ml-auto">
-            {hasBilingual && (
-              <Link
-                href={`/audit/${id}?lang=${otherLang}`}
-                className="text-xs uppercase tracking-wider text-text-soft hover:text-text px-2 py-1"
-              >
-                {otherLang === "zh" ? "中文" : "EN"}
-              </Link>
-            )}
-            {enUrl && (
-              <a href={enUrl} target="_blank" rel="noopener noreferrer">
-                <Button variant="secondary" size="sm">
-                  <Download className="h-3.5 w-3.5" />
-                  EN PDF
-                </Button>
-              </a>
-            )}
-            {zhUrl && (
-              <a href={zhUrl} target="_blank" rel="noopener noreferrer">
-                <Button variant="secondary" size="sm">
-                  <Download className="h-3.5 w-3.5" />
-                  中文 PDF
-                </Button>
-              </a>
-            )}
-            <Link href="/audit/new">
-              <Button variant="primary" size="sm">New audit</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
+      <AuditTopNav />
+      <AuditResultSubBar
+        audit_id={data.id}
+        business_name={business.name}
+        short_id={shortAuditId(data.id)}
+        city={business.city}
+        state={business.state}
+        score={data.total_score}
+        grade={data.grade}
+        pdf_urls={data.pdf_urls}
+        languages_rendered={data.languages_rendered}
+        current_language={lang}
+      />
       <AuditEmbed src={`/audit/${id}/embed?lang=${lang}`} />
     </main>
   );

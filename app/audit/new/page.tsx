@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { canUserAudit } from "@/lib/audit/quotas";
+import { AuditTopNav } from "@/components/audit/audit-top-nav";
 import { IntakeForm } from "./intake-form";
 
 export const metadata = { title: "Start a new audit · BAAM Review" };
@@ -40,28 +40,11 @@ export default async function NewAuditPage(props: {
     year: "numeric",
   });
 
-  const userEmail = authData.user.email ?? "";
-
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
-      <nav className="nav">
-        <div className="nav-inner">
-          <div className="nav-brand">
-            <span className="nav-brand-mark">BAAM · REVIEW</span>
-            <span className="nav-brand-sub">the reputation audit</span>
-          </div>
-          <div className="nav-links">
-            <Link href="/audits" className="nav-link active">Audits</Link>
-            <Link href="/app/profile" className="nav-link">Account</Link>
-            <div className="nav-user">
-              <span>{userEmail}</span>
-              <Link href="/logout" className="nav-link">Log out</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <AuditTopNav active="audit-new" />
 
       <div className="intake-page">
         <div className="intake-inner">

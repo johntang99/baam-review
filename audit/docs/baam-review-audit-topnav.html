@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAAM · Review Audit · Unified top nav · Design prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* Tokens lifted from app/globals.css so this prototype matches the
+     real app's colour + type system 1:1. */
+  :root {
+    --ink: #0F1F1A;
+    --forest: #1F4D3F;
+    --forest-dark: #163A30;
+    --forest-light: #2A6B57;
+    --sage: #87A899;
+    --sage-soft: #C5D2CB;
+    --cream: #FDFBF6;
+    --cream-deep: #E8E1D0;
+    --paper: #FFFFFF;
+    --gold: #C9A961;
+    --gold-soft: #E8D9B5;
+    --gold-dark: #A88847;
+    --text: #131815;
+    --text-soft: #2C3530;
+    --text-muted: #4F5A55;
+    --border-base: #D2C9B2;
+    --border-soft: #E2D9C2;
+    --hover: #F0EBDC;
+    --alert: #B5443A;
+    --warn: #D4924A;
+
+    --font-serif: 'Newsreader', ui-serif, Georgia, serif;
+    --font-sans: 'Onest', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--cream); color: var(--text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+
+  body { padding: 32px 16px 64px; }
+
+  .demo-shell { max-width: 1280px; margin: 0 auto; }
+
+  /* ============ DEMO LABEL ============ */
+  .demo-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin: 40px 0 8px;
+    padding-left: 4px;
+  }
+
+  .demo-label:first-of-type { margin-top: 0; }
+  .demo-label strong { color: var(--ink); font-weight: 600; }
+
+  .demo-caption {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 16px;
+    padding-left: 4px;
+    max-width: 720px;
+    line-height: 1.5;
+  }
+
+  .demo-frame {
+    background: var(--cream);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+  }
+
+  .demo-frame-fake-content {
+    padding: 60px 80px 80px;
+    color: var(--text-muted);
+    font-style: italic;
+    font-family: var(--font-serif);
+    font-size: 18px;
+    text-align: center;
+  }
+
+  /* =================================================================
+     PRIMARY NAV — appears at the top of every audit page
+     ================================================================= */
+  .audit-nav {
+    background: var(--paper);
+    border-bottom: 1px solid var(--border-base);
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  /* Brand mark — clickable, leads to /audit (marketing) when logged out,
+     /audits (dashboard) when logged in. */
+  .audit-nav-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
+  }
+  .audit-nav-brand-mark {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--ink);
+  }
+  .audit-nav-brand-mark .accent {
+    color: var(--gold-dark);
+  }
+  .audit-nav-brand-sub {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-muted);
+    display: none;
+  }
+  @media (min-width: 720px) {
+    .audit-nav-brand-sub { display: inline; }
+  }
+
+  /* Right side: links + CTA */
+  .audit-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .audit-nav-link {
+    text-decoration: none;
+    color: var(--text-soft);
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 6px;
+    transition: background 120ms, color 120ms;
+    white-space: nowrap;
+  }
+  .audit-nav-link:hover { background: var(--hover); color: var(--ink); }
+  .audit-nav-link.active {
+    color: var(--ink);
+    background: var(--cream-deep);
+  }
+
+  /* Tertiary link — review platform cross-link */
+  .audit-nav-link-secondary {
+    color: var(--text-muted);
+    font-size: 12.5px;
+    border-left: 1px solid var(--border-soft);
+    margin-left: 4px;
+    padding-left: 18px;
+  }
+  .audit-nav-link-secondary::before {
+    content: '↗';
+    margin-right: 4px;
+    font-size: 11px;
+    opacity: 0.6;
+  }
+
+  /* User chip + logout */
+  .audit-nav-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 14px;
+    margin-left: 4px;
+    border-left: 1px solid var(--border-soft);
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+  .audit-nav-user-email {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-soft);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .audit-nav-logout {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    padding: 6px 10px;
+    border-radius: 5px;
+  }
+  .audit-nav-logout:hover { color: var(--alert); background: rgba(181,68,58,0.06); }
+
+  /* Primary CTA — only shown logged-out */
+  .audit-nav-cta {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    background: var(--forest);
+    color: var(--cream);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 10px 18px;
+    border-radius: 6px;
+    margin-left: 6px;
+    transition: background 120ms;
+  }
+  .audit-nav-cta:hover { background: var(--forest-dark); }
+
+  /* =================================================================
+     CONTEXTUAL SUB-BAR — only the audit result page uses this
+     ================================================================= */
+  .audit-subbar {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border-soft);
+    padding: 0 32px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .audit-subbar-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+  }
+  .audit-subbar-back {
+    text-decoration: none;
+    color: var(--text-soft);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+  .audit-subbar-back:hover { background: var(--hover); color: var(--ink); }
+
+  .audit-subbar-context {
+    border-left: 1px solid var(--border-soft);
+    padding-left: 18px;
+    min-width: 0;
+  }
+  .audit-subbar-business {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .audit-subbar-meta {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .audit-subbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .audit-subbar-lang-toggle {
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 6px 10px;
+    border-radius: 5px;
+  }
+  .audit-subbar-lang-toggle:hover { background: var(--hover); color: var(--ink); }
+
+  .audit-subbar-pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    background: var(--paper);
+    border: 1px solid var(--border-base);
+    color: var(--text);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 7px 12px;
+    border-radius: 5px;
+    transition: background 120ms;
+  }
+  .audit-subbar-pdf-btn:hover { background: var(--hover); }
+  .audit-subbar-pdf-btn-icon { font-size: 12px; opacity: 0.6; }
+
+  .audit-subbar-new-btn {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    background: var(--forest);
+    color: var(--cream);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 5px;
+  }
+  .audit-subbar-new-btn:hover { background: var(--forest-dark); }
+</style>
+</head>
+<body>
+
+<div class="demo-shell">
+
+  <!-- ============================================================
+       STATE 1 · LOGGED OUT · MARKETING PAGE
+       ============================================================ -->
+  <div class="demo-label"><strong>State 1 · Logged out</strong> — marketing pages (/audit, /about, etc.)</div>
+  <p class="demo-caption">
+    Anonymous visitor. CTA button is the conversion target.
+    The "Review Platform" link points to the BAAM Review marketing page (/) so they can discover the sister product.
+  </p>
+  <div class="demo-frame">
+    <nav class="audit-nav">
+      <a href="/audit" class="audit-nav-brand">
+        <span class="audit-nav-brand-mark">BAAM · REVIEW AUDIT</span>
+        <span class="audit-nav-brand-sub">the reputation audit</span>
+      </a>
+      <div class="audit-nav-right">
+        <a href="/audit" class="audit-nav-link active">Home</a>
+        <a href="/about" class="audit-nav-link">About</a>
+        <a href="/methodology" class="audit-nav-link">Methodology</a>
+        <a href="/" class="audit-nav-link-secondary">Review platform</a>
+        <a href="/login?next=/audits" class="audit-nav-link">Log in</a>
+        <a href="/signup?next=/audit/new" class="audit-nav-cta">Get free audit</a>
+      </div>
+    </nav>
+    <div class="demo-frame-fake-content">— marketing page hero / body —</div>
+  </div>
+
+  <!-- ============================================================
+       STATE 2 · LOGGED IN · DASHBOARD (/audits)
+       ============================================================ -->
+  <div class="demo-label"><strong>State 2 · Logged in</strong> — dashboard (/audits)</div>
+  <p class="demo-caption">
+    Returning user, currently viewing their audit list. "My audits" is the active item.
+    "Review Platform" jumps to /app (the BAAM Review admin app). User email + log out grouped at the right edge.
+  </p>
+  <div class="demo-frame">
+    <nav class="audit-nav">
+      <a href="/audits" class="audit-nav-brand">
+        <span class="audit-nav-brand-mark">BAAM · REVIEW AUDIT</span>
+        <span class="audit-nav-brand-sub">the reputation audit</span>
+      </a>
+      <div class="audit-nav-right">
+        <a href="/audits" class="audit-nav-link active">My audits</a>
+        <a href="/audit/new" class="audit-nav-link">New audit</a>
+        <a href="/about" class="audit-nav-link">About</a>
+        <a href="/app" class="audit-nav-link-secondary">Review platform</a>
+        <div class="audit-nav-user">
+          <span class="audit-nav-user-email">john.tang2025@gmail.com</span>
+          <a href="/logout" class="audit-nav-logout">Log out</a>
+        </div>
+      </div>
+    </nav>
+    <div class="demo-frame-fake-content">— audits list / cards —</div>
+  </div>
+
+  <!-- ============================================================
+       STATE 3 · LOGGED IN · NEW AUDIT (/audit/new)
+       ============================================================ -->
+  <div class="demo-label"><strong>State 3 · Logged in</strong> — new audit intake (/audit/new)</div>
+  <p class="demo-caption">
+    Same nav as State 2, but "New audit" is the active item. Single source of truth for the chrome — only the active-link highlight differs between authenticated routes.
+  </p>
+  <div class="demo-frame">
+    <nav class="audit-nav">
+      <a href="/audits" class="audit-nav-brand">
+        <span class="audit-nav-brand-mark">BAAM · REVIEW AUDIT</span>
+        <span class="audit-nav-brand-sub">the reputation audit</span>
+      </a>
+      <div class="audit-nav-right">
+        <a href="/audits" class="audit-nav-link">My audits</a>
+        <a href="/audit/new" class="audit-nav-link active">New audit</a>
+        <a href="/about" class="audit-nav-link">About</a>
+        <a href="/app" class="audit-nav-link-secondary">Review platform</a>
+        <div class="audit-nav-user">
+          <span class="audit-nav-user-email">john.tang2025@gmail.com</span>
+          <a href="/logout" class="audit-nav-logout">Log out</a>
+        </div>
+      </div>
+    </nav>
+    <div class="demo-frame-fake-content">— 3-field intake form —</div>
+  </div>
+
+  <!-- ============================================================
+       STATE 4 · LOGGED IN · AUDIT RESULT (/audit/[id])
+       ============================================================ -->
+  <div class="demo-label"><strong>State 4 · Logged in</strong> — single audit result (/audit/[id])</div>
+  <p class="demo-caption">
+    Same primary nav as States 2 + 3 (no active item — viewing a specific audit isn't a top-level section).
+    A second sub-bar carries the page-specific controls: back to dashboard, business context, language toggle, PDF downloads, "new audit" shortcut.
+    The sub-bar is sticky so it stays accessible as the user scrolls the 7-page inline audit.
+  </p>
+  <div class="demo-frame">
+    <nav class="audit-nav">
+      <a href="/audits" class="audit-nav-brand">
+        <span class="audit-nav-brand-mark">BAAM · REVIEW AUDIT</span>
+        <span class="audit-nav-brand-sub">the reputation audit</span>
+      </a>
+      <div class="audit-nav-right">
+        <a href="/audits" class="audit-nav-link">My audits</a>
+        <a href="/audit/new" class="audit-nav-link">New audit</a>
+        <a href="/about" class="audit-nav-link">About</a>
+        <a href="/app" class="audit-nav-link-secondary">Review platform</a>
+        <div class="audit-nav-user">
+          <span class="audit-nav-user-email">john.tang2025@gmail.com</span>
+          <a href="/logout" class="audit-nav-logout">Log out</a>
+        </div>
+      </div>
+    </nav>
+    <div class="audit-subbar">
+      <div class="audit-subbar-left">
+        <a href="/audits" class="audit-subbar-back">← My audits</a>
+        <div class="audit-subbar-context">
+          <div class="audit-subbar-business">Wedding Atelier Flagship Bridal Boutique</div>
+          <div class="audit-subbar-meta">72 MADISON AVE · NEW YORK · BR-5BDA-30E2 · SCORE 51/D</div>
+        </div>
+      </div>
+      <div class="audit-subbar-right">
+        <a href="?lang=zh" class="audit-subbar-lang-toggle">中文</a>
+        <a href="#" class="audit-subbar-pdf-btn">
+          <span class="audit-subbar-pdf-btn-icon">⬇</span>
+          EN PDF
+        </a>
+        <a href="#" class="audit-subbar-pdf-btn">
+          <span class="audit-subbar-pdf-btn-icon">⬇</span>
+          中文 PDF
+        </a>
+        <a href="/audit/new" class="audit-subbar-new-btn">New audit</a>
+      </div>
+    </div>
+    <div class="demo-frame-fake-content">— inline 7-page audit (iframe) —</div>
+  </div>
+
+  <!-- ============================================================
+       STATE 5 · LOGGED OUT · ON RESULT PAGE (rare — shared link)
+       ============================================================ -->
+  <div class="demo-label"><strong>State 5 · Logged out viewing a result link</strong> (e.g. someone shared the URL)</div>
+  <p class="demo-caption">
+    Edge case for completeness. The page itself enforces auth — anonymous visitor gets bounced to /login?next=/audit/&lt;id&gt; — so they only see this for ~150ms before the redirect. But if we ever ship public-share links, this is what the nav looks like: marketing-style with no per-audit sub-bar.
+  </p>
+  <div class="demo-frame">
+    <nav class="audit-nav">
+      <a href="/audit" class="audit-nav-brand">
+        <span class="audit-nav-brand-mark">BAAM · REVIEW AUDIT</span>
+        <span class="audit-nav-brand-sub">the reputation audit</span>
+      </a>
+      <div class="audit-nav-right">
+        <a href="/audit" class="audit-nav-link">Home</a>
+        <a href="/about" class="audit-nav-link">About</a>
+        <a href="/methodology" class="audit-nav-link">Methodology</a>
+        <a href="/" class="audit-nav-link-secondary">Review platform</a>
+        <a href="/login?next=/audit/5bda30e2-7cb2-407e-b5f0-83bc637be218" class="audit-nav-link">Log in</a>
+        <a href="/signup?next=/audit/new" class="audit-nav-cta">Get free audit</a>
+      </div>
+    </nav>
+    <div class="demo-frame-fake-content">— redirecting to /login… —</div>
+  </div>
+
+  <!-- ============================================================
+       NOTES
+       ============================================================ -->
+  <div class="demo-label"><strong>Design notes</strong></div>
+  <div style="background: var(--paper); border: 1px solid var(--border-soft); border-radius: 10px; padding: 20px 28px; font-size: 13.5px; line-height: 1.65; color: var(--text-soft); margin-top: 8px;">
+    <ul style="list-style: none; padding: 0; margin: 0;">
+      <li style="padding: 6px 0; border-bottom: 1px solid var(--border-soft);">
+        <strong style="color: var(--ink);">One primary nav · everywhere.</strong>
+        Same height (64px), same brand, same right-edge pattern. Only the active link + the right-side cluster (CTA vs user-chip) change.
+      </li>
+      <li style="padding: 6px 0; border-bottom: 1px solid var(--border-soft);">
+        <strong style="color: var(--ink);">Brand is "BAAM · REVIEW AUDIT"</strong> — the word AUDIT in gold to distinguish from the sister product. Tagline italic, hides under 720px.
+      </li>
+      <li style="padding: 6px 0; border-bottom: 1px solid var(--border-soft);">
+        <strong style="color: var(--ink);">Review platform cross-link is visually de-emphasized</strong> — small caps, gray, divider in front, ↗ glyph. Reads as "and there's also our other product over there" without competing with the primary CTA.
+      </li>
+      <li style="padding: 6px 0; border-bottom: 1px solid var(--border-soft);">
+        <strong style="color: var(--ink);">Result page gets a sub-bar</strong> for per-audit chrome (business name, downloads, language toggle, "new audit" shortcut). Keeps the primary nav clean and the audit context always visible at the top.
+      </li>
+      <li style="padding: 6px 0;">
+        <strong style="color: var(--ink);">Mobile</strong> — at narrow widths the right-side links collapse into a hamburger; the brand stays visible, CTA button stays visible. (Not shown in this prototype; can add when we implement.)
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
