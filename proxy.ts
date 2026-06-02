@@ -2,25 +2,22 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
 /**
- * Hostname normalization for the single-domain deployment.
+ * Hostname normalization.
  *
  *   baamreview.com           → canonical host, serves everything
  *                              (marketing, audit app, review platform admin)
- *   www.baamreview.com       → 308 → baamreview.com
  *   review.baamplatform.com  → 308 → baamreview.com (legacy subdomain)
  *
- * 308 (Permanent Redirect) preserves method and body, so POST/PUT/API
- * requests survive the redirect — important for any client still calling
- * the old origin during the transition.
+ * The www ↔ root redirect is owned by Vercel's domain config (set
+ * `www.baamreview.com` to redirect to `baamreview.com` in the Vercel
+ * dashboard). Doing it here too creates a loop when Vercel's setting
+ * happens to point the opposite direction.
  *
- * Localhost and Vercel preview URLs fall through to updateSession
- * (Supabase session refresh) without redirect.
+ * 308 (Permanent Redirect) preserves method and body, so POST/PUT/API
+ * requests survive the redirect.
  */
 const CANONICAL_HOST = "baamreview.com";
-const LEGACY_HOSTS = new Set<string>([
-  "www.baamreview.com",
-  "review.baamplatform.com",
-]);
+const LEGACY_HOSTS = new Set<string>(["review.baamplatform.com"]);
 
 export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
