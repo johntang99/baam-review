@@ -19,6 +19,23 @@ const nextConfig: NextConfig = {
     "puppeteer-core",
     "@sparticuz/chromium",
   ],
+
+  // Externalizing keeps the JS out of the bundle, but Vercel's file tracer
+  // also needs to ship @sparticuz/chromium's `bin/` directory (the
+  // Brotli-compressed Chrome binary). Without these globs the package is
+  // present at runtime but `executablePath()` can't find the tar to inflate.
+  // Both the public path and the pnpm `.pnpm/` path are listed because pnpm
+  // symlinks the package and the tracer doesn't always follow symlinks.
+  outputFileTracingIncludes: {
+    "/audit/**": [
+      "./node_modules/@sparticuz/chromium/**",
+      "./node_modules/.pnpm/@sparticuz+chromium@*/node_modules/@sparticuz/chromium/**",
+    ],
+    "/api/**": [
+      "./node_modules/@sparticuz/chromium/**",
+      "./node_modules/.pnpm/@sparticuz+chromium@*/node_modules/@sparticuz/chromium/**",
+    ],
+  },
 };
 
 export default nextConfig;
