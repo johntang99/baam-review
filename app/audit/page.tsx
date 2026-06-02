@@ -88,21 +88,27 @@ export default async function AuditPage() {
     }
   }
 
-  return <StateAMarketing />;
+  return <StateAMarketing loggedIn={!!user} />;
 }
 
 // =============================================================================
-// STATE A — cold visitor / no audits yet (existing audit-marketing.html)
+// STATE A — cold visitor OR signed-in user with no audits yet.
+// Renders the existing audit-marketing.html. For signed-in users we rewrite
+// the hardcoded `/signup?next=/audit/new` CTAs to point straight at
+// `/audit/new` — they're already authenticated, no signup detour needed.
 // =============================================================================
-function StateAMarketing() {
+function StateAMarketing({ loggedIn }: { loggedIn: boolean }) {
   const { css, bodyHtml } = readMarketingDoc("audit-marketing.html");
+  const finalHtml = loggedIn
+    ? bodyHtml.replaceAll("/signup?next=/audit/new", "/audit/new")
+    : bodyHtml;
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <AuditTopNav />
       <div
         style={{ display: "contents" }}
-        dangerouslySetInnerHTML={{ __html: bodyHtml }}
+        dangerouslySetInnerHTML={{ __html: finalHtml }}
       />
     </>
   );
