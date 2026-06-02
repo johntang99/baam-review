@@ -25,10 +25,7 @@ export default async function SignupPage({
     : null;
 
   return (
-    <AuthShell
-      title="Create your account"
-      subtitle="Five minutes to your first review request"
-    >
+    <AuthShell title="Create your account">
       <SignupForm preferredPlan={preferredPlan} />
     </AuthShell>
   );

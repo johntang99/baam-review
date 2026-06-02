@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Mail } from "lucide-react";
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "./password-input";
+
+const RESEND_COOLDOWN_SECONDS = 60;
 
 function sanitiseNext(raw: string | null): string {
   if (!raw) return "/app";
@@ -33,6 +35,40 @@ export function SignupForm({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+
+  // Resend confirmation email state. Supabase rate-limits resends to ~60s
+  // — we surface a countdown so the user knows when they can try again.
+  const [resendPending, setResendPending] = useState(false);
+  const [resendError, setResendError] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendCount, setResendCount] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  async function handleResend() {
+    setResendError(null);
+    setResendPending(true);
+    const supabase = createClient();
+    const origin = window.location.origin;
+    const { error: err } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
+    });
+    setResendPending(false);
+    if (err) {
+      setResendError(err.message);
+      return;
+    }
+    setResendCount((n) => n + 1);
+    setResendCooldown(RESEND_COOLDOWN_SECONDS);
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -94,6 +130,33 @@ export function SignupForm({
           </li>
           <li>• The link expires after 24 hours.</li>
         </ul>
+
+        <div className="pt-2 text-center text-sm text-text-soft">
+          Didn&apos;t receive it?{" "}
+          {resendCooldown > 0 ? (
+            <span className="text-text-muted">
+              Resend available in {resendCooldown}s
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendPending}
+              className="font-medium text-forest hover:underline disabled:opacity-60 disabled:cursor-wait"
+            >
+              {resendPending ? "Sending…" : "Send email again"}
+            </button>
+          )}
+          {resendCount > 0 && resendCooldown > 0 && (
+            <span className="ml-1 text-text-muted">· sent ✓</span>
+          )}
+        </div>
+        {resendError && (
+          <p className="text-center text-xs text-alert" role="alert">
+            {resendError}
+          </p>
+        )}
+
         <div className="pt-2 text-center text-sm">
           <Link
             href={loginHref}
