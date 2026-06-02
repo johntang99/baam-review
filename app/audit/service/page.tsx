@@ -128,7 +128,7 @@ function ServiceFooter() {
               Terms
             </Link>
             <a
-              href="mailto:support@baamreview.com"
+              href="mailto:support@baamplatform.com"
               style={{ color: "rgba(250, 247, 242, 0.6)" }}
             >
               Support
@@ -196,7 +196,7 @@ function PlanInterestBanner({ plan }: { plan: Plan }) {
         </div>
       </div>
       <a
-        href={`mailto:support@baamreview.com?subject=Service interest: ${planLabel}`}
+        href={`mailto:support@baamplatform.com?subject=Service interest: ${planLabel}`}
         style={{
           background: "var(--gold)",
           color: "var(--ink)",

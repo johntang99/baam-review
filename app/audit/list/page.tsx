@@ -343,7 +343,7 @@ export default async function AuditListPage(props: {
                 within one business day.
               </p>
               <a
-                href="mailto:support@baamreview.com"
+                href="mailto:support@baamplatform.com"
                 className="action-card-link"
               >
                 Contact support →
@@ -363,7 +363,7 @@ export default async function AuditListPage(props: {
               <Link href="/account">Account</Link>
               <Link href="/legal/privacy">Privacy</Link>
               <Link href="/legal/terms">Terms</Link>
-              <a href="mailto:support@baamreview.com">Support</a>
+              <a href="mailto:support@baamplatform.com">Support</a>
             </div>
           </div>
         </div>
