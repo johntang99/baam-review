@@ -113,6 +113,9 @@
   font-size: 10px;
   font-weight: 700;
 }
+/* Bumped specificity past `.audit-nav-v2-links a` so the cream text
+ * color isn't shadowed by the inherited link color. */
+.audit-nav-v2-links a.audit-nav-v2-cta,
 .audit-nav-v2-cta {
   display: inline-flex;
   align-items: center;
@@ -126,8 +129,10 @@
   text-decoration: none;
   transition: background 0.15s;
 }
+.audit-nav-v2-links a.audit-nav-v2-cta:hover,
 .audit-nav-v2-cta:hover {
   background: var(--forest-dark);
+  color: var(--cream);
 }
 .audit-nav-v2-signout {
   background: none;

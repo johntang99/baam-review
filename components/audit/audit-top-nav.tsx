@@ -34,10 +34,7 @@ export async function AuditTopNav({ active = null }: AuditTopNavProps) {
   return (
     <nav className="audit-nav-v2">
       <div className="audit-nav-v2-inner">
-        <Link
-          href={loggedIn ? "/audit/list" : "/audit"}
-          className="audit-nav-v2-logo"
-        >
+        <Link href="/audit" className="audit-nav-v2-logo">
           <span className="audit-nav-v2-logo-mark">B</span>
           BAAM Review Audit
         </Link>
