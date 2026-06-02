@@ -9,17 +9,22 @@ const TEMPLATES_DIR = path.join(process.cwd(), "lib/audit/templating/templates")
 let compiledTemplate: HandlebarsTemplateDelegate | null = null;
 let cachedStyles: string | null = null;
 
+// In dev, skip the cache so audit.hbs / styles.css edits show up without
+// a server restart. Next.js hot-reload only watches .ts/.tsx, so without
+// this the cached template persists across template-file edits.
+const DEV_NO_CACHE = process.env.NODE_ENV !== "production";
+
 export function renderAuditHtml(view: AuditViewModel): string {
   ensureRegistered();
 
-  if (cachedStyles === null) {
+  if (cachedStyles === null || DEV_NO_CACHE) {
     cachedStyles = fs.readFileSync(
       path.join(TEMPLATES_DIR, "styles.css"),
       "utf-8",
     );
   }
 
-  if (compiledTemplate === null) {
+  if (compiledTemplate === null || DEV_NO_CACHE) {
     const source = fs.readFileSync(
       path.join(TEMPLATES_DIR, "audit.hbs"),
       "utf-8",

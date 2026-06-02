@@ -46,7 +46,7 @@ export function AuditResultSubBar({
     <div className="audit-subbar">
       <div className="audit-subbar-inner">
         <div className="audit-subbar-left">
-          <Link href="/audits" className="audit-subbar-back">
+          <Link href="/audit/list" className="audit-subbar-back">
             ← My audits
           </Link>
           <div className="audit-subbar-context">

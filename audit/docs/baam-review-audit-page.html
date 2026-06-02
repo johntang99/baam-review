@@ -1,0 +1,2149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAAM Review · Free 7-Page Reputation Audit · Two-state design</title>
+<meta name="description" content="Get a free 7-page reputation audit. See your BAAM Review Score, your 5 real local competitors, and the 5 actions to climb. Delivered in under 10 seconds. No credit card.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --forest-light: #2A6B57;
+  --sage: #87A899;
+  --sage-soft: #C5D2CB;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-soft: #E8D9B5;
+  --gold-dark: #8E7430;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --warn: #B85A38;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 16px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 24px 48px rgba(15, 31, 26, 0.08);
+  --shadow-xl: 0 40px 80px rgba(15, 31, 26, 0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Onest', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+a { color: inherit; text-decoration: none; }
+.container { max-width: 1240px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+/* ============ DOC INTRO ============ */
+.doc-intro {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 44px 32px;
+}
+.doc-intro-inner { max-width: 920px; margin: 0 auto; }
+.doc-intro-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.doc-intro-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.18;
+  letter-spacing: -0.018em;
+  color: var(--cream);
+  margin-bottom: 12px;
+}
+.doc-intro-title em { font-style: italic; color: var(--gold); }
+.doc-intro-body {
+  font-family: 'Newsreader', serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(250, 247, 242, 0.78);
+  max-width: 720px;
+}
+.doc-intro-states {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(250, 247, 242, 0.15);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.doc-state-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.doc-state-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--cream);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+.doc-state-body {
+  font-family: 'Newsreader', serif;
+  font-size: 13px;
+  color: rgba(250, 247, 242, 0.7);
+  line-height: 1.5;
+}
+
+.state-divider {
+  background: var(--gold);
+  color: var(--ink);
+  padding: 14px 32px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.state-divider-num {
+  background: var(--ink);
+  color: var(--gold);
+  padding: 4px 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.state-divider-cond {
+  margin-left: auto;
+  font-style: italic;
+  font-family: 'Newsreader', serif;
+  font-size: 14px;
+  color: rgba(15, 31, 26, 0.7);
+}
+
+/* ============ NAV (UNIFIED) ============ */
+nav {
+  padding: 22px 0;
+  position: sticky;
+  top: 0;
+  background: rgba(250, 247, 242, 0.85);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  z-index: 100;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+nav.scrolled { border-color: var(--border); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; }
+.logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--forest);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cream);
+  font-weight: 600;
+  font-size: 14px;
+}
+.nav-links { display: flex; gap: 22px; align-items: center; }
+.nav-links a {
+  font-size: 13.5px;
+  color: var(--text-soft);
+  font-weight: 400;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-links a.active { color: var(--ink); font-weight: 600; }
+.nav-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 4px;
+}
+.nav-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  color: var(--text);
+}
+.nav-user-avatar {
+  width: 22px; height: 22px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* ============ BUTTONS ============ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.btn-primary { background: var(--forest); color: var(--cream); }
+.btn-primary:hover { background: var(--forest-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-outline { background: transparent; color: var(--forest); border-color: var(--forest); }
+.btn-outline:hover { background: var(--forest); color: var(--cream); }
+.btn-gold { background: var(--gold); color: var(--ink); }
+.btn-gold:hover { background: #B8985A; transform: translateY(-1px); }
+.btn-ghost { background: transparent; color: var(--text); }
+.btn-ghost:hover { background: var(--cream-deep); }
+.btn-large { padding: 14px 26px; font-size: 14.5px; }
+.btn-xl { padding: 16px 32px; font-size: 15px; }
+
+/* ============ TYPOGRAPHY HELPERS ============ */
+.section-eyebrow {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--forest);
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3.2vw, 38px);
+  line-height: 1.1;
+  letter-spacing: -0.022em;
+  color: var(--ink);
+  margin-bottom: 16px;
+  max-width: 720px;
+}
+.section-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--forest);
+}
+.section-title .gold-em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gold);
+}
+.section-sub {
+  font-family: 'Newsreader', serif;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  max-width: 640px;
+}
+.section-sub strong {
+  font-family: 'Onest', sans-serif;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+/* ============ HERO (STATE A) ============ */
+.hero {
+  padding: 64px 0 80px;
+  position: relative;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 13px 5px 7px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-bottom: 26px;
+  font-weight: 400;
+}
+.hero-eyebrow-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-left: 4px;
+}
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(32px, 3.8vw, 48px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: 22px;
+  max-width: 580px;
+}
+.hero h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gold);
+}
+.hero-sub {
+  font-family: 'Newsreader', serif;
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  max-width: 560px;
+  margin-bottom: 28px;
+}
+.hero-sub strong {
+  font-family: 'Onest', sans-serif;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 16.5px;
+}
+.hero-ctas {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.hero-trust {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  flex-wrap: wrap;
+}
+.hero-trust-line { width: 18px; height: 1px; background: var(--border); }
+.hero-trust svg {
+  width: 14px; height: 14px;
+  color: var(--forest);
+  margin-right: 2px;
+  vertical-align: -2px;
+}
+
+/* Audit preview visual on right */
+.hero-audit-preview {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(15, 31, 26, 0.12), 0 8px 24px rgba(15, 31, 26, 0.06);
+  transform: rotate(-1.5deg);
+  position: relative;
+  max-width: 380px;
+  margin: 0 auto;
+}
+.hero-audit-preview::before {
+  content: '';
+  position: absolute;
+  top: -60px; left: -60px; right: -60px; bottom: -60px;
+  background: radial-gradient(ellipse at center, rgba(201, 169, 97, 0.08), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+.audit-preview-header {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 14px 20px;
+}
+.audit-preview-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+.audit-preview-brand {
+  font-family: 'Onest', sans-serif;
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--cream);
+}
+.audit-preview-vol {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+}
+.audit-preview-sample-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.audit-preview-body { padding: 22px; }
+.audit-preview-business {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+.audit-preview-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 4px;
+  letter-spacing: -0.015em;
+}
+.audit-preview-meta {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.audit-preview-score {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+.audit-preview-score-num-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  min-width: 128px;
+}
+.audit-preview-score-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 68px;
+  line-height: 0.85;
+  color: var(--ink);
+  letter-spacing: -0.04em;
+}
+.audit-preview-score-divider {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 34px;
+  color: var(--text-muted);
+  align-self: center;
+  transform: translateY(-2px);
+}
+.audit-preview-score-denom {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 28px;
+  color: var(--text-muted);
+  align-self: flex-end;
+  margin-bottom: 6px;
+}
+.audit-preview-score-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.audit-preview-grade {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--warn);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.audit-preview-diagnosis {
+  font-family: 'Newsreader', serif;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+.audit-preview-subscores {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+.audit-preview-subscore-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 28px;
+  gap: 10px;
+  align-items: center;
+  font-family: 'Onest', sans-serif;
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 500;
+}
+.audit-preview-bar {
+  height: 5px;
+  background: var(--cream-deep);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.audit-preview-bar-fill { height: 100%; border-radius: 3px; }
+.audit-preview-bar-fill.ok { background: var(--gold); }
+.audit-preview-bar-fill.bad { background: var(--warn); }
+.audit-preview-bar-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: right;
+}
+.audit-preview-projection {
+  background: linear-gradient(135deg, rgba(184, 90, 56, 0.06) 0%, rgba(184, 90, 56, 0.02) 100%);
+  border: 1px solid rgba(184, 90, 56, 0.25);
+  border-radius: 8px;
+  padding: 14px;
+}
+.audit-preview-projection-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--warn);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.audit-preview-projection-val {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.audit-preview-projection-val em { font-style: italic; color: var(--warn); font-weight: 300; }
+.audit-preview-projection-sub {
+  font-family: 'Newsreader', serif;
+  font-size: 10.5px;
+  font-style: italic;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+/* ============ HERO STATE B (PERSONALIZED HUB) ============ */
+.hero.state-b {
+  background: linear-gradient(135deg, var(--cream) 0%, var(--cream-deep) 100%);
+  position: relative;
+  padding: 56px 0 72px;
+}
+.hero.state-b::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 56px; height: 1px;
+  background: var(--gold);
+}
+.hub-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.hub-card-header {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.hub-card-header-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.hub-card-greeting {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 26px;
+  color: var(--cream);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+.hub-card-greeting em { font-style: italic; color: var(--gold); }
+.hub-card-summary {
+  font-family: 'Newsreader', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: rgba(250, 247, 242, 0.7);
+  margin-top: 6px;
+}
+.hub-card-stats {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.hub-card-stat-block {
+  text-align: right;
+}
+.hub-card-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(250, 247, 242, 0.55);
+  margin-bottom: 4px;
+}
+.hub-card-stat-val {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 26px;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.hub-card-body {
+  padding: 28px 32px;
+}
+.hub-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+.hub-audits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 28px;
+  border-top: 1px solid var(--border);
+}
+.hub-audit-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  gap: 20px;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.hub-audit-row:hover { background: var(--cream); padding-left: 8px; padding-right: 8px; margin-left: -8px; margin-right: -8px; border-radius: 6px; border-bottom-color: var(--border); }
+.hub-audit-row-mark {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--gold), #B8985A);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.hub-audit-row-info {}
+.hub-audit-row-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--ink);
+  letter-spacing: -0.012em;
+  line-height: 1.3;
+}
+.hub-audit-row-meta {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.hub-audit-row-score-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.hub-audit-row-score {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--ink);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.hub-audit-row-score-denom {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.hub-audit-row-grade {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 15px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--cream-deep);
+  color: var(--text);
+}
+.hub-audit-row-grade.warn { background: rgba(184, 90, 56, 0.1); color: var(--warn); }
+.hub-audit-row-grade.ok { background: rgba(201, 169, 97, 0.15); color: var(--gold-dark); }
+.hub-audit-row-grade.good { background: rgba(31, 77, 63, 0.1); color: var(--forest); }
+.hub-audit-row-date {
+  font-family: 'Onest', sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.hub-audit-row-link {
+  font-family: 'Onest', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--forest);
+}
+.hub-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+.hub-quota-note {
+  margin-top: 16px;
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.hub-quota-note strong {
+  font-family: 'Onest', sans-serif;
+  font-weight: 600;
+  color: var(--text-soft);
+  font-style: normal;
+  font-size: 12.5px;
+}
+
+/* Service cross-link card */
+.hub-service-card {
+  margin-top: 36px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 16px;
+  padding: 28px 32px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.hub-service-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--gold);
+}
+.hub-service-card-content {}
+.hub-service-card-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.hub-service-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--cream);
+  line-height: 1.25;
+  margin-bottom: 8px;
+  letter-spacing: -0.015em;
+}
+.hub-service-card-title em { font-style: italic; color: var(--gold); }
+.hub-service-card-body {
+  font-family: 'Newsreader', serif;
+  font-size: 15px;
+  color: rgba(250, 247, 242, 0.75);
+  line-height: 1.5;
+  max-width: 540px;
+}
+.hub-service-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.hub-service-card-cta:hover { background: #B8985A; }
+
+/* ============ WHAT YOU RECEIVE (7-pages grid) ============ */
+.pages-section {
+  padding: 88px 0;
+  background: var(--paper);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.pages-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.pages-header .section-title { margin-left: auto; margin-right: auto; }
+.pages-header .section-sub { margin: 0 auto; }
+.pages-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.pages-grid .page-card:nth-child(5),
+.pages-grid .page-card:nth-child(6),
+.pages-grid .page-card:nth-child(7) {
+  grid-column: span 1;
+}
+.pages-grid .page-card:nth-child(5) { grid-column-start: 1; }
+.page-card {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 22px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+.page-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.page-card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.page-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+.page-card-detail {
+  font-family: 'Newsreader', serif;
+  font-size: 13.5px;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+/* ============ HOW IT WORKS ============ */
+.how-section { padding: 88px 0; background: var(--cream); }
+.how-header { text-align: center; margin-bottom: 56px; }
+.how-header .section-title { margin-left: auto; margin-right: auto; }
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  max-width: 1080px;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--paper);
+}
+.how-step {
+  padding: 32px 28px;
+  border-right: 1px solid var(--border);
+  text-align: left;
+}
+.how-step:last-child { border-right: none; }
+.how-step-num {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 36px;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+.how-step-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 10px;
+  letter-spacing: -0.015em;
+}
+.how-step-body {
+  font-family: 'Newsreader', serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+.how-cta-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 56px;
+}
+.how-cta-note {
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* ============ THE PROOF (Bridge Street Dental case study) ============ */
+.proof-section {
+  padding: 96px 0;
+  background: var(--cream);
+}
+.proof-header {
+  text-align: center;
+  max-width: 780px;
+  margin: 0 auto 56px;
+}
+.proof-card {
+  max-width: 920px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 48px 48px 44px;
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.04));
+}
+.proof-card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(31, 77, 63, 0.08);
+  color: var(--forest);
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.proof-card-tag::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--forest);
+  border-radius: 50%;
+}
+.proof-card-name {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 4px;
+  letter-spacing: -0.015em;
+}
+.proof-card-meta {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+.proof-scores {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 28px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.proof-score-block { text-align: center; }
+.proof-score-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 64px;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+.proof-score-block.start .proof-score-num { color: var(--text-muted); }
+.proof-score-block.now .proof-score-num { color: var(--forest); font-weight: 500; }
+.proof-score-block.goal .proof-score-num { color: var(--gold); font-weight: 400; font-style: italic; }
+.proof-score-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 12px;
+}
+.proof-score-block.now .proof-score-label { color: var(--forest); }
+.proof-score-block.goal .proof-score-label { color: var(--gold-dark); }
+.proof-score-arrow {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 26px;
+  color: var(--gold);
+}
+.proof-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-bottom: 28px;
+}
+.proof-stat {
+  text-align: center;
+}
+.proof-stat-num {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--forest);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.proof-stat-num.goal-stat { color: var(--gold); }
+.proof-stat-label {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--text-soft);
+  margin-top: 10px;
+  line-height: 1.4;
+}
+.proof-footnote {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  line-height: 1.55;
+}
+.proof-footnote strong {
+  font-family: 'Onest', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  color: var(--text);
+}
+.proof-cta-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 48px;
+}
+@media (max-width: 720px) {
+  .proof-card { padding: 32px 28px; }
+  .proof-card-name { font-size: 22px; }
+  .proof-scores { grid-template-columns: 1fr auto 1fr auto 1fr; gap: 8px; }
+  .proof-score-num { font-size: 44px; }
+  .proof-stats { grid-template-columns: 1fr; gap: 20px; }
+  .proof-stat-num { font-size: 30px; }
+}
+
+/* ============ METHODOLOGY ============ */
+.methodology-section {
+  padding: 88px 0;
+  background: linear-gradient(135deg, var(--forest) 0%, var(--forest-dark) 100%);
+  color: var(--cream);
+  position: relative;
+}
+.methodology-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 64px; height: 1px;
+  background: var(--gold);
+}
+.methodology-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.methodology-header .section-eyebrow { color: var(--gold); }
+.methodology-header .section-title {
+  color: var(--cream);
+  margin-left: auto;
+  margin-right: auto;
+}
+.methodology-header .section-title em { color: var(--gold); }
+.methodology-header .section-sub {
+  color: rgba(250, 247, 242, 0.78);
+  margin: 0 auto;
+}
+.methodology-facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 1px solid rgba(250, 247, 242, 0.15);
+  padding-top: 36px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.method-fact {
+  padding: 0 24px;
+  border-right: 1px solid rgba(250, 247, 242, 0.12);
+}
+.method-fact:last-child { border-right: none; }
+.method-fact-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.method-fact-stat {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 46px;
+  line-height: 1;
+  color: var(--cream);
+  margin-bottom: 12px;
+  letter-spacing: -0.03em;
+}
+.method-fact-stat .unit {
+  font-size: 0.55em;
+  color: var(--gold);
+  margin-left: 1px;
+}
+.method-fact-body {
+  font-family: 'Onest', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(250, 247, 242, 0.75);
+}
+.methodology-footer {
+  text-align: center;
+  margin-top: 40px;
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(250, 247, 242, 0.65);
+}
+.methodology-footer a {
+  color: var(--gold);
+  border-bottom: 1px solid rgba(201, 169, 97, 0.4);
+  padding-bottom: 1px;
+}
+
+/* ============ SERVICE CROSS-PROMO ============ */
+.service-promo-section {
+  padding: 88px 0;
+  background: var(--cream-deep);
+}
+.service-promo-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.service-promo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+.service-promo-text .section-title {
+  font-size: clamp(26px, 3vw, 34px);
+}
+.service-promo-text .section-sub {
+  margin-bottom: 24px;
+}
+.service-promo-tiers {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+.service-promo-tier {
+  flex: 1;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  min-width: 160px;
+}
+.service-promo-tier-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--forest);
+  margin-bottom: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.service-promo-tier-price {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--ink);
+  margin-bottom: 4px;
+  letter-spacing: -0.025em;
+}
+.service-promo-tier-price-sub {
+  font-family: 'Onest', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.service-promo-tier-desc {
+  font-family: 'Newsreader', serif;
+  font-size: 13px;
+  color: var(--text-soft);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Service preview visual */
+.service-promo-visual {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+.service-promo-visual-header {
+  background: var(--forest);
+  color: var(--cream);
+  padding: 14px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+}
+.service-promo-visual-body { padding: 22px; }
+.service-promo-rhythm-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.service-promo-rhythm-row:last-child { border-bottom: none; }
+.service-promo-rhythm-when {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  font-weight: 600;
+  min-width: 100px;
+}
+.service-promo-rhythm-what {
+  font-family: 'Onest', sans-serif;
+  font-size: 13.5px;
+  color: var(--text);
+  font-weight: 500;
+}
+.service-promo-rhythm-by {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-weight: 700;
+  background: var(--forest);
+  color: var(--cream);
+}
+
+/* ============ FAQ ============ */
+.faq-section { padding: 88px 0; background: var(--paper); }
+.faq-inner { max-width: 820px; margin: 0 auto; }
+.faq-header { text-align: center; margin-bottom: 40px; }
+.faq-header .section-title { margin-left: auto; margin-right: auto; }
+.faq-list { border-top: 1px solid var(--ink); }
+.faq-item { padding: 24px 0; border-bottom: 1px solid var(--border); }
+.faq-q {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--ink);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.faq-q em { font-style: italic; color: var(--forest); }
+.faq-a {
+  font-family: 'Newsreader', serif;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--text-soft);
+}
+.faq-a strong { font-family: 'Onest', sans-serif; font-weight: 600; color: var(--ink); font-size: 15px; }
+.faq-a a { color: var(--forest); font-weight: 500; border-bottom: 1px solid var(--sage-soft); padding-bottom: 1px; }
+
+/* ============ FINAL CTA ============ */
+.final-cta {
+  padding: 112px 0;
+  background: var(--ink);
+  color: var(--cream);
+  text-align: center;
+  position: relative;
+}
+.final-cta::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 64px; height: 1px;
+  background: var(--gold);
+}
+.final-cta-inner { max-width: 760px; margin: 0 auto; }
+.final-cta-mark {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 56px;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 18px;
+}
+.final-cta-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3.6vw, 42px);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--cream);
+  margin-bottom: 16px;
+}
+.final-cta-title em { font-style: italic; color: var(--gold); }
+.final-cta-sub {
+  font-family: 'Newsreader', serif;
+  font-size: 18px;
+  color: rgba(250, 247, 242, 0.75);
+  max-width: 520px;
+  margin: 0 auto 32px;
+  line-height: 1.5;
+}
+.final-cta-buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.final-cta-buttons .btn-xl { padding: 17px 36px; font-size: 15px; }
+.final-cta-buttons .btn-outline { color: var(--cream); border-color: rgba(250, 247, 242, 0.3); }
+.final-cta-buttons .btn-outline:hover { background: rgba(250, 247, 242, 0.08); color: var(--cream); border-color: rgba(250, 247, 242, 0.5); }
+.final-cta-footnote {
+  margin-top: 22px;
+  font-family: 'Onest', sans-serif;
+  font-size: 12px;
+  color: rgba(250, 247, 242, 0.5);
+  letter-spacing: 0.03em;
+}
+
+/* ============ AFTER YOUR AUDIT (small service cross-promo) ============ */
+.after-audit-section {
+  padding: 80px 0;
+  background: var(--cream);
+}
+.after-audit-card {
+  max-width: 820px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 32px 36px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 28px;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.after-audit-card-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-dark, #836A30);
+  font-weight: 700;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding-right: 14px;
+  border-right: 1px solid var(--border);
+}
+.after-audit-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 19px;
+  color: var(--ink);
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+.after-audit-card-copy {
+  font-family: 'Newsreader', serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  margin: 0;
+}
+.after-audit-card-copy strong {
+  font-family: 'Onest', sans-serif;
+  font-weight: 600;
+  color: var(--ink);
+}
+.after-audit-card-cta {
+  flex-shrink: 0;
+}
+@media (max-width: 720px) {
+  .after-audit-card {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 24px 24px;
+  }
+  .after-audit-card-tag {
+    writing-mode: horizontal-tb;
+    transform: none;
+    padding-right: 0;
+    padding-bottom: 10px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+/* ============ FOOTER ============ */
+footer {
+  padding: 56px 0 40px;
+  background: var(--ink);
+  color: var(--cream);
+  border-top: 1px solid rgba(250, 247, 242, 0.08);
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+}
+.footer-tagline {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: rgba(250, 247, 242, 0.55);
+  margin-top: 12px;
+  line-height: 1.5;
+  max-width: 280px;
+}
+.footer-col-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+.footer-col ul { list-style: none; }
+.footer-col li { padding: 5px 0; font-family: 'Onest', sans-serif; font-size: 13px; }
+.footer-col a { color: rgba(250, 247, 242, 0.7); transition: color 0.15s; }
+.footer-col a:hover { color: var(--gold); }
+.footer-bottom {
+  margin-top: 48px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(250, 247, 242, 0.12);
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(250, 247, 242, 0.4);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ============ MOBILE ============ */
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+  .hero-audit-preview { transform: none; }
+  .pages-grid { grid-template-columns: 1fr 1fr; }
+  .pages-grid .page-card:nth-child(5) { grid-column-start: auto; }
+  .how-steps { grid-template-columns: 1fr; }
+  .how-step { border-right: none; border-bottom: 1px solid var(--border); }
+  .how-step:last-child { border-bottom: none; }
+  .methodology-facts { grid-template-columns: 1fr 1fr; gap: 24px; border-top: none; }
+  .method-fact { border-right: none; padding: 16px 12px; border-bottom: 1px solid rgba(250, 247, 242, 0.12); }
+  .service-promo-grid { grid-template-columns: 1fr; gap: 40px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-bottom { flex-direction: column; gap: 10px; }
+  .hub-card-header { flex-direction: column; align-items: flex-start; }
+  .hub-card-stats { width: 100%; justify-content: flex-start; }
+  .hub-card-stat-block { text-align: left; }
+  .hub-audit-row { grid-template-columns: auto 1fr auto; gap: 14px; }
+  .hub-audit-row-date, .hub-audit-row-link { display: none; }
+  .hub-service-card { grid-template-columns: 1fr; gap: 18px; }
+  .nav-links a:not(.btn) { display: none; }
+  .nav-links a.nav-keep, .nav-links .nav-divider, .nav-links .nav-user-pill { display: inline-flex; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ DOC INTRO ============ -->
+<div class="doc-intro">
+  <div class="doc-intro-inner">
+    <div class="doc-intro-tag">/audit · single-goal landing page · drives signup for the free Review Audit</div>
+    <h1 class="doc-intro-title">Full alignment with the homepage. <em>One goal</em>: get the visitor to start the free Review Audit.</h1>
+    <p class="doc-intro-body">Rebuilt around a single conversion goal. Every section pushes the user to start the audit or explains what the audit is. New voice (&ldquo;Review Audit&rdquo;, &ldquo;Review Score&rdquo;, &ldquo;no fake reviews, no shortcuts, ever&rdquo;), new proof section (Bridge Street Dental 52&rarr;84&rarr;90), Service cross-promo demoted to a small card after the final CTA so it doesn&rsquo;t compete with the primary CTA.</p>
+    
+    <div class="doc-intro-states">
+      <div>
+        <div class="doc-state-num">State A · Cold visitor</div>
+        <div class="doc-state-title">Single-goal landing page</div>
+        <div class="doc-state-body">Hero, 7-page Review Audit explained, three steps, proof case study, methodology, FAQ, final CTA. The primary CTA &ldquo;Get your free Review Audit&rdquo; repeats 4 times down the page. Small service cross-promo card at the bottom only.</div>
+      </div>
+      <div>
+        <div class="doc-state-num">State B · Logged-in with audits</div>
+        <div class="doc-state-title">Audit hub</div>
+        <div class="doc-state-body">Personalized greeting + list of past audits + &ldquo;Generate new audit&rdquo; + path to choose a service plan. Marketing content below is condensed. Hub state preserved from previous build.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- STATE A · COLD VISITOR                                          -->
+<!-- ============================================================== -->
+<div class="state-divider">
+  <span class="state-divider-num">STATE A</span>
+  Cold visitor · marketing landing
+  <span class="state-divider-cond">if (!user || !user.hasAnyAudit) render this</span>
+</div>
+
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-mark">B</span>
+        BAAM Review
+      </a>
+      <div class="nav-links">
+        <a href="/audit" class="active">Audit</a>
+        <a href="/service">Service</a>
+        <a href="/methodology">Research</a>
+        <span class="nav-divider"></span>
+        <a href="https://app.baamreview.com/login">Log in</a>
+        <a href="https://app.baamreview.com/signup" class="btn btn-primary nav-keep" style="padding: 9px 16px; font-size: 13px;">Get free audit →</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      
+      <div>
+        <div class="hero-eyebrow">
+          A PROFESSIONAL SERVICE FROM BAAM STUDIO
+          <span class="hero-eyebrow-dot"></span>
+        </div>
+        <h1>
+          Know exactly where your reputation stands.<br>
+          <em>In ten seconds. Free.</em>
+        </h1>
+        <p class="hero-sub">
+          The <strong>free 7-page Review Audit</strong> shows your <strong>Review Score</strong> (0–100), how much money your reviews are costing you each month, and the 5 specific actions to climb. Real analysis on your real local competitors &mdash; <strong>no fake reviews, no shortcuts, ever.</strong>
+        </p>
+        <div class="hero-ctas">
+          <a href="https://app.baamreview.com/signup" class="btn btn-primary btn-large">Get your free Review Audit &rarr;</a>
+          <a href="#what-you-get" class="btn btn-outline btn-large">What&rsquo;s in the audit &rarr;</a>
+        </div>
+        <div class="hero-trust">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Free, no card</span>
+          <span class="hero-trust-line"></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>23 NY-metro clients &middot; 4.8&#9733;</span>
+          <span class="hero-trust-line"></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>EN / 中文 / Español</span>
+        </div>
+      </div>
+      
+      <!-- Audit preview visual -->
+      <div class="hero-audit-preview">
+        <div class="audit-preview-header">
+          <div class="audit-preview-header-row">
+            <span class="audit-preview-brand">BAAM · REVIEW AUDIT</span>
+            <span class="audit-preview-vol">VOL. I · 2026</span>
+          </div>
+          <span class="audit-preview-sample-tag">⚠ Sample audit · for demonstration</span>
+        </div>
+        <div class="audit-preview-body">
+          <div class="audit-preview-business">
+            <h4 class="audit-preview-name">Bridge Street Dental</h4>
+            <div class="audit-preview-meta">Brooklyn, NY · Dental practice</div>
+          </div>
+          <div class="audit-preview-score">
+            <div class="audit-preview-score-num-wrap">
+              <span class="audit-preview-score-num">52</span>
+              <span class="audit-preview-score-divider">/</span>
+              <span class="audit-preview-score-denom">100</span>
+            </div>
+            <div>
+              <div class="audit-preview-score-label">BAAM Review Score</div>
+              <div class="audit-preview-grade">Grade C · Below average</div>
+              <div class="audit-preview-diagnosis">4 of 5 competitors rank higher.</div>
+            </div>
+          </div>
+          <div class="audit-preview-subscores">
+            <div class="audit-preview-subscore-row">
+              <span>Rating</span>
+              <div class="audit-preview-bar"><div class="audit-preview-bar-fill ok" style="width: 68%;"></div></div>
+              <span class="audit-preview-bar-val">68</span>
+            </div>
+            <div class="audit-preview-subscore-row">
+              <span>Volume</span>
+              <div class="audit-preview-bar"><div class="audit-preview-bar-fill bad" style="width: 45%;"></div></div>
+              <span class="audit-preview-bar-val">45</span>
+            </div>
+            <div class="audit-preview-subscore-row">
+              <span>30d velocity</span>
+              <div class="audit-preview-bar"><div class="audit-preview-bar-fill bad" style="width: 20%;"></div></div>
+              <span class="audit-preview-bar-val">20</span>
+            </div>
+            <div class="audit-preview-subscore-row">
+              <span>6mo velocity</span>
+              <div class="audit-preview-bar"><div class="audit-preview-bar-fill bad" style="width: 38%;"></div></div>
+              <span class="audit-preview-bar-val">38</span>
+            </div>
+          </div>
+          <div class="audit-preview-projection">
+            <div class="audit-preview-projection-label">Do-nothing 6-month projection</div>
+            <div class="audit-preview-projection-val"><em>−$48,200</em> in lost revenue</div>
+            <div class="audit-preview-projection-sub">Per BAAM dental benchmarks · $1,340/review</div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT YOU RECEIVE (7 pages) ============ -->
+<section class="pages-section" id="what-you-get">
+  <div class="container">
+    <div class="pages-header">
+      <div class="section-eyebrow">§ 01 · What you receive</div>
+      <h2 class="section-title">A real <em>Review Audit.</em> Not &ldquo;7 tips.&rdquo;</h2>
+      <p class="section-sub">Seven pages of analysis built specifically for your business, your vertical, and your local market. Delivered as a PDF you can share with partners, accountants, or investors. <strong>Free, every page.</strong></p>
+    </div>
+    <div class="pages-grid">
+      <div class="page-card">
+        <div class="page-card-num">Page 01</div>
+        <div class="page-card-title">Why reviews decide who wins</div>
+        <div class="page-card-detail">5 cited facts about local search, conversion, and AI-driven discovery.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">Page 02</div>
+        <div class="page-card-title">Your current snapshot</div>
+        <div class="page-card-detail">Your standing across Google, Yelp, and vertical-specific platforms.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">Page 03</div>
+        <div class="page-card-title">Your BAAM Review Score</div>
+        <div class="page-card-detail">0–100 score with transparent sub-score rubric and grade.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">Page 04</div>
+        <div class="page-card-title">Industry benchmarks</div>
+        <div class="page-card-detail">Per-review dollar value and velocity standards for your vertical.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">Page 05</div>
+        <div class="page-card-title">Competitor comparison</div>
+        <div class="page-card-detail">Your 5 real local competitors, side-by-side.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">Page 06</div>
+        <div class="page-card-title">12-month action plan</div>
+        <div class="page-card-detail">Five specific actions with dollar value per action.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-num">Page 07</div>
+        <div class="page-card-title">Reference appendix</div>
+        <div class="page-card-detail">Methodology, sources, and per-vertical reference tables.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="how-section">
+  <div class="container">
+    <div class="how-header">
+      <div class="section-eyebrow">§ 02 · How it works</div>
+      <h2 class="section-title">Three steps. <em>Ten seconds.</em> Always free.</h2>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num">i</div>
+        <h3 class="how-step-title">Sign up</h3>
+        <p class="how-step-body">Create your free account with email or Google. <strong>No card asked.</strong> We need to know where to send your audit.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">ii</div>
+        <h3 class="how-step-title">Enter your business</h3>
+        <p class="how-step-body">Business name, address, and (optional) website. We find your Google profile, your reviews, and your 5 real local competitors automatically.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">iii</div>
+        <h3 class="how-step-title">Receive your Review Audit</h3>
+        <p class="how-step-body">The 7-page PDF arrives in your inbox. View it anytime in your dashboard. Re-audit monthly to track your <strong>Review Score</strong> over time.</p>
+      </div>
+    </div>
+    <div class="how-cta-row">
+      <a href="https://app.baamreview.com/signup" class="btn btn-primary btn-large">Get your free Review Audit &rarr;</a>
+      <span class="how-cta-note">Free &middot; No card asked &middot; ~10 seconds</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE PROOF (Bridge Street Dental case study) ============ -->
+<section class="proof-section">
+  <div class="container">
+    <div class="proof-header">
+      <div class="section-eyebrow">§ 03 · The proof</div>
+      <h2 class="section-title">A real audit. <em>A real result.</em></h2>
+      <p class="section-sub">A Brooklyn dental practice took their audit, followed the action plan with the BAAM Review service, and tracked their <strong>Review Score</strong> month over month. This is what happened.</p>
+    </div>
+
+    <div class="proof-card">
+      <div class="proof-card-tag">A real client &middot; 6 months in</div>
+      <div class="proof-card-name">Bridge Street Dental</div>
+      <div class="proof-card-meta">Brooklyn, NY · Dental practice</div>
+
+      <div class="proof-scores">
+        <div class="proof-score-block start">
+          <div class="proof-score-num">52</div>
+          <div class="proof-score-label">Month 1</div>
+        </div>
+        <span class="proof-score-arrow">&rarr;</span>
+        <div class="proof-score-block now">
+          <div class="proof-score-num">84</div>
+          <div class="proof-score-label">Month 6</div>
+        </div>
+        <span class="proof-score-arrow">&rarr;</span>
+        <div class="proof-score-block goal">
+          <div class="proof-score-num">90</div>
+          <div class="proof-score-label">Goal</div>
+        </div>
+      </div>
+
+      <div class="proof-stats">
+        <div class="proof-stat">
+          <div class="proof-stat-num">+47</div>
+          <div class="proof-stat-label">new reviews,<br>all real</div>
+        </div>
+        <div class="proof-stat">
+          <div class="proof-stat-num">+0.6&#9733;</div>
+          <div class="proof-stat-label">star rating<br>lift</div>
+        </div>
+        <div class="proof-stat">
+          <div class="proof-stat-num">C &rarr; B &rarr; <span class="goal-stat">A</span></div>
+          <div class="proof-stat-label">grade so far &middot;<br>goal: A (90)</div>
+        </div>
+      </div>
+
+      <p class="proof-footnote"><strong>No fake reviews, no shortcuts, ever.</strong> Every review counted above was written by a real patient after a real visit. The audit identified the gap; the service kept the rhythm. Your audit will show your version of this trajectory &mdash; whatever your starting score.</p>
+    </div>
+
+    <div class="proof-cta-row">
+      <a href="https://app.baamreview.com/signup" class="btn btn-primary btn-large">Get your free Review Audit &rarr;</a>
+      <span class="how-cta-note">Free &middot; No card asked &middot; ~10 seconds</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ METHODOLOGY ============ -->
+<section class="methodology-section">
+  <div class="container">
+    <div class="methodology-header">
+      <div class="section-eyebrow">§ 04 · The methodology</div>
+      <h2 class="section-title">Four facts that justify <em>every number</em> in your audit.</h2>
+      <p class="section-sub">Backed by 15 independent sources &mdash; Harvard Business School, BrightLocal, Whitespark, FTC, and more. The audit shows you the work, not just the conclusions.</p>
+    </div>
+    <div class="methodology-facts">
+      <div class="method-fact">
+        <div class="method-fact-num">01</div>
+        <div class="method-fact-stat">16–20<span class="unit">%</span></div>
+        <div class="method-fact-body">Of Google's Local Pack ranking weight now comes from review signals — up from 11% five years ago.</div>
+      </div>
+      <div class="method-fact">
+        <div class="method-fact-num">02</div>
+        <div class="method-fact-stat">87<span class="unit">%</span></div>
+        <div class="method-fact-body">Of local customers check Google reviews before visiting a business. (BrightLocal Local Consumer Review Survey, 2024.)</div>
+      </div>
+      <div class="method-fact">
+        <div class="method-fact-num">03</div>
+        <div class="method-fact-stat">+25<span class="unit">%</span></div>
+        <div class="method-fact-body">Conversion lift from a 0.1-star rating increase for brick-and-mortar businesses.</div>
+      </div>
+      <div class="method-fact">
+        <div class="method-fact-num">04</div>
+        <div class="method-fact-stat">5–9<span class="unit">%</span></div>
+        <div class="method-fact-body">Revenue increase per 1-star rating bump. Harvard Business School confirms it's causation, not correlation.</div>
+      </div>
+    </div>
+    <div class="methodology-footer">
+      Full methodology · 15 cited sources · <a href="/methodology">read the research →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq-section">
+  <div class="container">
+    <div class="faq-inner">
+      <div class="faq-header">
+        <div class="section-eyebrow">§ 05 · Frequently asked</div>
+        <h2 class="section-title">The things <em>everyone asks</em> about the audit.</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q">Is the Review Audit really free? <em>What&rsquo;s the catch?</em></div>
+          <div class="faq-a">No catch. The audit is genuinely free &mdash; <strong>no card asked, no hidden tier, no time-limited trial</strong>. We hope some businesses, after seeing what the audit recommends, will want help executing the action plan &mdash; that&rsquo;s what the <a href="/service">Review Service</a> is for. The audit alone has no cost and no obligation.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Why do I need to sign up if it&rsquo;s free?</div>
+          <div class="faq-a">So we can email your PDF and so you can come back to view past audits. <strong>We don&rsquo;t sell email lists.</strong> Same account works for both the audit and the service &mdash; if you upgrade later, no re-signup needed.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">How many audits can I run?</div>
+          <div class="faq-a"><strong>Two audits per month, five audits lifetime.</strong> Generous enough to audit a few businesses you own; restrictive enough to prevent abuse. Re-audit monthly to track your <strong>Review Score</strong> over time.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">My business is mainly in Chinese &mdash; does that work?</div>
+          <div class="faq-a">是。For Chinese-name businesses, we auto-detect and produce both English and Traditional Chinese versions of the audit. 對於主要服務華語客戶的企業，我們會自動生成中英雙語版本。</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">How accurate is the <em>Review Score?</em></div>
+          <div class="faq-a">The score is calculated from four sub-scores (rating, volume, 30-day velocity, 6-month velocity), each weighted against verified industry benchmarks. The full rubric and per-vertical reference tables are on Page 07 of the audit &mdash; the methodology is transparent. <strong>No fake reviews, no shortcuts, ever</strong> &mdash; we won&rsquo;t inflate your numbers and we won&rsquo;t recommend anything we wouldn&rsquo;t do for our own clients.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">How is this different from <em>Birdeye or Podium?</em></div>
+          <div class="faq-a">Birdeye and Podium are review management platforms ($299+/mo with setup fees). We&rsquo;re an audit (free) plus an optional follow-on Review Service ($99&ndash;$399/mo, no setup). The audit gives you the analysis before you commit to anything &mdash; including us.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What if my business has <em>no reviews yet?</em></div>
+          <div class="faq-a">The audit needs at least 5 Google reviews to produce meaningful analysis. Below that, results are unreliable. If you have fewer than 5, we recommend collecting some first, then coming back &mdash; or talk to us about the Full Service tier, which includes a setup phase for businesses starting from zero.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="final-cta">
+  <div class="container">
+    <div class="final-cta-inner">
+      <div class="final-cta-mark">§</div>
+      <h2 class="final-cta-title">Your reputation is being audited <em>right now</em> by your customers.</h2>
+      <p class="final-cta-sub">The only question is whether you&rsquo;ve seen the report. Get yours in ten seconds &mdash; free, no card, no commitment.</p>
+      <div class="final-cta-buttons">
+        <a href="https://app.baamreview.com/signup" class="btn btn-gold btn-xl">Get your free Review Audit &rarr;</a>
+      </div>
+      <div class="final-cta-footnote">Free &middot; No card asked &middot; ~10 seconds &middot; EN / 中文 / Español</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AFTER YOUR AUDIT (small service cross-promo) ============ -->
+<section class="after-audit-section">
+  <div class="container">
+    <div class="after-audit-card">
+      <div class="after-audit-card-tag">After your audit</div>
+      <div class="after-audit-card-body">
+        <h3 class="after-audit-card-title">If you&rsquo;d rather have us run it for you</h3>
+        <p class="after-audit-card-copy">The audit shows you exactly what to do. If your team doesn&rsquo;t have time to execute &mdash; the <strong>Review Service</strong> ($99 or $399/mo) handles requests, replies, and reporting. Same login, no re-signup. Read it after you have your audit, not before.</p>
+      </div>
+      <div class="after-audit-card-cta">
+        <a href="/service" class="btn btn-outline">Learn about the service &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="/" class="logo">
+          <span class="logo-mark">B</span>
+          BAAM Review
+        </a>
+        <p class="footer-tagline">Your reputation, audited. Then run for you. From BAAM Studio · New York.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Product</div>
+        <ul>
+          <li><a href="/audit">Free Audit</a></li>
+          <li><a href="/service">Service</a></li>
+          <li><a href="/methodology">Methodology</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Company</div>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Legal</div>
+        <ul>
+          <li><a href="/legal/privacy">Privacy</a></li>
+          <li><a href="/legal/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 BAAM Studio · New York</span>
+      <span>Vol. I · No. 001</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================== -->
+<!-- STATE B · LOGGED IN, HAS AUDITS                                 -->
+<!-- ============================================================== -->
+<div class="state-divider">
+  <span class="state-divider-num">STATE B</span>
+  Logged in with audits · audit hub
+  <span class="state-divider-cond">if (user &amp;&amp; user.audits.length &gt; 0) render this</span>
+</div>
+
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-mark">B</span>
+        BAAM Review
+      </a>
+      <div class="nav-links">
+        <a href="/audit" class="active">Audit</a>
+        <a href="/service">Service</a>
+        <a href="https://app.baamreview.com/audits">Dashboard</a>
+        <span class="nav-divider"></span>
+        <span class="nav-user-pill">
+          <span class="nav-user-avatar">J</span>
+          John
+        </span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- STATE B · AUDIT HUB -->
+<section class="hero state-b">
+  <div class="container">
+    <div class="hub-card">
+      
+      <!-- Hub header -->
+      <div class="hub-card-header">
+        <div>
+          <div class="hub-card-header-tag">Your audit hub</div>
+          <h1 class="hub-card-greeting">Welcome back, <em>John.</em></h1>
+          <div class="hub-card-summary">3 audits across 2 businesses · Latest audit 3 days ago</div>
+        </div>
+        <div class="hub-card-stats">
+          <div class="hub-card-stat-block">
+            <div class="hub-card-stat-label">This month</div>
+            <div class="hub-card-stat-val">1 / 2</div>
+          </div>
+          <div class="hub-card-stat-block">
+            <div class="hub-card-stat-label">Lifetime</div>
+            <div class="hub-card-stat-val">3 / 5</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Hub body -->
+      <div class="hub-card-body">
+        
+        <div class="hub-section-label">Recent audits · click to view</div>
+        <div class="hub-audits-list">
+          
+          <a href="/audits/26-0512" class="hub-audit-row">
+            <div class="hub-audit-row-mark">B</div>
+            <div class="hub-audit-row-info">
+              <div class="hub-audit-row-name">Bridge Street Dental</div>
+              <div class="hub-audit-row-meta">Brooklyn, NY · Dental practice</div>
+            </div>
+            <div class="hub-audit-row-score-wrap">
+              <span class="hub-audit-row-score">52</span>
+              <span class="hub-audit-row-score-denom">/100</span>
+            </div>
+            <span class="hub-audit-row-grade warn">Grade C</span>
+            <span class="hub-audit-row-date">May 29, 2026</span>
+          </a>
+          
+          <a href="/audits/26-0498" class="hub-audit-row">
+            <div class="hub-audit-row-mark" style="background: linear-gradient(135deg, #C0392B, #962D22); color: white;">黄</div>
+            <div class="hub-audit-row-info">
+              <div class="hub-audit-row-name">Dr. Huang Acupuncture</div>
+              <div class="hub-audit-row-meta">Flushing, NY · TCM clinic</div>
+            </div>
+            <div class="hub-audit-row-score-wrap">
+              <span class="hub-audit-row-score">71</span>
+              <span class="hub-audit-row-score-denom">/100</span>
+            </div>
+            <span class="hub-audit-row-grade ok">Grade B</span>
+            <span class="hub-audit-row-date">Apr 21, 2026</span>
+          </a>
+          
+          <a href="/audits/26-0312" class="hub-audit-row">
+            <div class="hub-audit-row-mark" style="background: linear-gradient(135deg, var(--forest), var(--forest-dark)); color: var(--cream);">B</div>
+            <div class="hub-audit-row-info">
+              <div class="hub-audit-row-name">Bridge Street Dental</div>
+              <div class="hub-audit-row-meta">Brooklyn, NY · Dental practice · Re-audit</div>
+            </div>
+            <div class="hub-audit-row-score-wrap">
+              <span class="hub-audit-row-score">48</span>
+              <span class="hub-audit-row-score-denom">/100</span>
+            </div>
+            <span class="hub-audit-row-grade warn">Grade C-</span>
+            <span class="hub-audit-row-date">Mar 18, 2026</span>
+          </a>
+          
+        </div>
+        
+        <!-- Hub actions -->
+        <div class="hub-actions">
+          <a href="https://app.baamreview.com/audits/new" class="btn btn-primary btn-large">Run a new audit →</a>
+          <a href="https://app.baamreview.com/audits" class="btn btn-outline btn-large">View all in dashboard →</a>
+        </div>
+        <p class="hub-quota-note">
+          <strong>QUOTA</strong> &nbsp; You have 1 audit remaining this month and 2 remaining lifetime. Quotas reset on the 1st of each month.
+        </p>
+        
+        <!-- Service cross-link -->
+        <div class="hub-service-card">
+          <div class="hub-service-card-content">
+            <div class="hub-service-card-tag">→ Ready to act on Bridge Street Dental's audit?</div>
+            <h3 class="hub-service-card-title">Most clients with Grade C reach <em>Grade B</em> within 90 days of service.</h3>
+            <p class="hub-service-card-body">BAAM Review Service runs your review collection for you. Start a 30-day free trial — uses this same account, no re-signup. Two tiers: $99 or $399/mo.</p>
+          </div>
+          <a href="/service" class="hub-service-card-cta">Choose a plan →</a>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Below State B hero: condensed marketing content for context -->
+<!-- The 7-pages grid, methodology, FAQ sections remain the same as State A — Claude Code renders them conditionally.
+     For this preview, only the hero is replaced. -->
+
+<section class="pages-section">
+  <div class="container">
+    <div class="pages-header">
+      <div class="section-eyebrow">§ Reference · What each audit contains</div>
+      <h2 class="section-title">Every audit you run is <em>7 pages</em>, same structure.</h2>
+      <p class="section-sub">Re-running an audit lets you track score changes month-over-month. Everything below appears in every audit.</p>
+    </div>
+    <div class="pages-grid">
+      <div class="page-card"><div class="page-card-num">Page 01</div><div class="page-card-title">Why reviews decide who wins</div><div class="page-card-detail">5 cited facts about local search and AI-driven discovery.</div></div>
+      <div class="page-card"><div class="page-card-num">Page 02</div><div class="page-card-title">Your current snapshot</div><div class="page-card-detail">Standing across Google, Yelp, vertical platforms.</div></div>
+      <div class="page-card"><div class="page-card-num">Page 03</div><div class="page-card-title">Your BAAM Review Score</div><div class="page-card-detail">0–100 score with sub-score rubric and grade.</div></div>
+      <div class="page-card"><div class="page-card-num">Page 04</div><div class="page-card-title">Industry benchmarks</div><div class="page-card-detail">Per-review dollar value for your vertical.</div></div>
+      <div class="page-card"><div class="page-card-num">Page 05</div><div class="page-card-title">Competitor comparison</div><div class="page-card-detail">Your 5 real local competitors, side-by-side.</div></div>
+      <div class="page-card"><div class="page-card-num">Page 06</div><div class="page-card-title">12-month action plan</div><div class="page-card-detail">Five specific actions with dollar value per action.</div></div>
+      <div class="page-card"><div class="page-card-num">Page 07</div><div class="page-card-title">Reference appendix</div><div class="page-card-detail">Methodology, sources, per-vertical references.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- State B Final CTA -->
+<section class="final-cta">
+  <div class="container">
+    <div class="final-cta-inner">
+      <div class="final-cta-mark">§</div>
+      <h2 class="final-cta-title">Ready for another <em>audit</em>?</h2>
+      <p class="final-cta-sub">You have 1 audit remaining this month. Re-audit Bridge Street Dental to see what's changed, or audit a new business.</p>
+      <div class="final-cta-buttons">
+        <a href="https://app.baamreview.com/audits/new" class="btn btn-gold btn-xl">Run a new audit →</a>
+        <a href="/service" class="btn btn-outline btn-xl">Choose a service plan →</a>
+      </div>
+      <div class="final-cta-footnote">Same account · No charge · ~10 seconds · 1 of 2 audits remaining this month</div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('nav').forEach(n => {
+    window.addEventListener('scroll', () => n.classList.toggle('scrolled', window.scrollY > 20));
+  });
+</script>
+
+</body>
+</html>

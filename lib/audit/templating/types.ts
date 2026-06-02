@@ -83,6 +83,9 @@ export interface AuditViewModel {
   total_value_added_display: string;
   total_value_lost_display: string;
 
+  // Service Opportunity — between Section 6 and Section 7 (paid only)
+  service_opportunity: ServiceOpportunityVM;
+
   // Section 7 — Appendix (paid only)
   appendix_value_rows: AppendixValueRowVM[];
   appendix_velocity_rows: AppendixVelocityRowVM[];
@@ -153,6 +156,31 @@ export interface TranslatedStrings {
   cta_self: { label: string; title: string; price: string; desc: string };
   cta_full: { label: string; title: string; price: string; desc: string };
   cta_promise_html: string;
+  cta_action_self_label: string;
+  cta_action_full_label: string;
+  cta_action_compare_label: string;
+  so_eyebrow: string;
+  so_headline_html: string;
+  so_deck: string;
+  so_stat_label_90d: string;
+  so_stat_label_180d: string;
+  so_stat_label_12mo: string;
+  so_stat_sub_90d: string;
+  so_stat_sub_180d: string;
+  so_stat_sub_12mo: string;
+  so_tier_self_name_html: string;
+  so_tier_self_price: string;
+  so_tier_self_projection_html: string;
+  so_tier_self_cta: string;
+  so_tier_full_name_html: string;
+  so_tier_full_price: string;
+  so_tier_full_projection_html: string;
+  so_tier_full_cta: string;
+  so_tier_full_recommended: string;
+  so_compare_link: string;
+  so_trust_line: string;
+  inline_service_preview_html: string;
+  inline_service_preview_link: string;
   appendix_section_title: string;
   appendix_section_headline_html: string;
   appendix_section_deck_html: string;
@@ -238,6 +266,26 @@ export interface ActionItemVM {
   value_amount_display: string;
   value_label: string;
   value_calc_html: string;
+}
+
+export interface ServiceOpportunityVM {
+  starting_score: number;
+  starting_grade: "A" | "B" | "C" | "D" | "F";
+  d90_display: string;
+  d90_grade: "A" | "B" | "C" | "D" | "F";
+  d90_grade_label_en: string;
+  d90_grade_label_zh: string;
+  d180_display: string;
+  d180_grade: "A" | "B" | "C" | "D" | "F";
+  d180_grade_label_en: string;
+  d180_grade_label_zh: string;
+  m12_display: string;
+  m12_grade: "A" | "B" | "C" | "D" | "F";
+  m12_grade_label_en: string;
+  m12_grade_label_zh: string;
+  self_d90_display: string;
+  full_d90_display: string;
+  audit_id: string;
 }
 
 export interface AppendixValueRowVM {

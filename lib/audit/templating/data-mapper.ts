@@ -15,6 +15,7 @@ import type {
   PlatformRowVM,
   RenderAuditInput,
   ScaleTickVM,
+  ServiceOpportunityVM,
   SubscoreRowVM,
   TranslatedStrings,
 } from "./types";
@@ -90,6 +91,8 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
     total_value_added_display: buildTotalValueAddedDisplay(google, score, competitors, benchmarks),
     total_value_lost_display: `$${projection.revenue_impact.six_month_loss_usd.toLocaleString()}`,
 
+    service_opportunity: buildServiceOpportunity(score.total, score.grade, auditId),
+
     appendix_value_rows: buildAppendixValueRows(google.vertical.inferred_vertical, language),
     appendix_velocity_rows: buildAppendixVelocityRows(google.vertical.inferred_vertical, language),
 
@@ -101,6 +104,8 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
       per_review_value_range_display: `$${benchmarks.per_review_value.range_low_usd.toLocaleString()} — $${benchmarks.per_review_value.range_high_usd.toLocaleString()}`,
       total_value_added_display: buildTotalValueAddedDisplay(google, score, competitors, benchmarks),
       total_value_lost_display: `$${projection.revenue_impact.six_month_loss_usd.toLocaleString()}`,
+      service_opportunity: buildServiceOpportunity(score.total, score.grade, auditId),
+      business_name_display: pickPrimaryName(google.business.name, language),
     }),
   };
 }
@@ -115,6 +120,8 @@ function buildTranslatedStrings(
     per_review_value_range_display: string;
     total_value_added_display: string;
     total_value_lost_display: string;
+    service_opportunity: ServiceOpportunityVM;
+    business_name_display: string;
   },
 ): TranslatedStrings {
   const s = STRINGS[language];
@@ -190,6 +197,46 @@ function buildTranslatedStrings(
     cta_self: s.cta_self,
     cta_full: s.cta_full,
     cta_promise_html: s.cta_promise_html,
+    cta_action_self_label: s.cta_action_self_label,
+    cta_action_full_label: s.cta_action_full_label,
+    cta_action_compare_label: s.cta_action_compare_label,
+    so_eyebrow: s.so_eyebrow,
+    so_headline_html: s.so_headline_html(
+      ctx.service_opportunity.starting_score,
+      ctx.service_opportunity.d180_grade,
+    ),
+    so_deck: s.so_deck,
+    so_stat_label_90d: s.so_stat_label_90d,
+    so_stat_label_180d: s.so_stat_label_180d,
+    so_stat_label_12mo: s.so_stat_label_12mo,
+    so_stat_sub_90d: isZh
+      ? ctx.service_opportunity.d90_grade_label_zh
+      : ctx.service_opportunity.d90_grade_label_en,
+    so_stat_sub_180d: isZh
+      ? ctx.service_opportunity.d180_grade_label_zh
+      : ctx.service_opportunity.d180_grade_label_en,
+    so_stat_sub_12mo: isZh
+      ? ctx.service_opportunity.m12_grade_label_zh
+      : ctx.service_opportunity.m12_grade_label_en,
+    so_tier_self_name_html: s.so_tier_self_name_html,
+    so_tier_self_price: s.so_tier_self_price,
+    so_tier_self_projection_html: s.so_tier_self_projection_html(
+      ctx.business_name_display,
+      ctx.service_opportunity.self_d90_display,
+    ),
+    so_tier_self_cta: s.so_tier_self_cta,
+    so_tier_full_name_html: s.so_tier_full_name_html,
+    so_tier_full_price: s.so_tier_full_price,
+    so_tier_full_projection_html: s.so_tier_full_projection_html(
+      ctx.business_name_display,
+      ctx.service_opportunity.full_d90_display,
+    ),
+    so_tier_full_cta: s.so_tier_full_cta,
+    so_tier_full_recommended: s.so_tier_full_recommended,
+    so_compare_link: s.so_compare_link,
+    so_trust_line: s.so_trust_line,
+    inline_service_preview_html: s.inline_service_preview_html,
+    inline_service_preview_link: s.inline_service_preview_link,
     appendix_section_title: s.appendix_section_title,
     appendix_section_headline_html: s.appendix_section_headline_html,
     appendix_section_deck_html: s.appendix_section_deck_html,
@@ -817,3 +864,98 @@ const APPENDIX_VELOCITY_DATA: Array<{
   { key: "real_estate", minimum: 1, optimal: "3 – 5", aggressive: "6+", matches: ["real_estate"] },
   { key: "legal_immigration", minimum: 1, optimal: "3 – 5", aggressive: "6+", matches: ["legal_immigration"] },
 ];
+
+// ===================================================================
+// Service Opportunity projection — simple, defensible model used in the
+// "§ Service Opportunity" section that sits between Page 6 and Page 7.
+//
+// Lift bands by starting grade:
+//   F (0-39):  90d +12-22  ·  180d +20-32  ·  12mo +28-42  (most room to grow)
+//   D (40-59): 90d +10-18  ·  180d +16-26  ·  12mo +24-36
+//   C (60-74): 90d +6-14   ·  180d +10-20  ·  12mo +16-26  ← typical
+//   B (75-89): 90d +3-8    ·  180d +5-12   ·  12mo +8-16   (less headroom)
+//   A (90+):   90d +1-4    ·  180d +2-6    ·  12mo +3-8    (mostly maintenance)
+// Caps each at 95 so we never project unrealistic perfection.
+// ===================================================================
+
+interface LiftBand {
+  d90: [number, number];
+  d180: [number, number];
+  m12: [number, number];
+}
+
+const LIFT_BANDS_BY_GRADE: Record<"A" | "B" | "C" | "D" | "F", LiftBand> = {
+  F: { d90: [12, 22], d180: [20, 32], m12: [28, 42] },
+  D: { d90: [10, 18], d180: [16, 26], m12: [24, 36] },
+  C: { d90: [6, 14], d180: [10, 20], m12: [16, 26] },
+  B: { d90: [3, 8], d180: [5, 12], m12: [8, 16] },
+  A: { d90: [1, 4], d180: [2, 6], m12: [3, 8] },
+};
+
+const MAX_PROJECTED_SCORE = 95;
+
+function projectRange(
+  start: number,
+  lift: [number, number],
+): { low: number; high: number; display: string } {
+  const low = Math.min(start + lift[0], MAX_PROJECTED_SCORE);
+  const high = Math.min(start + lift[1], MAX_PROJECTED_SCORE);
+  return { low, high, display: `${low}–${high}` };
+}
+
+function gradeForScore(s: number): "A" | "B" | "C" | "D" | "F" {
+  if (s >= 90) return "A";
+  if (s >= 75) return "B";
+  if (s >= 60) return "C";
+  if (s >= 40) return "D";
+  return "F";
+}
+
+function buildServiceOpportunity(
+  startingScore: number,
+  startingGrade: "A" | "B" | "C" | "D" | "F",
+  auditId: string,
+): ServiceOpportunityVM {
+  const band = LIFT_BANDS_BY_GRADE[startingGrade];
+
+  const d90 = projectRange(startingScore, band.d90);
+  const d180 = projectRange(startingScore, band.d180);
+  const m12 = projectRange(startingScore, band.m12);
+
+  // Self-Serve: bottom-of-band lift (owner-driven, less consistent)
+  const selfBand: [number, number] = [
+    band.d90[0],
+    Math.round((band.d90[0] + band.d90[1]) / 2),
+  ];
+  const selfD90 = projectRange(startingScore, selfBand);
+
+  const d90Grade = gradeForScore(d90.high);
+  const d180Grade = gradeForScore(d180.high);
+  const m12Grade = gradeForScore(m12.high);
+
+  return {
+    starting_score: startingScore,
+    starting_grade: startingGrade,
+    d90_display: d90.display,
+    d90_grade: d90Grade,
+    d90_grade_label_en: `Entering Grade ${d90Grade} · velocity recovered`,
+    d90_grade_label_zh: `進入 ${d90Grade} 級 · 速度回升`,
+    d180_display: d180.display,
+    d180_grade: d180Grade,
+    d180_grade_label_en: `Solid Grade ${d180Grade} · competitor gap closing`,
+    d180_grade_label_zh: `穩固 ${d180Grade} 級 · 縮小與競爭對手差距`,
+    m12_display: m12.display,
+    m12_grade: m12Grade,
+    m12_grade_label_en:
+      m12Grade === "A"
+        ? "Grade A · 5× Return Standard hit"
+        : `Grade ${m12Grade} · sustained growth`,
+    m12_grade_label_zh:
+      m12Grade === "A"
+        ? "A 級 · 達成 5× 回報標準"
+        : `${m12Grade} 級 · 持續成長`,
+    self_d90_display: selfD90.display,
+    full_d90_display: d90.display,
+    audit_id: auditId,
+  };
+}

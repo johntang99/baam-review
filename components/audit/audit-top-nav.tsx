@@ -1,106 +1,92 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
-/** Unified top nav for every page under the audit product. Server
- *  component — auto-detects auth state, renders the right cluster
- *  accordingly. Pass `active` to highlight the current section. */
+/** Unified top nav for every page under /audit/*. Server component —
+ *  auto-detects auth state, renders the right user cluster.
+ *  Pass `active` to highlight the current section. */
 export type AuditNavActive =
-  | "audit"
-  | "audits"
+  | "audit-list"
   | "audit-new"
-  | "about"
-  | "methodology"
+  | "audit-service"
+  | "review"
   | null;
 
 interface AuditTopNavProps {
   active?: AuditNavActive;
-  /** Override the brand mark's link target. Defaults to /audit when
-   *  logged-out and /audits when logged-in. */
-  brandHref?: string;
 }
 
-export async function AuditTopNav({ active = null, brandHref }: AuditTopNavProps) {
+const MENU: Array<{ key: Exclude<AuditNavActive, null>; href: string; label: string }> = [
+  { key: "audit-list", href: "/audit/list", label: "My audits" },
+  { key: "audit-new", href: "/audit/new", label: "New audit" },
+  { key: "audit-service", href: "/audit/service", label: "Service" },
+  { key: "review", href: "/", label: "Review" },
+];
+
+export async function AuditTopNav({ active = null }: AuditTopNavProps) {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   const user = data.user;
   const loggedIn = !!user;
 
-  const resolvedBrandHref = brandHref ?? (loggedIn ? "/audits" : "/audit");
+  const userInitial = user?.email?.[0]?.toUpperCase() ?? "•";
+  const userName = firstNameOrEmail(user?.email ?? "");
 
   return (
-    <nav className="audit-nav">
-      <div className="audit-nav-inner">
-        <Link href={resolvedBrandHref} className="audit-nav-brand">
-          <span className="audit-nav-brand-mark">BAAM · REVIEW AUDIT</span>
-          <span className="audit-nav-brand-sub">the reputation audit</span>
+    <nav className="audit-nav-v2">
+      <div className="audit-nav-v2-inner">
+        <Link
+          href={loggedIn ? "/audit/list" : "/audit"}
+          className="audit-nav-v2-logo"
+        >
+          <span className="audit-nav-v2-logo-mark">B</span>
+          BAAM Review Audit
         </Link>
 
-        <div className="audit-nav-right">
-        {loggedIn ? (
-          <>
+        <div className="audit-nav-v2-links">
+          {MENU.map((item) => (
             <Link
-              href="/audits"
-              className={`audit-nav-link${active === "audits" ? " active" : ""}`}
+              key={item.key}
+              href={item.href}
+              className={active === item.key ? "active" : undefined}
             >
-              My audits
+              {item.label}
             </Link>
-            <Link
-              href="/audit/new"
-              className={`audit-nav-link${active === "audit-new" ? " active" : ""}`}
-            >
-              New audit
-            </Link>
-            <Link
-              href="/about"
-              className={`audit-nav-link${active === "about" ? " active" : ""}`}
-            >
-              About
-            </Link>
-            <Link href="/app" className="audit-nav-link-secondary">
-              Review platform
-            </Link>
-            <div className="audit-nav-user">
-              <span className="audit-nav-user-email">{user.email}</span>
-              <Link href="/logout" className="audit-nav-logout">
-                Log out
+          ))}
+
+          <span className="audit-nav-v2-divider"></span>
+
+          {loggedIn ? (
+            <>
+              <span className="audit-nav-v2-user-pill">
+                <span className="audit-nav-v2-user-avatar">{userInitial}</span>
+                {userName}
+              </span>
+              <form action="/api/auth/signout" method="post">
+                <input type="hidden" name="next" value="/audit" />
+                <button type="submit" className="audit-nav-v2-signout">
+                  Sign out
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link href="/login?next=/audit/list">Sign in</Link>
+              <Link
+                href="/signup?next=/audit/new"
+                className="audit-nav-v2-cta"
+              >
+                Get free audit →
               </Link>
-            </div>
-          </>
-        ) : (
-          <>
-            <Link
-              href="/audit"
-              className={`audit-nav-link${active === "audit" ? " active" : ""}`}
-            >
-              Home
-            </Link>
-            <Link
-              href="/about"
-              className={`audit-nav-link${active === "about" ? " active" : ""}`}
-            >
-              About
-            </Link>
-            <a
-              href="https://www.baamreview.com/review-value.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="audit-nav-link"
-            >
-              Methodology
-            </a>
-            <Link href="/" className="audit-nav-link-secondary">
-              Review platform
-            </Link>
-            <Link href="/login?next=/audits" className="audit-nav-link">
-              Log in
-            </Link>
-            <Link href="/signup?next=/audit/new" className="audit-nav-cta">
-              Get free audit
-            </Link>
-          </>
-        )}
+            </>
+          )}
         </div>
       </div>
     </nav>
   );
+}
+
+function firstNameOrEmail(email: string): string {
+  if (!email) return "you";
+  const local = email.split("@")[0] ?? email;
+  return local.charAt(0).toUpperCase() + local.slice(1);
 }

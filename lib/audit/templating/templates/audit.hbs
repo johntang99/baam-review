@@ -290,6 +290,13 @@
     </table>
   </div>
 
+  {{#if is_paid}}
+  <div class="service-preview-inline">
+    <p class="service-preview-inline-text">{{{t.inline_service_preview_html}}}</p>
+    <a href="#service-opportunity" class="service-preview-inline-link">{{t.inline_service_preview_link}}</a>
+  </div>
+  {{/if}}
+
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
     <span>{{t.page_label_3}}</span>
@@ -464,12 +471,74 @@
     </div>
 
     <p class="promise-line">{{{t.cta_promise_html}}}</p>
+
+    <div class="cta-action-row">
+      <a href="/signup?next=/audit/service%3Faudit%3D{{audit_id}}%26plan%3Dself" class="btn-svc dark">{{t.cta_action_self_label}}</a>
+      <a href="/signup?next=/audit/service%3Faudit%3D{{audit_id}}%26plan%3Dfull" class="btn-svc amber">{{t.cta_action_full_label}}</a>
+      <a href="/audit/service" class="cta-detail-link">{{t.cta_action_compare_label}}</a>
+    </div>
   </div>
 
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
     <span>{{t.page_label_6}}</span>
   </div>
+</section>
+
+<!-- ====================== SERVICE OPPORTUNITY · between Page 6 and Page 7 ====================== -->
+<section class="service-opportunity-page" id="service-opportunity">
+  <div class="so-eyebrow">{{t.so_eyebrow}}</div>
+  <h2 class="so-headline">{{{t.so_headline_html}}}</h2>
+  <p class="so-deck">{{t.so_deck}}</p>
+
+  <div class="so-grid">
+    <div class="so-stat">
+      <div class="so-stat-label">{{t.so_stat_label_90d}}</div>
+      <div class="so-stat-value">{{service_opportunity.d90_display}}</div>
+      <div class="so-stat-sub">{{t.so_stat_sub_90d}}</div>
+    </div>
+    <div class="so-stat">
+      <div class="so-stat-label">{{t.so_stat_label_180d}}</div>
+      <div class="so-stat-value">{{service_opportunity.d180_display}}</div>
+      <div class="so-stat-sub">{{t.so_stat_sub_180d}}</div>
+    </div>
+    <div class="so-stat">
+      <div class="so-stat-label">{{t.so_stat_label_12mo}}</div>
+      <div class="so-stat-value">{{service_opportunity.m12_display}}</div>
+      <div class="so-stat-sub">{{t.so_stat_sub_12mo}}</div>
+    </div>
+  </div>
+
+  <div class="so-tiers">
+    <div class="so-tier">
+      <div class="so-tier-name-row">
+        <div class="so-tier-name">{{{t.so_tier_self_name_html}}}</div>
+        <div class="so-tier-price">{{t.so_tier_self_price}}</div>
+      </div>
+      <p class="so-tier-projection">{{{t.so_tier_self_projection_html}}}</p>
+      <div class="so-cta-row">
+        <a href="/signup?next=/audit/service%3Faudit%3D{{audit_id}}%26plan%3Dself" class="so-cta outline">{{t.so_tier_self_cta}}</a>
+      </div>
+    </div>
+
+    <div class="so-tier featured">
+      <span class="so-tier-recommended">{{t.so_tier_full_recommended}}</span>
+      <div class="so-tier-name-row">
+        <div class="so-tier-name">{{{t.so_tier_full_name_html}}}</div>
+        <div class="so-tier-price">{{t.so_tier_full_price}}</div>
+      </div>
+      <p class="so-tier-projection">{{{t.so_tier_full_projection_html}}}</p>
+      <div class="so-cta-row">
+        <a href="/signup?next=/audit/service%3Faudit%3D{{audit_id}}%26plan%3Dfull" class="so-cta amber">{{t.so_tier_full_cta}}</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="so-compare-link">
+    <a href="/audit/service">{{t.so_compare_link}}</a>
+  </div>
+
+  <p class="so-trust">{{t.so_trust_line}}</p>
 </section>
 
 <!-- ====================== PAGE 7 — APPENDIX ====================== -->

@@ -1,0 +1,154 @@
+/* Shared design tokens + nav for every /audit/* route.
+ * Loaded by app/audit/layout.tsx — page-specific design HTML (audit-list.html,
+ * audit-service.html, etc.) redefines the same tokens, which is harmless. */
+
+.audit-shell {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-soft: #E8D9B5;
+  --gold-dark: #8E7430;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --warn: #B85A38;
+}
+
+.audit-nav-v2 {
+  padding: 22px 0;
+  position: sticky;
+  top: 0;
+  background: rgba(250, 247, 242, 0.92);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+}
+.audit-nav-v2-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.audit-nav-v2-logo {
+  font-family: "Fraunces", serif;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
+}
+.audit-nav-v2-logo-mark {
+  width: 32px;
+  height: 32px;
+  background: var(--forest);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cream);
+  font-weight: 600;
+  font-size: 14px;
+}
+.audit-nav-v2-links {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+}
+.audit-nav-v2-links a {
+  font-family: "Onest", system-ui, sans-serif;
+  font-size: 13.5px;
+  color: var(--text-soft);
+  font-weight: 400;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.audit-nav-v2-links a:hover {
+  color: var(--text);
+}
+.audit-nav-v2-links a.active {
+  color: var(--text);
+  font-weight: 600;
+}
+.audit-nav-v2-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 4px;
+}
+.audit-nav-v2-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: "Onest", sans-serif;
+  font-size: 12.5px;
+  color: var(--text);
+}
+.audit-nav-v2-user-avatar {
+  width: 22px;
+  height: 22px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+.audit-nav-v2-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 16px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 999px;
+  font-family: "Onest", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.audit-nav-v2-cta:hover {
+  background: var(--forest-dark);
+}
+.audit-nav-v2-signout {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: "Onest", system-ui, sans-serif;
+  font-size: 13.5px;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.audit-nav-v2-signout:hover {
+  color: var(--text);
+}
+
+@media (max-width: 720px) {
+  .audit-nav-v2-links {
+    gap: 14px;
+  }
+  .audit-nav-v2-links a:not(.audit-nav-v2-cta) {
+    font-size: 12.5px;
+  }
+}

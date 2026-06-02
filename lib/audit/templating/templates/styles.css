@@ -1360,3 +1360,323 @@
     .appendix-table td:not(:first-child), .appendix-table th:not(:first-child) { padding: 10px 0 10px 8px; font-size: 11px; }
     .appendix-table tr.highlight td:first-child::after { display: block; margin-left: 0; margin-top: 4px; }
   }
+
+  /* ============ SERVICE PREVIEW INLINE (Page 3, after grade scale) ============ */
+  .service-preview-inline {
+    margin-top: 32px;
+    padding: 18px 22px;
+    background: var(--cream);
+    border: 1px solid var(--rule-soft);
+    border-left: 3px solid var(--amber);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .service-preview-inline-text {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 540px;
+  }
+  .service-preview-inline-text strong {
+    font-family: 'Archivo', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--rust-deep);
+    font-size: 14px;
+  }
+  .service-preview-inline-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--rust-deep);
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--rust-deep);
+    padding-bottom: 1px;
+  }
+
+  /* ============ PAGE 6 ENHANCED CTA ROW ============ */
+  .cta-action-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+  .btn-svc {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 4px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    border: 1px solid transparent;
+  }
+  .btn-svc.dark { background: var(--ink); color: var(--cream); }
+  .btn-svc.amber { background: var(--amber); color: var(--ink); }
+  .cta-detail-link {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--rust-deep);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid var(--rust-deep);
+    padding-bottom: 2px;
+  }
+
+  /* ============ SERVICE OPPORTUNITY (between Page 6 and Page 7) ============ */
+  .service-opportunity-page {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 80px;
+    max-width: 920px;
+    margin: 0 auto;
+    border-left: 1px solid var(--rule-soft);
+    border-right: 1px solid var(--rule-soft);
+    position: relative;
+  }
+  .service-opportunity-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 1px;
+    background: var(--amber);
+  }
+  .so-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    font-weight: 500;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .so-headline {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 42px;
+    line-height: 1.1;
+    color: var(--cream);
+    text-align: center;
+    margin-bottom: 18px;
+    letter-spacing: -0.015em;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .so-headline em { font-style: italic; color: var(--amber); }
+  .so-score-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 28px;
+    background: rgba(245, 240, 230, 0.08);
+    padding: 4px 14px;
+    border-radius: 8px;
+    color: var(--amber);
+    border: 1px solid rgba(212, 136, 45, 0.3);
+    font-weight: 500;
+    margin: 0 4px;
+    letter-spacing: 0.01em;
+    display: inline-block;
+    vertical-align: 4px;
+  }
+  .so-deck {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.5;
+    color: rgba(245, 240, 230, 0.78);
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 40px;
+  }
+  .so-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid rgba(245, 240, 230, 0.15);
+    border-bottom: 1px solid rgba(245, 240, 230, 0.15);
+    padding: 32px 0;
+    margin-bottom: 40px;
+  }
+  .so-stat {
+    padding: 0 24px;
+    border-right: 1px solid rgba(245, 240, 230, 0.12);
+    text-align: center;
+  }
+  .so-stat:last-child { border-right: none; }
+  .so-stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: rgba(245, 240, 230, 0.55);
+    margin-bottom: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  .so-stat-value {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 36px;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .so-stat-sub {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: rgba(245, 240, 230, 0.65);
+    line-height: 1.4;
+  }
+  .so-tiers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 32px;
+  }
+  .so-tier {
+    background: rgba(245, 240, 230, 0.04);
+    border: 1px solid rgba(245, 240, 230, 0.15);
+    border-radius: 8px;
+    padding: 24px 26px;
+    position: relative;
+  }
+  .so-tier.featured {
+    background: rgba(212, 136, 45, 0.08);
+    border-color: rgba(212, 136, 45, 0.4);
+  }
+  .so-tier-recommended {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: var(--amber);
+    color: var(--ink);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .so-tier-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(245, 240, 230, 0.1);
+  }
+  .so-tier-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+  }
+  .so-tier-name em { font-style: italic; color: var(--amber); }
+  .so-tier-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    color: var(--cream);
+    font-weight: 500;
+  }
+  .so-tier-projection {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: rgba(245, 240, 230, 0.8);
+    margin-bottom: 18px;
+  }
+  .so-tier-projection strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-weight: 500;
+    color: var(--amber);
+    font-size: 14px;
+  }
+  .so-cta-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .so-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 22px;
+    border-radius: 999px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+  }
+  .so-cta.outline {
+    color: var(--cream);
+    border-color: rgba(245, 240, 230, 0.4);
+    background: transparent;
+  }
+  .so-cta.amber {
+    background: var(--amber);
+    color: var(--ink);
+  }
+  .so-compare-link {
+    text-align: center;
+    margin-top: 14px;
+  }
+  .so-compare-link a {
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber);
+    padding-bottom: 2px;
+  }
+  .so-trust {
+    text-align: center;
+    margin-top: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    color: rgba(245, 240, 230, 0.45);
+  }
+
+  @media (max-width: 720px) {
+    .service-opportunity-page { padding: 56px 28px; }
+    .so-headline { font-size: 30px; }
+    .so-score-pill { font-size: 22px; }
+    .so-grid { grid-template-columns: 1fr; padding: 24px 0; }
+    .so-stat { border-right: none; border-bottom: 1px solid rgba(245, 240, 230, 0.12); padding: 16px 0; }
+    .so-stat:last-child { border-bottom: none; }
+    .so-tiers { grid-template-columns: 1fr; }
+    .service-preview-inline { flex-direction: column; align-items: flex-start; }
+    .cta-action-row { flex-direction: column; align-items: stretch; }
+    .cta-detail-link { margin-left: 0; }
+  }

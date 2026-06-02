@@ -436,6 +436,34 @@ export const STRINGS: Record<
     cta_self: { label: string; title: string; price: string; desc: string };
     cta_full: { label: string; title: string; price: string; desc: string };
     cta_promise_html: string;
+    cta_action_self_label: string;
+    cta_action_full_label: string;
+    cta_action_compare_label: string;
+    so_eyebrow: string;
+    so_headline_html: (startingScore: number, targetGrade: string) => string;
+    so_deck: string;
+    so_stat_label_90d: string;
+    so_stat_label_180d: string;
+    so_stat_label_12mo: string;
+    so_tier_self_name_html: string;
+    so_tier_self_price: string;
+    so_tier_self_projection_html: (
+      businessName: string,
+      d90: string,
+    ) => string;
+    so_tier_self_cta: string;
+    so_tier_full_name_html: string;
+    so_tier_full_price: string;
+    so_tier_full_projection_html: (
+      businessName: string,
+      d90: string,
+    ) => string;
+    so_tier_full_cta: string;
+    so_tier_full_recommended: string;
+    so_compare_link: string;
+    so_trust_line: string;
+    inline_service_preview_html: string;
+    inline_service_preview_link: string;
     appendix_section_title: string;
     appendix_section_headline_html: string;
     appendix_section_deck_html: string;
@@ -545,6 +573,31 @@ export const STRINGS: Record<
       desc: "Send us your weekly customer list. We handle every other step — bilingual sends, AI-assisted responses, monthly reports, the 12-month plan above. We guarantee 5× the value within 12 months.",
     },
     cta_promise_html: "Compare with <strong>Birdeye</strong> at $299/mo + $5,000 setup, or <strong>Podium</strong> at $399/mo + onboarding. BAAM Review starts free and bills monthly.",
+    cta_action_self_label: "Start Self-Serve trial →",
+    cta_action_full_label: "Start Full Service trial →",
+    cta_action_compare_label: "Compare tiers in detail →",
+    so_eyebrow: "§ Service opportunity · Tailored to your audit",
+    so_headline_html: (startingScore, targetGrade) =>
+      `From <span class="so-score-pill">${startingScore}</span> to <em>Grade ${targetGrade}</em> in 90–120 days.`,
+    so_deck: "Most clients reach the next grade up within 90–120 days of BAAM Review Service. Ranges below are conservative estimates by starting score — not a guarantee, but a defensible projection.",
+    so_stat_label_90d: "After 90 days",
+    so_stat_label_180d: "After 180 days",
+    so_stat_label_12mo: "After 12 months",
+    so_tier_self_name_html: "Run it <em>yourself</em>",
+    so_tier_self_price: "$99 /mo",
+    so_tier_self_projection_html: (businessName, d90) =>
+      `For ${businessName}, this typically means 90-day score <strong>${d90}</strong>, recovering 3–5 reviews/month. You execute the plan. We power the platform.`,
+    so_tier_self_cta: "Start Self-Serve trial →",
+    so_tier_full_name_html: "We run it <em>for you</em>",
+    so_tier_full_price: "$399 /mo",
+    so_tier_full_projection_html: (businessName, d90) =>
+      `For ${businessName}, this typically means 90-day score <strong>${d90}</strong>, recovering 5–8 reviews/month. We execute all five actions. <strong>5× Return Standard</strong> backs the result.`,
+    so_tier_full_cta: "Start Full Service trial →",
+    so_tier_full_recommended: "Recommended",
+    so_compare_link: "Compare both tiers in detail →",
+    so_trust_line: "30-DAY FREE TRIAL · CARD REQUIRED, NO CHARGE · CANCEL ANYTIME · USES YOUR EXISTING ACCOUNT",
+    inline_service_preview_html: "<strong>This loss is preventable.</strong> Most clients starting at your grade reach the next grade up within 90–120 days of BAAM Review Service. See <em>§ Service Opportunity below</em> for the projection.",
+    inline_service_preview_link: "See the service →",
     appendix_section_title: "Appendix · Reference Tables",
     appendix_section_headline_html: "The full methodology, <em>in two tables.</em>",
     appendix_section_deck_html: "Every number in this audit traces to one of the standards below. Your vertical is highlighted. The complete research brief lives at <a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">baamreview.com/review-value.html</a>.",
@@ -653,6 +706,31 @@ export const STRINGS: Record<
       desc: "每週寄給我們客戶名單，其他全部由我們處理 — 雙語發送、AI 輔助回覆、每月報告、上述 12 個月計劃。我們承諾 12 個月內帶來 5 倍價值。",
     },
     cta_promise_html: "對比 <strong>Birdeye</strong> 每月 $299 + $5,000 開通費，或 <strong>Podium</strong> 每月 $399 + 入駐流程。BAAM Review 免費起步，按月計費。",
+    cta_action_self_label: "啟動自助方案試用 →",
+    cta_action_full_label: "啟動全託管試用 →",
+    cta_action_compare_label: "詳細比較兩個方案 →",
+    so_eyebrow: "§ 服務機會 · 依您的審計量身定制",
+    so_headline_html: (startingScore, targetGrade) =>
+      `從 <span class="so-score-pill">${startingScore}</span> 提升至 <em>${targetGrade} 級</em>，僅需 90–120 天。`,
+    so_deck: "大多數客戶在 BAAM Review 服務 90–120 天內提升一個等級。下方範圍依您的起始分數保守估算 — 並非保證，但為可信賴的預測。",
+    so_stat_label_90d: "90 天後",
+    so_stat_label_180d: "180 天後",
+    so_stat_label_12mo: "12 個月後",
+    so_tier_self_name_html: "<em>自己</em>運行",
+    so_tier_self_price: "$99 /月",
+    so_tier_self_projection_html: (businessName, d90) =>
+      `對 ${businessName} 而言，這通常意味著 90 天分數 <strong>${d90}</strong>，每月恢復 3–5 則評論。您執行計劃，我們提供平台。`,
+    so_tier_self_cta: "啟動自助方案試用 →",
+    so_tier_full_name_html: "由我們<em>替您</em>運行",
+    so_tier_full_price: "$399 /月",
+    so_tier_full_projection_html: (businessName, d90) =>
+      `對 ${businessName} 而言，這通常意味著 90 天分數 <strong>${d90}</strong>，每月恢復 5–8 則評論。我們執行全部五項行動。<strong>5× 回報標準</strong>支持成果。`,
+    so_tier_full_cta: "啟動全託管試用 →",
+    so_tier_full_recommended: "推薦",
+    so_compare_link: "詳細比較兩個方案 →",
+    so_trust_line: "30 天免費試用 · 需綁定卡片但不扣款 · 可隨時取消 · 沿用您現有帳號",
+    inline_service_preview_html: "<strong>此損失可預防。</strong>大多數與您相同等級的客戶，在 BAAM Review 服務 90–120 天內即可提升一個等級。請見下方 <em>§ 服務機會</em> 區塊的預測。",
+    inline_service_preview_link: "查看服務 →",
     appendix_section_title: "附錄 · 參考數據表",
     appendix_section_headline_html: "完整方法 · <em>濃縮在兩張表</em>",
     appendix_section_deck_html: "本審計中的每個數字都可追溯到下方標準之一，您的行業已標示。完整研究報告於 <a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">baamreview.com/review-value.html</a>。",

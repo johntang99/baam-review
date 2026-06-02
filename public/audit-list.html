@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Audits · BAAM Review Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #163A30;
+  --forest-light: #2A6B57;
+  --sage: #87A899;
+  --sage-soft: #C5D2CB;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-soft: #E8D9B5;
+  --gold-dark: #8E7430;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #E8E2D5;
+  --border-soft: #F0ECE1;
+  --warn: #B85A38;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 26, 0.04);
+  --shadow-md: 0 4px 16px rgba(15, 31, 26, 0.06);
+  --shadow-lg: 0 24px 48px rgba(15, 31, 26, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Onest', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+a { color: inherit; text-decoration: none; }
+.container { max-width: 1240px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+/* ============ DOC INTRO ============ */
+.doc-intro {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 40px 32px;
+}
+.doc-intro-inner { max-width: 920px; margin: 0 auto; }
+.doc-intro-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.doc-intro-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.22;
+  letter-spacing: -0.018em;
+  color: var(--cream);
+  margin-bottom: 10px;
+}
+.doc-intro-title em { font-style: italic; color: var(--gold); }
+.doc-intro-body {
+  font-family: 'Newsreader', serif;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: rgba(250, 247, 242, 0.78);
+  max-width: 720px;
+}
+.doc-intro-routes {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(250, 247, 242, 0.15);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+.doc-route-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(250, 247, 242, 0.55);
+  letter-spacing: 0.04em;
+}
+.doc-route-item strong {
+  color: var(--gold);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 9px;
+}
+
+/* ============ NAV (UNIFIED · 4 items) ============ */
+nav {
+  padding: 22px 0;
+  position: sticky;
+  top: 0;
+  background: rgba(250, 247, 242, 0.85);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  z-index: 100;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+nav.scrolled { border-color: var(--border); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; }
+.logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--forest);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cream);
+  font-weight: 600;
+  font-size: 14px;
+}
+.logo-sub {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a {
+  font-size: 13.5px;
+  color: var(--text-soft);
+  font-weight: 400;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-links a.active { color: var(--ink); font-weight: 600; }
+.nav-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 4px;
+}
+.nav-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  background: var(--cream-deep);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  color: var(--text);
+  cursor: pointer;
+}
+.nav-user-avatar {
+  width: 22px; height: 22px;
+  background: var(--forest);
+  color: var(--cream);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* ============ BUTTONS ============ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  font-family: 'Onest', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.btn-primary { background: var(--forest); color: var(--cream); }
+.btn-primary:hover { background: var(--forest-dark); transform: translateY(-1px); }
+.btn-outline { background: transparent; color: var(--forest); border-color: var(--forest); }
+.btn-outline:hover { background: var(--forest); color: var(--cream); }
+.btn-gold { background: var(--gold); color: var(--ink); }
+.btn-gold:hover { background: #B8985A; }
+.btn-ghost { background: transparent; color: var(--text-soft); }
+.btn-ghost:hover { background: var(--cream-deep); color: var(--ink); }
+.btn-small { padding: 7px 14px; font-size: 12.5px; }
+.btn-large { padding: 13px 24px; font-size: 14px; }
+
+/* ============ PAGE HEADER ============ */
+.page-header {
+  padding: 48px 0 24px;
+}
+.page-header-inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: end;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+.page-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(30px, 3.4vw, 42px);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.page-title em { font-style: italic; color: var(--forest); }
+.page-sub {
+  font-family: 'Newsreader', serif;
+  font-size: 17px;
+  font-style: italic;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+.page-sub strong { font-family: 'Onest', sans-serif; font-weight: 600; color: var(--text); font-style: normal; font-size: 15.5px; }
+
+.page-quota {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+.quota-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  gap: 24px;
+  align-items: baseline;
+}
+.quota-block { text-align: right; }
+.quota-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.quota-val {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--ink);
+  line-height: 1;
+  letter-spacing: -0.015em;
+}
+.quota-val em {
+  font-style: italic;
+  color: var(--text-muted);
+  font-weight: 300;
+  font-size: 16px;
+}
+.quota-reset {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+/* ============ SERVICE BANNER (contextual) ============ */
+.service-banner {
+  margin: 28px 0 36px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.service-banner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--gold);
+}
+.service-banner-dismiss {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(250, 247, 242, 0.4);
+  cursor: pointer;
+  letter-spacing: 0.06em;
+}
+.service-banner-dismiss:hover { color: var(--gold); }
+.service-banner-content {}
+.service-banner-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.service-banner-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--cream);
+  line-height: 1.25;
+  margin-bottom: 6px;
+  letter-spacing: -0.015em;
+}
+.service-banner-title em { font-style: italic; color: var(--gold); }
+.service-banner-title .business-name { color: var(--gold); font-style: normal; }
+.service-banner-body {
+  font-family: 'Newsreader', serif;
+  font-size: 14.5px;
+  color: rgba(250, 247, 242, 0.75);
+  line-height: 1.5;
+  max-width: 560px;
+}
+.service-banner-tiers {
+  display: inline-flex;
+  gap: 16px;
+  margin-top: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(250, 247, 242, 0.65);
+  letter-spacing: 0.06em;
+}
+.service-banner-tiers strong { color: var(--cream); font-weight: 600; }
+.service-banner-cta {
+  background: var(--gold);
+  color: var(--ink);
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-weight: 600;
+  font-size: 13.5px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.service-banner-cta:hover { background: #B8985A; }
+
+/* ============ FILTERS ============ */
+.list-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.list-filters-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.filter-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.filter-chips { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.filter-chip {
+  padding: 6px 14px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-chip:hover { border-color: var(--forest); color: var(--ink); }
+.filter-chip.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.filter-chip-count {
+  background: rgba(15, 31, 26, 0.08);
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+.filter-chip.active .filter-chip-count {
+  background: rgba(250, 247, 242, 0.15);
+  color: var(--cream);
+}
+.list-filters-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.list-sort {
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  color: var(--text-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.list-sort::after {
+  content: '▾';
+  color: var(--gold-dark);
+  font-size: 10px;
+}
+
+/* ============ AUDIT LIST ============ */
+.audit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 56px;
+}
+.audit-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  gap: 28px;
+  align-items: center;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border-soft);
+  transition: background 0.15s;
+}
+.audit-row:last-child { border-bottom: none; }
+.audit-row:hover { background: var(--cream); }
+.audit-row-info {
+  min-width: 0;
+}
+.audit-row-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+.audit-row-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--ink);
+  letter-spacing: -0.018em;
+  line-height: 1.3;
+}
+.audit-row-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--cream-deep);
+  color: var(--text-muted);
+  font-weight: 600;
+  vertical-align: 1px;
+}
+.audit-row-tag.bilingual { background: rgba(201, 169, 97, 0.18); color: var(--gold-dark); }
+.audit-row-tag.reaudit { background: rgba(31, 77, 63, 0.1); color: var(--forest); }
+.audit-row-meta {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.audit-row-meta-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-style: normal;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+.audit-row-score-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  text-align: center;
+  min-width: 70px;
+}
+.audit-row-score {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--ink);
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+.audit-row-score-denom {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+.audit-row-grade-block { text-align: center; min-width: 76px; }
+.audit-row-grade {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 17px;
+  padding: 4px 11px;
+  border-radius: 6px;
+  background: var(--cream-deep);
+  color: var(--text);
+  display: inline-block;
+  line-height: 1.2;
+}
+.audit-row-grade.warn { background: rgba(184, 90, 56, 0.1); color: var(--warn); }
+.audit-row-grade.ok { background: rgba(201, 169, 97, 0.15); color: var(--gold-dark); }
+.audit-row-grade.good { background: rgba(31, 77, 63, 0.1); color: var(--forest); }
+.audit-row-grade-trend {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  letter-spacing: 0.06em;
+}
+.audit-row-grade-trend.up { color: var(--forest); }
+.audit-row-grade-trend.down { color: var(--warn); }
+.audit-row-date-block {
+  text-align: right;
+  min-width: 110px;
+}
+.audit-row-date {
+  font-family: 'Onest', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.audit-row-date-ago {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.audit-row-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.audit-row-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  background: var(--cream-deep);
+  color: var(--text);
+  border: 1px solid var(--border);
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.audit-row-action:hover {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+.audit-row-action.primary {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+.audit-row-action.primary:hover {
+  background: var(--forest);
+  border-color: var(--forest);
+}
+.audit-row-action-icon {
+  width: 14px; height: 14px;
+}
+.audit-row-action-dropdown {
+  padding: 7px 9px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1;
+}
+.audit-row-action-dropdown:hover { color: var(--ink); background: var(--cream-deep); }
+
+/* ============ INSIGHTS BAR (contextual reminder) ============ */
+.insights-bar {
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, var(--cream-deep) 0%, var(--cream) 100%);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 12px 12px 0;
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.insights-bar-text {
+  font-family: 'Newsreader', serif;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.5;
+  flex: 1;
+}
+.insights-bar-text strong {
+  font-family: 'Onest', sans-serif;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 14px;
+}
+.insights-bar-text em {
+  font-style: italic;
+  color: var(--gold-dark);
+}
+.insights-bar-cta {
+  font-family: 'Onest', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--forest);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--sage-soft);
+  padding-bottom: 1px;
+  cursor: pointer;
+}
+.insights-bar-cta:hover { color: var(--forest-dark); border-bottom-color: var(--forest); }
+
+/* ============ BOTTOM ACTIONS (3-card section) ============ */
+.bottom-actions {
+  margin-top: 56px;
+  padding-top: 48px;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding-bottom: 80px;
+}
+.action-card {
+  padding: 0;
+}
+.action-card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.action-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 8px;
+  letter-spacing: -0.015em;
+}
+.action-card-title em { font-style: italic; color: var(--forest); }
+.action-card-body {
+  font-family: 'Newsreader', serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  margin-bottom: 14px;
+}
+.action-card-link {
+  font-family: 'Onest', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--forest);
+  border-bottom: 1px solid var(--sage-soft);
+  padding-bottom: 1px;
+  display: inline-block;
+}
+.action-card-link:hover { color: var(--forest-dark); border-bottom-color: var(--forest); }
+
+/* ============ FOOTER ============ */
+footer {
+  padding: 40px 0;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-left { color: rgba(250, 247, 242, 0.5); }
+.footer-right { display: flex; gap: 20px; }
+.footer-right a { color: rgba(250, 247, 242, 0.6); transition: color 0.15s; }
+.footer-right a:hover { color: var(--gold); }
+
+/* ============ EMPTY STATE (not shown by default, kept for reference) ============ */
+.empty-state {
+  text-align: center;
+  padding: 80px 32px;
+  background: var(--paper);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+}
+.empty-state-icon {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 64px;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 18px;
+}
+.empty-state-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 26px;
+  color: var(--ink);
+  margin-bottom: 8px;
+  letter-spacing: -0.018em;
+}
+.empty-state-body {
+  font-family: 'Newsreader', serif;
+  font-size: 16px;
+  color: var(--text-soft);
+  max-width: 440px;
+  margin: 0 auto 24px;
+  line-height: 1.55;
+}
+
+/* ============ MOBILE ============ */
+@media (max-width: 900px) {
+  .page-header-inner { grid-template-columns: 1fr; gap: 24px; align-items: start; }
+  .page-quota { align-items: flex-start; text-align: left; }
+  .quota-block { text-align: left; }
+  .service-banner { grid-template-columns: 1fr; gap: 18px; }
+  .audit-row { grid-template-columns: 1fr auto; gap: 14px; padding: 18px 20px; }
+  .audit-row-grade-block, .audit-row-date-block { display: none; }
+  .audit-row-actions { display: none; }
+  .bottom-actions { grid-template-columns: 1fr; gap: 32px; }
+  .list-filters { flex-direction: column; align-items: flex-start; }
+  .doc-intro-routes { grid-template-columns: 1fr 1fr; }
+  .nav-links a:not(.btn):not(.active):not(.nav-keep) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ DOC INTRO ============ -->
+<div class="doc-intro">
+  <div class="doc-intro-inner">
+    <div class="doc-intro-tag">/audit/list · The central app surface</div>
+    <h1 class="doc-intro-title">Where your audits live. <em>Simplified nav, four items only.</em></h1>
+    <p class="doc-intro-body">Replaces the existing review.baamplatform.com/audits page. Brings it into the unified design system with the four-item nav (New Audit · Audits · Service · Sign in). Adds re-audit affordance, business filter, quota indicator, contextual service banner pulling from the user's lowest-scoring audit.</p>
+    
+    <div class="doc-intro-routes">
+      <div class="doc-route-item"><strong>Route</strong>/audit/list</div>
+      <div class="doc-route-item"><strong>Auth</strong>required · cookie session</div>
+      <div class="doc-route-item"><strong>Data</strong>all completed audits for user</div>
+      <div class="doc-route-item"><strong>Empty state</strong>when no audits exist</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ NAV ============ -->
+<nav id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="/audit/" class="logo">
+        <span class="logo-mark">B</span>
+        BAAM Review <span class="logo-sub">· Audit</span>
+      </a>
+      <div class="nav-links">
+        <a href="/audit/new">New Audit</a>
+        <a href="/audit/list" class="active nav-keep">Audits</a>
+        <a href="/audit/service">Service</a>
+        <span class="nav-divider"></span>
+        <span class="nav-user-pill nav-keep">
+          <span class="nav-user-avatar">J</span>
+          John
+        </span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ PAGE HEADER ============ -->
+<section class="page-header">
+  <div class="container">
+    
+    <div class="page-header-inner">
+      <div>
+        <div class="page-eyebrow">Your audits · Vol. I · 2026</div>
+        <h1 class="page-title">Five audits, <em>ready to review.</em></h1>
+        <p class="page-sub">Across <strong>2 businesses</strong> · Latest audit 3 days ago · 30-day velocity dropping fastest.</p>
+      </div>
+      
+      <div class="page-quota">
+        <div class="quota-card">
+          <div class="quota-block">
+            <div class="quota-label">This month</div>
+            <div class="quota-val">1<em>/2</em></div>
+          </div>
+          <div class="quota-block">
+            <div class="quota-label">Lifetime</div>
+            <div class="quota-val">5<em>/999</em></div>
+          </div>
+        </div>
+        <div class="quota-reset">Quota resets June 1, 2026</div>
+      </div>
+    </div>
+    
+    <!-- Service banner (contextual, dismissible) -->
+    <div class="service-banner">
+      <span class="service-banner-dismiss">DISMISS ×</span>
+      <div class="service-banner-content">
+        <div class="service-banner-tag">From your lowest-scoring audit · Bridge Street Dental</div>
+        <h2 class="service-banner-title"><span class="business-name">Bridge Street Dental</span> scored <em>52</em>. BAAM Review Service can take this to <em>70-78</em> in 90 days.</h2>
+        <p class="service-banner-body">Most clients with Grade C reach Grade B within 90-120 days of Full Service. Conservative ranges based on aggregate client data — full methodology in the service page.</p>
+        <div class="service-banner-tiers">
+          <span><strong>Self-Serve</strong> · $99/mo</span>
+          <span>·</span>
+          <span><strong>Full Service</strong> · $399/mo</span>
+          <span>·</span>
+          <span>30-day free trial · no charge</span>
+        </div>
+      </div>
+      <a href="/audit/service" class="service-banner-cta">Choose a plan →</a>
+    </div>
+    
+    <!-- Insights bar -->
+    <div class="insights-bar">
+      <p class="insights-bar-text">
+        <strong>FROM YOUR LATEST AUDIT</strong> &nbsp; Bridge Street Dental's <em>30-day velocity</em> is dropping fastest. The first action of the 12-month plan would address this — review velocity recovery typically lifts the score 8-12 points in 60 days.
+      </p>
+      <a href="/audit/26-0512#action-01" class="insights-bar-cta">See action 1 →</a>
+    </div>
+    
+    <!-- Filters -->
+    <div class="list-filters">
+      <div class="list-filters-left">
+        <span class="filter-label">Filter</span>
+        <div class="filter-chips">
+          <span class="filter-chip active">All audits <span class="filter-chip-count">5</span></span>
+          <span class="filter-chip">Bridge Street Dental <span class="filter-chip-count">2</span></span>
+          <span class="filter-chip">Dr. Huang Acupuncture <span class="filter-chip-count">3</span></span>
+        </div>
+      </div>
+      <div class="list-filters-right">
+        <span class="list-sort">Sorted: Newest first</span>
+      </div>
+    </div>
+    
+    <!-- Audit list -->
+    <div class="audit-list">
+      
+      <div class="audit-row">
+        <div class="audit-row-info">
+          <div class="audit-row-name-row">
+            <span class="audit-row-name">Bridge Street Dental</span>
+            <span class="audit-row-tag reaudit">Re-audit</span>
+          </div>
+          <div class="audit-row-meta">Brooklyn, NY · Dental practice <span class="audit-row-meta-id">BR-26-0512</span></div>
+        </div>
+        <div class="audit-row-score-wrap">
+          <span class="audit-row-score">52</span>
+          <span class="audit-row-score-denom">/100</span>
+        </div>
+        <div class="audit-row-grade-block">
+          <span class="audit-row-grade warn">Grade C</span>
+          <div class="audit-row-grade-trend up">↑ 4 vs. last</div>
+        </div>
+        <div class="audit-row-date-block">
+          <div class="audit-row-date">May 29, 2026</div>
+          <div class="audit-row-date-ago">3 days ago</div>
+        </div>
+        <div class="audit-row-actions">
+          <a href="/audit/26-0512" class="audit-row-action primary">View report</a>
+          <span class="audit-row-action">↓ PDF</span>
+          <span class="audit-row-action-dropdown">⋯</span>
+        </div>
+      </div>
+      
+      <div class="audit-row">
+        <div class="audit-row-info">
+          <div class="audit-row-name-row">
+            <span class="audit-row-name">Dr. Huang Acupuncture · 黄醫師針灸</span>
+            <span class="audit-row-tag bilingual">EN + 中文</span>
+          </div>
+          <div class="audit-row-meta">Flushing, NY · TCM clinic <span class="audit-row-meta-id">BR-26-0498</span></div>
+        </div>
+        <div class="audit-row-score-wrap">
+          <span class="audit-row-score">71</span>
+          <span class="audit-row-score-denom">/100</span>
+        </div>
+        <div class="audit-row-grade-block">
+          <span class="audit-row-grade ok">Grade B</span>
+          <div class="audit-row-grade-trend up">↑ 6 vs. last</div>
+        </div>
+        <div class="audit-row-date-block">
+          <div class="audit-row-date">Apr 21, 2026</div>
+          <div class="audit-row-date-ago">41 days ago</div>
+        </div>
+        <div class="audit-row-actions">
+          <a href="/audit/26-0498" class="audit-row-action primary">View report</a>
+          <span class="audit-row-action">↓ EN PDF</span>
+          <span class="audit-row-action">↓ 中文 PDF</span>
+        </div>
+      </div>
+      
+      <div class="audit-row">
+        <div class="audit-row-info">
+          <div class="audit-row-name-row">
+            <span class="audit-row-name">Dr. Huang Acupuncture · 黄醫師針灸</span>
+            <span class="audit-row-tag bilingual">EN + 中文</span>
+            <span class="audit-row-tag reaudit">Re-audit</span>
+          </div>
+          <div class="audit-row-meta">Flushing, NY · TCM clinic <span class="audit-row-meta-id">BR-26-0387</span></div>
+        </div>
+        <div class="audit-row-score-wrap">
+          <span class="audit-row-score">65</span>
+          <span class="audit-row-score-denom">/100</span>
+        </div>
+        <div class="audit-row-grade-block">
+          <span class="audit-row-grade ok">Grade C+</span>
+          <div class="audit-row-grade-trend">→ baseline</div>
+        </div>
+        <div class="audit-row-date-block">
+          <div class="audit-row-date">Mar 12, 2026</div>
+          <div class="audit-row-date-ago">81 days ago</div>
+        </div>
+        <div class="audit-row-actions">
+          <a href="/audit/26-0387" class="audit-row-action primary">View report</a>
+          <span class="audit-row-action">↓ PDF</span>
+          <span class="audit-row-action-dropdown">⋯</span>
+        </div>
+      </div>
+      
+      <div class="audit-row">
+        <div class="audit-row-info">
+          <div class="audit-row-name-row">
+            <span class="audit-row-name">Bridge Street Dental</span>
+          </div>
+          <div class="audit-row-meta">Brooklyn, NY · Dental practice <span class="audit-row-meta-id">BR-26-0312</span></div>
+        </div>
+        <div class="audit-row-score-wrap">
+          <span class="audit-row-score">48</span>
+          <span class="audit-row-score-denom">/100</span>
+        </div>
+        <div class="audit-row-grade-block">
+          <span class="audit-row-grade warn">Grade C-</span>
+          <div class="audit-row-grade-trend">→ baseline</div>
+        </div>
+        <div class="audit-row-date-block">
+          <div class="audit-row-date">Mar 18, 2026</div>
+          <div class="audit-row-date-ago">75 days ago</div>
+        </div>
+        <div class="audit-row-actions">
+          <a href="/audit/26-0312" class="audit-row-action primary">View report</a>
+          <span class="audit-row-action">↓ PDF</span>
+          <span class="audit-row-action-dropdown">⋯</span>
+        </div>
+      </div>
+      
+      <div class="audit-row">
+        <div class="audit-row-info">
+          <div class="audit-row-name-row">
+            <span class="audit-row-name">Dr. Huang Acupuncture · 黄醫師針灸</span>
+            <span class="audit-row-tag bilingual">EN + 中文</span>
+          </div>
+          <div class="audit-row-meta">Flushing, NY · TCM clinic <span class="audit-row-meta-id">BR-26-0142</span></div>
+        </div>
+        <div class="audit-row-score-wrap">
+          <span class="audit-row-score">59</span>
+          <span class="audit-row-score-denom">/100</span>
+        </div>
+        <div class="audit-row-grade-block">
+          <span class="audit-row-grade ok">Grade C</span>
+          <div class="audit-row-grade-trend">→ baseline</div>
+        </div>
+        <div class="audit-row-date-block">
+          <div class="audit-row-date">Feb 02, 2026</div>
+          <div class="audit-row-date-ago">119 days ago</div>
+        </div>
+        <div class="audit-row-actions">
+          <a href="/audit/26-0142" class="audit-row-action primary">View report</a>
+          <span class="audit-row-action">↓ PDF</span>
+          <span class="audit-row-action-dropdown">⋯</span>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Bottom actions: 3-card section -->
+    <div class="bottom-actions">
+      <div class="action-card">
+        <div class="action-card-label">More to do</div>
+        <h3 class="action-card-title">Audit <em>another business</em></h3>
+        <p class="action-card-body">You have 1 audit remaining this month. Audit a competitor, a partner business, or another location you own.</p>
+        <a href="/audit/new" class="action-card-link">Start new audit →</a>
+      </div>
+      
+      <div class="action-card">
+        <div class="action-card-label">Read the research</div>
+        <h3 class="action-card-title">The <em>methodology</em> behind the score</h3>
+        <p class="action-card-body">15 cited studies on review economics, healthy velocity, and local search ranking. Every number in your audit traces back here.</p>
+        <a href="/methodology" class="action-card-link">View methodology →</a>
+      </div>
+      
+      <div class="action-card">
+        <div class="action-card-label">Get help</div>
+        <h3 class="action-card-title">Have <em>questions</em> about your audit?</h3>
+        <p class="action-card-body">Email us with any audit-specific questions. We typically respond within one business day. Or start a free trial to act on what the audit found.</p>
+        <a href="mailto:support@baamreview.com" class="action-card-link">Contact support →</a>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <span class="footer-left">© 2026 BAAM Studio · New York · Vol. I · No. 005</span>
+      <div class="footer-right">
+        <a href="/audit/account">Account</a>
+        <a href="/legal/privacy">Privacy</a>
+        <a href="/legal/terms">Terms</a>
+        <a href="mailto:support@baamreview.com">Support</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  if (nav) window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+</script>
+
+</body>
+</html>

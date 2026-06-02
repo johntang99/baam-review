@@ -71,7 +71,7 @@ export async function runAudit(formData: FormData): Promise<void> {
     redirect(`/audit/new?error=${encodeURIComponent(message)}`);
   }
 
-  revalidatePath("/audits");
+  revalidatePath("/audit/list");
   redirect(`/audit/${auditId}`);
 }
 
