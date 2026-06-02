@@ -8,9 +8,9 @@
 
 | Surface | URL |
 |---|---|
-| Production app | https://review.baamplatform.com |
-| Admin | https://review.baamplatform.com/app |
-| Public review pages | https://review.baamplatform.com/r/[slug] |
+| Production app | https://baamreview.com |
+| Admin | https://baamreview.com/app |
+| Public review pages | https://baamreview.com/r/[slug] |
 | Repo | https://github.com/johntang99/baam-review |
 | Supabase project | `baam-review` (in the Supabase dashboard) |
 | Vercel project | `baam-review` (in the Vercel dashboard) |
@@ -50,7 +50,7 @@ Live in **Vercel → Project Settings → Environment Variables** for *Productio
 | `NEXT_PUBLIC_SUPABASE_URL` | All | Public, baked into client bundle |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | All | Public |
 | `SUPABASE_SERVICE_ROLE_KEY` | All | **Server only**; never exposed to browser |
-| `NEXT_PUBLIC_APP_URL` | All | Production: `https://review.baamplatform.com`. Local dev: `http://localhost:4001` |
+| `NEXT_PUBLIC_APP_URL` | All | Production: `https://baamreview.com`. Local dev: `http://localhost:4001` |
 | `GOOGLE_CLIENT_ID` | All | OAuth client from `baam-platform` GCP project |
 | `GOOGLE_CLIENT_SECRET` | All | Server only |
 | `ANTHROPIC_API_KEY` | All | Server only; rotate yearly |
@@ -97,8 +97,8 @@ In addition to the schema (managed by migrations), some Supabase settings are co
 
 ### Authentication → URL Configuration
 
-- **Site URL**: `https://review.baamplatform.com`
-- **Redirect URLs**: include both `https://review.baamplatform.com/**` and `http://localhost:4001/**`
+- **Site URL**: `https://baamreview.com`
+- **Redirect URLs**: include both `https://baamreview.com/**` and `http://localhost:4001/**`
 
 When the domain migrates (see [DOMAIN_MIGRATION.md](DOMAIN_MIGRATION.md)), update both fields.
 
@@ -140,14 +140,14 @@ A customer can add their own domain in `/app/locations/[id]/settings` → Email 
 
 ### Resend webhooks
 
-The Resend webhook endpoint is `https://review.baamplatform.com/api/webhooks/resend`. It handles `email.delivered`, `email.opened`, `email.bounced`, and `email.complained` events.
+The Resend webhook endpoint is `https://baamreview.com/api/webhooks/resend`. It handles `email.delivered`, `email.opened`, `email.bounced`, and `email.complained` events.
 
 **Signature verification** is enforced when `RESEND_WEBHOOK_SECRET` is set in Vercel. We verify the `svix-signature` header against the secret; unverified requests are rejected with 401. Without the secret set, the handler accepts all requests (useful for local testing).
 
 **Setup steps (one-time per environment)**:
 
 1. Resend dashboard → Webhooks → Add endpoint
-2. URL: `https://review.baamplatform.com/api/webhooks/resend`
+2. URL: `https://baamreview.com/api/webhooks/resend`
 3. Events to subscribe: at minimum `email.delivered`, `email.opened`, `email.bounced`, `email.complained`
 4. Save
 5. Copy the **Signing Secret** (starts with `whsec_…`)
@@ -164,7 +164,7 @@ Until the webhook is configured, `delivered_at` is set optimistically when the R
 
 1. Twilio Console → Buy a number (or use trial)
 2. Phone number → Messaging → A message comes in → set to your webhook (not used currently)
-3. Phone number → Messaging → Delivery status callback URL → `https://review.baamplatform.com/api/webhooks/twilio`
+3. Phone number → Messaging → Delivery status callback URL → `https://baamreview.com/api/webhooks/twilio`
 4. Set `TWILIO_*` env vars in Vercel
 5. Redeploy
 

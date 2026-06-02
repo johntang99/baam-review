@@ -201,7 +201,7 @@ export default async function WidgetPage({
 
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    "https://review.baamplatform.com";
+    "https://baamreview.com";
 
   const jsonLd = buildJsonLd({
     name: location.display_name,

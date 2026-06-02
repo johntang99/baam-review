@@ -775,7 +775,7 @@ export async function generateVariantsForList(
   const vars = {
     name: "{name}",
     businessName: location.display_name,
-    link: "https://review.baamplatform.com/r/<slug>?t=<token>",
+    link: "https://baamreview.com/r/<slug>?t=<token>",
   };
   const base =
     channel === "email"

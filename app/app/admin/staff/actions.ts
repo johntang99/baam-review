@@ -115,7 +115,7 @@ export async function inviteStaff(formData: FormData): Promise<ActionResult> {
   } else {
     const h = await headers();
     const proto = h.get("x-forwarded-proto") ?? "https";
-    const host = h.get("host") ?? "review.baamplatform.com";
+    const host = h.get("host") ?? "baamreview.com";
     origin = `${proto}://${host}`;
   }
   // After the user clicks the email link, /auth/callback exchanges the

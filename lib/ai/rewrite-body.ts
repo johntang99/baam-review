@@ -57,7 +57,7 @@ function buildSystemPrompt(inputs: RewriteInputs): string {
     "HARD RULES — violation is failure:",
     `1. The business name "${inputs.businessName}" MUST appear in the BODY exactly as written, character-for-character. Do not translate, abbreviate, paraphrase, or reorder it. (It may also appear in the subject, but is not required there.)`,
     "2. The URL placeholders <slug> and <token> MUST appear in the BODY EXACTLY as the strings '<slug>' and '<token>'. Do not remove them, rename them, or wrap them in different brackets.",
-    "3. The URL format must remain: https://review.baamplatform.com/r/<slug>?t=<token>",
+    "3. The URL format must remain: https://baamreview.com/r/<slug>?t=<token>",
     "4. Include exactly one clear call-to-action pointing to that URL.",
     "5. The placeholder {name} MUST appear in the BODY, somewhere in the greeting or opening sentence (e.g. 'Hi {name},' or '{name}, thanks for…'). Do NOT replace it with a generic word like 'Customer' / '客户' / 'Cliente' — leave it as the literal string '{name}'. This is how each customer's first name gets inserted at send time.",
     "6. NEVER offer incentives, discounts, gifts, or rewards in exchange for a review. NEVER imply the reviewer should leave a specific rating. NEVER use urgency tactics ('limited time', 'today only').",

@@ -23,7 +23,7 @@ export default function PrivacyPage() {
         BAAM Review (&ldquo;we,&rdquo; &ldquo;us&rdquo;) is operated by BAAM
         Platform Inc., a New York corporation. This policy covers our website
         at <code>baamreview.com</code>, the application at{" "}
-        <code>review.baamplatform.com</code>, and any review-collection page we
+        <code>baamreview.com</code>, and any review-collection page we
         host at <code>baamreview.com/r/&lt;slug&gt;</code> on behalf of a
         business.
       </p>

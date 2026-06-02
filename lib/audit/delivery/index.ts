@@ -96,7 +96,7 @@ export async function renderAndDeliverAudit(
   let email_error: string | undefined;
 
   if (input.send_email && input.customer?.email) {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://review.baamplatform.com";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://baamreview.com";
     const result = await sendAuditEmail({
       to: input.customer.email,
       recipient_name: input.customer.name,

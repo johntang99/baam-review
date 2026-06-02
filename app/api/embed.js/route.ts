@@ -7,7 +7,7 @@ export const runtime = "edge";
  *
  *   Button (data-mode="button" or unset) — renders a single CTA button.
  *
- *     <script src="https://review.baamplatform.com/api/embed.js"
+ *     <script src="https://baamreview.com/api/embed.js"
  *             data-slug="<their-slug>"
  *             data-color="#1F4D3F"
  *             data-label="Leave a review"></script>
@@ -16,7 +16,7 @@ export const runtime = "edge";
  *   /widget/<slug> that shows the curated review carousel + JSON-LD.
  *   The iframe auto-resizes via postMessage from the widget tracker.
  *
- *     <script src="https://review.baamplatform.com/api/embed.js"
+ *     <script src="https://baamreview.com/api/embed.js"
  *             data-slug="<their-slug>"
  *             data-mode="widget"
  *             data-color="#1F4D3F"></script>

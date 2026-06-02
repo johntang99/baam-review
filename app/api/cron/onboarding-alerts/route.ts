@@ -188,7 +188,7 @@ async function sendTeamUrgent(opts: {
     "  2. If no reply within 48 h, consider pausing the trial in Stripe so",
     "     they aren't charged on day 30 without service.",
     "",
-    `Open queue: https://review.baamplatform.com/app/onboarding`,
+    `Open queue: https://baamreview.com/app/onboarding`,
   ];
 
   const text = lines.join("\n");

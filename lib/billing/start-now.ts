@@ -239,7 +239,7 @@ async function sendTeamNotification(data: StartNowSessionData) {
     "     on their Google Business Profile.",
     "  2. Accept the manager invitation in our BAAM Google account.",
     "  3. Open the Onboarding queue and click 'Connect their GBP':",
-    "     https://review.baamplatform.com/app/onboarding",
+    "     https://baamreview.com/app/onboarding",
     "",
     "Day 5 and day 7 alerts will fire automatically if onboarding stalls.",
   ];

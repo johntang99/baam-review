@@ -220,7 +220,7 @@ export default function CompliancePage() {
         <li>Language is declared via the <code>lang</code> attribute so screen readers pronounce correctly.</li>
       </ul>
       <p>
-        The admin app at <code>review.baamplatform.com</code> is held to the
+        The admin app at <code>baamreview.com</code> is held to the
         same standard with one exception: complex data tables in analytics
         sections may not be fully optimized for screen-reader navigation.
         We&rsquo;re working on it.

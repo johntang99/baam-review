@@ -2,64 +2,38 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
 /**
- * Hostname-based routing for the two-domain deployment.
+ * Hostname normalization for the single-domain deployment.
  *
- *   baamreview.com           → public marketing site (this app's root,
- *                              /pricing, /review-value.html)
- *   review.baamplatform.com  → admin app (/app, /login, /signup, /api/*)
+ *   baamreview.com           → canonical host, serves everything
+ *                              (marketing, audit app, review platform admin)
+ *   www.baamreview.com       → 308 → baamreview.com
+ *   review.baamplatform.com  → 308 → baamreview.com (legacy subdomain)
  *
- * Both domains point at the same Vercel deployment; this proxy decides which
- * surface the visitor lands on. Runs before updateSession so we don't burn
- * a Supabase call on requests we're about to redirect.
+ * 308 (Permanent Redirect) preserves method and body, so POST/PUT/API
+ * requests survive the redirect — important for any client still calling
+ * the old origin during the transition.
+ *
+ * Localhost and Vercel preview URLs fall through to updateSession
+ * (Supabase session refresh) without redirect.
  */
-const ADMIN_HOST = "review.baamplatform.com";
-const MARKETING_HOST_PRIMARY = "baamreview.com";
-const MARKETING_HOST_WWW = "www.baamreview.com";
-
-const MARKETING_ONLY_PATHS = new Set([
-  "/",
-  "/zh",
-  "/pricing",
-  "/review-value.html",
+const CANONICAL_HOST = "baamreview.com";
+const LEGACY_HOSTS = new Set<string>([
+  "www.baamreview.com",
+  "review.baamplatform.com",
 ]);
-
-/**
- * Paths that must live on the admin host because they touch Supabase auth
- * cookies. When a marketing-host visitor hits one, redirect cross-domain so
- * cookies are set on the right origin.
- */
-const ADMIN_REDIRECT_PREFIXES = ["/app", "/login", "/signup"];
 
 export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const host = (request.headers.get("host") ?? "").toLowerCase();
-  const isAdminHost = host === ADMIN_HOST;
-  const isMarketingHost =
-    host === MARKETING_HOST_PRIMARY || host === MARKETING_HOST_WWW;
 
-  // Admin host hit a marketing-only path: bounce to /app. Auth/redirect is
-  // handled there by updateSession on the follow-up request.
-  if (isAdminHost && MARKETING_ONLY_PATHS.has(url.pathname)) {
-    url.pathname = "/app";
-    return NextResponse.redirect(url);
-  }
-
-  // Marketing host hit an admin path: cross-domain redirect so cookies and
-  // Supabase sessions live on the admin origin. Covers /app/*, /login, and
-  // /signup — the three paths the marketing site links into.
-  if (
-    isMarketingHost &&
-    ADMIN_REDIRECT_PREFIXES.some((p) => url.pathname.startsWith(p))
-  ) {
-    const adminUrl = new URL(
+  if (LEGACY_HOSTS.has(host)) {
+    const target = new URL(
       url.pathname + url.search,
-      `https://${ADMIN_HOST}`,
+      `https://${CANONICAL_HOST}`,
     );
-    return NextResponse.redirect(adminUrl);
+    return NextResponse.redirect(target, { status: 308 });
   }
 
-  // Everything else (including localhost in dev): fall through to the
-  // Supabase session refresh + /app auth gate.
   return updateSession(request);
 }
 

@@ -86,7 +86,7 @@ export default async function ThankYouPage({
   // Build share URL + image only when consent allows it.
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    "https://review.baamplatform.com";
+    "https://baamreview.com";
   const shareToken = requestId ?? null;
   // Share link points at the dedicated share-card landing /s/<token>, not the
   // review-collection /r/<slug> page — friends should see the recommendation

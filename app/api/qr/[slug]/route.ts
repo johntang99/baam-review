@@ -41,7 +41,7 @@ export async function GET(
   }
 
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "https://review.baamplatform.com";
+    process.env.NEXT_PUBLIC_APP_URL || "https://baamreview.com";
 
   // Build the destination URL with optional source and lang.
   const target = new URL(`${appUrl}/r/${slug}`);

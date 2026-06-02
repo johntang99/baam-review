@@ -104,7 +104,7 @@ export function SendForm({
   // Use the public env so server and client render identically — referring
   // window inside render would mismatch on hydration.
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "https://review.baamplatform.com";
+    process.env.NEXT_PUBLIC_APP_URL || "https://baamreview.com";
   const previewLink = `${appUrl}/r/<slug>?t=<token>`;
   const previewVars = {
     name: previewName,

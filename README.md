@@ -13,8 +13,31 @@ git commit -m "Update: describe your changes"
 git push
 
 
+lsof -ti:4001 | xargs kill -9
+pnpm dev
 
-Standalone review collection SaaS, built on the BAAM Studio stack. Served from `review.baamplatform.com`
+
+
+Baam Review Accounts:
+
+admin
+john.tang2025@gmail.com
+baamreview
+
+manager:
+support@baamplatform.com
+support123
+
+Sales:
+baamplatform@gmail.com
+baamplatform
+
+
+
+
+
+
+Standalone review collection SaaS, built on the BAAM Studio stack. Served from `baamreview.com`
 
 The full vision and roadmap live in [`docs/BAAM_REVIEW_MASTER_PLAN.md`](docs/BAAM_REVIEW_MASTER_PLAN.md). This README is the operator's guide.
 
@@ -75,15 +98,15 @@ Unauthenticated requests to `/app/*` are redirected to `/login?next=...` by [`mi
 1. Push this repo to GitHub.
 2. Import the repo in Vercel — `pnpm` and Next.js auto-detected.
 3. Add the four env vars from `.env.local` to **Project Settings → Environment Variables** for *Production*, *Preview*, and *Development*.
-4. Set `NEXT_PUBLIC_APP_URL` to `https://review.baamplatform.com` for Production.
-5. Add the custom domain `review.baamplatform.com` under **Project Settings → Domains**. The CNAME (`review` → `cname.vercel-dns.com`) should already be configured at the DNS provider.
+4. Set `NEXT_PUBLIC_APP_URL` to `https://baamreview.com` for Production.
+5. Add the custom domain `baamreview.com` (and `www.baamreview.com`) under **Project Settings → Domains**. Vercel will issue SSL and tell you what DNS records to set (A record at the root, plus CNAME for www). The legacy subdomain `review.baamplatform.com` redirects to `baamreview.com` via `proxy.ts`.
 
 ### Supabase configuration
 
 In the Supabase dashboard for the `baam-review` project:
 
 - **Authentication → URL Configuration**
-  - Site URL: `https://review.baamplatform.com`
+  - Site URL: `https://baamreview.com`
   - Redirect URLs: add `http://localhost:4001/**` for local dev
 - **Authentication → Providers → Email** — confirm email enabled
 

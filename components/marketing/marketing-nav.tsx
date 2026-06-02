@@ -19,7 +19,7 @@ const NAV_LINKS: NavLink[] = [
 
 /**
  * Where the admin app lives. In production, marketing is on baamreview.com
- * and the admin is on review.baamplatform.com — Log in / Start free trial
+ * and the admin is on baamreview.com — Log in / Start free trial
  * must cross-origin. In dev (no env var), stay same-origin so localhost works.
  */
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "";

@@ -52,7 +52,7 @@ export async function GET(
   const accent = loc.brand_color ?? "#1F4D3F";
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    "https://review.baamplatform.com";
+    "https://baamreview.com";
   const ctaUrl = `${baseUrl}/r/${loc.slug}`;
 
   const quote = consent

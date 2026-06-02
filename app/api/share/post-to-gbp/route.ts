@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    "https://review.baamplatform.com";
+    "https://baamreview.com";
   const mediaUrl = `${baseUrl}/og/review/${review.google_review_id}?size=${size}&theme=${encodeURIComponent(theme)}`;
 
   const cta = body.cta ?? (location.booking_url

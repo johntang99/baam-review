@@ -70,7 +70,7 @@ export function WidgetBuilder({
   const [iframeHeight, setIframeHeight] = useState(640);
 
   // Preview pulls from the current admin origin (localhost during dev,
-  // review.baamplatform.com in prod). This guarantees a fresh deploy is
+  // baamreview.com in prod). This guarantees a fresh deploy is
   // visible immediately rather than waiting for the production app's
   // widget route to ship.
   const [previewOrigin, setPreviewOrigin] = useState(appUrl);

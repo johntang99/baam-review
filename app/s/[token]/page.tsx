@@ -83,7 +83,7 @@ export async function generateMetadata({
     .maybeSingle();
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    "https://review.baamplatform.com";
+    "https://baamreview.com";
   const ogImage = `${baseUrl}/og/share/${token}`;
   const title = loc?.display_name
     ? `${loc.display_name} — recommended by a customer`

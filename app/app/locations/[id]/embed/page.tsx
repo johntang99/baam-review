@@ -59,7 +59,7 @@ export default async function EmbedPage({
   if (!location) notFound();
 
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "https://review.baamplatform.com";
+    process.env.NEXT_PUBLIC_APP_URL || "https://baamreview.com";
 
   return (
     <main className="px-10 py-10">

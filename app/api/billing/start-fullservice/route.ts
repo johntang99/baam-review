@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   // Build absolute URLs for Stripe's success/cancel redirects.
   const h = await headers();
   const proto = h.get("x-forwarded-proto") ?? "https";
-  const host = h.get("host") ?? "review.baamplatform.com";
+  const host = h.get("host") ?? "baamreview.com";
   const origin = `${proto}://${host}`;
 
   const stripe = getStripe();

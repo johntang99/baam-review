@@ -94,7 +94,7 @@ export default async function ReferralsPage({
   }
 
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "https://review.baamplatform.com";
+    process.env.NEXT_PUBLIC_APP_URL || "https://baamreview.com";
 
   if (!location) {
     return (
