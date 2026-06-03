@@ -412,7 +412,7 @@ export default async function LocationsPage({
         }
       >
         {internal?.opsRole !== "account_manager" && (
-          <Link href="/api/auth/google/start">
+          <Link href="/api/auth/google/start" prefetch={false}>
             <Button>
               <Plus className="h-4 w-4" />
               Connect Google

@@ -32,9 +32,16 @@ export function NavItem({ href, label, icon, badge, exact }: NavItemProps) {
       ? pathname === "/app"
       : pathname === href || pathname.startsWith(`${href}/`);
 
+  // Never prefetch API routes — they often issue cross-origin redirects
+  // (e.g. /api/auth/google/start → accounts.google.com) and the fetch
+  // that Next.js uses for prefetching can't follow them, logging a CORS
+  // error to the console. Regular page Links continue to prefetch normally.
+  const isApiRoute = href.startsWith("/api/");
+
   return (
     <Link
       href={href}
+      prefetch={isApiRoute ? false : undefined}
       className={cn(
         "flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13.5px] transition-colors",
         isActive

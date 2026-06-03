@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
+import { StartTrialButton } from "./start-trial-button";
 
 export const metadata: Metadata = {
   title: "BAAM Review · Service — We run your review collection",
@@ -140,14 +141,14 @@ function ServiceFooter() {
   );
 }
 
-/** Tier CTAs route through signup when logged-out (`?next=` preserves the
- *  plan), or stay in-page with `?plan=` when logged in. The page detects
- *  the param and shows an interest-captured banner. */
-function tierHref(plan: Plan, loggedIn: boolean, auditId?: string): string {
+/** Logged-out signup URL for a tier CTA. `?next=` preserves the audit
+ *  context so when the user lands back on this page after auth, the
+ *  StartTrialButton (rendered for logged-in users) is ready to click and
+ *  POSTs to the real Stripe Checkout endpoint. */
+function signupHrefForTier(plan: Plan, auditId?: string): string {
   const target = auditId
     ? `/audit/service?plan=${plan}&audit=${encodeURIComponent(auditId)}`
     : `/audit/service?plan=${plan}`;
-  if (loggedIn) return target;
   return `/signup?next=${encodeURIComponent(target)}`;
 }
 
@@ -246,7 +247,7 @@ function StateAMarketing({ requestedPlan }: { requestedPlan: Plan | null }) {
             </p>
             <div className="hero-ctas">
               <Link
-                href={tierHref("full", false)}
+                href={signupHrefForTier("full")}
                 className="btn btn-primary btn-large"
               >
                 Start free trial →
@@ -297,7 +298,7 @@ function StateAMarketing({ requestedPlan }: { requestedPlan: Plan | null }) {
             </p>
             <div className="final-cta-buttons">
               <Link
-                href={tierHref("full", false)}
+                href={signupHrefForTier("full")}
                 className="btn btn-gold btn-xl"
               >
                 Start free trial →
@@ -387,12 +388,12 @@ function StateBPersonalized({
             </div>
 
             <div className="hero-ctas">
-              <Link
-                href={tierHref(recommendedTier, true, audit.id)}
+              <StartTrialButton
+                plan={recommendedTier}
                 className="btn btn-primary btn-large"
               >
                 Start free trial →
-              </Link>
+              </StartTrialButton>
               <Link
                 href={`/audit/${audit.id}`}
                 className="btn btn-outline btn-large"
@@ -447,18 +448,12 @@ function StateBPersonalized({
               Your account is already set up — one click activates everything.
             </p>
             <div className="final-cta-buttons">
-              <Link
-                href={tierHref("full", true, audit.id)}
-                className="btn btn-gold btn-xl"
-              >
+              <StartTrialButton plan="full" className="btn btn-gold btn-xl">
                 Start Full Service trial →
-              </Link>
-              <Link
-                href={tierHref("self", true, audit.id)}
-                className="btn btn-outline btn-xl"
-              >
+              </StartTrialButton>
+              <StartTrialButton plan="self" className="btn btn-outline btn-xl">
                 Start Self-Serve trial →
-              </Link>
+              </StartTrialButton>
             </div>
             <div className="final-cta-footnote">
               30-day trial · No charge · Cancel anytime · Activates your
@@ -725,12 +720,18 @@ function TierCard({
           </li>
         ))}
       </ul>
-      <Link
-        href={tierHref(plan, loggedIn, auditId)}
-        className="tier-cta"
-      >
-        Start {isSelfServe ? "Self-Serve" : "Full Service"} trial →
-      </Link>
+      {loggedIn ? (
+        <StartTrialButton plan={plan} className="tier-cta">
+          Start {isSelfServe ? "Self-Serve" : "Full Service"} trial →
+        </StartTrialButton>
+      ) : (
+        <Link
+          href={signupHrefForTier(plan, auditId)}
+          className="tier-cta"
+        >
+          Start {isSelfServe ? "Self-Serve" : "Full Service"} trial →
+        </Link>
+      )}
       <div className="tier-cta-sub">
         {loggedIn
           ? "Uses your existing account · no re-signup"
@@ -869,7 +870,7 @@ function AuditOffRamp() {
                 Take the free audit →
               </Link>
               <Link
-                href={tierHref("full", false)}
+                href={signupHrefForTier("full")}
                 className="btn btn-outline btn-large"
               >
                 Skip to trial →

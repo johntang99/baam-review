@@ -98,10 +98,31 @@ export async function getValidAccessToken(userId: string): Promise<string> {
   return refreshed.access_token;
 }
 
+/**
+ * Google's My Business APIs are well-known for transient 503/UNAVAILABLE
+ * responses even when your project has plenty of quota — backend hiccups
+ * are routine. Retry once after a short delay before giving up. 502/504
+ * are also treated as retryable for the same reason.
+ */
+async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+  { retries = 1, backoffMs = 800 }: { retries?: number; backoffMs?: number } = {},
+): Promise<Response> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetch(url, init);
+    const retryable = res.status === 503 || res.status === 502 || res.status === 504;
+    if (res.ok || !retryable || attempt === retries) return res;
+    await new Promise((r) => setTimeout(r, backoffMs * (attempt + 1)));
+  }
+  // Unreachable — the loop always returns or hits the last iteration.
+  throw new Error("fetchWithRetry: exhausted");
+}
+
 export async function listGoogleAccounts(
   accessToken: string,
 ): Promise<GoogleAccount[]> {
-  const res = await fetch(ACCOUNTS_URL, {
+  const res = await fetchWithRetry(ACCOUNTS_URL, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   if (!res.ok) {
@@ -122,7 +143,7 @@ export async function listGoogleLocations(
   accountResourceName: string,
 ): Promise<GoogleLocation[]> {
   const url = `${LOCATIONS_BASE_URL}/${accountResourceName}/locations?readMask=${encodeURIComponent(LOCATION_READ_MASK)}&pageSize=100`;
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   if (!res.ok) {

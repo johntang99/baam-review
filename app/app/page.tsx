@@ -1201,6 +1201,7 @@ function EmptyDashboard({
         <div className="flex flex-wrap gap-2.5">
           <Link
             href="/api/auth/google/start"
+            prefetch={false}
             className="inline-flex items-center gap-1.5 rounded-lg bg-forest text-cream px-4 py-2.5 text-[13.5px] font-medium hover:bg-forest-dark"
           >
             <Sparkles className="h-3.5 w-3.5" />
