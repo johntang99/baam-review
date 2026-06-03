@@ -12,12 +12,15 @@ import {
   reconcileCheckoutSession,
   reconcileAccountSubscriptions,
 } from "@/lib/billing/sync";
+import { AutoSelectLocation } from "./auto-select-location";
 import {
   PlanChooser,
   LocationActions,
   StartFullServiceTrialButton,
 } from "./billing-client";
 import { BillingRequiredButton } from "../locations/billing-required-button";
+import { getOnboardingStatus } from "@/lib/onboarding/status";
+import { OnboardingProgress } from "../onboarding-progress";
 
 export const metadata = { title: "Billing — BAAM Review" };
 
@@ -78,9 +81,16 @@ export default async function BillingPage({
   const { status, session_id } = await searchParams;
 
   // Reconcile straight from Stripe on the success redirect so the UI is
-  // correct immediately even if the webhook is delayed/missed.
+  // correct immediately even if the webhook is delayed/missed. Also pull
+  // the location_id off the subscription so we can auto-select that
+  // location in the sidebar — paying for X means "show me X".
+  let justPaidLocationId: string | null = null;
   if (session_id && isStripeConfigured()) {
-    await reconcileCheckoutSession(getStripe(), session_id);
+    const reconcileResult = await reconcileCheckoutSession(
+      getStripe(),
+      session_id,
+    );
+    justPaidLocationId = reconcileResult.locationId;
   }
 
   const supabase = await createClient();
@@ -164,10 +174,20 @@ export default async function BillingPage({
   );
 
   const plan = (account?.review_plan as ReviewPlan | null) ?? null;
+  const onboarding = await getOnboardingStatus(supabase, profile.account_id);
 
   return (
     <main className="px-10 py-10">
       <div className="max-w-6xl space-y-2">
+        {!onboarding.complete && (
+          <div className="mb-6">
+            <OnboardingProgress
+              hasLocation={onboarding.hasLocation}
+              hasBilling={onboarding.hasBilling}
+              hasActivatedRequest={onboarding.hasActivatedRequest}
+            />
+          </div>
+        )}
         <PageHeader
           eyebrow="Billing"
           title="Plan & billing"
@@ -178,6 +198,9 @@ export default async function BillingPage({
           <div className="mt-4 rounded-lg border border-forest/30 bg-forest/5 px-4 py-3 text-[13.5px] text-forest">
             Done — it can take a few seconds to reflect; refresh if needed.
           </div>
+        )}
+        {justPaidLocationId && (
+          <AutoSelectLocation locationId={justPaidLocationId} />
         )}
         {status === "cancelled" && (
           <div className="mt-4 rounded-lg border border-border-base bg-cream px-4 py-3 text-[13.5px] text-text-soft">

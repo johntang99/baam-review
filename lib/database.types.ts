@@ -177,6 +177,7 @@ export interface Database {
           suspended_at: string | null;
           suspension_reason: string | null;
           is_baam_internal: boolean;
+          onboarding_request_activated_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -197,6 +198,7 @@ export interface Database {
           suspended_at?: string | null;
           suspension_reason?: string | null;
           is_baam_internal?: boolean;
+          onboarding_request_activated_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };

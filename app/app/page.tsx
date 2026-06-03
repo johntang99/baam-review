@@ -29,6 +29,8 @@ import { Funnel } from "@/components/admin/funnel";
 import { computeRevenue, fmtUSD } from "@/lib/analytics/revenue";
 import { getLocationBillingState } from "@/lib/billing/access";
 import { BillingRequiredBanner } from "@/components/admin/billing-required-banner";
+import { OnboardingProgress } from "./onboarding-progress";
+import { getOnboardingStatus } from "@/lib/onboarding/status";
 import type { ReferralConfig } from "@/lib/database.types";
 
 export const metadata = {
@@ -54,7 +56,9 @@ export default async function DashboardPage() {
   let { data: account } = profile?.account_id
     ? await supabase
         .from("accounts")
-        .select("name, subscription_tier, review_plan")
+        .select(
+          "name, subscription_tier, review_plan, stripe_customer_id, subscription_status, onboarding_request_activated_at",
+        )
         .eq("id", profile.account_id)
         .maybeSingle()
     : { data: null };
@@ -301,6 +305,16 @@ export default async function DashboardPage() {
   const hasData =
     rs.length + (feedback?.length ?? 0) + gr.length + refs.length > 0;
 
+  const onboarding = profile?.account_id
+    ? await getOnboardingStatus(supabase, profile.account_id)
+    : {
+        hasLocation: false,
+        hasBilling: false,
+        hasActivatedRequest: false,
+        complete: false,
+      };
+  const onboardingComplete = onboarding.complete;
+
   // Recent activity feed — merges google reviews, referrals, and completed
   // requests into a single chronological list with status pills.
   type ActivityItem = {
@@ -417,17 +431,16 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      {!hasData ? (
-        <EmptyDashboard
-          stage={
-            account?.review_plan === "full_service" &&
-            (locations ?? []).length === 0
-              ? "full-service-needs-billing"
-              : (locations ?? []).length === 0
-                ? "no-locations"
-                : "no-activity"
-          }
+      {!onboardingComplete && (
+        <OnboardingProgress
+          hasLocation={onboarding.hasLocation}
+          hasBilling={onboarding.hasBilling}
+          hasActivatedRequest={onboarding.hasActivatedRequest}
         />
+      )}
+
+      {!hasData ? (
+        onboardingComplete ? <EmptyDashboard /> : null
       ) : (
         <>
           {/* SERVICE RECOVERY ALERT */}
@@ -1122,116 +1135,10 @@ function OfferPreviewCard({
   );
 }
 
-function EmptyDashboard({
-  stage,
-}: {
-  stage: "no-locations" | "no-activity" | "full-service-needs-billing";
-}) {
-  if (stage === "full-service-needs-billing") {
-    return (
-      <div className="rounded-2xl border border-gold/50 bg-gold/[0.06] p-10 max-w-3xl space-y-6">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-2.5 py-1 text-[11.5px] font-medium text-gold-dark">
-            <Sparkles className="h-3 w-3" />
-            Full Service trial
-          </div>
-          <h2 className="font-display text-[24px] text-ink leading-tight">
-            Step 1 — Set up your Full Service trial
-          </h2>
-          <p className="text-[14px] text-text-soft leading-relaxed">
-            With Full Service, our team handles the day-to-day: connecting
-            your Google Business Profile, sending review requests on your
-            behalf, replying to reviews in your voice. Start with a 30-day
-            free trial — your card is saved but not charged until day 31.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-2.5">
-          <Link
-            href="/app/billing"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-forest text-cream px-4 py-2.5 text-[13.5px] font-medium hover:bg-forest-dark"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Set up Full Service trial →
-          </Link>
-          <Link
-            href="/app/help"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-paper border border-border-base px-3.5 py-2 text-[13.5px] font-medium text-text hover:bg-hover"
-          >
-            Setup guides
-          </Link>
-        </div>
-
-        <div className="border-t border-border-base pt-5 space-y-1.5">
-          <p className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted font-medium">
-            What happens after you start the trial
-          </p>
-          <ol className="space-y-1 text-[13px] text-text-soft leading-relaxed list-decimal pl-5">
-            <li>Our team gets a notification and reaches out within 1 business day</li>
-            <li>We connect your Google Business Profile for you</li>
-            <li>We start sending review requests to your recent customers</li>
-            <li>You watch the funnel, revenue, and reviews update right here</li>
-          </ol>
-        </div>
-      </div>
-    );
-  }
-
-  if (stage === "no-locations") {
-    return (
-      <div className="rounded-2xl border border-forest/30 bg-forest/[0.04] p-10 max-w-3xl space-y-6">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-forest/10 px-2.5 py-1 text-[11.5px] font-medium text-forest">
-            <Sparkles className="h-3 w-3" />
-            Welcome to BAAM Review
-          </div>
-          <h2 className="font-display text-[24px] text-ink leading-tight">
-            Step 1 — Connect your Google Business Profile
-          </h2>
-          <p className="text-[14px] text-text-soft leading-relaxed">
-            BAAM Review needs to know which business you&apos;re collecting
-            reviews for. Click below (or use{" "}
-            <strong className="text-ink">Connect a new location</strong> in
-            the left sidebar) to sign in with Google and pick your business.
-            We&apos;ll set up the public review page, QR poster, and email
-            sender automatically.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-2.5">
-          <Link
-            href="/api/auth/google/start"
-            prefetch={false}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-forest text-cream px-4 py-2.5 text-[13.5px] font-medium hover:bg-forest-dark"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Connect Google Business Profile →
-          </Link>
-          <Link
-            href="/app/help"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-paper border border-border-base px-3.5 py-2 text-[13.5px] font-medium text-text hover:bg-hover"
-          >
-            Setup guides
-          </Link>
-        </div>
-
-        <div className="border-t border-border-base pt-5 space-y-1.5">
-          <p className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted font-medium">
-            What happens after you connect
-          </p>
-          <ol className="space-y-1 text-[13px] text-text-soft leading-relaxed list-decimal pl-5">
-            <li>Pick a plan and set up billing (Self-Service or Full-Service)</li>
-            <li>Send your first review request — single or bulk</li>
-            <li>Review responses, Google reviews, and revenue impact appear here</li>
-          </ol>
-        </div>
-      </div>
-    );
-  }
-
-  // stage === "no-activity" — has at least one connected location, just no
-  // review-request activity yet. Show the original "send your first request"
-  // empty state.
+// Onboarding (no locations / no billing) is handled by OnboardingProgress.
+// This card only fires once onboarding is complete but no requests / reviews
+// have flowed through yet.
+function EmptyDashboard() {
   return (
     <div className="rounded-2xl border border-dashed border-border-base bg-paper/60 p-10 max-w-3xl space-y-5">
       <div className="space-y-1">

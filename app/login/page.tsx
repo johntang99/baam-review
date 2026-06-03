@@ -22,7 +22,7 @@ export default async function LoginPage({
   const { data } = await supabase.auth.getUser();
   if (data.user) {
     const params = await searchParams;
-    const next = params.next?.startsWith("/") ? params.next : "/audit/list";
+    const next = params.next?.startsWith("/") ? params.next : "/app";
     redirect(next);
   }
 

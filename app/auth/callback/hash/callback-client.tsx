@@ -3,33 +3,26 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import { createBrowserClient } from "@supabase/ssr";
-import type { Database } from "@/lib/database.types";
-
-/**
- * Local Supabase client with `detectSessionInUrl: false`. The shared
- * `lib/supabase/client.ts` defaults to PKCE flow + auto-detect, which
- * on this page sees the email link's URL params and tries to call
- * exchangeCodeForSession *before* our handler runs — that fails with
- * "PKCE code verifier not found in storage" because the verifier
- * cookie was never set (server-initiated invite). Disabling auto-detect
- * lets the manual hash/token_hash/code branches below run unimpeded.
- */
-function makeCallbackClient() {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      auth: {
-        detectSessionInUrl: false,
-        flowType: "implicit",
-      },
-    },
-  );
-}
+import { createClient } from "@/lib/supabase/client";
 
 type Status = "working" | "error";
 
+/**
+ * Auth callback handler. Uses the shared @supabase/ssr browser client so
+ * the PKCE code_verifier cookie set during signup/login is in the same
+ * storage we read from here — building a one-off client wipes out the
+ * cookie storage adapter @supabase/ssr injects via the auth options and
+ * surfaces as "PKCE code verifier not found in storage".
+ *
+ * Handles all three flavours Supabase can send us:
+ *   • ?code=…             — PKCE (sign-in / sign-up / magic-link)
+ *   • ?token_hash=&type=  — server-side OTP (custom email template)
+ *   • #access_token=…     — implicit (default invite / recovery email)
+ *
+ * Order matters: we check the hash branch first because the URL fragment
+ * isn't visible to server routes, and we want to consume it before any
+ * router-driven re-render strips it.
+ */
 export function CallbackClient() {
   const router = useRouter();
   const [status, setStatus] = useState<Status>("working");
@@ -40,7 +33,6 @@ export function CallbackClient() {
 
     const finish = (path: string) => {
       if (cancelled) return;
-      // Replace, not push — the callback URL should not stay in history.
       router.replace(path);
     };
 
@@ -48,8 +40,6 @@ export function CallbackClient() {
       if (cancelled) return;
       setStatus("error");
       setError(msg);
-      // Auto-redirect to /login with the error after a short pause so the
-      // user can still see what went wrong.
       setTimeout(
         () => router.replace(`/login?error=${encodeURIComponent(msg)}`),
         2500,
@@ -57,11 +47,10 @@ export function CallbackClient() {
     };
 
     const run = async () => {
-      const supabase = makeCallbackClient();
+      const supabase = createClient();
       const url = new URL(window.location.href);
       const next = sanitiseNext(url.searchParams.get("next"));
 
-      // Surface explicit errors from Supabase (expired link, etc.).
       const explicitError =
         url.searchParams.get("error_description") ??
         url.searchParams.get("error_code") ??
@@ -71,7 +60,6 @@ export function CallbackClient() {
         return;
       }
 
-      // 1) Hash fragment (#access_token=…&refresh_token=…) — implicit flow.
       const hash = window.location.hash.replace(/^#/, "");
       if (hash) {
         const hp = new URLSearchParams(hash);
@@ -91,7 +79,6 @@ export function CallbackClient() {
         }
       }
 
-      // 2) ?token_hash= + ?type= — server-side OTP (custom email template).
       const tokenHash = url.searchParams.get("token_hash");
       const type = url.searchParams.get("type") as
         | "invite"
@@ -114,9 +101,17 @@ export function CallbackClient() {
         return;
       }
 
-      // 3) ?code= — PKCE flow (same-browser sign-in / sign-up).
       const code = url.searchParams.get("code");
       if (code) {
+        // The shared client has detectSessionInUrl on, so it may have
+        // already exchanged the code by the time this effect runs. Check
+        // for an existing session first to avoid double-spending the code
+        // (which yields "invalid or expired").
+        const { data: existing } = await supabase.auth.getSession();
+        if (existing.session) {
+          finish(next);
+          return;
+        }
         const { error: exErr } =
           await supabase.auth.exchangeCodeForSession(code);
         if (exErr) {
@@ -127,7 +122,6 @@ export function CallbackClient() {
         return;
       }
 
-      // Nothing actionable — kick to login.
       fail("No auth parameters in the link");
     };
 

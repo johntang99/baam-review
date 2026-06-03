@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { classifyByGoogleCategory } from "@/lib/review/google-category-mapping";
 import { CATEGORY_LABELS } from "@/lib/review/industry-presets";
 import { getLocationBillingMap } from "@/lib/billing/access";
+import { getOnboardingStatus } from "@/lib/onboarding/status";
+import { OnboardingProgress } from "@/app/app/onboarding-progress";
 import { createLocationFromGoogle, switchGoogleAccount } from "./actions";
 
 export const metadata = {
@@ -144,9 +146,17 @@ export default async function PickerPage({
   }
 
   const claimedCount = claimedByPlaceId.size;
+  const onboarding = await getOnboardingStatus(supabase, profile.account_id);
 
   return (
     <main className="px-10 py-10 space-y-8">
+      {!onboarding.complete && (
+        <OnboardingProgress
+          hasLocation={onboarding.hasLocation}
+          hasBilling={onboarding.hasBilling}
+          hasActivatedRequest={onboarding.hasActivatedRequest}
+        />
+      )}
       <div>
         <Link
           href="/app/locations"

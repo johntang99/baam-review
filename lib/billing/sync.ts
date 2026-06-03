@@ -103,23 +103,30 @@ export async function applyStripeSubscription(sub: Stripe.Subscription) {
 /**
  * Reconcile a completed Checkout Session into the DB by reading the
  * subscription straight from Stripe. Safe to call on the success redirect.
+ *
+ * Returns the location_id from the subscription's metadata so the caller
+ * can auto-select that location in the sidebar after payment — the UX
+ * expectation is "I just paid for location X, that's what I want to see."
  */
 export async function reconcileCheckoutSession(
   stripe: Stripe,
   sessionId: string,
-): Promise<boolean> {
+): Promise<{ ok: boolean; locationId: string | null }> {
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    if (session.mode !== "subscription" || !session.subscription) return false;
+    if (session.mode !== "subscription" || !session.subscription) {
+      return { ok: false, locationId: null };
+    }
     const subId =
       typeof session.subscription === "string"
         ? session.subscription
         : session.subscription.id;
     const sub = await stripe.subscriptions.retrieve(subId);
     await applyStripeSubscription(sub);
-    return true;
+    const locationId = (sub.metadata?.location_id as string | undefined) ?? null;
+    return { ok: true, locationId };
   } catch {
-    return false;
+    return { ok: false, locationId: null };
   }
 }
 
