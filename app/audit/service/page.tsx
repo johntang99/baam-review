@@ -3,7 +3,16 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
-import { StartTrialButton } from "./start-trial-button";
+/**
+ * NOTE: this page used to fire Stripe Checkout directly via StartTrialButton.
+ * It now routes plan-CTA clicks through /signup?plan=… for everyone:
+ *   • logged-out → renders the signup form, persists preferred_plan
+ *   • logged-in  → /signup applies the plan and redirects to /app/billing
+ *                  where the onboarding bar (1-Connect GBP, 2-Set up billing,
+ *                  3-Start Review Request) drives the rest of the journey.
+ * Single, unified flow whether the user is coming from the audit, the
+ * marketing home, or anywhere else.
+ */
 
 export const metadata: Metadata = {
   title: "BAAM Review · Service — We run your review collection",
@@ -388,12 +397,12 @@ function StateBPersonalized({
             </div>
 
             <div className="hero-ctas">
-              <StartTrialButton
-                plan={recommendedTier}
+              <Link
+                href={`/signup?plan=${recommendedTier}`}
                 className="btn btn-primary btn-large"
               >
                 Start free trial →
-              </StartTrialButton>
+              </Link>
               <Link
                 href={`/audit/${audit.id}`}
                 className="btn btn-outline btn-large"
@@ -448,12 +457,12 @@ function StateBPersonalized({
               Your account is already set up — one click activates everything.
             </p>
             <div className="final-cta-buttons">
-              <StartTrialButton plan="full" className="btn btn-gold btn-xl">
+              <Link href="/signup?plan=full" className="btn btn-gold btn-xl">
                 Start Full Service trial →
-              </StartTrialButton>
-              <StartTrialButton plan="self" className="btn btn-outline btn-xl">
+              </Link>
+              <Link href="/signup?plan=self" className="btn btn-outline btn-xl">
                 Start Self-Serve trial →
-              </StartTrialButton>
+              </Link>
             </div>
             <div className="final-cta-footnote">
               30-day trial · No charge · Cancel anytime · Activates your
@@ -720,18 +729,9 @@ function TierCard({
           </li>
         ))}
       </ul>
-      {loggedIn ? (
-        <StartTrialButton plan={plan} className="tier-cta">
-          Start {isSelfServe ? "Self-Serve" : "Full Service"} trial →
-        </StartTrialButton>
-      ) : (
-        <Link
-          href={signupHrefForTier(plan, auditId)}
-          className="tier-cta"
-        >
-          Start {isSelfServe ? "Self-Serve" : "Full Service"} trial →
-        </Link>
-      )}
+      <Link href={`/signup?plan=${plan}`} className="tier-cta">
+        Start {isSelfServe ? "Self-Serve" : "Full Service"} trial →
+      </Link>
       <div className="tier-cta-sub">
         {loggedIn
           ? "Uses your existing account · no re-signup"

@@ -114,6 +114,14 @@ export function OnboardingProgress({
       <div className="flex items-baseline justify-between gap-3 mb-5">
         <span className="text-[10.5px] uppercase tracking-[0.18em] text-gold-dark font-semibold">
           Getting started
+          {plan && (
+            <>
+              <span className="mx-2 text-text-muted">·</span>
+              <span className="text-text-soft">
+                {plan === "full_service" ? "Full Service" : "Self-Service"}
+              </span>
+            </>
+          )}
         </span>
         <span className="text-[11px] text-text-muted font-mono">
           {doneCount} of 3 complete

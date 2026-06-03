@@ -50,7 +50,14 @@ export default async function SignupPage({
           .select("review_plan")
           .eq("id", profile.account_id)
           .maybeSingle();
-        if (!acct?.review_plan) {
+        // Always honour the user's latest pick. Clicking "Start Full
+        // Service trial" after previously choosing Self-Serve is an
+        // explicit switch intent — the dashboard plan label, onboarding
+        // bar variant, and billing-page UI all read review_plan, so
+        // failing to update here leaves them on the wrong journey.
+        // Stripe subscriptions live on their own table and aren't
+        // affected by this column.
+        if (acct?.review_plan !== preferredPlan) {
           const svc = createServiceClient();
           await svc
             .from("accounts")
@@ -58,7 +65,13 @@ export default async function SignupPage({
             .eq("id", profile.account_id);
         }
       }
-      redirect("/app/billing");
+      // Full Service starts with billing (Step 1 of their bar). Self-Serve
+      // starts with GBP connect (Step 1 of theirs) — land on the dashboard
+      // so the bar's "Connect Google Business Profile →" CTA is the first
+      // thing they see.
+      redirect(
+        preferredPlan === "full_service" ? "/app/billing" : "/app",
+      );
     }
     const next = params.next?.startsWith("/") ? params.next : "/app";
     redirect(next);
