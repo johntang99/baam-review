@@ -1,51 +1,113 @@
 import Link from "next/link";
 import { markRequestReviewActivated } from "./actions/onboarding";
+import type { ReviewPlan } from "@/lib/onboarding/status";
 
 type StepState = "done" | "active" | "pending";
 
-interface Step {
+type CtaConfig =
+  | { kind: "link"; href: string; label: string; prefetch?: false }
+  | { kind: "form"; label: string }
+  | { kind: "passive"; label: string };
+
+interface StepConfig {
   index: number;
   label: string;
-  state: StepState;
+  done: boolean;
+  cta: CtaConfig;
 }
 
 interface OnboardingProgressProps {
+  plan: ReviewPlan;
   hasLocation: boolean;
   hasBilling: boolean;
   hasActivatedRequest: boolean;
 }
 
 /**
- * Three-step "Getting started" bar shown on the dashboard until all three
- * onboarding milestones are met. Once all three are done the bar hides
- * permanently (driven by accounts.onboarding_request_activated_at being
- * set — see markRequestReviewActivated server action).
+ * Three-step "Getting started" bar shown until all three onboarding
+ * milestones are met. The step order and CTAs differ by plan:
  *
- * Existing customers adding a second location skip this entirely because
- * `hasLocation` will already be true and the third flag is permanent.
+ *   Self Service (or no plan picked yet):
+ *     1. Connect Google location  (user does it via OAuth)
+ *     2. Set up billing
+ *     3. Start Review Request
+ *
+ *   Full Service:
+ *     1. Set up billing  (user pays for trial — comes first)
+ *     2. BAAM connects your GBP  (passive — no CTA, staff does it)
+ *     3. Start Review Request
+ *
+ * Bar hides entirely once all three are done.
  */
 export function OnboardingProgress({
+  plan,
   hasLocation,
   hasBilling,
   hasActivatedRequest,
 }: OnboardingProgressProps) {
   if (hasLocation && hasBilling && hasActivatedRequest) return null;
 
-  const stepDone = [hasLocation, hasBilling, hasActivatedRequest];
-  const doneCount = stepDone.filter(Boolean).length;
-  const activeIndex = stepDone.findIndex((d) => !d);
+  const steps: StepConfig[] =
+    plan === "full_service"
+      ? [
+          {
+            index: 1,
+            label: "Set up billing",
+            done: hasBilling,
+            cta: {
+              kind: "link",
+              href: "/app/billing",
+              label: "Set up billing →",
+            },
+          },
+          {
+            index: 2,
+            label: "BAAM connects your GBP",
+            done: hasLocation,
+            cta: {
+              kind: "passive",
+              label: "Usually within 1 business day after billing setup.",
+            },
+          },
+          {
+            index: 3,
+            label: "Start Review Request",
+            done: hasActivatedRequest,
+            cta: { kind: "form", label: "Start Review Request →" },
+          },
+        ]
+      : [
+          {
+            index: 1,
+            label: "Connect Google location",
+            done: hasLocation,
+            cta: {
+              kind: "link",
+              href: "/api/auth/google/start",
+              label: "Connect Google Business Profile →",
+              prefetch: false,
+            },
+          },
+          {
+            index: 2,
+            label: "Set up billing",
+            done: hasBilling,
+            cta: {
+              kind: "link",
+              href: "/app/billing",
+              label: "Set up billing →",
+            },
+          },
+          {
+            index: 3,
+            label: "Start Review Request",
+            done: hasActivatedRequest,
+            cta: { kind: "form", label: "Start Review Request →" },
+          },
+        ];
 
-  const steps: Step[] = [
-    { index: 1, label: "Connect Google location", state: stateFor(0) },
-    { index: 2, label: "Set up billing", state: stateFor(1) },
-    { index: 3, label: "Start Review Request", state: stateFor(2) },
-  ];
-
-  function stateFor(i: number): StepState {
-    if (stepDone[i]) return "done";
-    if (i === activeIndex) return "active";
-    return "pending";
-  }
+  const doneCount = steps.filter((s) => s.done).length;
+  const activeIndex = steps.findIndex((s) => !s.done);
 
   return (
     <section className="rounded-2xl border border-border-base bg-paper px-7 py-6">
@@ -63,44 +125,54 @@ export function OnboardingProgress({
           <StepDisplay
             key={step.index}
             step={step}
+            state={
+              step.done
+                ? "done"
+                : i === activeIndex
+                  ? "active"
+                  : "pending"
+            }
             isLast={i === steps.length - 1}
           />
         ))}
       </div>
 
-      <CtaRow
-        activeIndex={activeIndex}
-        hasLocation={hasLocation}
-        hasBilling={hasBilling}
-      />
+      {activeIndex !== -1 && <CtaRow cta={steps[activeIndex].cta} />}
     </section>
   );
 }
 
-function StepDisplay({ step, isLast }: { step: Step; isLast: boolean }) {
+function StepDisplay({
+  step,
+  state,
+  isLast,
+}: {
+  step: StepConfig;
+  state: StepState;
+  isLast: boolean;
+}) {
   const circleClass =
-    step.state === "done"
+    state === "done"
       ? "bg-success border-success text-cream"
-      : step.state === "active"
+      : state === "active"
         ? "bg-gold border-gold text-ink ring-[6px] ring-gold/20"
         : "bg-paper border-border text-text-muted";
 
   const labelClass =
-    step.state === "pending"
+    state === "pending"
       ? "text-text-muted"
-      : step.state === "done"
+      : state === "done"
         ? "text-ink font-normal"
         : "text-ink";
 
-  const connectorClass =
-    step.state === "done" ? "bg-success" : "bg-border";
+  const connectorClass = state === "done" ? "bg-success" : "bg-border";
 
   return (
     <div className="flex flex-col items-center text-center relative px-2">
       <div
         className={`flex h-9 w-9 items-center justify-center rounded-full border-[1.5px] font-display text-[14px] font-medium relative z-[2] ${circleClass}`}
       >
-        {step.state === "done" ? (
+        {state === "done" ? (
           <span className="font-sans font-bold text-[15px] leading-none">
             ✓
           </span>
@@ -126,60 +198,42 @@ function StepDisplay({ step, isLast }: { step: Step; isLast: boolean }) {
   );
 }
 
-function CtaRow({
-  activeIndex,
-  hasLocation,
-  hasBilling,
-}: {
-  activeIndex: number;
-  hasLocation: boolean;
-  hasBilling: boolean;
-}) {
-  if (activeIndex === -1) return null;
-
-  if (!hasLocation) {
+function CtaRow({ cta }: { cta: CtaConfig }) {
+  if (cta.kind === "passive") {
     return (
-      <CtaWrap>
-        <Link
-          href="/api/auth/google/start"
-          prefetch={false}
-          className="inline-flex items-center gap-2 rounded-full bg-forest text-cream px-5 py-2.5 text-[13.5px] font-medium hover:bg-forest-dark"
-        >
-          Connect Google Business Profile →
-        </Link>
-      </CtaWrap>
+      <div className="flex flex-col items-center gap-2 pt-1">
+        <span className="inline-flex items-center gap-2 rounded-full bg-cream-deep px-4 py-2 text-[13px] font-medium text-text-soft">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-gold animate-pulse" />
+          {cta.label}
+        </span>
+      </div>
     );
   }
 
-  if (!hasBilling) {
+  if (cta.kind === "link") {
     return (
-      <CtaWrap>
+      <div className="flex flex-col items-center gap-2 pt-1">
         <Link
-          href="/app/billing"
+          href={cta.href}
+          prefetch={cta.prefetch}
           className="inline-flex items-center gap-2 rounded-full bg-forest text-cream px-5 py-2.5 text-[13.5px] font-medium hover:bg-forest-dark"
         >
-          Set up billing →
+          {cta.label}
         </Link>
-      </CtaWrap>
+      </div>
     );
   }
 
   return (
-    <CtaWrap>
+    <div className="flex flex-col items-center gap-2 pt-1">
       <form action={markRequestReviewActivated}>
         <button
           type="submit"
           className="inline-flex items-center gap-2 rounded-full bg-forest text-cream px-5 py-2.5 text-[13.5px] font-medium hover:bg-forest-dark"
         >
-          Start Review Request →
+          {cta.label}
         </button>
       </form>
-    </CtaWrap>
-  );
-}
-
-function CtaWrap({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col items-center gap-2 pt-1">{children}</div>
+    </div>
   );
 }

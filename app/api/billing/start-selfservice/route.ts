@@ -63,7 +63,17 @@ export async function POST(request: Request) {
       trial_period_days: TRIAL_DAYS,
       metadata: {
         baam_review_source: "start_now_selfservice",
-        ...(accountId ? { signed_in_account_id: accountId } : {}),
+        plan: "self_service",
+        interval,
+        // account_id drives applyStripeSubscription's post-pay reconcile;
+        // signed_in_account_id is what the webhook in lib/billing/start-now.ts
+        // reads. Both for the same id — keep both keys.
+        ...(accountId
+          ? {
+              account_id: accountId,
+              signed_in_account_id: accountId,
+            }
+          : {}),
       },
     },
 

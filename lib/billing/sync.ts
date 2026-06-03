@@ -1,6 +1,7 @@
 import "server-only";
 import type Stripe from "stripe";
 import { createServiceClient } from "@/lib/supabase/service";
+import { handleStartNowCheckoutSession } from "@/lib/billing/start-now";
 import type { Database } from "@/lib/database.types";
 
 type AccountsUpdate = Database["public"]["Tables"]["accounts"]["Update"];
@@ -41,7 +42,11 @@ function isoFromUnix(sec: number | null | undefined): string | null {
 }
 
 export async function applyStripeSubscription(sub: Stripe.Subscription) {
-  const accountId = sub.metadata?.account_id;
+  // `signed_in_account_id` is the older key set by /api/billing/start-* on
+  // marketing-page Start-Now signups. New code sets both keys; accept
+  // either so subs created before the rename still reconcile correctly.
+  const accountId =
+    sub.metadata?.account_id ?? sub.metadata?.signed_in_account_id;
   // No BAAM Review metadata → not ours (e.g. website-services product).
   if (!accountId) return;
 
@@ -123,6 +128,23 @@ export async function reconcileCheckoutSession(
         : session.subscription.id;
     const sub = await stripe.subscriptions.retrieve(subId);
     await applyStripeSubscription(sub);
+
+    // Mirror what the Stripe webhook does for Start-Now Full Service
+    // sessions: insert the customer_records row + send the welcome /
+    // team-notify emails. Webhooks don't reach localhost without
+    // `stripe listen`, and we don't want the customer's welcome email
+    // (with the "add baamplatform@gmail.com as Manager" instructions)
+    // to be silently skipped on dev or on a missed webhook in prod.
+    // The handler short-circuits when the customer_record already
+    // exists, so this is safe to run from both code paths.
+    if (session.metadata?.source === "start_now_fullservice") {
+      try {
+        await handleStartNowCheckoutSession(session, stripe);
+      } catch (e) {
+        console.error("[reconcile] start-now handler failed", e);
+      }
+    }
+
     const locationId = (sub.metadata?.location_id as string | undefined) ?? null;
     return { ok: true, locationId };
   } catch {

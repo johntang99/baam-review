@@ -308,6 +308,7 @@ export default async function DashboardPage() {
   const onboarding = profile?.account_id
     ? await getOnboardingStatus(supabase, profile.account_id)
     : {
+        plan: null,
         hasLocation: false,
         hasBilling: false,
         hasActivatedRequest: false,
@@ -411,8 +412,7 @@ export default async function DashboardPage() {
           </h1>
           {!selectedLocation && account?.name && (
             <p className="text-[14px] text-text-soft">
-              {account.name} ·{" "}
-              <span className="capitalize">{account.subscription_tier}</span> plan
+              {account.name} · {planLabel(account)}
             </p>
           )}
         </div>
@@ -433,6 +433,7 @@ export default async function DashboardPage() {
 
       {!onboardingComplete && (
         <OnboardingProgress
+          plan={onboarding.plan}
           hasLocation={onboarding.hasLocation}
           hasBilling={onboarding.hasBilling}
           hasActivatedRequest={onboarding.hasActivatedRequest}
@@ -1194,6 +1195,39 @@ function greetingPart(): string {
   if (h < 12) return "morning";
   if (h < 18) return "afternoon";
   return "evening";
+}
+
+function planLabel(account: {
+  review_plan: "self_service" | "full_service" | null;
+  subscription_status: string | null;
+  subscription_tier: string;
+}): string {
+  // Prefer the review_plan choice (Self-Service vs Full Service) — that's
+  // the thing the customer actually picked on the marketing page. Fall
+  // back to the legacy subscription_tier when review_plan hasn't been
+  // applied yet (cold signup before they pick a plan). Append a status
+  // suffix so trialing / past-due customers see their state.
+  const base =
+    account.review_plan === "self_service"
+      ? "Self-Service plan"
+      : account.review_plan === "full_service"
+        ? "Full Service plan"
+        : `${capitalize(account.subscription_tier)} plan`;
+
+  switch (account.subscription_status) {
+    case "trialing":
+      return `${base} · trial`;
+    case "past_due":
+      return `${base} · past due`;
+    case "canceled":
+      return `${base} · canceled`;
+    default:
+      return base;
+  }
+}
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function initialsFrom(name: string | null | undefined): string {

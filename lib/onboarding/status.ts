@@ -1,7 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 
+export type ReviewPlan = "self_service" | "full_service" | null;
+
 export interface OnboardingStatus {
+  plan: ReviewPlan;
   hasLocation: boolean;
   hasBilling: boolean;
   hasActivatedRequest: boolean;
@@ -30,7 +33,7 @@ export async function getOnboardingStatus(
     supabase
       .from("accounts")
       .select(
-        "stripe_customer_id, subscription_status, onboarding_request_activated_at",
+        "review_plan, stripe_customer_id, subscription_status, onboarding_request_activated_at",
       )
       .eq("id", accountId)
       .maybeSingle(),
@@ -58,6 +61,7 @@ export async function getOnboardingStatus(
   const hasActivatedRequest = !!account?.onboarding_request_activated_at;
 
   return {
+    plan: (account?.review_plan as ReviewPlan) ?? null,
     hasLocation,
     hasBilling,
     hasActivatedRequest,

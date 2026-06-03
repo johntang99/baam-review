@@ -20,6 +20,7 @@ import { CATEGORY_LABELS } from "@/lib/review/industry-presets";
 import { getLocationBillingMap } from "@/lib/billing/access";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
 import { OnboardingProgress } from "@/app/app/onboarding-progress";
+import { UseLocationButton } from "./use-location-button";
 import { createLocationFromGoogle, switchGoogleAccount } from "./actions";
 
 export const metadata = {
@@ -152,6 +153,7 @@ export default async function PickerPage({
     <main className="px-10 py-10 space-y-8">
       {!onboarding.complete && (
         <OnboardingProgress
+          plan={onboarding.plan}
           hasLocation={onboarding.hasLocation}
           hasBilling={onboarding.hasBilling}
           hasActivatedRequest={onboarding.hasActivatedRequest}
@@ -349,9 +351,16 @@ export default async function PickerPage({
                             value={customerRecord.id}
                           />
                         )}
-                        <Button type="submit" size="sm">
-                          {customerRecord ? "Bind to customer" : "Use this location"}
-                        </Button>
+                        <UseLocationButton
+                          label={
+                            customerRecord
+                              ? "Bind to customer"
+                              : "Use this location"
+                          }
+                          pendingLabel={
+                            customerRecord ? "Binding…" : "Adding…"
+                          }
+                        />
                       </form>
                     )}
                   </div>

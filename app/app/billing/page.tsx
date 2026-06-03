@@ -182,6 +182,7 @@ export default async function BillingPage({
         {!onboarding.complete && (
           <div className="mb-6">
             <OnboardingProgress
+              plan={onboarding.plan}
               hasLocation={onboarding.hasLocation}
               hasBilling={onboarding.hasBilling}
               hasActivatedRequest={onboarding.hasActivatedRequest}

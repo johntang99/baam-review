@@ -82,11 +82,28 @@ export async function POST(request: Request) {
     ...(user?.email ? { customer_email: user.email } : {}),
 
     // The 30-day trial: card is saved, customer not charged until day 31.
+    //
+    // Two keys for the same id:
+    //   • account_id           — read by applyStripeSubscription on the
+    //                            success-redirect reconcile so the account
+    //                            row is updated with subscription_status
+    //                            immediately (drives the onboarding bar).
+    //   • signed_in_account_id — read by lib/billing/start-now.ts in the
+    //                            webhook to wire the customer_records row.
+    // Sending both keeps the post-pay reconcile AND the staff handoff path
+    // working without one having to query the other.
     subscription_data: {
       trial_period_days: TRIAL_DAYS,
       metadata: {
         baam_review_source: "start_now_fullservice",
-        ...(accountId ? { signed_in_account_id: accountId } : {}),
+        plan: "full_service",
+        interval,
+        ...(accountId
+          ? {
+              account_id: accountId,
+              signed_in_account_id: accountId,
+            }
+          : {}),
       },
     },
 
