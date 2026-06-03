@@ -313,6 +313,8 @@ export default async function DashboardPage() {
         hasBilling: false,
         hasActivatedRequest: false,
         complete: false,
+        hasAnyRequest: false,
+        showBar: false,
       };
   const onboardingComplete = onboarding.complete;
 
@@ -431,7 +433,7 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      {!onboardingComplete && (
+      {onboarding.showBar && (
         <OnboardingProgress
           plan={onboarding.plan}
           hasLocation={onboarding.hasLocation}

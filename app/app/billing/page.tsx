@@ -179,7 +179,7 @@ export default async function BillingPage({
   return (
     <main className="px-10 py-10">
       <div className="max-w-6xl space-y-2">
-        {!onboarding.complete && (
+        {onboarding.showBar && (
           <div className="mb-6">
             <OnboardingProgress
               plan={onboarding.plan}

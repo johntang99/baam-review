@@ -45,15 +45,11 @@ export function OnboardingProgress({
   hasBilling,
   hasActivatedRequest,
 }: OnboardingProgressProps) {
-  // The bar is a Getting-Started guide for brand-new accounts only. Once
-  // the user has at least one location they're past the onboarding phase
-  // (whether they self-connected via Step 1 or BAAM connected for them
-  // on Full Service), so the bar should disappear — established users
-  // see a clean dashboard. Established users still set up per-location
-  // billing through the Locations / Billing pages, which have their own
-  // per-row prompts.
-  if (hasLocation) return null;
-  if (hasBilling && hasActivatedRequest) return null;
+  // Hide only when the user has finished every explicit step. Callers
+  // additionally guard on getOnboardingStatus().showBar which also hides
+  // the bar for established accounts (those that already sent review
+  // requests), so this null-guard mostly protects against double-render.
+  if (hasLocation && hasBilling && hasActivatedRequest) return null;
 
   const steps: StepConfig[] =
     plan === "full_service"

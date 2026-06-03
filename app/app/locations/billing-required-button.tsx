@@ -252,7 +252,7 @@ export function BillingRequiredButton({
                 {pending
                   ? "Opening…"
                   : method === "card"
-                    ? "Continue to Stripe →"
+                    ? "Continue to Payment →"
                     : "Create invoice subscription →"}
               </Button>
             </div>

@@ -151,7 +151,7 @@ export default async function PickerPage({
 
   return (
     <main className="px-10 py-10 space-y-8">
-      {!onboarding.complete && (
+      {onboarding.showBar && (
         <OnboardingProgress
           plan={onboarding.plan}
           hasLocation={onboarding.hasLocation}
