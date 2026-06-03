@@ -29,6 +29,7 @@ import {
   createGmailDraftRequest,
   type SendResult,
 } from "./actions";
+import { GmailSenderEditor } from "./gmail-sender-editor";
 
 interface LocationOption {
   id: string;
@@ -382,29 +383,37 @@ export function SendForm({
                   </option>
                 ))}
               </select>
-              <SenderBadge
-                sender={currentGmailSender}
-                locationId={currentLocation?.id || ""}
-              />
+              {currentLocation && (
+                <GmailSenderEditor
+                  locationId={currentLocation.id}
+                  initialEmail={currentLocation.gmail_sender_email ?? ""}
+                  connectedViaGoogleEmail={
+                    currentLocation.connected_via_google_email
+                  }
+                />
+              )}
             </div>
           </Field>
         )}
         {locations.length === 1 && (
           <>
             <input type="hidden" name="location_id" value={locationId} />
-            <div className="rounded-lg border border-border-soft bg-cream/30 px-3 py-2">
+            <div className="rounded-lg border border-border-soft bg-cream/30 px-3 py-2 space-y-2">
               <p className="text-[12px] text-text-soft">
                 Location:{" "}
                 <span className="font-medium text-ink">
                   {currentLocation?.display_name ?? "Current location"}
                 </span>
               </p>
-              <div className="mt-1.5">
-                <SenderBadge
-                  sender={currentGmailSender}
-                  locationId={currentLocation?.id || ""}
+              {currentLocation && (
+                <GmailSenderEditor
+                  locationId={currentLocation.id}
+                  initialEmail={currentLocation.gmail_sender_email ?? ""}
+                  connectedViaGoogleEmail={
+                    currentLocation.connected_via_google_email
+                  }
                 />
-              </div>
+              )}
             </div>
           </>
         )}
@@ -812,38 +821,6 @@ function ChannelToggle({
       <span className="font-medium">{label}</span>
       {hint && <span className="text-[11px] text-text-muted ml-auto">{hint}</span>}
     </button>
-  );
-}
-
-function SenderBadge({
-  sender,
-  locationId,
-}: {
-  sender: string;
-  locationId: string;
-}) {
-  const hasSender = Boolean(sender);
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span
-        className={cn(
-          "inline-flex items-center rounded-full border px-2.5 py-1 text-[11.5px] font-medium",
-          hasSender
-            ? "border-success/35 bg-success/10 text-success"
-            : "border-alert/35 bg-alert/10 text-alert",
-        )}
-      >
-        Sender: {hasSender ? sender : "Not set"}
-      </span>
-      {!hasSender && locationId && (
-        <Link
-          href={`/app/locations/${locationId}?tab=email`}
-          className="text-[11.5px] text-alert underline hover:no-underline"
-        >
-          Set now →
-        </Link>
-      )}
-    </div>
   );
 }
 

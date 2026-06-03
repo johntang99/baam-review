@@ -15,6 +15,59 @@ import {
   getValidGmailAccessTokenForLocation,
   sendEmailViaGmailApi,
 } from "@/lib/google/gmail-api";
+import { canAccessLocation, getInternalContext } from "@/lib/auth/staff";
+
+export interface UpdateGmailSenderResult {
+  ok: boolean;
+  error?: string;
+  saved?: string | null;
+}
+
+/**
+ * Persist the per-location Gmail sender preset from the Send page. Single
+ * source of truth with Location Setup — both pages read/write the same
+ * `locations.gmail_sender_email` column, so saving here reflects on the
+ * settings page too.
+ *
+ * Empty string clears the preset (column → null).
+ */
+export async function updateLocationGmailSender(
+  locationId: string,
+  email: string,
+): Promise<UpdateGmailSenderResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in" };
+
+  if (!locationId) return { ok: false, error: "Missing location" };
+
+  const trimmed = email.trim().toLowerCase();
+  if (trimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+    return { ok: false, error: "Enter a valid email address" };
+  }
+
+  // Permission gate. Customers can only edit locations under their own
+  // account (RLS would block the write anyway, but checking here gives a
+  // clean error message rather than a silent no-op row count). Staff have
+  // their own visibility rules in canAccessLocation.
+  const internal = await getInternalContext(supabase, user.id);
+  const allowed = await canAccessLocation(supabase, internal, locationId);
+  if (!allowed) return { ok: false, error: "Not allowed" };
+
+  const valueToSave = trimmed || null;
+  const { error } = await supabase
+    .from("locations")
+    .update({ gmail_sender_email: valueToSave })
+    .eq("id", locationId);
+  if (error) return { ok: false, error: error.message };
+
+  // The Send page caches location data via its server component. Bust
+  // it so the next render shows the updated sender immediately.
+  revalidatePath("/app/send");
+  return { ok: true, saved: valueToSave };
+}
 
 export interface SendResult {
   ok: boolean;
