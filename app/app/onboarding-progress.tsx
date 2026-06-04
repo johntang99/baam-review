@@ -132,7 +132,7 @@ export function OnboardingProgress({
         </span>
       </div>
 
-      <div className="grid grid-cols-3 gap-0 relative mb-5">
+      <div className="grid grid-cols-3 gap-0 relative mb-10">
         {steps.map((step, i) => (
           <StepDisplay
             key={step.index}

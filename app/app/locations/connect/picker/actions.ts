@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
@@ -10,6 +11,20 @@ import { classifyByGoogleCategory } from "@/lib/review/google-category-mapping";
 import { getStripe } from "@/lib/billing/stripe";
 import { applyStripeSubscription } from "@/lib/billing/sync";
 import { sendEmailViaResend } from "@/lib/messaging/resend";
+import { SELECTED_LOCATION_COOKIE } from "@/lib/selected-location";
+
+/** Switch the sidebar's selected-location cookie to the just-added GBP.
+ *  The sidebar's location switcher reads this cookie via
+ *  getSelectedLocationId(), so the next render shows the new location
+ *  instead of the default "Manage all locations" aggregate. */
+async function selectLocation(locationId: string) {
+  const store = await cookies();
+  store.set(SELECTED_LOCATION_COOKIE, locationId, {
+    path: "/",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+}
 
 export async function createLocationFromGoogle(formData: FormData) {
   const placeId = formData.get("place_id");
@@ -99,6 +114,10 @@ export async function createLocationFromGoogle(formData: FormData) {
     .eq("google_place_id", placeId)
     .maybeSingle();
   if (alreadyConnected) {
+    // Re-clicking "Use this location" on an already-added GBP — still
+    // switch the sidebar to it so the next view reflects what the user
+    // just acted on.
+    await selectLocation(alreadyConnected.id);
     // If staff is trying to bind a customer_record to an already-connected
     // location, do the binding now (rare race) and exit. Otherwise just
     // redirect — nothing more to do.
@@ -250,6 +269,10 @@ export async function createLocationFromGoogle(formData: FormData) {
     redirect("/app/onboarding");
   }
 
+  // Self-serve / regular customer path: switch the sidebar to the just-
+  // added location so the dashboard / billing / send pages show it as
+  // the active context.
+  await selectLocation(insertedLoc.id);
   redirect("/app/locations/connect/picker");
 }
 

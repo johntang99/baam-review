@@ -278,3 +278,207 @@ function escapeHtml(s: string): string {
 function textToHtml(text: string): string {
   return `<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:14px;line-height:1.65;color:#1A1F1C;max-width:560px">${escapeHtml(text).replace(/\n/g, "<br>")}</div>`;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Self-Service per-location billing — welcome + team notify emails.
+ *
+ * Fires when the user completes Stripe Checkout from the per-location
+ * "Set up billing" modal on /app/billing. Unlike Full Service, BAAM
+ * doesn't connect a GBP — the customer already did. So this email
+ * skips the manager-invite instructions and just confirms the trial +
+ * points to the next dashboard actions.
+ *
+ * Idempotency: the location_subscriptions row gains a
+ * welcome_email_sent_at timestamp on the first successful send. Both
+ * the Stripe webhook and the post-checkout reconcile call this; the
+ * timestamp prevents duplicate emails when they race.
+ * ──────────────────────────────────────────────────────────────────────── */
+export async function handleSelfServiceLocationCheckoutSession(
+  session: Stripe.Checkout.Session,
+  stripe: Stripe,
+): Promise<void> {
+  const subRef = session.subscription;
+  if (!subRef) return;
+  const subscriptionId =
+    typeof subRef === "string" ? subRef : subRef.id;
+
+  const locationId = session.metadata?.location_id;
+  const accountId = session.metadata?.account_id;
+  if (!locationId || !accountId) return;
+
+  const email =
+    session.customer_details?.email ?? session.customer_email ?? "";
+  if (!email) return;
+
+  const service = createServiceClient();
+
+  // Idempotency: check the welcome_email_sent_at marker on the
+  // location_subscriptions row. If already set, bail without re-sending.
+  // The row is created by applyStripeSubscription before this runs (both
+  // webhook and reconcile call applyStripeSubscription first).
+  const { data: existingSub } = await service
+    .from("location_subscriptions")
+    .select("id, welcome_email_sent_at")
+    .eq("stripe_subscription_id", subscriptionId)
+    .maybeSingle();
+
+  if (!existingSub) {
+    // applyStripeSubscription hasn't created the row yet — bail. The
+    // caller race will resolve and one of the two paths (webhook /
+    // reconcile) will retry after the row lands.
+    console.warn(
+      "[selfservice email] subscription row not found yet, skipping",
+      subscriptionId,
+    );
+    return;
+  }
+
+  if (existingSub.welcome_email_sent_at) {
+    return;
+  }
+
+  const { data: loc } = await service
+    .from("locations")
+    .select("display_name, slug, id")
+    .eq("id", locationId)
+    .maybeSingle();
+
+  const locationName = loc?.display_name ?? "your location";
+  const firstName =
+    session.customer_details?.name?.trim().split(/\s+/)[0] ||
+    email.split("@")[0].split(/[._-]/)[0] ||
+    "there";
+
+  let trialEndIso: string | null = null;
+  let customerId: string | null = null;
+  try {
+    const sub = await stripe.subscriptions.retrieve(subscriptionId);
+    trialEndIso = sub.trial_end
+      ? new Date(sub.trial_end * 1000).toISOString()
+      : null;
+    customerId =
+      typeof sub.customer === "string" ? sub.customer : sub.customer.id;
+  } catch (e) {
+    console.warn(
+      "[selfservice email] could not retrieve subscription detail",
+      e,
+    );
+  }
+
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://baamreview.com";
+
+  try {
+    await Promise.all([
+      sendSelfServiceCustomerWelcome({
+        to: email,
+        firstName,
+        locationName,
+        trialEndIso,
+        appUrl,
+        locationId: loc?.id ?? locationId,
+      }),
+      sendSelfServiceTeamNotify({
+        email,
+        locationName,
+        accountId,
+        subscriptionId,
+        customerId,
+        trialEndIso,
+      }),
+    ]);
+  } catch (e) {
+    console.warn("[selfservice email] send failed", e);
+    // Don't set the marker if sending failed, so the next call retries.
+    return;
+  }
+
+  await service
+    .from("location_subscriptions")
+    .update({ welcome_email_sent_at: new Date().toISOString() })
+    .eq("id", existingSub.id);
+}
+
+async function sendSelfServiceCustomerWelcome(opts: {
+  to: string;
+  firstName: string;
+  locationName: string;
+  trialEndIso: string | null;
+  appUrl: string;
+  locationId: string;
+}) {
+  const from = process.env.RESEND_FROM;
+  if (!from) return;
+
+  const trialLine = opts.trialEndIso
+    ? formatDate(opts.trialEndIso)
+    : "30 days from today";
+
+  const lines = [
+    `Hi ${opts.firstName},`,
+    "",
+    `Thanks for setting up billing for ${opts.locationName}.`,
+    `Your 30-day trial has started — we don't charge until ${trialLine}.`,
+    "",
+    "You're all set. Two things to try first:",
+    "",
+    `  1. Send your first review request:`,
+    `     ${opts.appUrl}/app/send`,
+    "",
+    `  2. Print a QR poster for your shop:`,
+    `     ${opts.appUrl}/app/locations/${opts.locationId}/qr`,
+    "",
+    "Reply anytime if you have questions — this is a real inbox.",
+    "",
+    "— The BAAM Review team",
+  ];
+
+  const text = lines.join("\n");
+  await sendEmailViaResend({
+    to: opts.to,
+    subject: "Your BAAM Review trial is live",
+    text,
+    html: textToHtml(text),
+    replyTo: TEAM_NOTIFY_EMAIL,
+    from,
+  });
+}
+
+async function sendSelfServiceTeamNotify(opts: {
+  email: string;
+  locationName: string;
+  accountId: string;
+  subscriptionId: string;
+  customerId: string | null;
+  trialEndIso: string | null;
+}) {
+  const from = process.env.RESEND_FROM;
+  if (!from) return;
+
+  const trialLine = opts.trialEndIso
+    ? formatDate(opts.trialEndIso)
+    : "unknown";
+
+  const lines = [
+    `🟢 Self-Service location billing started`,
+    "",
+    `Location:        ${opts.locationName}`,
+    `Account ID:      ${opts.accountId}`,
+    `Email:           ${opts.email}`,
+    `Stripe sub:      ${opts.subscriptionId}`,
+    `Stripe customer: ${opts.customerId ?? "—"}`,
+    `Trial ends:      ${trialLine}`,
+    "",
+    "No staff action required — customer self-serves from here.",
+  ];
+
+  const text = lines.join("\n");
+  await sendEmailViaResend({
+    to: TEAM_NOTIFY_EMAIL,
+    subject: `🟢 Self-Service billing — ${opts.locationName}`,
+    text,
+    html: `<pre style="font-family:ui-monospace,Menlo,monospace;font-size:13px;white-space:pre-wrap;line-height:1.55">${escapeHtml(text)}</pre>`,
+    replyTo: opts.email,
+    from,
+  });
+}

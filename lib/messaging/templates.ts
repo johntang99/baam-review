@@ -104,9 +104,17 @@ function emailHtml(parts: {
   link: string;
   unsubscribe?: { label: string; url: string };
 }): EmailOutput {
-  const footerText = parts.unsubscribe
+  // Only emit the footer line when there's a real unsubscribe URL to
+  // attach. Otherwise the editor preview ends with "If you'd rather
+  // not hear from us, you can unsubscribe:" with nothing after it,
+  // which (a) confuses staff and (b) caused ensureUnsubscribeFooter()
+  // to append a duplicate footer on send because it couldn't detect
+  // the existing one had no URL. At send time the action always passes
+  // a real URL, so the default template body always carries a working
+  // footer; for the preview we just hide it.
+  const footerLine = parts.unsubscribe
     ? `${parts.footer} ${parts.unsubscribe.url}`
-    : parts.footer;
+    : null;
 
   // Plain-text first. Gmail Promotions classifier strongly weights HTML-heavy
   // marketing-style emails. Keep this looking like a personal note.
@@ -116,10 +124,7 @@ ${parts.body}
 
 ${parts.link}
 
-${parts.sign}
-
-—
-${footerText}`;
+${parts.sign}${footerLine ? `\n\n—\n${footerLine}` : ""}`;
 
   // Minimal HTML: same content, system font, single sentence link. No
   // buttons, no card chrome, no images. Reads like a normal email.
@@ -129,12 +134,12 @@ ${footerText}`;
     <p style="margin: 0 0 14px 0;">${escapeHtml(parts.greeting)}</p>
     <p style="margin: 0 0 14px 0;">${escapeHtml(parts.body)}</p>
     <p style="margin: 0 0 14px 0;"><a href="${parts.link}" style="color: #1F4D3F;">${escapeHtml(parts.link)}</a></p>
-    <p style="margin: 0 0 22px 0;">${escapeHtml(parts.sign)}</p>
-    <p style="font-size: 12px; color: #8A938E; margin: 0;">${escapeHtml(parts.footer)}${
+    <p style="margin: 0 0 22px 0;">${escapeHtml(parts.sign)}</p>${
       parts.unsubscribe
-        ? ` <a href="${parts.unsubscribe.url}" style="color: #8A938E;">${escapeHtml(parts.unsubscribe.label)}</a>`
+        ? `
+    <p style="font-size: 12px; color: #8A938E; margin: 0;">${escapeHtml(parts.footer)} <a href="${parts.unsubscribe.url}" style="color: #8A938E;">${escapeHtml(parts.unsubscribe.label)}</a></p>`
         : ""
-    }</p>
+    }
   </body>
 </html>`;
 
@@ -148,4 +153,53 @@ function escapeHtml(s: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+/**
+ * Localized unsubscribe footer text — the line that precedes the URL.
+ * Mirrors the per-language footers used by `buildEmail()` so an
+ * auto-appended footer reads identically to the default template.
+ */
+const UNSUBSCRIBE_FOOTER_TEXT: Record<Language, string> = {
+  en: "If you'd rather not hear from us, you can unsubscribe:",
+  zh: "如不想收到此类邮件，可点击下方退订：",
+  es: "Si prefiere no recibir más, puede cancelar la suscripción:",
+};
+
+/**
+ * Guarantee the email body carries a working unsubscribe link, regardless
+ * of how heavily the sender edited the default template.
+ *
+ * The default body returned by `buildEmail()` already includes the
+ * unsubscribe URL. But on the Send page the user can rewrite the body
+ * arbitrarily — including deleting the footer or starting from scratch.
+ * Sending a review-request email without a one-click unsubscribe breaks
+ * CAN-SPAM and trips Gmail / Yahoo bulk-sender filters; it also
+ * eliminates the one mechanism the recipient has to opt out (which
+ * cascades into us not respecting their opt-out on subsequent sends,
+ * since `opt_outs` is keyed off the click on the unsubscribe URL).
+ *
+ * So: if the supplied body does not already contain
+ * `/api/unsubscribe?t=`, append the localized footer + URL on a fresh
+ * pair of lines. The check is broad-substring intentionally — any
+ * unsubscribe URL is considered enough, so we don't double-append when
+ * the user kept the default footer or pasted in their own.
+ *
+ * Returns the body unchanged when:
+ *  - it already contains an `/api/unsubscribe?t=` URL, OR
+ *  - no `unsubscribeUrl` is provided (e.g., SMS flow uses Reply STOP).
+ */
+export function ensureUnsubscribeFooter(
+  body: string,
+  unsubscribeUrl: string | null | undefined,
+  language: Language,
+): string {
+  if (!unsubscribeUrl) return body;
+  if (body.includes("/api/unsubscribe?t=")) return body;
+
+  const footerText =
+    UNSUBSCRIBE_FOOTER_TEXT[language] ?? UNSUBSCRIBE_FOOTER_TEXT.en;
+  // Two newlines + em dash + footer line mirrors the visual rhythm
+  // buildEmail() uses for the default template footer.
+  return `${body.trimEnd()}\n\n—\n${footerText} ${unsubscribeUrl}`;
 }

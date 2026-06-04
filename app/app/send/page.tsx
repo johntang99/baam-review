@@ -57,18 +57,20 @@ export default async function SendPage() {
     null;
 
   return (
-    <main className="px-10 py-10 space-y-8">
-      <PageHeader
-        eyebrow="Request"
-        title="Request a Review"
-        description="One customer at a time. They'll receive a link to a 60-second review flow."
-      />
-      <SendForm
-        locations={locations ?? []}
-        smsEnabled={smsEnabled}
-        initialLocationId={initialLocationId}
-        blockedLocationIds={blockedLocationIds}
-      />
+    <main className="px-10 py-10">
+      <div className="max-w-[1080px] space-y-8">
+        <PageHeader
+          eyebrow="Request"
+          title="Request a Review"
+          description="One customer at a time. They'll receive a link to a 60-second review flow."
+        />
+        <SendForm
+          locations={locations ?? []}
+          smsEnabled={smsEnabled}
+          initialLocationId={initialLocationId}
+          blockedLocationIds={blockedLocationIds}
+        />
+      </div>
     </main>
   );
 }

@@ -5,7 +5,11 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { generateTrackingToken } from "@/lib/tokens";
-import { buildSmsBody, buildEmail } from "@/lib/messaging/templates";
+import {
+  buildSmsBody,
+  buildEmail,
+  ensureUnsubscribeFooter,
+} from "@/lib/messaging/templates";
 import { sendSmsViaTwilio, isTwilioConfigured } from "@/lib/messaging/twilio";
 import { sendEmailViaResend } from "@/lib/messaging/resend";
 import { checkVelocity } from "@/lib/messaging/velocity";
@@ -274,7 +278,16 @@ export async function createGmailDraftRequest(
   const subjectText = overrideSubjectRaw
     ? applyVars(overrideSubjectRaw)
     : defaultEmail.subject;
-  const bodyText = overrideBodyRaw ? applyVars(overrideBodyRaw) : defaultEmail.body;
+  // Always include a working unsubscribe link. If the user edited the
+  // body and removed (or never had) the footer, append it automatically
+  // — non-negotiable for CAN-SPAM compliance and Gmail / Yahoo bulk
+  // sender reputation. The helper no-ops when the URL is already
+  // present, so editing the default body is unaffected.
+  const bodyText = ensureUnsubscribeFooter(
+    overrideBodyRaw ? applyVars(overrideBodyRaw) : defaultEmail.body,
+    unsubscribeUrl,
+    language,
+  );
   const now = new Date().toISOString();
   const flaggedAt =
     velocity.kind === "flag" ? now : null;
@@ -478,9 +491,16 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
     const subjectText = overrideSubjectRaw
       ? applyVars(overrideSubjectRaw)
       : defaultEmail.subject;
-    const bodyText = overrideBodyRaw
-      ? applyVars(overrideBodyRaw)
-      : defaultEmail.body;
+    // ensureUnsubscribeFooter is a no-op when the URL is already in the
+    // body (which is the case for the default template). Catches the
+    // case where the user wiped the footer while editing — outbound
+    // mail without an unsubscribe link tanks deliverability and violates
+    // CAN-SPAM, so it's never optional.
+    const bodyText = ensureUnsubscribeFooter(
+      overrideBodyRaw ? applyVars(overrideBodyRaw) : defaultEmail.body,
+      unsubscribeUrl,
+      language,
+    );
     messageBody = bodyText;
     const html = bodyText === defaultEmail.body ? defaultEmail.html : plainToHtml(bodyText);
 

@@ -1,7 +1,10 @@
 import "server-only";
 import type Stripe from "stripe";
 import { createServiceClient } from "@/lib/supabase/service";
-import { handleStartNowCheckoutSession } from "@/lib/billing/start-now";
+import {
+  handleStartNowCheckoutSession,
+  handleSelfServiceLocationCheckoutSession,
+} from "@/lib/billing/start-now";
 import type { Database } from "@/lib/database.types";
 
 type AccountsUpdate = Database["public"]["Tables"]["accounts"]["Update"];
@@ -142,6 +145,18 @@ export async function reconcileCheckoutSession(
         await handleStartNowCheckoutSession(session, stripe);
       } catch (e) {
         console.error("[reconcile] start-now handler failed", e);
+      }
+    }
+
+    // Per-location Self-Service: send the welcome + team-notify emails.
+    // Mirrors the webhook branch above. Idempotent on
+    // location_subscriptions.welcome_email_sent_at, so it's safe to fire
+    // here even if the webhook already did.
+    if (session.metadata?.kind === "location") {
+      try {
+        await handleSelfServiceLocationCheckoutSession(session, stripe);
+      } catch (e) {
+        console.error("[reconcile] self-service email handler failed", e);
       }
     }
 

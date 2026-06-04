@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, AlertCircle, UserCheck } from "lucide-react";
+import { ExternalLink, AlertCircle, UserCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
@@ -21,7 +21,7 @@ import { getLocationBillingMap } from "@/lib/billing/access";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
 import { OnboardingProgress } from "@/app/app/onboarding-progress";
 import { UseLocationButton } from "./use-location-button";
-import { createLocationFromGoogle, switchGoogleAccount } from "./actions";
+import { createLocationFromGoogle } from "./actions";
 
 export const metadata = {
   title: "Pick a location — BAAM Review",
@@ -163,13 +163,6 @@ export default async function PickerPage({
         />
       )}
       <div>
-        <Link
-          href="/app/locations"
-          className="inline-flex items-center gap-1.5 text-[12.5px] text-text-soft hover:text-text mb-3"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to locations
-        </Link>
         <PageHeader
           eyebrow="Connect Google"
           title="Pick locations"
@@ -178,27 +171,7 @@ export default async function PickerPage({
               ? `Showing locations from ${googleEmail}. Add as many as you'd like — tap "Use this location" on each one.`
               : "Add as many locations as you'd like — tap \"Use this location\" on each one."
           }
-        >
-          <form action={switchGoogleAccount}>
-            {customerRecordIdParam && (
-              <input
-                type="hidden"
-                name="customer_record"
-                value={customerRecordIdParam}
-              />
-            )}
-            <Button type="submit" variant="ghost" size="sm">
-              Use a different Google account →
-            </Button>
-          </form>
-          {claimedCount > 0 && (
-            <Link href="/app/locations">
-              <Button variant="secondary">
-                Done — view {claimedCount === 1 ? "location" : `${claimedCount} locations`}
-              </Button>
-            </Link>
-          )}
-        </PageHeader>
+        />
       </div>
 
       {customerRecord && (

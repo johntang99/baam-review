@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Request a Review · Redesign prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Onest:wght@300..700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0F1F1A;
+  --forest: #1F4D3F;
+  --forest-dark: #143427;
+  --cream: #FAF7F2;
+  --cream-deep: #F0EBE0;
+  --paper: #FFFFFF;
+  --gold: #C9A961;
+  --gold-dark: #8E7430;
+  --gold-soft: #E5D5A7;
+  --text: #1A1F1C;
+  --text-soft: #5A6660;
+  --text-muted: #8A938E;
+  --border: #DDD5C2;
+  --border-soft: #ECE6D5;
+  --warn-bg: #FFF4E6;
+  --warn-border: #E8B86B;
+  --warn-text: #7A4F12;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Onest', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--cream-deep);
+  line-height: 1.5;
+}
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 40px 60px;
+}
+.page-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-head h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: -0.015em;
+}
+.page-head .legend {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;   /* stack vertically — each variant gets full width */
+  gap: 36px;
+  align-items: start;
+}
+.variant {
+  background: var(--cream);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 28px;
+  position: relative;
+}
+.variant-label {
+  position: absolute;
+  top: -12px;
+  left: 22px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* ============ Shared form internals ============ */
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.heading {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 28px;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  margin-bottom: 4px;
+}
+.subhead {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-bottom: 16px;
+}
+.warn {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--warn-text);
+  line-height: 1.5;
+  margin-bottom: 22px;
+}
+.warn-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  background: var(--warn-border);
+  color: var(--paper);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: serif;
+}
+.card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 1px 0 rgba(15, 31, 26, 0.02);
+}
+
+/* Inputs — KEY CHANGES: stronger contrast, bolder labels, white-white bg */
+.label {
+  font-size: 12.5px;
+  font-weight: 700;            /* requirement 2: bolder */
+  color: var(--ink);
+  letter-spacing: -0.005em;
+  margin-bottom: 6px;
+  display: block;
+}
+.label-hint {
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 6px;
+  font-size: 11.5px;
+}
+.input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--ink);
+  background: #FFFFFF;          /* requirement 1: whiter */
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--forest);
+  box-shadow: 0 0 0 3px rgba(31, 77, 63, 0.12);
+}
+.input::placeholder { color: var(--text-muted); }
+.textarea {
+  min-height: 130px;
+  resize: vertical;
+  font-family: 'Onest', system-ui, sans-serif;
+  line-height: 1.55;
+}
+
+/* Segmented toggle (How to send, Language) */
+.seg {
+  display: inline-flex;
+  background: #FFFFFF;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+.seg button {
+  background: transparent;
+  border: 0;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-soft);
+  padding: 7px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.seg button.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* Inline Sender Gmail editor */
+.sender-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.sender-row .input { flex: 1; }
+.btn {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 9px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 0;
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--forest);
+  color: var(--paper);
+}
+.btn-primary:hover { background: var(--forest-dark); }
+.btn-primary:disabled {
+  background: #BCC4BF;
+  cursor: not-allowed;
+}
+.btn-ghost {
+  background: var(--paper);
+  color: var(--text-soft);
+  border: 1.5px solid var(--border);
+}
+.btn-ghost:hover { background: var(--cream); }
+.btn-large {
+  font-size: 14px;
+  padding: 12px 22px;
+  border-radius: 999px;
+}
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* Message language */
+.lang-toggle {
+  display: inline-flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.lang-toggle button {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: #FFFFFF;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+.lang-toggle button.active {
+  background: var(--forest);
+  color: var(--paper);
+  border-color: var(--forest);
+}
+
+/* Message editor inner card */
+.msg {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 6px;
+}
+.msg-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 12px;
+}
+.msg-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0 6px;
+}
+.msg-meta-row .meta-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.tone-select {
+  font-family: inherit;
+  font-size: 12px;
+  border: 1.5px solid var(--border);
+  background: #FFFFFF;
+  padding: 5px 10px;
+  border-radius: 6px;
+  color: var(--text);
+}
+
+/* Send-CTA row */
+.send-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.send-row .btn-large { flex: 1; min-width: 200px; }
+.send-row .btn-large.secondary {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+.send-row .btn-large.secondary:hover {
+  background: var(--cream);
+}
+
+/* Tips block — moved BELOW send buttons per requirement 4 */
+.tips {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--cream);
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+}
+.tips p {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+.tips p + p { margin-top: 8px; }
+.tips strong { color: var(--ink); font-weight: 700; }
+.tips a { color: var(--forest); text-decoration: underline; }
+
+/* ============ VARIANT B: LEFT-LABEL LAYOUT ============ */
+.field-row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 20px;
+  align-items: start;
+  padding: 12px 0;          /* dividers removed — vertical rhythm via padding only */
+}
+.field-row .label {
+  margin-top: 8px;
+  margin-bottom: 0;
+  text-align: left;
+}
+.field-row .label .label-hint {
+  display: block;
+  margin-left: 0;
+  margin-top: 2px;
+  font-weight: 400;
+}
+.field-row .field-body { min-width: 0; }
+
+.section-divider {
+  margin: 18px 0 4px;            /* extra top margin replaces the rule line */
+  padding: 8px 0 6px;
+}
+.section-divider .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="page-head">
+    <h1>Request a Review — redesign prototypes</h1>
+    <span class="legend">side-by-side · pick one</span>
+  </div>
+
+  <div class="grid">
+
+    <!-- ===================== VARIANT A: STACKED (current style, improved) ===================== -->
+    <section class="variant">
+      <div class="variant-label">A · Stacked (labels above)</div>
+
+      <div class="eyebrow">Request</div>
+      <h2 class="heading">Request a Review</h2>
+      <p class="subhead">One customer at a time. They'll receive a link to a 60-second review flow.</p>
+
+      <div class="warn">
+        <span class="warn-icon">i</span>
+        <span>
+          Only send to people who actually visited <strong>American Education &amp; Translation Services 美域留学与翻译公司</strong>.
+          Sharing the link with friends who didn't visit is a Google policy violation and can get your reviews removed or your profile suspended.
+        </span>
+      </div>
+
+      <div class="card">
+        <!-- Location -->
+        <div style="margin-bottom: 16px;">
+          <label class="label" for="va-loc">Location</label>
+          <select class="input" id="va-loc">
+            <option>American Education &amp; Translation Services 美域留学与翻译公司</option>
+            <option>信用贷款 个人贷款 ...</option>
+          </select>
+        </div>
+
+        <!-- Sender Gmail -->
+        <div style="margin-bottom: 18px;">
+          <label class="label" for="va-sender">Sender Gmail <span class="label-hint">used when staff clicks "Send in Gmail"</span></label>
+          <div class="sender-row">
+            <input class="input" id="va-sender" type="email" value="support@baamplatform.com">
+            <button type="button" class="btn btn-primary" disabled>Save</button>
+            <button type="button" class="btn btn-ghost">Test →</button>
+          </div>
+        </div>
+
+        <!-- Customer name -->
+        <div style="margin-bottom: 16px;">
+          <label class="label" for="va-name">Customer name</label>
+          <input class="input" id="va-name" type="text" placeholder="e.g. Sarah Chen">
+        </div>
+
+        <!-- How to send -->
+        <div style="margin-bottom: 16px;">
+          <label class="label">How to send</label>
+          <div class="seg">
+            <button type="button" class="active">📧 Email</button>
+            <button type="button">💬 SMS</button>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div style="margin-bottom: 18px;">
+          <label class="label" for="va-email">Email address</label>
+          <input class="input" id="va-email" type="email" placeholder="customer@example.com">
+        </div>
+
+        <!-- Message -->
+        <div>
+          <label class="label">Message language</label>
+          <div class="lang-toggle">
+            <button class="active">English</button>
+            <button>中文</button>
+            <button>Español</button>
+          </div>
+          <div class="msg">
+            <div class="msg-eyebrow">Message (editable)</div>
+            <label class="label" for="va-subj">Subject</label>
+            <input class="input" id="va-subj" value="Customer, do you have a minute?">
+
+            <div class="msg-meta-row">
+              <span class="meta-label">Body</span>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <select class="tone-select">
+                  <option>Warm</option>
+                  <option>Formal</option>
+                  <option>Casual</option>
+                </select>
+                <button class="btn btn-ghost" type="button" style="padding:6px 10px;">✨ Rewrite with AI</button>
+              </div>
+            </div>
+            <textarea class="input textarea">Hi Customer,
+
+Thanks for stopping by American Education &amp; Translation Services 美域留学与翻译公司 today. If you have a minute, we'd love to hear how it went — there are a few quick options at this link:
+
+https://review.baamplatform.com/r/&lt;slug&gt;?t=&lt;token&gt;
+
+The team at American Education &amp; Translation Services 美域留学与翻译公司</textarea>
+            <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 8px;">
+              Variables in <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:#F3EFE0;padding:1px 4px;border-radius:3px;">&lt;slug&gt;</code> /
+              <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:#F3EFE0;padding:1px 4px;border-radius:3px;">&lt;token&gt;</code>
+              are filled in when the message is sent.
+            </p>
+          </div>
+        </div>
+
+        <!-- Send buttons -->
+        <div class="send-row">
+          <button class="btn btn-primary btn-large">📤 Send via BAAM email</button>
+          <button class="btn btn-large secondary">✉️ Send in Gmail</button>
+        </div>
+
+        <!-- Tips block (moved BELOW the send buttons per requirement 4) -->
+        <div class="tips">
+          <p><strong>Tip:</strong> Want it to feel personal? Click <strong>Send in Gmail</strong> to open a prefilled draft in Gmail web — recipient still lands on your review page.</p>
+          <p>Sender Gmail preset for this location: <strong>support@baamplatform.com</strong>. You can update it in <a href="#">Location Settings → Email Sender</a>.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===================== VARIANT B: LEFT-LABEL (form-style) ===================== -->
+    <section class="variant">
+      <div class="variant-label">B · Left-label (form rows)</div>
+
+      <div class="eyebrow">Request</div>
+      <h2 class="heading">Request a Review</h2>
+      <p class="subhead">One customer at a time. They'll receive a link to a 60-second review flow.</p>
+
+      <div class="warn">
+        <span class="warn-icon">i</span>
+        <span>
+          Only send to people who actually visited <strong>American Education &amp; Translation Services 美域留学与翻译公司</strong>.
+          Sharing the link with friends who didn't visit is a Google policy violation and can get your reviews removed or your profile suspended.
+        </span>
+      </div>
+
+      <div class="card" style="padding: 8px 24px;">
+
+        <!-- Location -->
+        <div class="field-row">
+          <label class="label" for="vb-loc">Location</label>
+          <div class="field-body">
+            <select class="input" id="vb-loc">
+              <option>American Education &amp; Translation Services 美域留学与翻译公司</option>
+              <option>信用贷款 个人贷款 ...</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sender Gmail -->
+        <div class="field-row">
+          <label class="label" for="vb-sender">
+            Sender Gmail
+            <span class="label-hint">used when staff clicks "Send in Gmail"</span>
+          </label>
+          <div class="field-body">
+            <div class="sender-row">
+              <input class="input" id="vb-sender" type="email" value="support@baamplatform.com">
+              <button type="button" class="btn btn-primary" disabled>Save</button>
+              <button type="button" class="btn btn-ghost">Test →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer name -->
+        <div class="field-row">
+          <label class="label" for="vb-name">Customer name</label>
+          <div class="field-body">
+            <input class="input" id="vb-name" type="text" placeholder="e.g. Sarah Chen">
+          </div>
+        </div>
+
+        <!-- How to send -->
+        <div class="field-row">
+          <label class="label">How to send</label>
+          <div class="field-body">
+            <div class="seg">
+              <button type="button" class="active">📧 Email</button>
+              <button type="button">💬 SMS</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="field-row">
+          <label class="label" for="vb-email">Email address</label>
+          <div class="field-body">
+            <input class="input" id="vb-email" type="email" placeholder="customer@example.com">
+          </div>
+        </div>
+
+        <!-- Message section divider -->
+        <div class="section-divider field-row">
+          <label class="label">Message</label>
+          <div class="field-body">
+            <div class="lang-toggle">
+              <button class="active">English</button>
+              <button>中文</button>
+              <button>Español</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject -->
+        <div class="field-row">
+          <label class="label" for="vb-subj">Subject</label>
+          <div class="field-body">
+            <input class="input" id="vb-subj" value="Customer, do you have a minute?">
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="field-row">
+          <label class="label" for="vb-body">
+            Body
+            <span class="label-hint">tone &amp; AI rewrite available</span>
+          </label>
+          <div class="field-body">
+            <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:6px;">
+              <select class="tone-select">
+                <option>Warm</option>
+                <option>Formal</option>
+                <option>Casual</option>
+              </select>
+              <button class="btn btn-ghost" type="button" style="padding:6px 10px;">✨ Rewrite with AI</button>
+            </div>
+            <textarea class="input textarea" id="vb-body">Hi Customer,
+
+Thanks for stopping by American Education &amp; Translation Services 美域留学与翻译公司 today. If you have a minute, we'd love to hear how it went — there are a few quick options at this link:
+
+https://review.baamplatform.com/r/&lt;slug&gt;?t=&lt;token&gt;
+
+The team at American Education &amp; Translation Services 美域留学与翻译公司</textarea>
+            <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 8px;">
+              Variables in <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:#F3EFE0;padding:1px 4px;border-radius:3px;">&lt;slug&gt;</code> /
+              <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:#F3EFE0;padding:1px 4px;border-radius:3px;">&lt;token&gt;</code>
+              are filled in when the message is sent.
+            </p>
+          </div>
+        </div>
+
+        <!-- Send buttons — Send in Gmail is the primary action -->
+        <div style="padding: 16px 0 4px;">
+          <div class="send-row">
+            <button class="btn btn-primary btn-large">✉️ Send in Gmail</button>
+            <button class="btn btn-large secondary">📤 Send via BAAM email</button>
+          </div>
+
+          <!-- Tips block (moved BELOW the send buttons per requirement 4) -->
+          <div class="tips">
+            <p><strong>Tip:</strong> Want it to feel personal? Click <strong>Send in Gmail</strong> to open a prefilled draft in Gmail web — recipient still lands on your review page.</p>
+            <p>Sender Gmail preset for this location: <strong>support@baamplatform.com</strong>. You can update it in <a href="#">Location Settings → Email Sender</a>.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Notes -->
+  <div style="margin-top: 36px; padding: 18px 22px; background: var(--paper); border: 1px solid var(--border-soft); border-radius: 12px;">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-dark); font-weight: 700; margin-bottom: 8px;">Design changes vs. current</div>
+    <ul style="margin: 0; padding-left: 22px; font-size: 13px; color: var(--text-soft); line-height: 1.7;">
+      <li><strong style="color: var(--ink);">Input fields are pure white</strong> (#FFFFFF), with a stronger 1.5px border for definition against the cream page bg.</li>
+      <li><strong style="color: var(--ink);">Labels are 700-weight ink</strong> instead of the previous 500-weight soft grey — easier to scan.</li>
+      <li><strong style="color: var(--ink);">Tips moved below the send buttons</strong> (instead of between the form and the buttons). Less interruption to the form flow.</li>
+      <li><strong style="color: var(--ink);">Variant A (stacked):</strong> minimal visual change from current, just the above polish. Compact for narrower viewports.</li>
+      <li><strong style="color: var(--ink);">Variant B (left-label):</strong> classic form-row pattern. Easier scan when filling many fields, more space for input content. Best on wide screens.</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

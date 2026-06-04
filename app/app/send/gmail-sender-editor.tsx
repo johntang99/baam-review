@@ -13,6 +13,9 @@ interface GmailSenderEditorProps {
   /** OAuth-connected Google account, shown as a fallback display when no
    * explicit preset is set. Not editable here. */
   connectedViaGoogleEmail?: string | null;
+  /** When this editor is wrapped in a FormRow (left-label layout), the
+   * parent already renders the field label, so suppress the internal one. */
+  hideLabel?: boolean;
 }
 
 /**
@@ -29,6 +32,7 @@ export function GmailSenderEditor({
   locationId,
   initialEmail,
   connectedViaGoogleEmail,
+  hideLabel = false,
 }: GmailSenderEditorProps) {
   const [savedEmail, setSavedEmail] = useState(initialEmail);
   const [draft, setDraft] = useState(initialEmail);
@@ -100,15 +104,17 @@ export function GmailSenderEditor({
 
   return (
     <div className="space-y-2">
-      <label
-        htmlFor={`gmail_sender_${locationId}`}
-        className="text-[12.5px] font-medium tracking-tight text-text-soft"
-      >
-        Sender Gmail{" "}
-        <span className="font-normal text-text-muted">
-          (used when staff clicks &ldquo;Send in Gmail&rdquo;)
-        </span>
-      </label>
+      {!hideLabel && (
+        <label
+          htmlFor={`gmail_sender_${locationId}`}
+          className="text-[12.5px] font-medium tracking-tight text-text-soft"
+        >
+          Sender Gmail{" "}
+          <span className="font-normal text-text-muted">
+            (used when staff clicks &ldquo;Send in Gmail&rdquo;)
+          </span>
+        </label>
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <Input
           id={`gmail_sender_${locationId}`}
@@ -119,7 +125,7 @@ export function GmailSenderEditor({
             if (error) setError(null);
           }}
           placeholder={connectedViaGoogleEmail || "name@gmail.com"}
-          className="flex-1 min-w-[220px]"
+          className="flex-1 min-w-[220px] shadow-none"
         />
         <button
           type="button"

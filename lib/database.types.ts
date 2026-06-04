@@ -660,6 +660,7 @@ export interface Database {
           subscription_status: string | null;
           current_period_end: string | null;
           cancel_at_period_end: boolean;
+          welcome_email_sent_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -675,6 +676,7 @@ export interface Database {
           subscription_status?: string | null;
           current_period_end?: string | null;
           cancel_at_period_end?: boolean;
+          welcome_email_sent_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };

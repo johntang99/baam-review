@@ -16,7 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Field } from "@/components/ui/section";
 import { cn } from "@/lib/utils";
 import {
   asEmailOrEmpty,
@@ -366,59 +365,54 @@ export function SendForm({
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="space-y-5 rounded-2xl border border-border-base bg-paper p-5 sm:p-6 shadow-sm">
-        {locations.length > 1 && (
-          <Field label="Location" htmlFor="location_id">
-            <div className="space-y-2">
-              <select
-                id="location_id"
-                name="location_id"
-                value={locationId}
-                onChange={(e) => onLocationChange(e.target.value)}
-                className="flex h-10 w-full rounded-lg border border-border-base bg-paper px-3 text-sm focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15"
-              >
-                {locations.map((loc) => (
-                  <option key={loc.id} value={loc.id}>
-                    {loc.display_name}
-                  </option>
-                ))}
-              </select>
-              {currentLocation && (
-                <GmailSenderEditor
-                  locationId={currentLocation.id}
-                  initialEmail={currentLocation.gmail_sender_email ?? ""}
-                  connectedViaGoogleEmail={
-                    currentLocation.connected_via_google_email
-                  }
-                />
-              )}
-            </div>
-          </Field>
-        )}
-        {locations.length === 1 && (
+      <form onSubmit={onSubmit} className="space-y-1 rounded-2xl border border-border-base bg-paper px-6 py-4 sm:px-8 sm:py-5 shadow-sm">
+        {locations.length > 1 ? (
+          <FormRow label="Location" htmlFor="location_id">
+            <select
+              id="location_id"
+              name="location_id"
+              value={locationId}
+              onChange={(e) => onLocationChange(e.target.value)}
+              className="flex h-10 w-full rounded-lg border border-border-base bg-white px-3 text-sm focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15"
+            >
+              {locations.map((loc) => (
+                <option key={loc.id} value={loc.id}>
+                  {loc.display_name}
+                </option>
+              ))}
+            </select>
+          </FormRow>
+        ) : (
           <>
             <input type="hidden" name="location_id" value={locationId} />
-            <div className="rounded-lg border border-border-soft bg-cream/30 px-3 py-2 space-y-2">
-              <p className="text-[12px] text-text-soft">
-                Location:{" "}
-                <span className="font-medium text-ink">
+            <FormRow label="Location">
+              <p className="text-[13px] text-ink py-2">
+                <span className="font-medium">
                   {currentLocation?.display_name ?? "Current location"}
                 </span>
               </p>
-              {currentLocation && (
-                <GmailSenderEditor
-                  locationId={currentLocation.id}
-                  initialEmail={currentLocation.gmail_sender_email ?? ""}
-                  connectedViaGoogleEmail={
-                    currentLocation.connected_via_google_email
-                  }
-                />
-              )}
-            </div>
+            </FormRow>
           </>
         )}
 
-        <Field label="Customer name" htmlFor="recipient_name">
+        {currentLocation && (
+          <FormRow
+            label="Sender Gmail"
+            htmlFor={`gmail_sender_${currentLocation.id}`}
+            hint='used when staff clicks "Send in Gmail"'
+          >
+            <GmailSenderEditor
+              locationId={currentLocation.id}
+              initialEmail={currentLocation.gmail_sender_email ?? ""}
+              connectedViaGoogleEmail={
+                currentLocation.connected_via_google_email
+              }
+              hideLabel
+            />
+          </FormRow>
+        )}
+
+        <FormRow label="Customer name" htmlFor="recipient_name">
           <Input
             id="recipient_name"
             name="recipient_name"
@@ -431,21 +425,18 @@ export function SendForm({
                 setFieldErrors((prev) => ({ ...prev, name: undefined }));
               }
             }}
-            className={
-              fieldErrors.name
-                ? "border-alert focus:border-alert focus:ring-alert/20"
-                : ""
-            }
+            className={cn(
+              "border bg-white shadow-none",
+              fieldErrors.name &&
+                "border-alert focus:border-alert focus:ring-alert/20",
+            )}
           />
           {fieldErrors.name && (
-            <p className="text-[12px] text-alert">{fieldErrors.name}</p>
+            <p className="text-[12px] text-alert pt-1">{fieldErrors.name}</p>
           )}
-        </Field>
+        </FormRow>
 
-        <div className="space-y-2">
-          <p className="text-[12.5px] font-medium tracking-tight text-text-soft">
-            How to send
-          </p>
+        <FormRow label="How to send">
           <div className="grid grid-cols-2 gap-2">
             <ChannelToggle
               icon={Mail}
@@ -461,8 +452,6 @@ export function SendForm({
               hint={!smsEnabled ? "Coming soon" : undefined}
               onClick={() => {
                 if (!smsEnabled) {
-                  // Show the inline hint; persists until the user
-                  // clicks the toggle again (toggle to dismiss).
                   setSmsHintShown((shown) => !shown);
                   return;
                 }
@@ -473,7 +462,7 @@ export function SendForm({
           {smsHintShown && (
             <div
               role="status"
-              className="rounded-lg border border-gold/40 bg-gold/[0.07] px-3.5 py-3 space-y-1.5"
+              className="mt-2 rounded-lg border border-gold/40 bg-gold/[0.07] px-3.5 py-3 space-y-1.5"
             >
               <p className="text-[12.5px] font-semibold text-gold-dark">
                 SMS delivery is coming soon
@@ -503,10 +492,14 @@ export function SendForm({
             </div>
           )}
           <input type="hidden" name="channel" value={channel} />
-        </div>
+        </FormRow>
 
         {channel === "sms" ? (
-          <Field label="Phone number" htmlFor="recipient_phone" hint="Include country code, e.g. +12125551234">
+          <FormRow
+            label="Phone number"
+            htmlFor="recipient_phone"
+            hint="include country code, e.g. +12125551234"
+          >
             <Input
               id="recipient_phone"
               name="recipient_phone"
@@ -516,10 +509,11 @@ export function SendForm({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+1"
+              className="border bg-white shadow-none"
             />
-          </Field>
+          </FormRow>
         ) : (
-          <Field label="Email address" htmlFor="recipient_email">
+          <FormRow label="Email address" htmlFor="recipient_email">
             <Input
               id="recipient_email"
               name="recipient_email"
@@ -533,22 +527,20 @@ export function SendForm({
                   setFieldErrors((prev) => ({ ...prev, email: undefined }));
                 }
               }}
-              className={
-                fieldErrors.email
-                  ? "border-alert focus:border-alert focus:ring-alert/20"
-                  : ""
-              }
+              className={cn(
+                "border bg-white shadow-none",
+                fieldErrors.email &&
+                  "border-alert focus:border-alert focus:ring-alert/20",
+              )}
             />
             {fieldErrors.email && (
-              <p className="text-[12px] text-alert">{fieldErrors.email}</p>
+              <p className="text-[12px] text-alert pt-1">{fieldErrors.email}</p>
             )}
-          </Field>
+          </FormRow>
         )}
 
-        <div className="space-y-2">
-          <p className="text-[12.5px] font-medium tracking-tight text-text-soft">
-            Message language
-          </p>
+        {/* Message group — extra top padding instead of a divider for grouping. */}
+        <FormRow label="Message language">
           <input type="hidden" name="language" value={language} />
           <div className="flex flex-wrap gap-2">
             {supported.map((code) => (
@@ -557,10 +549,10 @@ export function SendForm({
                 type="button"
                 onClick={() => setLanguage(code)}
                 className={cn(
-                  "rounded-lg border px-3 py-1.5 text-[13px] transition-colors",
+                  "rounded-lg border px-3 py-1.5 text-[13px] font-medium transition-colors",
                   language === code
                     ? "border-forest bg-forest text-cream"
-                    : "border-border-base bg-paper text-text-soft hover:bg-hover",
+                    : "border-border-base bg-white text-text-soft hover:bg-cream-deep/30",
                 )}
               >
                 {LANG_LABEL[code] ?? code.toUpperCase()}
@@ -568,7 +560,7 @@ export function SendForm({
             ))}
           </div>
           {missingLangs.length > 0 && currentLocation && (
-            <p className="text-[11.5px] text-text-muted pt-1">
+            <p className="text-[11.5px] text-text-muted pt-2">
               To send in {missingLangs.map((l) => LANG_LABEL[l]).join(" / ")},{" "}
               <Link
                 href={`/app/locations/${currentLocation.id}`}
@@ -579,169 +571,121 @@ export function SendForm({
               .
             </p>
           )}
-        </div>
+        </FormRow>
 
-        <div className="space-y-2 rounded-xl border border-border-soft bg-cream/40 p-3.5">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">
-              Message (editable)
-            </p>
+        {channel === "email" && (
+          <FormRow label="Subject" htmlFor="message_subject">
+            <Input
+              id="message_subject"
+              name="message_subject"
+              value={subject}
+              onChange={(e) => {
+                setSubject(e.target.value);
+                setSubjectTouched(true);
+              }}
+              className="border bg-white shadow-none"
+            />
+          </FormRow>
+        )}
+
+        <FormRow
+          label={channel === "sms" ? "Text message" : "Body"}
+          htmlFor="message_body"
+        >
+          <div className="flex items-center justify-end gap-1.5 pb-2">
+            <select
+              value={tone}
+              onChange={(e) => setTone(e.target.value as Tone)}
+              disabled={rewriting}
+              className="rounded-md border border-border-base bg-white px-2 py-1 text-[11.5px] text-text focus:outline-none focus:ring-2 focus:ring-forest/30 disabled:opacity-50"
+              aria-label="Rewrite tone"
+            >
+              {previewLang === "zh" ? (
+                <>
+                  <option value="warm">親切</option>
+                  <option value="brief">簡潔</option>
+                  <option value="professional">正式</option>
+                  <option value="casual">輕鬆</option>
+                </>
+              ) : (
+                <>
+                  <option value="warm">Warm</option>
+                  <option value="brief">Brief</option>
+                  <option value="professional">Professional</option>
+                  <option value="casual">Casual</option>
+                </>
+              )}
+            </select>
+            {rewriteHistory.length > 0 && (
+              <button
+                type="button"
+                onClick={undoRewrite}
+                disabled={rewriting}
+                title="Undo last AI rewrite"
+                className="inline-flex items-center gap-1 rounded-md border border-border-base bg-white px-2 py-1 text-[11.5px] text-text-soft hover:bg-cream-deep/30 disabled:opacity-50"
+              >
+                <Undo2 className="h-3 w-3" />
+                Undo
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={rewriteBodyWithAI}
+              disabled={rewriting || !currentLocation}
+              className="inline-flex items-center gap-1 rounded-md border border-forest/30 bg-forest/10 px-2 py-1 text-[11.5px] font-medium text-forest hover:bg-forest/15 disabled:opacity-50"
+            >
+              <Sparkles className="h-3 w-3" />
+              {rewriting ? "Rewriting…" : "Rewrite with AI"}
+            </button>
             {(subjectTouched || bodyTouched) && (
               <button
                 type="button"
                 onClick={resetPreview}
-                className="text-[11.5px] text-text-soft hover:text-text underline"
+                className="ml-1 text-[11.5px] text-text-soft hover:text-text underline"
               >
-                Reset to default
+                Reset
               </button>
             )}
           </div>
-
-          {channel === "email" && (
-            <div className="space-y-1.5">
-              <label
-                htmlFor="message_subject"
-                className="block text-[11.5px] font-medium tracking-tight text-text-soft"
-              >
-                Subject
-              </label>
-              <Input
-                id="message_subject"
-                name="message_subject"
-                value={subject}
-                onChange={(e) => {
-                  setSubject(e.target.value);
-                  setSubjectTouched(true);
-                }}
-              />
-            </div>
+          {rewriteError && (
+            <p className="text-[11px] text-alert pb-1">{rewriteError}</p>
           )}
-
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between gap-3">
-              <label
-                htmlFor="message_body"
-                className="block text-[11.5px] font-medium tracking-tight text-text-soft"
-              >
-                {channel === "sms" ? "Text message" : "Body"}
-              </label>
-              <div className="flex items-center gap-1.5">
-                <select
-                  value={tone}
-                  onChange={(e) => setTone(e.target.value as Tone)}
-                  disabled={rewriting}
-                  className="rounded-md border border-border-base bg-paper px-2 py-1 text-[11.5px] text-text focus:outline-none focus:ring-2 focus:ring-forest/30 disabled:opacity-50"
-                  aria-label="Rewrite tone"
-                >
-                  {previewLang === "zh" ? (
-                    <>
-                      <option value="warm">親切</option>
-                      <option value="brief">簡潔</option>
-                      <option value="professional">正式</option>
-                      <option value="casual">輕鬆</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="warm">Warm</option>
-                      <option value="brief">Brief</option>
-                      <option value="professional">Professional</option>
-                      <option value="casual">Casual</option>
-                    </>
-                  )}
-                </select>
-                {rewriteHistory.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={undoRewrite}
-                    disabled={rewriting}
-                    title="Undo last AI rewrite"
-                    className="inline-flex items-center gap-1 rounded-md border border-border-base bg-paper px-2 py-1 text-[11.5px] text-text-soft hover:bg-cream-deep/30 disabled:opacity-50"
-                  >
-                    <Undo2 className="h-3 w-3" />
-                    Undo
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={rewriteBodyWithAI}
-                  disabled={rewriting || !currentLocation}
-                  className="inline-flex items-center gap-1 rounded-md border border-forest/30 bg-forest/10 px-2 py-1 text-[11.5px] font-medium text-forest hover:bg-forest/15 disabled:opacity-50"
-                >
-                  <Sparkles className="h-3 w-3" />
-                  {rewriting ? "Rewriting…" : "Rewrite with AI"}
-                </button>
-              </div>
-            </div>
-            {rewriteError && (
-              <p className="text-[11px] text-alert">{rewriteError}</p>
-            )}
-            <Textarea
-              id="message_body"
-              name="message_body"
-              rows={channel === "sms" ? 5 : 10}
-              value={body}
-              onChange={(e) => {
-                setBody(e.target.value);
-                setBodyTouched(true);
-              }}
-              className="text-[13px] leading-relaxed"
-            />
-            {channel === "sms" && (
-              <p className="text-[11px] text-text-muted">
-                {body.length} characters · {Math.max(1, Math.ceil(body.length / 160))} SMS segment{Math.max(1, Math.ceil(body.length / 160)) === 1 ? "" : "s"}
-              </p>
-            )}
-          </div>
-
-          <p className="text-[11px] text-text-muted">
+          <Textarea
+            id="message_body"
+            name="message_body"
+            rows={channel === "sms" ? 5 : 10}
+            value={body}
+            onChange={(e) => {
+              setBody(e.target.value);
+              setBodyTouched(true);
+            }}
+            className="border bg-white shadow-none text-[13px] leading-relaxed"
+          />
+          {channel === "sms" && (
+            <p className="text-[11px] text-text-muted pt-1">
+              {body.length} characters · {Math.max(1, Math.ceil(body.length / 160))} SMS segment{Math.max(1, Math.ceil(body.length / 160)) === 1 ? "" : "s"}
+            </p>
+          )}
+          <p className="text-[11px] text-text-muted pt-2">
             Variables in <code className="font-mono">&lt;slug&gt;</code> /{" "}
             <code className="font-mono">&lt;token&gt;</code> are filled in when the
             message is sent. Other text sends exactly as written.
           </p>
-        </div>
+        </FormRow>
 
         {result && !result.ok && (
           <div
             role="alert"
-            className="flex gap-2.5 rounded-xl border border-alert/30 bg-alert/5 p-3 text-[13px] text-alert"
+            className="mt-4 flex gap-2.5 rounded-xl border border-alert/30 bg-alert/5 p-3 text-[13px] text-alert"
           >
             <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
             <p>{result.error}</p>
           </div>
         )}
 
-        <div className="border-t border-border-base pt-5 space-y-3">
-          <p className="text-[12.5px] text-text-soft leading-relaxed">
-            <span className="font-medium text-ink">Tip:</span> Want it to feel
-            personal? Click{" "}
-            <span className="font-medium text-ink">
-              Send in Gmail
-            </span>{" "}
-            to open a prefilled draft in Gmail web — recipient still lands on
-            your review page.
-          </p>
-          <p className="text-[12px] text-text-soft">
-            Sender Gmail preset for this location:{" "}
-            <span className="font-medium text-ink">
-              {currentGmailSender || "(not set — uses currently signed-in Gmail)"}
-            </span>
-            . You can update it in Location Settings → Email Sender.
-          </p>
-          {!currentGmailSender && currentLocation && (
-            <p className="text-[12px] text-alert">
-              Sender not set for this location.{" "}
-              <Link
-                href={`/app/locations/${currentLocation.id}?tab=email`}
-                className="font-medium underline hover:no-underline"
-              >
-                Set Gmail sender preset →
-              </Link>
-            </p>
-          )}
-          {gmailError && (
-            <p className="text-[12px] text-alert text-right">{gmailError}</p>
-          )}
-          <div className="flex flex-wrap items-center justify-end gap-3">
+        {/* Send buttons — "Send in Gmail" is the primary action. */}
+        <div className="pt-6">
+          <div className="flex flex-wrap gap-3">
             <Button
               type="button"
               size="lg"
@@ -752,6 +696,7 @@ export function SendForm({
                 openingGmail ||
                 channel !== "email"
               }
+              className="flex-1 min-w-[200px] justify-center"
             >
               <Mail className="h-4 w-4" />
               {openingGmail ? "Opening Gmail…" : "Send in Gmail"}
@@ -759,19 +704,65 @@ export function SendForm({
             <Button
               type="submit"
               size="lg"
-              variant={channel === "email" ? "secondary" : "primary"}
+              variant="secondary"
               disabled={pending || billingBlocked}
               onClick={(e) => {
                 if (!validateEmailRequiredFields()) {
                   e.preventDefault();
                 }
               }}
+              className="flex-1 min-w-[200px] justify-center"
             >
               <Send className="h-4 w-4" />
               {pending
                 ? "Sending…"
                 : `Send via ${channel === "sms" ? "SMS" : "BAAM email"}`}
             </Button>
+          </div>
+          {gmailError && (
+            <p className="mt-2 text-[12px] text-alert text-right">
+              {gmailError}
+            </p>
+          )}
+
+          {/* Tips block — moved BELOW the send buttons. */}
+          <div className="mt-4 rounded-xl border border-dashed border-border-base bg-cream/40 px-4 py-3 space-y-2">
+            <p className="text-[12.5px] text-text-soft leading-relaxed">
+              <span className="font-semibold text-ink">Tip:</span> Want it to
+              feel personal? Click{" "}
+              <span className="font-semibold text-ink">Send in Gmail</span> to
+              open a prefilled draft in Gmail web — recipient still lands on
+              your review page.
+            </p>
+            <p className="text-[12px] text-text-soft leading-relaxed">
+              Sender Gmail preset for this location:{" "}
+              <span className="font-semibold text-ink">
+                {currentGmailSender || "(not set — uses currently signed-in Gmail)"}
+              </span>
+              . You can update it in{" "}
+              {currentLocation ? (
+                <Link
+                  href={`/app/locations/${currentLocation.id}?tab=email`}
+                  className="text-forest underline hover:no-underline"
+                >
+                  Location Settings → Email Sender
+                </Link>
+              ) : (
+                "Location Settings → Email Sender"
+              )}
+              .
+            </p>
+            {!currentGmailSender && currentLocation && (
+              <p className="text-[12px] text-alert">
+                Sender not set for this location.{" "}
+                <Link
+                  href={`/app/locations/${currentLocation.id}?tab=email`}
+                  className="font-semibold underline hover:no-underline"
+                >
+                  Set Gmail sender preset →
+                </Link>
+              </p>
+            )}
           </div>
         </div>
       </form>
@@ -782,6 +773,42 @@ export function SendForm({
           flagged={!!result.flagged}
         />
       )}
+    </div>
+  );
+}
+
+/**
+ * Left-label form row used throughout this page. Replaces the stacked
+ * label-above-input pattern with a 170px label column + flexible body
+ * column. Labels are bolder (font-semibold, ink) for scan-ability; the
+ * row uses padding instead of rule lines for vertical rhythm so the
+ * form reads as a single connected unit, not a divided table.
+ */
+function FormRow({
+  label,
+  htmlFor,
+  hint,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="grid items-start gap-3 py-2 sm:grid-cols-[140px_1fr]">
+      <label
+        htmlFor={htmlFor}
+        className="block pt-2 text-[12.5px] font-semibold tracking-tight text-ink"
+      >
+        {label}
+        {hint && (
+          <span className="mt-1 block text-[11.5px] font-normal text-text-muted">
+            {hint}
+          </span>
+        )}
+      </label>
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }

@@ -3,7 +3,10 @@ import type Stripe from "stripe";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getStripe } from "@/lib/billing/stripe";
 import { applyStripeSubscription } from "@/lib/billing/sync";
-import { handleStartNowCheckoutSession } from "@/lib/billing/start-now";
+import {
+  handleStartNowCheckoutSession,
+  handleSelfServiceLocationCheckoutSession,
+} from "@/lib/billing/start-now";
 
 /**
  * Stripe webhook for BAAM Review billing. Verifies the signature when
@@ -63,6 +66,14 @@ export async function POST(request: NextRequest) {
         await applyStripeSubscription(
           await stripe.subscriptions.retrieve(subId),
         );
+
+        // Per-location Self-Service checkout: fire the welcome + team-
+        // notify emails after the location_subscriptions row has been
+        // upserted by applyStripeSubscription above. Handler is
+        // idempotent via location_subscriptions.welcome_email_sent_at.
+        if (session.metadata?.kind === "location") {
+          await handleSelfServiceLocationCheckoutSession(session, stripe);
+        }
         break;
       }
       case "customer.subscription.created":

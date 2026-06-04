@@ -429,13 +429,6 @@ export default async function DashboardPage() {
             <Calendar className="h-3.5 w-3.5 text-text-soft" />
             Last {WINDOW_DAYS} days
           </span>
-          <Link
-            href="/app/send"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-forest text-cream px-3.5 py-2 text-[13.5px] font-medium hover:bg-forest-dark"
-          >
-            <Send className="h-3.5 w-3.5" />
-            Send request
-          </Link>
         </div>
       </header>
 
