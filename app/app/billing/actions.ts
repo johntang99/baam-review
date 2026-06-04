@@ -127,7 +127,10 @@ export async function setSelfServiceAccount(): Promise<ActionResult> {
     .from("accounts")
     .update({ review_plan: "self_service" })
     .eq("id", account.id);
+  // /app reads review_plan to decide between plan-picker and onboarding
+  // bar, so revalidate both surfaces.
   revalidatePath("/app/billing");
+  revalidatePath("/app");
   return { ok: true };
 }
 
@@ -140,6 +143,7 @@ export async function setFullServiceAccount(): Promise<ActionResult> {
     .update({ review_plan: "full_service" })
     .eq("id", account.id);
   revalidatePath("/app/billing");
+  revalidatePath("/app");
   return { ok: true };
 }
 

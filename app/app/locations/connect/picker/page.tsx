@@ -151,7 +151,10 @@ export default async function PickerPage({
 
   return (
     <main className="px-10 py-10 space-y-8">
-      {onboarding.showBar && (
+      {/* No plan picked yet → the dashboard's PlanChooser should drive
+          the choice first. Don't render a Self-Serve-defaulted bar here
+          for a user who hasn't expressed an intent. */}
+      {onboarding.showBar && onboarding.plan !== null && (
         <OnboardingProgress
           plan={onboarding.plan}
           hasLocation={onboarding.hasLocation}

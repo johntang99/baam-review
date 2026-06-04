@@ -179,7 +179,10 @@ export default async function BillingPage({
   return (
     <main className="px-10 py-10">
       <div className="max-w-6xl space-y-2">
-        {onboarding.showBar && (
+        {/* Hide the bar when there's no plan yet — the in-page PlanChooser
+            below already prompts the same choice. Showing both at once
+            confuses the user with duplicate calls-to-action. */}
+        {onboarding.showBar && onboarding.plan !== null && (
           <div className="mb-6">
             <OnboardingProgress
               plan={onboarding.plan}

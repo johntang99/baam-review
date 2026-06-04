@@ -94,14 +94,21 @@ const btnGhost =
 
 /** No plan chosen yet → pick Self-service or Full-service. Neither creates
  *  a Stripe subscription; both just designate the plan. Locations are
- *  subscribed individually after. */
-export function PlanChooser() {
+ *  subscribed individually after.
+ *
+ *  `compact` mode (used on the dashboard) hides the Monthly/Yearly toggle
+ *  because the actual billing interval is selected later at Stripe
+ *  checkout — surfacing it here at "choose your plan" time implies it
+ *  affects the choice when it doesn't. Billing page keeps the toggle
+ *  because users there are deeper into the decision and want price
+ *  context. */
+export function PlanChooser({ compact = false }: { compact?: boolean } = {}) {
   const [interval, setInterval] = useState<BillingInterval>("month");
   const { pending, error, run } = useRun();
   const suffix = interval === "year" ? "/yr" : "/mo";
   return (
     <div className="space-y-5">
-      <IntervalToggle value={interval} onChange={setInterval} />
+      {!compact && <IntervalToggle value={interval} onChange={setInterval} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-border-base bg-white p-5">
           <div className="font-display text-[18px] text-ink">Self-service</div>
@@ -117,7 +124,7 @@ export function PlanChooser() {
             onClick={() => run(() => setSelfServiceAccount())}
             className={`mt-4 w-full ${btn}`}
           >
-            {pending ? "…" : "Use Self-service →"}
+            {pending ? "…" : "Choose Self-Service →"}
           </button>
         </div>
         <div className="rounded-xl border border-border-base bg-white p-5">
@@ -132,7 +139,7 @@ export function PlanChooser() {
             onClick={() => run(() => setFullServiceAccount())}
             className={`mt-4 w-full ${btnGhost}`}
           >
-            {pending ? "…" : "Use Full-service →"}
+            {pending ? "…" : "Choose Full Service →"}
           </button>
         </div>
       </div>

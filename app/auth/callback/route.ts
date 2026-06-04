@@ -63,10 +63,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}${next}`);
   }
 
-  // No code or token_hash in the query string — could be an implicit-flow
-  // hash fragment. Defer to the client component, which can read
-  // window.location.hash.
-  return NextResponse.rewrite(new URL("/auth/callback/hash", origin));
+  // No actionable params and no hash flow currently in use — just send
+  // the user back to /login. If we ever issue server-side invites or
+  // recovery emails that use the implicit `#access_token=…` format we'll
+  // need to bring the /auth/callback/hash client page back into play.
+  return NextResponse.redirect(`${origin}/login`);
 }
 
 function sanitiseNext(raw: string | null): string {

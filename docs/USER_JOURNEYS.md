@@ -2,8 +2,26 @@
 
 Snapshot of the post-signup / login flows as they exist today. Use this as
 the shared reference when changing any of the entry points (marketing CTAs,
-`/signup`, `/login`, onboarding bar, billing). If you change behavior, update
-this file in the same PR.
+`/signup`, `/login`, dashboard plan-picker, onboarding bar, billing). If you
+change behavior, update this file in the same PR.
+
+---
+
+## Core rule: plan-picker vs. journey bar on the dashboard
+
+The dashboard (`/app`) has two mutually-exclusive guidance widgets at the
+top of the page. Which one shows is decided by the user's saved
+`account.review_plan`:
+
+| `account.review_plan` | Widget shown on `/app` |
+|---|---|
+| `null` (no plan picked yet) | **Plan-picker** — Self-Service vs. Full Service cards. Picking writes `review_plan` and morphs into the journey bar. |
+| `self_service` or `full_service` | **Journey bar** — plan-tailored "Getting started" 3-step progress. |
+| set, but user is established (any review request ever sent) | Neither — clean dashboard. |
+
+This means the dashboard guidance is always plan-appropriate. The bar never
+defaults to the wrong plan because the user has to explicitly pick before
+the bar appears.
 
 ---
 
@@ -19,7 +37,8 @@ from `/` or `/audit/service`.
    session cookies, redirects)
 4. Lands on `/app` → dashboard auto-applies `preferred_plan` →
    `account.review_plan` (`app/app/page.tsx`)
-5. Onboarding bar appears, plan-tailored:
+5. **Plan is set → journey bar appears immediately** (no plan-picker step,
+   they already chose):
 
 | Self-Serve bar | Full Service bar |
 |---|---|
@@ -27,38 +46,39 @@ from `/` or `/audit/service`.
 | 2. Set up billing | 2. BAAM connects your GBP (passive — waits on staff) |
 | 3. Start Review Request | 3. Start Review Request |
 
-6. **Self-Serve:** click Step 1 → Google OAuth → picker → "Use this location"
-   → location row created. **Bar disappears** (because `hasLocation` is now
-   true). User then sets up billing for that location from `/app/billing`
-   (per-row "Set up billing" prompts there).
+6. **Self-Serve:** click Step 1 → Google OAuth → picker → "Use this
+   location" → location row created. Bar advances to Step 2. User sets up
+   billing for that location from `/app/billing` (per-row "Set up billing"
+   prompts on that page).
 7. **Full Service:** click Step 1 → Stripe trial checkout → returns to
    `/app/billing?status=success&session_id=…` → reconcile sets
    `account.subscription_status = trialing` + welcome email + team
    notification → bar advances to 2/3. User waits while BAAM staff
-   connects their GBP. When staff connects it, `hasLocation` flips to true
-   → **bar disappears**.
+   connects their GBP. When staff connects it, bar advances to 3/3.
+8. Click Step 3 ("Start Review Request →") OR send any actual review
+   request → bar hides permanently (established account).
 
 ---
 
 ## 2. First-time user, no plan picked (just signs up)
 
 **Entry:** Clicks `Sign in` → bottom of form → `Create account`, OR types
-`/signup` directly.
+`/signup` directly. No `?plan=` query param.
 
-1. Signup form has no `preferredPlan` → user only enters name/email/password
-2. Email confirm → `/app`
-3. `account.review_plan` stays `null`
-4. Onboarding bar appears with **no plan suffix** in the eyebrow, defaults
-   to **Self-Serve step order** (Connect location → Set up billing → Start
-   Review Request)
-5. User can either:
-   - Click Step 1 to connect a GBP first (and stay on the Self-Serve path
-     implicitly), OR
-   - Click the sidebar `Billing` → `/app/billing` where the `<PlanChooser>`
-     lets them pick Self-Serve or Full Service explicitly
+1. Signs up with name / email / password — no plan choice made yet.
+2. Email confirm → lands on `/app` (dashboard).
+3. **On the dashboard, two service plans are shown** for the user to
+   choose: Self-Service or Full Service.
+4. **User picks one** → the onboarding bar appears at the top of the
+   dashboard, tailored to the chosen plan.
+5. From here, the flow is identical to **Journey 1 from step 5 onward** —
+   same bar, same per-plan CTAs (Connect GBP / Set up billing / Start
+   Review Request), same Stripe checkout and GBP-connect paths.
 
-After they pick a plan on billing, `review_plan` is set and the bar's
-eyebrow + step order update accordingly.
+*Implementation note:* the picker is the same `PlanChooser` used on
+`/app/billing`; both write to `account.review_plan`. So a user who scrolls
+past the dashboard picker and goes straight to `/app/billing` still gets
+the same prompt.
 
 ---
 
@@ -66,17 +86,25 @@ eyebrow + step order update accordingly.
 
 **Entry:** Logs in via `/login` → defaults to `/app` (no `next` override).
 
-1. Dashboard renders with the onboarding bar (because `hasLocation` is false)
-2. Bar variant depends on their saved `review_plan`:
-   - **Self-Serve** → Step 1 active: "Connect Google location"
-   - **Full Service + no billing** → Step 1 active: "Set up billing"
-   - **Full Service + billing live** → Step 2 active: "BAAM connects your
-     GBP" (waiting state, no CTA)
-   - **No plan** → Self-Serve default order, no plan suffix
-3. They continue from wherever they left off
+1. Dashboard renders. Two sub-cases:
 
-Sidebar shows `Connect a new location`, `Manage all locations`, etc. — all
-available — but the bar's CTA is the most prominent next-action prompt.
+   **3a. Plan already picked in a prior session:**
+   - `review_plan` is set → **journey bar appears** at the position
+     they're at:
+     - Self-Serve → Step 1 active: "Connect Google location"
+     - Full Service + no billing → Step 1 active: "Set up billing"
+     - Full Service + billing live → Step 2 active: "BAAM connects your
+       GBP" (passive — waiting on staff)
+
+   **3b. No plan ever picked:**
+   - `review_plan` is `null` → **plan-picker appears** (same as Journey 2).
+   - After they pick, journey bar takes over.
+
+2. Sidebar shows `Connect a new location`, `Manage all locations`, etc. —
+   most items always visible. Exception:
+   - For Full Service users, `Connect a new location` is hidden. BAAM
+     staff connects GBPs for them; the picker page redirects them away
+     anyway, so the menu item is just a trap.
 
 ---
 
@@ -84,9 +112,9 @@ available — but the bar's CTA is the most prominent next-action prompt.
 
 **Entry:** Login → `/app`.
 
-1. `hasLocation` is true → **onboarding bar is hidden** (intentional design
-   — the bar is a Getting-Started guide only; established users see a clean
-   dashboard)
+1. The "established" signal triggers as soon as the account has sent
+   any review request → onboarding bar AND plan-picker are both
+   hidden (`getOnboardingStatus().showBar === false`).
 2. Full dashboard renders:
    - Greeting with `account.name · Self-Service plan · trial` (or whichever
      plan/status)
@@ -94,7 +122,7 @@ available — but the bar's CTA is the most prominent next-action prompt.
    - Service Recovery Alert (if low-rating reviews / unread feedback)
    - Funnel card, AI Reply queue, Share-a-review preview, Recent activity
    - Referrals card, Best advocates
-3. They work normally. Sidebar is their navigation.
+3. Sidebar is their main navigation.
 4. Per-location nudges still appear where relevant — e.g., the
    `/app/billing` table shows "Set up billing →" on any location without a
    sub, and `/app/locations` shows the same. So an established customer
@@ -108,9 +136,11 @@ available — but the bar's CTA is the most prominent next-action prompt.
   not confirmed". User goes back to the signup confirm-email screen (with
   the "Send email again" option).
 - **Plan switch after the fact** → Re-clicking a different plan on
-  `/audit/service` or marketing home routes through `/signup?plan=…` which
-  always overwrites `review_plan`. Subscription itself (Stripe) is
-  separate; they'd manage that on `/app/billing` if they're already paying.
+  `/audit/service`, marketing home, OR the dashboard plan-picker routes
+  through `/signup?plan=…` (for the first two) or a direct server action
+  (for the dashboard picker). Both always overwrite `review_plan`.
+  Subscription itself (Stripe) is separate; they'd manage that on
+  `/app/billing` if they're already paying.
 - **BAAM internal staff** (`accounts.is_baam_internal`) see an extra "BAAM
   Operations" sidebar section: Customers (`/app/customers`), Onboarding
   queue (`/app/onboarding`), Admin Staff (`/app/admin/staff`).
@@ -134,8 +164,9 @@ available — but the bar's CTA is the most prominent next-action prompt.
 | Signup (plan apply, signed-in redirect) | `app/signup/page.tsx`, `components/auth/signup-form.tsx` |
 | Login (signed-in redirect default) | `app/login/page.tsx` |
 | Auth callback (PKCE / OTP) | `app/auth/callback/route.ts` |
-| Dashboard + auto-apply preferred_plan | `app/app/page.tsx` |
-| Onboarding bar (plan-tailored steps, CTAs) | `app/app/onboarding-progress.tsx` |
+| Dashboard + plan-picker / journey bar slot | `app/app/page.tsx` |
+| Plan-picker component (shared with billing) | `app/app/billing/billing-client.tsx` (`PlanChooser`) |
+| Onboarding journey bar | `app/app/onboarding-progress.tsx` |
 | Onboarding flag computation | `lib/onboarding/status.ts` |
 | Activate Step 3 server action | `app/app/actions/onboarding.ts` |
 | Billing page (PlanChooser, reconciles) | `app/app/billing/page.tsx` |
@@ -143,4 +174,5 @@ available — but the bar's CTA is the most prominent next-action prompt.
 | Stripe webhook + reconcile | `app/api/webhooks/stripe/route.ts`, `lib/billing/sync.ts` |
 | Full Service welcome email + customer_record | `lib/billing/start-now.ts` |
 | GBP picker (Connect a new location) | `app/app/locations/connect/picker/page.tsx` |
+| Sidebar (per-plan visibility) | `components/admin/nav-sidebar.tsx` (or wherever `Connect a new location` is rendered) |
 | Send page Gmail sender editor | `app/app/send/gmail-sender-editor.tsx`, `app/app/send/actions.ts` |

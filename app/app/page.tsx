@@ -31,6 +31,8 @@ import { getLocationBillingState } from "@/lib/billing/access";
 import { BillingRequiredBanner } from "@/components/admin/billing-required-banner";
 import { OnboardingProgress } from "./onboarding-progress";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
+import { PlanChooser } from "./billing/billing-client";
+import { Section } from "@/components/ui/section";
 import type { ReferralConfig } from "@/lib/database.types";
 
 export const metadata = {
@@ -412,11 +414,15 @@ export default async function DashboardPage() {
             Good {greetingPart()},{" "}
             <em className="italic text-forest font-normal">{firstName}.</em>
           </h1>
-          {!selectedLocation && account?.name && (
-            <p className="text-[14px] text-text-soft">
-              {account.name} · {planLabel(account)}
-            </p>
-          )}
+          {!selectedLocation && account?.name && (() => {
+            const label = planLabel(account);
+            return (
+              <p className="text-[14px] text-text-soft">
+                {account.name}
+                {label ? ` · ${label}` : ""}
+              </p>
+            );
+          })()}
         </div>
         <div className="flex items-center gap-2.5">
           <span className="inline-flex items-center gap-2 rounded-lg border border-border-base bg-paper px-3.5 py-2 text-[13px] font-medium text-text">
@@ -433,7 +439,15 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      {onboarding.showBar && (
+      {onboarding.showBar && onboarding.plan === null && (
+        <Section
+          title="Choose how you'll use BAAM Review"
+          description="Self-service for your own business, or Full-service to manage clients. You can switch later."
+        >
+          <PlanChooser compact />
+        </Section>
+      )}
+      {onboarding.showBar && onboarding.plan !== null && (
         <OnboardingProgress
           plan={onboarding.plan}
           hasLocation={onboarding.hasLocation}
@@ -1203,18 +1217,18 @@ function planLabel(account: {
   review_plan: "self_service" | "full_service" | null;
   subscription_status: string | null;
   subscription_tier: string;
-}): string {
-  // Prefer the review_plan choice (Self-Service vs Full Service) — that's
-  // the thing the customer actually picked on the marketing page. Fall
-  // back to the legacy subscription_tier when review_plan hasn't been
-  // applied yet (cold signup before they pick a plan). Append a status
-  // suffix so trialing / past-due customers see their state.
+}): string | null {
+  // No plan picked → no plan label. The legacy subscription_tier column
+  // defaults to "growth" for every fresh account, which would surface a
+  // misleading "Growth plan · trial" on the dashboard for a brand-new
+  // user who hasn't picked anything yet. Returning null lets the caller
+  // hide the suffix entirely.
+  if (account.review_plan === null) return null;
+
   const base =
     account.review_plan === "self_service"
       ? "Self-Service plan"
-      : account.review_plan === "full_service"
-        ? "Full Service plan"
-        : `${capitalize(account.subscription_tier)} plan`;
+      : "Full Service plan";
 
   switch (account.subscription_status) {
     case "trialing":
