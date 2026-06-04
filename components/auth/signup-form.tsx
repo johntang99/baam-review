@@ -15,6 +15,12 @@ const RESEND_COOLDOWN_SECONDS = 60;
 function sanitiseNext(raw: string | null): string {
   if (!raw) return "/app";
   if (!raw.startsWith("/")) return "/app";
+  // "/" (marketing home) is never a useful post-signup destination —
+  // a brand-new user wants to land in their dashboard, not back on the
+  // public landing page. Treat it as "no intent" and default to /app.
+  // Other absolute paths (e.g. /audit/list, /audit/new) are honoured so
+  // users coming from those flows return to where they started.
+  if (raw === "/") return "/app";
   return raw;
 }
 

@@ -87,7 +87,11 @@ export function LoginForm() {
         Don&apos;t have an account?{" "}
         <Link
           href={
-            next === "/app"
+            // "/" and "/app" both mean "no specific intent" for the
+            // signup flow — drop the next so /signup uses its /app
+            // default. Anything else is a real return target (e.g.
+            // /audit/list) and we keep it.
+            next === "/app" || next === "/"
               ? "/signup"
               : `/signup?next=${encodeURIComponent(next)}`
           }

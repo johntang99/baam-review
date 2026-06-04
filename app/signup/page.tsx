@@ -73,7 +73,10 @@ export default async function SignupPage({
         preferredPlan === "full_service" ? "/app/billing" : "/app",
       );
     }
-    const next = params.next?.startsWith("/") ? params.next : "/app";
+    // Same "/" → "/app" rule as the signup form: marketing home is never
+    // a useful destination for a signed-in user who just clicked Sign up.
+    const rawNext = params.next?.startsWith("/") ? params.next : "/app";
+    const next = rawNext === "/" ? "/app" : rawNext;
     redirect(next);
   }
 
