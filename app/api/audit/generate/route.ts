@@ -20,6 +20,9 @@ interface GenerateRequest {
   vertical_override?: string;
   /** User-confirmed main-service keyword (e.g. "bridal boutique"). */
   service_override?: string;
+  /** Report-language choice from the intake form. "auto" defers to the
+   *  language router (Chinese businesses → both, else English). */
+  language_choice?: "auto" | "en" | "zh" | "both";
 }
 
 export async function POST(request: Request) {
@@ -74,6 +77,7 @@ export async function POST(request: Request) {
     name: profile?.full_name ?? undefined,
     vertical_override: verticalOverride,
     service_override: serviceOverride,
+    language_choice: body.language_choice,
   };
 
   const result = await startAuditGeneration(pipelineInput);

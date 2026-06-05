@@ -64,6 +64,8 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
   const [resolved, setResolved] = useState<ResolvedBusiness | null>(null);
   const [vertical, setVertical] = useState("");
   const [service, setService] = useState("");
+  const [languageChoice, setLanguageChoice] =
+    useState<"auto" | "en" | "zh" | "both">("auto");
   const [isPending, setIsPending] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [shakeField, setShakeField] = useState<"address" | "website" | null>(null);
@@ -147,6 +149,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           place_id: resolved.place_id,
           vertical_override: vertical,
           service_override: service.trim(),
+          language_choice: languageChoice,
         }),
       });
       if (!res.ok) {
@@ -204,9 +207,6 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
             <div className="found-confirmation-label">Google rating</div>
             <div className="found-confirmation-value">
               ★ {resolved.rating.toFixed(1)} · {resolved.total_count} reviews
-              {resolved.last_review_days_ago != null && (
-                <> · last review {resolved.last_review_days_ago} days ago</>
-              )}
             </div>
           </div>
 
@@ -266,21 +266,104 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
             </div>
           </div>
 
-          {resolved.is_chinese_business && (
-            <div
+          <fieldset
+            style={{
+              marginTop: 18,
+              padding: "14px 16px",
+              border: "1px solid var(--rule)",
+              borderRadius: 8,
+              background: "var(--cream-light, #FAF7F0)",
+            }}
+          >
+            <legend
               style={{
-                marginTop: 18,
-                padding: "10px 14px",
-                background: "rgba(107, 142, 110, 0.08)",
-                border: "1px solid rgba(107, 142, 110, 0.3)",
-                borderRadius: 6,
-                fontSize: 13,
+                padding: "0 8px",
+                fontSize: 12,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: 0.4,
                 color: "var(--ink-soft)",
               }}
             >
-              中文名稱 detected · we&apos;ll generate both English and 繁體中文 PDFs.
+              Report language
+            </legend>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                gap: 8,
+                marginTop: 4,
+              }}
+            >
+              {(
+                [
+                  {
+                    value: "auto",
+                    label: "Auto (recommended)",
+                    hint: resolved.is_chinese_business
+                      ? "中文名稱 detected → English + 繁體中文"
+                      : "English only",
+                  },
+                  { value: "en", label: "English only", hint: "EN PDF + HTML" },
+                  { value: "zh", label: "中文 only", hint: "ZH PDF + HTML" },
+                  {
+                    value: "both",
+                    label: "Both English and 中文",
+                    hint: "Bilingual: EN + ZH",
+                  },
+                ] as const
+              ).map((opt) => {
+                const checked = languageChoice === opt.value;
+                return (
+                  <label
+                    key={opt.value}
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      alignItems: "flex-start",
+                      padding: "10px 12px",
+                      border: `1px solid ${checked ? "var(--ink)" : "var(--rule)"}`,
+                      borderRadius: 6,
+                      background: checked ? "#fff" : "transparent",
+                      cursor: isPending ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="language_choice"
+                      value={opt.value}
+                      checked={checked}
+                      onChange={() => setLanguageChoice(opt.value)}
+                      disabled={isPending}
+                      style={{ marginTop: 3 }}
+                    />
+                    <span>
+                      <span
+                        style={{
+                          display: "block",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: "var(--ink)",
+                        }}
+                      >
+                        {opt.label}
+                      </span>
+                      <span
+                        style={{
+                          display: "block",
+                          marginTop: 2,
+                          fontSize: 11,
+                          color: "var(--ink-mute)",
+                        }}
+                      >
+                        {opt.hint}
+                      </span>
+                    </span>
+                  </label>
+                );
+              })}
             </div>
-          )}
+          </fieldset>
 
           {error && (
             <div

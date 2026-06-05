@@ -122,7 +122,6 @@
   </div>
 
   <h2 class="section-headline">{{{t.section_headlines.[02]}}}</h2>
-  <p class="section-deck">{{t.section_decks.[02]}}</p>
 
   <table class="snapshot-table">
     <thead>
@@ -224,49 +223,10 @@
     {{/each}}
   </div>
 
-  <div class="methodology-footer">
-    <span class="methodology-eyebrow">{{t.methodology_eyebrow}}</span>
-    <p>{{{t.methodology_text_html}}}</p>
-  </div>
-
-  <p style="margin-top: 32px; font-style: italic; font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1.35; color: var(--ink); max-width: 640px;">
-    {{{t.velocity_drag_line_html}}}
-  </p>
-
-  <div class="projection-block">
-    <div class="projection-eyebrow">{{t.forecast_eyebrow}}</div>
-    <h3 class="projection-title">{{{t.projection_title_html}}}</h3>
-    <p class="projection-deck">{{t.projection_deck}}</p>
-
-    <div class="projection-chart-frame">
-      <div class="projection-svg-wrap">
-        {{{projection_svg}}}
-      </div>
-
-      <div class="projection-legend">
-        {{#each t.projection_legend_lines}}<div class="legend-item">{{{this}}}</div>{{/each}}
-      </div>
-    </div>
-
-    <div class="projection-impact">
-      <div class="impact-cell">
-        <div class="impact-label">{{t.projection_impact_labels.score}}</div>
-        <div class="impact-value">{{projection_six_month_drop_display}}</div>
-        <div class="impact-sub">{{projection_floor_blurb}}</div>
-      </div>
-      <div class="impact-cell">
-        <div class="impact-label">{{t.projection_impact_labels.ranking}}</div>
-        <div class="impact-value">{{projection_ranking_drop_display}}</div>
-        <div class="impact-sub">{{#if (eq language "zh")}}預估本地搜尋包排名下滑 · 競爭對手持續複利擴大差距{{else}}Estimated Local Pack drop · competitors compounding the gap{{/if}}</div>
-      </div>
-      <div class="impact-cell">
-        <div class="impact-label">{{t.projection_impact_labels.revenue}}</div>
-        <div class="impact-value">{{projection_revenue_loss_display}}</div>
-        <div class="impact-sub">{{#if (eq language "zh")}}6 個月機會成本 · 行業每則評論價值 × 錯失的評論數{{else}}6-month opportunity cost · vertical per-review value × missed reviews{{/if}}</div>
-      </div>
-    </div>
-  </div>
-
+  <!-- Grade ladder moved up here (was previously below the projection
+       block). Reader sees their score → immediately understands what
+       the letter means → then dives into mechanics (methodology,
+       velocity drag, projection). -->
   <div class="grade-scale-block">
     <div class="grade-scale-eyebrow">{{t.grade_scale_eyebrow}}</div>
     <h3 class="grade-scale-headline">{{{t.grade_scale_headline_html}}}</h3>
@@ -290,6 +250,11 @@
     </table>
   </div>
 
+  <div class="methodology-footer">
+    <span class="methodology-eyebrow">{{t.methodology_eyebrow}}</span>
+    <p>{{{t.methodology_text_html}}}</p>
+  </div>
+
   {{#if is_paid}}
   <div class="service-preview-inline">
     <p class="service-preview-inline-text">{{{t.inline_service_preview_html}}}</p>
@@ -304,12 +269,18 @@
 </section>
 
 {{#if is_paid}}
-<!-- ====================== PAGE 4 — SECTION 4 BENCHMARKS ====================== -->
+<!-- ====================== PAGE 4 — COMPETITORS (was §5) ======================
+     Swapped UP per stakeholder request: readers want to see who's beating
+     them BEFORE the abstract industry-benchmark math. Label keys stay
+     `.[05]` / `section_5_*` / `page_label_5` so labels.ts didn't need to
+     change — only the displayed section number string in the header /
+     marker was updated to "§ 04" to match new physical position.
+============================================================================ -->
 <section class="page">
   <header class="doc-header">
     <div class="doc-header-left">
       <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
-      <div class="doc-header-sub">§ 04 · {{t.section_titles.[04]}}</div>
+      <div class="doc-header-sub">§ 04 · {{t.section_titles.[05]}}</div>
     </div>
     <div class="doc-header-right">
       <div><strong>{{business_name}}</strong></div>
@@ -319,76 +290,17 @@
 
   <div class="section-marker">
     <span class="section-marker-num">§ 04</span>
-    <span class="section-marker-title">{{t.section_titles.[04]}}</span>
-  </div>
-
-  <h2 class="section-headline">{{{t.section_4_headline_html}}}</h2>
-  <p class="section-deck">{{t.section_4_deck}}</p>
-
-  <div class="benchmark-split">
-    <div class="benchmark-panel">
-      <div class="benchmark-panel-eyebrow">{{t.benchmark_panel_a_eyebrow}}</div>
-      <h3 class="benchmark-panel-title">{{t.benchmark_panel_a_title}}</h3>
-      <div class="benchmark-value-big">{{per_review_value_median_display}}</div>
-      <div class="benchmark-value-range">{{#if (eq language "zh")}}範圍：{{else}}range: {{/if}}{{per_review_value_range_display}} · {{#if (eq language "zh")}}24 個月時程{{else}}24-month horizon{{/if}}</div>
-      <p class="benchmark-detail">{{{t.benchmark_panel_a_detail_html}}}</p>
-      <p style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-mute); margin-top: 14px; letter-spacing: 0.05em;">{{t.benchmark_panel_a_methodology}}</p>
-    </div>
-
-    <div class="benchmark-panel">
-      <div class="benchmark-panel-eyebrow">{{t.benchmark_panel_b_eyebrow}}</div>
-      <h3 class="benchmark-panel-title">{{t.benchmark_panel_b_title_html}}</h3>
-      <div class="velocity-gauge">
-        <div class="velocity-band silent">{{velocity_band_silent}}</div>
-        <div class="velocity-band min">{{velocity_band_min}}</div>
-        <div class="velocity-band optimal">{{velocity_band_optimal}}</div>
-        <div class="velocity-band aggressive">{{velocity_band_aggressive}}</div>
-      </div>
-      <div class="velocity-pointer-wrap">
-        <div class="velocity-pointer" style="left: {{velocity_pointer_pct}}%;">
-          <div class="velocity-pointer-label">{{velocity_pointer_label}}</div>
-        </div>
-      </div>
-      <p class="benchmark-detail" style="margin-top: 22px;">{{{t.benchmark_panel_b_detail_html}}}</p>
-    </div>
-  </div>
-
-  <div class="money-on-table">
-    <div class="money-on-table-eyebrow">{{t.money_on_table_eyebrow}}</div>
-    <p class="money-on-table-text">{{{money_on_table_html}}}</p>
-  </div>
-
-  <div class="doc-footer">
-    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_4}}</span>
-  </div>
-</section>
-
-<!-- ====================== PAGE 5 — SECTION 5 COMPETITORS ====================== -->
-<section class="page">
-  <header class="doc-header">
-    <div class="doc-header-left">
-      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
-      <div class="doc-header-sub">§ 05 · {{t.section_titles.[05]}}</div>
-    </div>
-    <div class="doc-header-right">
-      <div><strong>{{business_name}}</strong></div>
-      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
-    </div>
-  </header>
-
-  <div class="section-marker">
-    <span class="section-marker-num">§ 05</span>
     <span class="section-marker-title">{{t.section_titles.[05]}}</span>
   </div>
 
-  <h2 class="section-headline">{{{t.section_5_headline_html}}}</h2>
-  <p class="section-deck">{{t.section_5_deck}}</p>
+  <h2 class="section-headline" style="white-space: nowrap;">{{{t.section_5_headline_html}}}</h2>
+  <p class="section-deck" style="max-width: none; white-space: nowrap;">{{t.section_5_deck}}</p>
 
   <table class="competitor-table">
     <thead>
       <tr>
         <th>{{t.competitor_table_headers.business}}</th>
+        <th>{{t.competitor_table_headers.address}}</th>
         <th>{{t.competitor_table_headers.score}}</th>
         <th>{{t.competitor_table_headers.rating}}</th>
         <th>{{t.competitor_table_headers.total}}</th>
@@ -414,81 +326,22 @@
 
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_5}}</span>
+    <span>{{t.page_label_4}}</span>
   </div>
 </section>
 
-<!-- ====================== PAGE 6 — SECTION 6 ACTION + CTA ====================== -->
-<section class="page">
-  <header class="doc-header">
-    <div class="doc-header-left">
-      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
-      <div class="doc-header-sub">§ 06 · {{t.section_titles.[06]}}</div>
-    </div>
-    <div class="doc-header-right">
-      <div><strong>{{business_name}}</strong></div>
-      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
-    </div>
-  </header>
-
-  <div class="section-marker">
-    <span class="section-marker-num">§ 06</span>
-    <span class="section-marker-title">{{t.section_titles.[06]}}</span>
-  </div>
-
-  <h2 class="section-headline">{{{t.section_6_headline_html}}}</h2>
-  <p class="section-deck">{{t.section_6_deck}}</p>
-
-  <ol class="action-list">
-    {{#each action_items}}
-      {{> action-item}}
-    {{/each}}
-  </ol>
-
-  <div style="margin-top: 24px; padding: 20px 24px; background: var(--cream-deep); border-left: 3px solid var(--sage);">
-    <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.4; color: var(--ink);">
-      {{{t.summary_block_html}}}
-    </p>
-  </div>
-
-  <div class="cta-block">
-    <div class="cta-eyebrow">{{t.cta_eyebrow}}</div>
-    <h3 class="cta-headline">{{{t.cta_headline_html}}}</h3>
-
-    <div class="cta-paths">
-      <div class="cta-path">
-        <div class="cta-path-label">{{t.cta_self.label}}</div>
-        <h4 class="cta-path-title">{{t.cta_self.title}}</h4>
-        <div class="cta-path-price">{{t.cta_self.price}}</div>
-        <p class="cta-path-desc">{{t.cta_self.desc}}</p>
-      </div>
-      <div class="cta-path featured">
-        <div class="cta-path-label">{{t.cta_full.label}}</div>
-        <h4 class="cta-path-title">{{t.cta_full.title}}</h4>
-        <div class="cta-path-price">{{t.cta_full.price}}</div>
-        <p class="cta-path-desc">{{t.cta_full.desc}}</p>
-      </div>
-    </div>
-
-    <p class="promise-line">{{{t.cta_promise_html}}}</p>
-
-    <div class="cta-action-row">
-      <a href="/signup?next=/audit/service%3Faudit%3D{{audit_id}}%26plan%3Dself" target="_top" class="btn-svc dark">{{t.cta_action_self_label}}</a>
-      <a href="/signup?next=/audit/service%3Faudit%3D{{audit_id}}%26plan%3Dfull" target="_top" class="btn-svc amber">{{t.cta_action_full_label}}</a>
-      <a href="/audit/service" target="_top" class="cta-detail-link">{{t.cta_action_compare_label}}</a>
-    </div>
-  </div>
-
-  <div class="doc-footer">
-    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_6}}</span>
-  </div>
-</section>
-
-<!-- ====================== SERVICE OPPORTUNITY · between Page 6 and Page 7 ====================== -->
+<!-- ====================== SERVICE OPPORTUNITY · between Competitors and Forecast ======================
+     Moved up from its old position between Action Plan and Appendix.
+     New flow: Competitors (who's beating you) → Service Opportunity
+     (here's the lift if you act now) → Forecast (here's what happens
+     if you do nothing). The pitch lands right after the pain, while
+     the gap is fresh in the reader's mind, instead of being buried
+     after Action Plan where many readers had already dropped off.
+========================================================================================= -->
 <section class="service-opportunity-page" id="service-opportunity">
+  <h2 class="so-big-title">{{t.so_big_title}}</h2>
   <div class="so-eyebrow">{{t.so_eyebrow}}</div>
-  <h2 class="so-headline">{{{t.so_headline_html}}}</h2>
+  <h3 class="so-headline">{{{t.so_headline_html}}}</h3>
   <p class="so-deck">{{t.so_deck}}</p>
 
   <div class="so-grid">
@@ -539,6 +392,195 @@
   </div>
 
   <p class="so-trust">{{t.so_trust_line}}</p>
+</section>
+
+<!-- ====================== PAGE 5 — FORECAST (moved out of §3) ===================
+     Per request: competitors now sit BEFORE the do-nothing forecast.
+     Originally the projection block was inside §03 below the score; we
+     pulled it out so the reader sees Score → Grade Ladder → Who's
+     Beating You → What Happens If You Do Nothing → Benchmarks.
+============================================================================ -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">{{t.forecast_eyebrow}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{business_name}}</strong></div>
+      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
+    </div>
+  </header>
+
+  <p style="margin-top: 16px; font-style: italic; font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1.35; color: var(--ink); max-width: 640px;">
+    {{{t.velocity_drag_line_html}}}
+  </p>
+
+  <div class="projection-block">
+    <div class="projection-eyebrow">{{t.forecast_eyebrow}}</div>
+    <h3 class="projection-title">{{{t.projection_title_html}}}</h3>
+    <p class="projection-deck">{{t.projection_deck}}</p>
+
+    <div class="projection-chart-frame">
+      <div class="projection-svg-wrap">
+        {{{projection_svg}}}
+      </div>
+
+      <div class="projection-legend">
+        {{#each t.projection_legend_lines}}<div class="legend-item">{{{this}}}</div>{{/each}}
+      </div>
+    </div>
+
+    <div class="projection-impact">
+      <div class="impact-cell">
+        <div class="impact-label">{{t.projection_impact_labels.score}}</div>
+        <div class="impact-value">{{projection_six_month_drop_display}}</div>
+        <div class="impact-sub">{{projection_floor_blurb}}</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">{{t.projection_impact_labels.ranking}}</div>
+        <div class="impact-value">{{projection_ranking_drop_display}}</div>
+        <div class="impact-sub">{{#if (eq language "zh")}}預估本地搜尋包排名下滑 · 競爭對手持續複利擴大差距{{else}}Estimated Local Pack drop · competitors compounding the gap{{/if}}</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">{{t.projection_impact_labels.revenue}}</div>
+        <div class="impact-value">{{projection_revenue_loss_display}}</div>
+        <div class="impact-sub">{{#if (eq language "zh")}}6 個月機會成本 · 行業每則評論價值 × 錯失的評論數{{else}}6-month opportunity cost · vertical per-review value × missed reviews{{/if}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_5}}</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 6 — INDUSTRY BENCHMARKS (was §5, now §6) ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">§ 06 · {{t.section_titles.[04]}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{business_name}}</strong></div>
+      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 06</span>
+    <span class="section-marker-title">{{t.section_titles.[04]}}</span>
+  </div>
+
+  <h2 class="section-headline">{{{t.section_4_headline_html}}}</h2>
+  <p class="section-deck">{{t.section_4_deck}}</p>
+
+  <div class="benchmark-split">
+    <div class="benchmark-panel">
+      <div class="benchmark-panel-eyebrow">{{t.benchmark_panel_a_eyebrow}}</div>
+      <h3 class="benchmark-panel-title">{{t.benchmark_panel_a_title}}</h3>
+      <div class="benchmark-value-big">{{per_review_value_median_display}}</div>
+      <div class="benchmark-value-range">{{#if (eq language "zh")}}範圍：{{else}}range: {{/if}}{{per_review_value_range_display}} · {{#if (eq language "zh")}}24 個月時程{{else}}24-month horizon{{/if}}</div>
+      <p class="benchmark-detail">{{{t.benchmark_panel_a_detail_html}}}</p>
+      <p style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-mute); margin-top: 14px; letter-spacing: 0.05em;">{{t.benchmark_panel_a_methodology}}</p>
+    </div>
+
+    <div class="benchmark-panel">
+      <div class="benchmark-panel-eyebrow">{{t.benchmark_panel_b_eyebrow}}</div>
+      <h3 class="benchmark-panel-title">{{t.benchmark_panel_b_title_html}}</h3>
+      <div class="velocity-gauge">
+        <div class="velocity-band silent">{{velocity_band_silent}}</div>
+        <div class="velocity-band min">{{velocity_band_min}}</div>
+        <div class="velocity-band optimal">{{velocity_band_optimal}}</div>
+        <div class="velocity-band aggressive">{{velocity_band_aggressive}}</div>
+      </div>
+      <div class="velocity-pointer-wrap">
+        <div class="velocity-pointer" style="left: {{velocity_pointer_pct}}%;">
+          <div class="velocity-pointer-label">{{velocity_pointer_label}}</div>
+        </div>
+      </div>
+      <p class="benchmark-detail" style="margin-top: 22px;">{{{t.benchmark_panel_b_detail_html}}}</p>
+    </div>
+  </div>
+
+  <div class="money-on-table">
+    <div class="money-on-table-eyebrow">{{t.money_on_table_eyebrow}}</div>
+    <p class="money-on-table-text">{{{money_on_table_html}}}</p>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_5}}</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 6 — SECTION 6 ACTION + CTA ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
+      <div class="doc-header-sub">§ 07 · {{t.section_titles.[06]}}</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>{{business_name}}</strong></div>
+      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 07</span>
+    <span class="section-marker-title">{{t.section_titles.[06]}}</span>
+  </div>
+
+  <h2 class="section-headline">{{{t.section_6_headline_html}}}</h2>
+  <p class="section-deck">{{t.section_6_deck}}</p>
+
+  <ol class="action-list">
+    {{#each action_items}}
+      {{> action-item}}
+    {{/each}}
+  </ol>
+
+  <div style="margin-top: 24px; padding: 20px 24px; background: var(--cream-deep); border-left: 3px solid var(--sage);">
+    <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.4; color: var(--ink);">
+      {{{t.summary_block_html}}}
+    </p>
+  </div>
+
+  <div class="cta-block">
+    <div class="cta-eyebrow">{{t.cta_eyebrow}}</div>
+    <h3 class="cta-headline">{{{t.cta_headline_html}}}</h3>
+
+    <div class="cta-paths">
+      <div class="cta-path">
+        <div class="cta-path-label">{{t.cta_self.label}}</div>
+        <h4 class="cta-path-title">{{t.cta_self.title}}</h4>
+        <div class="cta-path-price">{{t.cta_self.price}}</div>
+        <p class="cta-path-desc">{{t.cta_self.desc}}</p>
+      </div>
+      <div class="cta-path featured">
+        <div class="cta-path-label">{{t.cta_full.label}}</div>
+        <h4 class="cta-path-title">{{t.cta_full.title}}</h4>
+        <div class="cta-path-price">{{t.cta_full.price}}</div>
+        <p class="cta-path-desc">{{t.cta_full.desc}}</p>
+      </div>
+    </div>
+
+    <p class="promise-line">{{{t.cta_promise_html}}}</p>
+
+    <div class="cta-action-row">
+      <a href="/signup?next=/audit/service%3Faudit%3D{{audit_id}}%26plan%3Dself" target="_top" class="btn-svc dark">{{t.cta_action_self_label}}</a>
+      <a href="/signup?next=/audit/service%3Faudit%3D{{audit_id}}%26plan%3Dfull" target="_top" class="btn-svc amber">{{t.cta_action_full_label}}</a>
+      <a href="/audit/service" target="_top" class="cta-detail-link">{{t.cta_action_compare_label}}</a>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
+    <span>{{t.page_label_6}}</span>
+  </div>
 </section>
 
 <!-- ====================== PAGE 7 — APPENDIX ====================== -->

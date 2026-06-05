@@ -9,7 +9,13 @@ interface AuditResultSubBarProps {
   state?: string;
   score?: number;
   grade?: string;
-  pdf_urls: Record<string, string>;
+  /** Kept for backward compatibility — the pre-baked PDF URLs stored on
+   *  the audit row at generation time. We no longer link to these
+   *  because they go stale every time we update the template. Downloads
+   *  go through /audit/[id]/download which re-renders from the current
+   *  template. Prop is still consumed in the type so callers don't
+   *  break, but it's intentionally unused. */
+  pdf_urls?: Record<string, string>;
   languages_rendered: string[];
   current_language: "en" | "zh";
 }
@@ -25,15 +31,18 @@ export function AuditResultSubBar({
   state,
   score,
   grade,
-  pdf_urls,
   languages_rendered,
   current_language,
 }: AuditResultSubBarProps) {
-  const enUrl = pdf_urls.en;
-  const zhUrl = pdf_urls.zh;
   const hasBilingual =
     languages_rendered.includes("en") && languages_rendered.includes("zh");
   const otherLang = current_language === "en" ? "zh" : "en";
+  // Download URLs always render fresh from the current template; ?lang
+  // controls the language variant. Format selector ?format=html|pdf is
+  // the only difference between the two buttons.
+  const downloadHref = (format: "html" | "pdf", lang: "en" | "zh") =>
+    `/audit/${audit_id}/download?format=${format}&lang=${lang}`;
+  const langLabel = current_language === "zh" ? "中文" : "EN";
 
   const metaParts: string[] = [];
   if (city) metaParts.push(city.toUpperCase());
@@ -64,28 +73,20 @@ export function AuditResultSubBar({
             {otherLang === "zh" ? "中文" : "EN"}
           </Link>
         )}
-        {enUrl && (
-          <a
-            href={enUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="audit-subbar-pdf-btn"
-          >
-            <Download className="h-3 w-3 opacity-60" />
-            EN PDF
-          </a>
-        )}
-        {zhUrl && (
-          <a
-            href={zhUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="audit-subbar-pdf-btn"
-          >
-            <Download className="h-3 w-3 opacity-60" />
-            中文 PDF
-          </a>
-        )}
+        <a
+          href={downloadHref("html", current_language)}
+          className="audit-subbar-pdf-btn"
+        >
+          <Download className="h-3 w-3 opacity-60" />
+          {langLabel} HTML
+        </a>
+        <a
+          href={downloadHref("pdf", current_language)}
+          className="audit-subbar-pdf-btn"
+        >
+          <Download className="h-3 w-3 opacity-60" />
+          {langLabel} PDF
+        </a>
         <Link href="/audit/new" className="audit-subbar-new-btn">
           New audit
         </Link>

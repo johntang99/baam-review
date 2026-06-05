@@ -103,7 +103,7 @@ export interface TranslatedStrings {
   hook_quote_html: string;
   section_titles: { "01": string; "02": string; "03": string; "04": string; "05": string; "06": string; A: string };
   section_headlines: { "01": string; "02": string };
-  section_decks: { "01": string; "02": string };
+  section_decks: { "01": string };
   snapshot_table_headers: { platform: string; rating: string; reviews: string; last_review: string; health: string };
   paid_only_row: string;
   methodology_eyebrow: string;
@@ -159,6 +159,7 @@ export interface TranslatedStrings {
   cta_action_self_label: string;
   cta_action_full_label: string;
   cta_action_compare_label: string;
+  so_big_title: string;
   so_eyebrow: string;
   so_headline_html: string;
   so_deck: string;
@@ -245,6 +246,11 @@ export interface CompetitorRowVM {
   rank: string;
   name: string;
   name_secondary: string;
+  /** Short address shown under the business name in the competitor
+   *  table. Street + neighborhood/city is plenty for in-table density;
+   *  full state/ZIP/country would crowd the row. Empty string when the
+   *  upstream data doesn't carry a street line (rare). */
+  address: string;
   is_you: boolean;
   score: number;
   rating_display: string;

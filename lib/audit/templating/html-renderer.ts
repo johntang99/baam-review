@@ -37,7 +37,12 @@ export function renderAuditHtml(view: AuditViewModel): string {
 
 let registered = false;
 function ensureRegistered() {
-  if (registered) return;
+  // In dev, re-register partials on every render so edits to .hbs files
+  // pick up without a server restart. Previously the `registered` flag
+  // was sticky across requests and partials were frozen to whatever the
+  // first render saw — a debugging trap because audit.hbs itself was
+  // already dev-no-cache, so partial edits looked silently ignored.
+  if (registered && process.env.NODE_ENV === "production") return;
   registered = true;
 
   Handlebars.registerHelper("eq", (a: unknown, b: unknown) => a === b);

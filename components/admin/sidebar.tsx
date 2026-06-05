@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   LayoutDashboard,
   LayoutGrid,
@@ -16,11 +15,14 @@ import {
   KeyRound,
   Building2,
   BookOpen,
+  Globe,
+  Search,
 } from "lucide-react";
 import { UserCard } from "./user-card";
 import { NavItem } from "./nav-item";
 import { SignOutNavItem } from "./sign-out-nav-item";
 import { LocationSetupNavItem } from "./location-setup-nav-item";
+import { ProductSwitcher } from "./product-switcher";
 import {
   LocationSwitcher,
   type LocationSwitcherLocation,
@@ -112,6 +114,15 @@ const helpItems: WorkspaceItem[] = [
   { href: "/app/help", label: "Setup guides", icon: BookOpen },
 ];
 
+// "Other Tools" — quick jump-out links to sibling products that share the
+// same auth session but live outside /app. Duplicates what the top-of-
+// sidebar product switcher exposes, in a more discoverable always-visible
+// row format for users who don't click the logo.
+const otherToolsItems: WorkspaceItem[] = [
+  { href: "/", label: "Marketing site", icon: Globe },
+  { href: "/audit", label: "Free Audit", icon: Search },
+];
+
 const customersItem: WorkspaceItem = {
   href: "/app/customers",
   label: "Customers",
@@ -168,14 +179,7 @@ export function Sidebar({
     : accountItems;
   return (
     <aside className="sticky top-0 flex h-screen w-[270px] flex-col bg-ink text-cream/90 px-4 py-6">
-      <Link href="/app" className="flex items-center gap-2.5 px-2 pb-4">
-        <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gold text-ink font-semibold text-[13px]">
-          B
-        </span>
-        <span className="font-display text-[17px] font-medium tracking-tight text-cream">
-          BAAM Review
-        </span>
-      </Link>
+      <ProductSwitcher active="review" />
 
       <div className="pb-5">
         <LocationSwitcher
@@ -199,6 +203,7 @@ export function Sidebar({
           <NavSection label="BAAM Operations" items={operationsItems} />
         )}
         <NavSection label="Help" items={helpItems} />
+        <NavSection label="Other Tools" items={otherToolsItems} />
         <NavSection
           label="Account"
           items={accountSection}

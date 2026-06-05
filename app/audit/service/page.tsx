@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
+import { HeroRotation } from "@/components/service/hero-rotation";
 /**
  * NOTE: this page used to fire Stripe Checkout directly via StartTrialButton.
  * It now routes plan-CTA clicks through /signup?plan=… for everyone:
@@ -359,64 +360,85 @@ function StateBPersonalized({
 
       <AuditTopNav active="audit-service" />
 
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            .hero.state-b .hero-inner { max-width: 1180px; }
+            @media (min-width: 960px) {
+              .hero.state-b .hero-inner {
+                display: grid;
+                grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+                gap: 56px;
+                align-items: center;
+              }
+              .hero.state-b .hero-inner > .hero-rotation { justify-self: end; }
+            }
+          `,
+        }}
+      />
+
       <section className="hero state-b">
         <div className="container">
           <div className="hero-inner">
-            <div className="hero-business-tag">
-              <span className="hero-business-tag-mark">
-                {(businessName[0] ?? "B").toUpperCase()}
-              </span>
-              {businessName}
-              <span className="hero-business-tag-divider">·</span>
-              <span className="hero-business-tag-detail">
-                Audited{" "}
-                {auditAgoDays === 0
-                  ? "today"
-                  : `${auditAgoDays} ${auditAgoDays === 1 ? "day" : "days"} ago`}
-              </span>
+            <div>
+              <div className="hero-business-tag">
+                <span className="hero-business-tag-mark">
+                  {(businessName[0] ?? "B").toUpperCase()}
+                </span>
+                {businessName}
+                <span className="hero-business-tag-divider">·</span>
+                <span className="hero-business-tag-detail">
+                  Audited{" "}
+                  {auditAgoDays === 0
+                    ? "today"
+                    : `${auditAgoDays} ${auditAgoDays === 1 ? "day" : "days"} ago`}
+                </span>
+              </div>
+
+              <h1>
+                {businessName} scored{" "}
+                <span className="score-inline">
+                  {score}
+                  <span className="score-inline-denom">/100</span>
+                </span>
+                .<br />
+                <em>Here's how to climb.</em>
+              </h1>
+
+              <div className="hero-personalized-context">
+                <span className="hero-personalized-context-label">
+                  What service typically delivers for businesses at your grade
+                </span>
+                Most clients starting at <strong>Grade {grade}</strong> reach{" "}
+                <strong>the next grade up</strong> within{" "}
+                <strong>90–120 days</strong> of Full Service. Below: your audit
+                summary, projected outcome range, and the rhythm we'd use.
+              </div>
+
+              <div className="hero-ctas">
+                <Link
+                  href={`/signup?plan=${recommendedTier}`}
+                  className="btn btn-primary btn-large"
+                >
+                  Start free trial →
+                </Link>
+                <Link
+                  href={`/audit/${audit.id}`}
+                  className="btn btn-outline btn-large"
+                >
+                  View full audit →
+                </Link>
+              </div>
+              <div className="hero-trust">
+                <span>30-day trial · No charge during beta</span>
+                <span className="hero-trust-line"></span>
+                <span>Cancel anytime</span>
+                <span className="hero-trust-line"></span>
+                <span>Uses your existing account</span>
+              </div>
             </div>
 
-            <h1>
-              {businessName} scored{" "}
-              <span className="score-inline">
-                {score}
-                <span className="score-inline-denom">/100</span>
-              </span>
-              .<br />
-              <em>Here's how to climb.</em>
-            </h1>
-
-            <div className="hero-personalized-context">
-              <span className="hero-personalized-context-label">
-                What service typically delivers for businesses at your grade
-              </span>
-              Most clients starting at <strong>Grade {grade}</strong> reach{" "}
-              <strong>the next grade up</strong> within{" "}
-              <strong>90–120 days</strong> of Full Service. Below: your audit
-              summary, projected outcome range, and the rhythm we'd use.
-            </div>
-
-            <div className="hero-ctas">
-              <Link
-                href={`/signup?plan=${recommendedTier}`}
-                className="btn btn-primary btn-large"
-              >
-                Start free trial →
-              </Link>
-              <Link
-                href={`/audit/${audit.id}`}
-                className="btn btn-outline btn-large"
-              >
-                View full audit →
-              </Link>
-            </div>
-            <div className="hero-trust">
-              <span>30-day trial · No charge during beta</span>
-              <span className="hero-trust-line"></span>
-              <span>Cancel anytime</span>
-              <span className="hero-trust-line"></span>
-              <span>Uses your existing account</span>
-            </div>
+            <HeroRotation />
           </div>
         </div>
       </section>

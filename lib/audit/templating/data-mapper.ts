@@ -200,10 +200,12 @@ function buildTranslatedStrings(
     cta_action_self_label: s.cta_action_self_label,
     cta_action_full_label: s.cta_action_full_label,
     cta_action_compare_label: s.cta_action_compare_label,
+    so_big_title: s.so_big_title,
     so_eyebrow: s.so_eyebrow,
     so_headline_html: s.so_headline_html(
       ctx.service_opportunity.starting_score,
       ctx.service_opportunity.d180_grade,
+      ctx.service_opportunity.m12_grade,
     ),
     so_deck: s.so_deck,
     so_stat_label_90d: s.so_stat_label_90d,
@@ -299,6 +301,17 @@ function pickSecondaryName(
   const cjk = business.name.replace(/[\x00-\x7F]+/g, "").replace(/[()（）]/g, "").trim();
   if (language === "zh") return ascii;
   return cjk;
+}
+
+/** Compact street + city used inline under the business name in the
+ *  competitor table. Skips state/ZIP/country since every row is in the
+ *  same metro and the redundancy would push the column too wide. */
+function shortAddress(business: AuditGoogleData["business"]): string {
+  const street = business.street?.trim();
+  if (street && business.city) return `${street}, ${business.city}`;
+  if (street) return street;
+  if (business.address_lines?.[0]) return business.address_lines[0];
+  return business.formatted_address ?? "";
 }
 
 function formatZhAddressLine2(google: AuditGoogleData): string {
@@ -567,6 +580,7 @@ function buildCompetitorRows(
     rank: "—",
     name: pickPrimaryName(google.business.name, language),
     name_secondary: pickSecondaryName(google.business, language),
+    address: shortAddress(google.business),
     is_you: true,
     score: score.total,
     rating_display: `${google.reviews_aggregate.rating.toFixed(1)} ★`,
@@ -589,6 +603,7 @@ function buildCompetitorRows(
     rank: String(c.rank).padStart(2, "0"),
     name: pickPrimaryName(c.google.business.name, language),
     name_secondary: pickSecondaryName(c.google.business, language),
+    address: shortAddress(c.google.business),
     is_you: false,
     score: roughScoreEstimate(c, benchmarks),
     rating_display: `${c.google.reviews_aggregate.rating.toFixed(1)} ★`,

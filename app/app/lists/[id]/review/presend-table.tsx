@@ -121,7 +121,7 @@ export function PresendTable({
           resumed.senderGmail
             ? `Target Gmail: ${resumed.senderGmail}.`
             : "No sender preset set; Gmail will use the currently signed-in account."
-        } Click "Open next Gmail draft" to continue.`,
+        } Click "Send next in Gmail" to continue.`,
       );
     });
     // only on first mount for this list id
@@ -435,8 +435,8 @@ export function PresendTable({
       )}
 
       {gmailHint && (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-forest/25 bg-forest/[0.06] px-5 py-4">
-          <p className="text-[12.5px] text-text">
+        <div className="mb-5 flex items-center justify-between gap-4 rounded-2xl border border-forest/25 bg-forest/[0.06] px-5 py-4">
+          <p className="min-w-0 flex-1 text-[12.5px] text-text">
             <span className="font-medium text-ink">{gmailHint}</span>{" "}
             Send each draft in Gmail, then come back for the next one. For safer
             deliverability on new senders, keep roughly 90–180s between sends.
@@ -446,19 +446,23 @@ export function PresendTable({
               type="button"
               onClick={openNextGmailDraft}
               disabled={waitSeconds > 0}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3.5 py-2 text-[12.5px] font-medium text-text hover:bg-cream-deep"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-forest px-5 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark disabled:opacity-50"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <ExternalLink className="h-4 w-4" />
               {waitSeconds > 0
                 ? `Wait ${waitSeconds}s`
-                : `Open next Gmail draft (${gmailQueue.length} left)`}
+                : `Send next in Gmail (${gmailQueue.length} left)`}
             </button>
           )}
         </div>
       )}
 
-      {/* STICKY SEND BAR */}
-      <div className="fixed bottom-0 left-[270px] right-0 z-40 flex flex-wrap items-center justify-between gap-4 border-t border-border-base bg-paper/95 px-10 py-4 backdrop-blur">
+      {/* STICKY SEND BAR — outer div spans full content width for an
+          unbroken border / backdrop blur, inner div is constrained to
+          match the page main's max-w-[1280px] + px-10 so it aligns
+          visually with the customer table above it. */}
+      <div className="fixed bottom-0 left-[270px] right-0 z-40 border-t border-border-base bg-paper/95 backdrop-blur">
+        <div className="flex flex-wrap items-center justify-between gap-4 max-w-[1280px] px-10 py-4">
         <div className="flex items-center gap-6">
           <div>
             <div className="font-display text-[22px] font-medium text-forest leading-none">
@@ -557,7 +561,7 @@ export function PresendTable({
                 }
               });
             }}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-5 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-5 py-2.5 text-[13.5px] font-medium text-text hover:bg-cream-deep disabled:opacity-50"
           >
             {sending
               ? "Sending…"
@@ -599,7 +603,7 @@ export function PresendTable({
                       res.senderGmail
                         ? `Target Gmail: ${res.senderGmail}.`
                         : "No sender preset set; Gmail will use the currently signed-in account."
-                    } Click "Open next Gmail draft" to start.`,
+                    } Click "Send next in Gmail" to start.`,
                   );
                   if (res.failed > 0) {
                     setSendNotice({
@@ -612,12 +616,13 @@ export function PresendTable({
                   router.refresh();
                 });
               }}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-4 py-2.5 text-[13.5px] font-medium text-text hover:bg-cream-deep disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-5 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark disabled:opacity-50"
             >
               <Mail className="h-4 w-4" />
-              {preparingGmail ? "Preparing Gmail drafts…" : "Prepare Gmail drafts"}
+              {preparingGmail ? "Preparing…" : "Prepare Send in Gmail"}
             </button>
           )}
+        </div>
         </div>
       </div>
     </>

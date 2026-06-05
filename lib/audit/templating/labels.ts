@@ -427,7 +427,7 @@ export const STRINGS: Record<
     money_on_table_eyebrow: string;
     section_5_headline_html: string;
     section_5_deck: string;
-    competitor_table_headers: { business: string; score: string; rating: string; total: string; last_30d: string; last_90d: string; trend: string };
+    competitor_table_headers: { business: string; address: string; score: string; rating: string; total: string; last_30d: string; last_90d: string; trend: string };
     section_6_headline_html: string;
     section_6_deck: string;
     summary_block_html: (added: string, lost: string) => string;
@@ -439,8 +439,13 @@ export const STRINGS: Record<
     cta_action_self_label: string;
     cta_action_full_label: string;
     cta_action_compare_label: string;
+    so_big_title: string;
     so_eyebrow: string;
-    so_headline_html: (startingScore: number, targetGrade: string) => string;
+    so_headline_html: (
+      startingScore: number,
+      d180Grade: string,
+      m12Grade: string,
+    ) => string;
     so_deck: string;
     so_stat_label_90d: string;
     so_stat_label_180d: string;
@@ -503,14 +508,13 @@ export const STRINGS: Record<
     },
     section_decks: {
       "01": "Five things that are now true about local search — each measured, each cited, none arguable.",
-      "02": "Free tier covers Google — by itself ~81% of local consumer reach. The paid audit adds Yelp, Facebook, Zocdoc, Healthgrades.",
     },
     snapshot_table_headers: { platform: "Platform", rating: "Rating", reviews: "Reviews", last_review: "Last Review", health: "Profile Health" },
     paid_only_row: "Yelp · Facebook · Zocdoc · Healthgrades — included in the paid audit.",
     methodology_eyebrow: "METHODOLOGY",
     methodology_text_html: "Every score is measured against published vertical benchmarks. <strong>Rating Quality</strong> uses a non-linear curve that rewards the 4.0★ threshold (where 70% of consumers filter). <strong>Review Volume</strong> compares total count to the median for your vertical. <strong>Velocity</strong> scores use BAAM Review Research healthy-pace bands. The black tick marks on each bar show where these standards sit on the 0–100 scale. <a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">Full methodology →</a>",
     velocity_drag_line_html: "The drag on your score is <em style=\"color: var(--rust-deep);\">velocity</em> — and velocity is what you can change starting Monday.",
-    forecast_eyebrow: "§ 03.5 · The Forecast",
+    forecast_eyebrow: "§ 05 · The Forecast",
     projection_title_html: "Your score in <em>six months</em> if you do nothing.",
     projection_deck: "Three forces work against a business that stops collecting reviews: velocity decay (mechanical), ranking decline (Sterling Sky), and competitors compounding the gap. This projection holds your current effort constant — and holds your competitors at their measured pace.",
     projection_legend_lines: [
@@ -553,7 +557,7 @@ export const STRINGS: Record<
     money_on_table_eyebrow: "§ The Money on the Table",
     section_5_headline_html: "The names customers <em>see before yours.</em>",
     section_5_deck: "Identified from Google Maps rankings within your search radius. We pick the competitors — owners almost always pick the wrong ones.",
-    competitor_table_headers: { business: "Business", score: "Score", rating: "Rating", total: "Total Reviews", last_30d: "Last 30d", last_90d: "Last 90d", trend: "Trend" },
+    competitor_table_headers: { business: "Business", address: "Address", score: "Score", rating: "Rating", total: "Total Reviews", last_30d: "Last 30d", last_90d: "Last 90d", trend: "Trend" },
     section_6_headline_html: "Five things. <em>Not three. Not ten.</em>",
     section_6_deck: "Prioritized by the lowest sub-scores in your audit. Each action targets a specific lever — and a specific dollar number.",
     summary_block_html: (added, lost) =>
@@ -576,9 +580,21 @@ export const STRINGS: Record<
     cta_action_self_label: "Start Self-Serve trial →",
     cta_action_full_label: "Start Full Service trial →",
     cta_action_compare_label: "Compare tiers in detail →",
+    so_big_title:
+      "We can help you climb the grade ladder — and grow your business.",
     so_eyebrow: "§ Service opportunity · Tailored to your audit",
-    so_headline_html: (startingScore, targetGrade) =>
-      `From <span class="so-score-pill">${startingScore}</span> to <em>Grade ${targetGrade}</em> in 90–120 days.`,
+    so_headline_html: (startingScore, d180Grade, m12Grade) => {
+      const base = `From <span class="so-score-pill">${startingScore}</span> to <em>Grade ${d180Grade}</em> in 90–120 days`;
+      // Only mention the 12-month grade when it's a meaningful jump
+      // beyond d180 — otherwise the headline becomes "to Grade B in 120
+      // days · to Grade B in a year", which reads like nothing happens
+      // in the back half. For most starting scores d180 → m12 advances
+      // one letter (e.g. B → A), which is the punchline worth showing.
+      if (m12Grade && m12Grade !== d180Grade) {
+        return `${base} · <em>Grade ${m12Grade}</em> within a year.`;
+      }
+      return `${base}.`;
+    },
     so_deck: "Most clients reach the next grade up within 90–120 days of BAAM Review Service. Ranges below are conservative estimates by starting score — not a guarantee, but a defensible projection.",
     so_stat_label_90d: "After 90 days",
     so_stat_label_180d: "After 180 days",
@@ -616,7 +632,7 @@ export const STRINGS: Record<
   zh: {
     page_label: (n, total) => `第 ${String(n).padStart(2, "0")} 頁 / 共 ${total} 頁`,
     cover_eyebrow: (pages) => `為您量身定制的診斷報告 · 共 ${pages} 頁 · 為老闆而寫，非為工程師`,
-    cover_title_html: "您一直缺少的那份<em>聲譽報告</em>",
+    cover_title_html: "您一定要了解的 <em>Google聲譽報告</em>",
     cover_subtitle: "您的業務當前狀況、每月損失多少、以及未來 12 個月需要採取的五項行動",
     cover_meta_labels: { business: "商家", location: "地址", vertical: "行業", audit_id: "審計編號" },
     cover_meta_subtitle: "由 BAAM Studio 編製",
@@ -631,19 +647,18 @@ export const STRINGS: Record<
       "A": "附錄 · 參考數據表",
     },
     section_headlines: {
-      "01": "被客戶找到的規則 · <em>已經改變了</em>",
+      "01": "客戶尋找商家的規則 · <em>已經改變了</em>",
       "02": "客戶<em>實際在哪裡</em>查找您",
     },
     section_decks: {
       "01": "關於本地搜索，現在有五件事實 — 每項都有測量數據、每項都有出處引用、無一可以爭辯。",
-      "02": "免費版本涵蓋 Google · 約佔本地消費者觸及的 81%。付費版本加入 Yelp · Facebook · Zocdoc · Healthgrades。",
     },
     snapshot_table_headers: { platform: "平台", rating: "評分", reviews: "評論數", last_review: "最新評論", health: "檔案健康度" },
     paid_only_row: "Yelp · Facebook · Zocdoc · Healthgrades — 包含於付費審計版本。",
     methodology_eyebrow: "方法說明",
     methodology_text_html: "每項分數均對照已發布的行業基準衡量。<strong>評分品質</strong>使用非線性曲線，重點獎勵 4.0 星門檻（70% 消費者以此篩選）。<strong>評論總數</strong>對比您行業的中位數。<strong>速率</strong>使用 BAAM Review 研究的健康節奏帶。每根柱上的黑色刻度標示這些標準在 0–100 分尺上的位置。<a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">完整方法 →</a>",
     velocity_drag_line_html: "拖累您分數的是<em style=\"color: var(--rust-deep);\">速率</em> — 而速率正是您下週一就可以開始改變的環節。",
-    forecast_eyebrow: "§ 03.5 · 預測",
+    forecast_eyebrow: "§ 05 · 預測",
     projection_title_html: "若您什麼都不做 · <em>六個月後的分數</em>",
     projection_deck: "停止累積評論的商家會面對三股力量：速率機械性衰減、排名下滑（Sterling Sky 研究）、競爭對手持續複利擴大差距。本預測假設您維持當前努力，競爭對手維持已測得的速率。",
     projection_legend_lines: [
@@ -672,7 +687,7 @@ export const STRINGS: Record<
       "<strong>第 7 章 · 附錄</strong> — 完整的參考數據表。",
     ],
     upgrade_cta_closing: "本報告中的每個等級都根據我們所有的數據誠實呈現。<br>付費版本展示完整全貌。",
-    section_4_headline_html: "轉化為<em>美元</em>與<em>客戶</em>",
+    section_4_headline_html: "Reviews 轉化為<em>美元</em>與<em>客戶</em>",
     section_4_deck: "BAAM Review 研究報告中的數據，套用到您的具體行業。",
     benchmark_panel_a_eyebrow: "§ 04A · 每則評論的美元價值",
     benchmark_panel_a_title_html: (v) => `對於${v}，一則強而有力的 Google 評論值多少…`,
@@ -684,9 +699,9 @@ export const STRINGS: Record<
     benchmark_panel_b_detail_html:
       "根據 BrightLocal · 只有 <strong>9% 的商家</strong>能維持理想速率 — 也就是 Google 排名演算法真正獎勵的區間。",
     money_on_table_eyebrow: "§ 桌上未取的金錢",
-    section_5_headline_html: "客戶<em>在看見您之前先看見的</em>對手",
-    section_5_deck: "由 Google Maps 在您的搜尋半徑內排名識別。我們替您挑選競爭對手 — 店主自己挑往往挑錯。",
-    competitor_table_headers: { business: "商家", score: "分數", rating: "評分", total: "總評論", last_30d: "近 30 天", last_90d: "近 90 天", trend: "趨勢" },
+    section_5_headline_html: "在眾多競爭對手中，<em>客戶能看見您嗎？</em>",
+    section_5_deck: "由 Google Maps 在您的搜尋半徑內排名識別。我們替您挑選競爭對手 — 供您參考",
+    competitor_table_headers: { business: "商家", address: "地址", score: "分數", rating: "評分", total: "總評論", last_30d: "近 30 天", last_90d: "近 90 天", trend: "趨勢" },
     section_6_headline_html: "五件事 · <em>不是三件，不是十件</em>",
     section_6_deck: "依您審計中最低的子分數排序。每項行動都針對特定的槓桿 — 與具體的美元數字。",
     summary_block_html: (added, lost) =>
@@ -709,9 +724,16 @@ export const STRINGS: Record<
     cta_action_self_label: "啟動自助方案試用 →",
     cta_action_full_label: "啟動全託管試用 →",
     cta_action_compare_label: "詳細比較兩個方案 →",
+    so_big_title:
+      "我們能幫您逐級攀升 — 帶動業績成長",
     so_eyebrow: "§ 服務機會 · 依您的審計量身定制",
-    so_headline_html: (startingScore, targetGrade) =>
-      `從 <span class="so-score-pill">${startingScore}</span> 提升至 <em>${targetGrade} 級</em>，僅需 90–120 天。`,
+    so_headline_html: (startingScore, d180Grade, m12Grade) => {
+      const base = `從 <span class="so-score-pill">${startingScore}</span> 提升至 <em>${d180Grade} 級</em>，僅需 90–120 天`;
+      if (m12Grade && m12Grade !== d180Grade) {
+        return `${base} · 一年內達到 <em>${m12Grade} 級</em>。`;
+      }
+      return `${base}。`;
+    },
     so_deck: "大多數客戶在 BAAM Review 服務 90–120 天內提升一個等級。下方範圍依您的起始分數保守估算 — 並非保證，但為可信賴的預測。",
     so_stat_label_90d: "90 天後",
     so_stat_label_180d: "180 天後",

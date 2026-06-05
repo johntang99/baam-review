@@ -22,6 +22,11 @@ export interface StartAuditInput {
   /** User-confirmed main service (e.g. "bridal boutique"). When set,
    *  overrides the auto-derived competitor search keyword. */
   service_override?: string;
+  /** User-picked report language. "auto" (or undefined) lets the
+   *  language router decide from Google data — Chinese businesses get
+   *  both, everyone else gets English. The explicit choices force the
+   *  render set: "en"/"zh" → single-language, "both" → bilingual. */
+  language_choice?: "auto" | "en" | "zh" | "both";
 }
 
 export interface StartAuditOutput {
@@ -75,6 +80,12 @@ export async function runAuditPipeline(
     const projection = computeProjection(google, competitors, score, benchmarks);
 
     await updateStage(audit_id, 5);
+    // "auto" / undefined → let decideLanguages() inspect the Google data
+    // and choose. Anything else is an explicit user override.
+    const forceLanguage =
+      input.language_choice && input.language_choice !== "auto"
+        ? input.language_choice
+        : undefined;
     await renderAndDeliverAudit({
       google,
       competitors,
@@ -85,6 +96,7 @@ export async function runAuditPipeline(
       customer: { user_id: input.user_id, email: input.email, name: input.name },
       send_email: !!input.email,
       audit_id,
+      force_language: forceLanguage,
     });
 
     await markComplete(audit_id);

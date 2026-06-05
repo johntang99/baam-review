@@ -9,7 +9,14 @@ const KEYWORD_BY_VERTICAL: Record<VerticalKey, string> = {
   hotel: "hotel",
   auto: "auto repair",
   contractor: "contractor",
-  salon_spa: "beauty salon",
+  // Empirically: a business categorized salon_spa with no other signal
+  // (no spa/nail/barber/lash word in the name, no specific Google type)
+  // is overwhelmingly a hair salon. "beauty salon" returned a mix of
+  // nail + hair + spa results that included none of the relevant
+  // hair-salon competitors. "hair salon" gives the right peer set.
+  // Actual spas are caught by the `\bspa\b` name pattern + the new
+  // `spa` Google-type refinement below — both run before this fallback.
+  salon_spa: "hair salon",
   cafe: "coffee shop",
   apparel: "clothing store",
   health_food: "health food store",
@@ -32,6 +39,11 @@ const TYPE_REFINEMENTS: Array<{ type: string; keyword: string }> = [
   { type: "nail_salon", keyword: "nail salon" },
   { type: "barber_shop", keyword: "barber shop" },
   { type: "massage_therapist", keyword: "massage therapist" },
+  // Google labels day spas as `spa`; some wellness studios use the
+  // broader `wellness_center`. Both should compete against spas, not
+  // hair salons.
+  { type: "spa", keyword: "day spa" },
+  { type: "wellness_center", keyword: "day spa" },
   { type: "pet_store", keyword: "pet store" },
   { type: "veterinary_care", keyword: "veterinarian" },
   { type: "physiotherapist", keyword: "physical therapy" },
@@ -58,6 +70,11 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
   { pattern: /\b(children|kids|baby)\b/i, keyword: "children's clothing" },
 
   // Salon / spa sub-types
+  // "spa" runs FIRST inside this block: a business named "X Salon and
+  // Spa" is empirically more spa than salon, and the user expects spa
+  // competitors. "Tai JI Spa", "Aqua Spa", "Bliss Day Spa" all land here
+  // and get spa competitors instead of hair-salon competitors.
+  { pattern: /\b(spa|day spa)\b/i, keyword: "day spa" },
   { pattern: /\b(nail|manicure|pedicure)\b/i, keyword: "nail salon" },
   { pattern: /\b(barber)\b/i, keyword: "barber shop" },
   { pattern: /\b(massage|reflexology)\b/i, keyword: "massage therapist" },
@@ -178,6 +195,7 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
   "lash bar": ["lash bar", "eyelash extensions"],
   "tattoo shop": ["tattoo shop", "tattoo studio"],
   "massage therapist": ["massage therapist", "massage spa", "deep tissue massage"],
+  "day spa": ["day spa", "massage spa", "wellness spa"],
 
   // ── Medical / dental ─────────────────────────────────────────────
   "dentist": ["dentist", "dental clinic", "family dentistry"],

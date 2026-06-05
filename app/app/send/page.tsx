@@ -58,7 +58,7 @@ export default async function SendPage() {
 
   return (
     <main className="px-10 py-10">
-      <div className="max-w-[1080px] space-y-8">
+      <div className="max-w-[1200px] space-y-8">
         <PageHeader
           eyebrow="Request"
           title="Request a Review"
