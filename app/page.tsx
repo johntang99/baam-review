@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { MarketingScripts } from "@/components/marketing/marketing-scripts";
+import { AskQuestionModal } from "@/components/marketing/ask-question-modal";
 
 export const metadata: Metadata = {
   title:
@@ -40,6 +41,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: finalHtml }}
       />
       <MarketingScripts />
+      <AskQuestionModal />
     </>
   );
 }

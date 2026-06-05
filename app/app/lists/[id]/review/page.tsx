@@ -5,6 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import { isFullServiceCustomerReadOnly } from "@/lib/auth/staff";
 import { PresendTable, type PresendCustomer } from "./presend-table";
 import { VariantsPanel, type ListVariant } from "./variants-panel";
+import { DefaultContentPanel } from "./default-content-panel";
+import { ReviewProgressBar } from "./review-progress-bar";
+import type { Language } from "@/lib/i18n/review";
 
 export const metadata = { title: "Review & send — BAAM Review" };
 export const dynamic = "force-dynamic";
@@ -79,17 +82,22 @@ export default async function ReviewPage({
         </Link>
       </div>
 
+      {(() => {
+        const sentCount = rows.filter(
+          (r) => r.status === "sent" && !r.excludedReason,
+        ).length;
+        const pendingCount = rows.filter(
+          (r) => r.status === "pending" && r.selected && !r.excludedReason,
+        ).length;
+        const current: 2 | 3 = sentCount > 0 ? 3 : 2;
+        const allDone = sentCount > 0 && pendingCount === 0;
+        return <ReviewProgressBar current={current} allDone={allDone} />;
+      })()}
+
       <div className="mb-7">
-        <p className="text-[11.5px] uppercase tracking-[0.14em] text-text-muted font-medium mb-2">
-          Step 2 of 2 · Last checkpoint before send
-        </p>
-        <h1 className="font-display text-[40px] leading-[1.05] tracking-tight text-ink mb-2.5">
-          Review and <em className="italic text-forest">send.</em>
+        <h1 className="font-display text-[40px] leading-[1.05] tracking-tight text-ink">
+          Bulk Review Requests
         </h1>
-        <p className="font-serif italic text-[17px] text-text-soft max-w-[600px] leading-relaxed">
-          Scan the list. Edit any channel or note inline. Uncheck anyone you
-          want to skip. When ready, hit Send.
-        </p>
       </div>
 
       {/* META BAR */}
@@ -120,21 +128,34 @@ export default async function ReviewPage({
         </span>
       </div>
 
-      <VariantsPanel
-        listId={list.id}
-        initialVariants={
-          Array.isArray(list.template_variants)
-            ? (list.template_variants as unknown as ListVariant[])
-            : null
-        }
-        channel={
+      {(() => {
+        const channel: "email" | "sms" =
           rows.some((r) => r.channel === "sms") &&
           !rows.some((r) => r.channel === "email")
             ? "sms"
-            : "email"
-        }
-        readOnly={readOnly}
-      />
+            : "email";
+        const language = (list.default_language ?? "en") as Language;
+        const initialVariants = Array.isArray(list.template_variants)
+          ? (list.template_variants as unknown as ListVariant[])
+          : null;
+        return (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-4 mb-12">
+              <DefaultContentPanel
+                language={language}
+                channel={channel}
+                businessName={location?.display_name ?? "your business"}
+              />
+              <VariantsPanel
+                listId={list.id}
+                initialVariants={initialVariants}
+                channel={channel}
+                readOnly={readOnly}
+              />
+            </div>
+          </>
+        );
+      })()}
 
       <PresendTable
         listId={list.id}

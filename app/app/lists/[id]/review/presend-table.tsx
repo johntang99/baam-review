@@ -17,7 +17,6 @@ import { formatPhone } from "@/lib/lists/normalize";
 import {
   updateListCustomer,
   saveListAsDraft,
-  sendList,
   prepareGmailDraftsForList,
   getPreparedGmailDraftQueue,
 } from "../../actions";
@@ -66,14 +65,16 @@ export function PresendTable({
     | null;
   const [sendNotice, setSendNotice] = useState<SendNotice>(null);
   const [savingDraft, setSavingDraft] = useState(false);
-  const [sending, setSending] = useState(false);
   const [preparingGmail, setPreparingGmail] = useState(false);
   const [gmailQueue, setGmailQueue] = useState<
     Array<{ customerId: string; name: string; href: string }>
   >([]);
-  const [gmailHint, setGmailHint] = useState<string | null>(null);
   const [nextAllowedOpenAt, setNextAllowedOpenAt] = useState<number | null>(null);
   const [nowMs, setNowMs] = useState<number>(Date.now());
+  // User-controlled pacing between Gmail draft opens. Floor 60s — anything
+  // shorter triggers Gmail's spam heuristics on new sender domains, especially
+  // for the first ~30 sends out of a freshly warmed inbox.
+  const [gmailIntervalSec, setGmailIntervalSec] = useState(90);
 
   const counts = useMemo(
     () => ({
@@ -99,7 +100,17 @@ export function PresendTable({
   const smsCount = rows.filter(
     (r) => r.selected && !r.excludedReason && r.status === "pending" && r.channel === "sms",
   ).length;
+  const sentCount = rows.filter(
+    (r) => r.status === "sent" && !r.excludedReason,
+  ).length;
   const gmailBlockedBySms = smsCount > 0;
+  // Customers still waiting to be opened in Gmail — used to differentiate
+  // "draft prepared" (in queue) from "actually sent" (popped off queue, so
+  // user has opened the compose tab and presumably hit Send).
+  const gmailQueueIds = useMemo(
+    () => new Set(gmailQueue.map((q) => q.customerId)),
+    [gmailQueue],
+  );
   const waitSeconds = nextAllowedOpenAt
     ? Math.max(0, Math.ceil((nextAllowedOpenAt - nowMs) / 1000))
     : 0;
@@ -114,15 +125,6 @@ export function PresendTable({
       const resumed = await getPreparedGmailDraftQueue(listId);
       if (!resumed.ok || resumed.drafts.length === 0) return;
       setGmailQueue(resumed.drafts);
-      setGmailHint(
-        `Loaded ${resumed.drafts.length} prepared Gmail draft${
-          resumed.drafts.length === 1 ? "" : "s"
-        } from this list. ${
-          resumed.senderGmail
-            ? `Target Gmail: ${resumed.senderGmail}.`
-            : "No sender preset set; Gmail will use the currently signed-in account."
-        } Click "Send next in Gmail" to continue.`,
-      );
     });
     // only on first mount for this list id
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -157,15 +159,38 @@ export function PresendTable({
     });
   }
 
+  /** Try to open a Gmail compose URL. Returns true on success, false if the
+   *  browser blocked the popup. We can't use `noopener` here because that
+   *  forces the return value to null whether the popup succeeded or was
+   *  blocked — and we *need* the return value to detect blocking. To keep
+   *  the noopener security guarantee, we null out `popup.opener` right
+   *  after opening so the new tab can't navigate us. */
+  function openGmailUrl(url: string): boolean {
+    const popup = window.open(url, "_blank");
+    if (!popup) return false;
+    try {
+      popup.opener = null;
+    } catch {
+      // cross-origin or sandboxed — fine, the browser already isolates us
+    }
+    return true;
+  }
+
   function openNextGmailDraft() {
     if (waitSeconds > 0) return;
-    setGmailQueue((current) => {
-      if (current.length === 0) return current;
-      const [next, ...rest] = current;
-      window.open(next.href, "_blank", "noopener,noreferrer");
-      setNextAllowedOpenAt(Date.now() + 90_000);
-      return rest;
-    });
+    if (gmailQueue.length === 0) return;
+    const next = gmailQueue[0];
+    const opened = openGmailUrl(next.href);
+    if (!opened) {
+      setSendNotice({
+        kind: "generic",
+        message:
+          "Browser blocked the Gmail popup. Allow popups for this site, then click again.",
+      });
+      return;
+    }
+    setGmailQueue((q) => q.slice(1));
+    setNextAllowedOpenAt(Date.now() + gmailIntervalSec * 1000);
   }
 
   return (
@@ -254,7 +279,6 @@ export function PresendTable({
               <th className="w-28 bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
                 Status
               </th>
-              <th className="w-10 bg-cream-deep px-3 py-2.5 border-b border-border-base" />
             </tr>
           </thead>
           <tbody>
@@ -375,9 +399,16 @@ export function PresendTable({
                               : "Excluded"}
                       </span>
                     ) : r.status === "sent" ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-forest/10 px-2 py-0.5 text-[11px] font-medium text-forest">
-                        Draft prepared
-                      </span>
+                      gmailQueueIds.has(r.id) ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2 py-0.5 text-[11px] font-medium text-gold-dark">
+                          Draft prepared
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-forest/10 px-2 py-0.5 text-[11px] font-medium text-forest">
+                          <Check className="h-3 w-3" />
+                          Sent
+                        </span>
+                      )
                     ) : !r.phone ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-warn-soft px-2 py-0.5 text-[11px] font-medium text-warn">
                         <TriangleAlert className="h-3 w-3" />
@@ -388,18 +419,6 @@ export function PresendTable({
                         <Check className="h-3 w-3" />
                         Ready
                       </span>
-                    )}
-                  </td>
-                  <td className="px-3 py-3 align-top">
-                    {!excluded && (
-                      <button
-                        type="button"
-                        onClick={() => patch(r.id, { selected: false })}
-                        className="flex h-7 w-7 items-center justify-center rounded-md text-text-muted hover:bg-cream-deep hover:text-alert"
-                        aria-label="Remove from send"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
                     )}
                   </td>
                 </tr>
@@ -434,29 +453,6 @@ export function PresendTable({
         </div>
       )}
 
-      {gmailHint && (
-        <div className="mb-5 flex items-center justify-between gap-4 rounded-2xl border border-forest/25 bg-forest/[0.06] px-5 py-4">
-          <p className="min-w-0 flex-1 text-[12.5px] text-text">
-            <span className="font-medium text-ink">{gmailHint}</span>{" "}
-            Send each draft in Gmail, then come back for the next one. For safer
-            deliverability on new senders, keep roughly 90–180s between sends.
-          </p>
-          {gmailQueue.length > 0 && (
-            <button
-              type="button"
-              onClick={openNextGmailDraft}
-              disabled={waitSeconds > 0}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-forest px-5 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark disabled:opacity-50"
-            >
-              <ExternalLink className="h-4 w-4" />
-              {waitSeconds > 0
-                ? `Wait ${waitSeconds}s`
-                : `Send next in Gmail (${gmailQueue.length} left)`}
-            </button>
-          )}
-        </div>
-      )}
-
       {/* STICKY SEND BAR — outer div spans full content width for an
           unbroken border / backdrop blur, inner div is constrained to
           match the page main's max-w-[1280px] + px-10 so it aligns
@@ -464,29 +460,62 @@ export function PresendTable({
       <div className="fixed bottom-0 left-[270px] right-0 z-40 border-t border-border-base bg-paper/95 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-4 max-w-[1280px] px-10 py-4">
         <div className="flex items-center gap-6">
-          <div>
-            <div className="font-display text-[22px] font-medium text-forest leading-none">
-              {selectedCount}
+          {selectedCount > 0 ? (
+            <>
+              <div>
+                <div className="font-display text-[22px] font-medium text-forest leading-none">
+                  {selectedCount}
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.08em] text-text-muted font-medium mt-1">
+                  Ready to send
+                </div>
+              </div>
+              <span className="h-8 w-px bg-border-base" />
+              <div>
+                <div className="text-[15px] text-text-soft font-medium">
+                  {emailCount} email · {smsCount} SMS
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.08em] text-text-muted font-medium mt-1">
+                  Channel mix
+                </div>
+              </div>
+            </>
+          ) : (
+            <div>
+              <div className="font-display text-[22px] font-medium text-forest leading-none">
+                {sentCount}
+              </div>
+              <div className="text-[11px] uppercase tracking-[0.08em] text-text-muted font-medium mt-1">
+                {sentCount === 1 ? "Customer sent" : "Customers sent"}
+              </div>
             </div>
-            <div className="text-[11px] uppercase tracking-[0.08em] text-text-muted font-medium mt-1">
-              Ready to send
-            </div>
-          </div>
-          <span className="h-8 w-px bg-border-base" />
-          <div>
-            <div className="text-[15px] text-text-soft font-medium">
-              {emailCount} email · {smsCount} SMS
-            </div>
-            <div className="text-[11px] uppercase tracking-[0.08em] text-text-muted font-medium mt-1">
-              Channel mix
-            </div>
-          </div>
+          )}
           <span className="h-8 w-px bg-border-base" />
           <span className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-cream px-3 py-2 text-[12.5px] text-text">
             <Clock className="h-3.5 w-3.5 text-text-soft" />
             Send <strong className="font-semibold">now</strong>
             <ChevronDown className="h-3 w-3 text-text-muted" />
           </span>
+          <label
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-cream px-3 py-2 text-[12.5px] text-text cursor-text"
+            title="Pause between Gmail draft opens (min 60s)"
+          >
+            <Clock className="h-3.5 w-3.5 text-text-soft" />
+            Gmail pace
+            <input
+              type="number"
+              min={60}
+              max={600}
+              step={30}
+              value={gmailIntervalSec}
+              onChange={(e) => {
+                const n = Math.max(60, Math.min(600, Number(e.target.value) || 60));
+                setGmailIntervalSec(n);
+              }}
+              className="w-12 bg-transparent border-0 outline-none text-center font-mono text-[12.5px] text-ink"
+            />
+            s
+          </label>
         </div>
         <div className="flex items-center gap-2.5">
           {readOnly && (
@@ -505,7 +534,7 @@ export function PresendTable({
               unselect them first.
             </span>
           )}
-          {!readOnly && (
+          {!readOnly && selectedCount > 0 && (
             <button
               type="button"
               disabled={savingDraft}
@@ -520,108 +549,119 @@ export function PresendTable({
               {savingDraft ? "Saving…" : "Save as draft"}
             </button>
           )}
-          {!readOnly && (
-          <button
-            type="button"
-            disabled={sending || preparingGmail || selectedCount === 0}
-            onClick={() => {
-              setSendNotice(null);
-              setGmailHint(null);
-              setSending(true);
-              startTransition(async () => {
-                const res = await sendList(listId);
-                if (res.ok) {
-                  const msg =
-                    res.failed > 0
-                      ? `Sent to ${res.sent} · ${res.failed} failed`
-                      : `Sent to ${res.sent} customer${res.sent === 1 ? "" : "s"}`;
-                  router.push(
-                    `/app/lists/${listId}?flash=${encodeURIComponent(msg)}`,
-                  );
-                } else {
-                  setSending(false);
-                  // Detect the most common systemic failure — billing not
-                  // set up for this location. Every per-customer error in
-                  // that case starts with "Billing required …", so a single
-                  // substring match catches them all and we can present a
-                  // dedicated, actionable banner with a direct link instead
-                  // of a cryptic "No sends succeeded" wrapper.
-                  const firstSpecific = (res.errors && res.errors[0]) ?? "";
-                  if (firstSpecific.includes("Billing required")) {
-                    setSendNotice({ kind: "billing" });
-                  } else {
-                    setSendNotice({
-                      kind: "generic",
-                      message:
-                        firstSpecific ||
-                        res.error ||
-                        "Send failed.",
-                    });
-                  }
+          {!readOnly && (() => {
+            const hasQueue = gmailQueue.length > 0;
+            // Hide the morphing button entirely when there's nothing to do:
+            // no prepared queue AND no pending email customers.
+            if (!hasQueue && emailCount === 0) return null;
+            const onCooldown = waitSeconds > 0;
+            const label = preparingGmail
+              ? "Preparing…"
+              : hasQueue
+                ? onCooldown
+                  ? `Wait ${waitSeconds}s`
+                  : `Send next in Gmail (${gmailQueue.length} left)`
+                : "Prepare Send in Gmail";
+
+            return (
+              <button
+                type="button"
+                disabled={
+                  preparingGmail ||
+                  (hasQueue ? onCooldown : emailCount === 0 || gmailBlockedBySms)
                 }
-              });
-            }}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-5 py-2.5 text-[13.5px] font-medium text-text hover:bg-cream-deep disabled:opacity-50"
-          >
-            {sending
-              ? "Sending…"
-              : `Send to ${selectedCount} customer${selectedCount === 1 ? "" : "s"}`}
-          </button>
-          )}
-          {!readOnly && (
-            <button
-              type="button"
-              disabled={
-                sending ||
-                preparingGmail ||
-                emailCount === 0 ||
-                gmailBlockedBySms
-              }
-              onClick={() => {
-                setSendNotice(null);
-                setGmailHint(null);
-                setPreparingGmail(true);
-                startTransition(async () => {
-                  const res = await prepareGmailDraftsForList(listId);
-                  setPreparingGmail(false);
-                  if (!res.ok) {
-                    setSendNotice({
-                      kind: "generic",
-                      message: res.error || "Could not prepare Gmail drafts.",
-                    });
+                onClick={() => {
+                  if (hasQueue) {
+                    openNextGmailDraft();
                     return;
                   }
-
-                  const queue = res.drafts ?? [];
-                  setGmailQueue(queue);
-                  setNextAllowedOpenAt(null);
-
-                  setGmailHint(
-                    `Prepared ${res.drafted} tracked Gmail draft${
-                      res.drafted === 1 ? "" : "s"
-                    }${res.failed > 0 ? ` · ${res.failed} failed` : ""}. ${
-                      res.senderGmail
-                        ? `Target Gmail: ${res.senderGmail}.`
-                        : "No sender preset set; Gmail will use the currently signed-in account."
-                    } Click "Send next in Gmail" to start.`,
-                  );
-                  if (res.failed > 0) {
-                    setSendNotice({
-                      kind: "generic",
-                      message:
-                        res.errors?.[0] ||
-                        `${res.failed} customer${res.failed === 1 ? "" : "s"} could not be prepared.`,
-                    });
-                  }
-                  router.refresh();
-                });
-              }}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-5 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark disabled:opacity-50"
-            >
-              <Mail className="h-4 w-4" />
-              {preparingGmail ? "Preparing…" : "Prepare Send in Gmail"}
-            </button>
-          )}
+                  setSendNotice(null);
+                  setPreparingGmail(true);
+                  startTransition(async () => {
+                    const res = await prepareGmailDraftsForList(listId);
+                    setPreparingGmail(false);
+                    if (!res.ok) {
+                      // Prefer per-customer reasons over the generic wrapper
+                      // ("No Gmail drafts prepared — list left as draft.")
+                      // since the specific reason is what the user needs to
+                      // see — most commonly billing not set up, suppression,
+                      // or velocity blocks.
+                      const detail = res.errors?.[0];
+                      if (detail?.includes("Billing required")) {
+                        setSendNotice({ kind: "billing" });
+                      } else {
+                        setSendNotice({
+                          kind: "generic",
+                          message:
+                            detail ||
+                            res.error ||
+                            "Could not prepare Gmail drafts.",
+                        });
+                      }
+                      return;
+                    }
+                    const queue = res.drafts ?? [];
+                    // Auto-open the first draft in Gmail so "Prepare" is a
+                    // single click instead of two. If the popup is blocked
+                    // (Safari, or Chrome with strict popup settings), we
+                    // leave the queue intact so the user can click the
+                    // now-morphed "Send next in Gmail" button to retry —
+                    // crucially we don't pop the first item, otherwise the
+                    // pill would lie and say "Sent" for a draft the user
+                    // never actually opened.
+                    setNextAllowedOpenAt(null);
+                    if (queue.length === 0) {
+                      setGmailQueue([]);
+                    } else {
+                      const first = queue[0];
+                      const opened = openGmailUrl(first.href);
+                      if (opened) {
+                        setGmailQueue(queue.slice(1));
+                        setNextAllowedOpenAt(
+                          Date.now() + gmailIntervalSec * 1000,
+                        );
+                      } else {
+                        setGmailQueue(queue);
+                        setSendNotice({
+                          kind: "generic",
+                          message:
+                            "Drafts ready in Gmail, but the browser blocked the popup. Click 'Send next in Gmail' to open the first one.",
+                        });
+                      }
+                    }
+                    // Sync the table rows: every prepared customer is now
+                    // status="sent" in the DB. Without this, the pill stays
+                    // on "Ready" until a hard reload because the local rows
+                    // state is initialized once and router.refresh() does
+                    // not reset child component state.
+                    const preparedIds = new Set(queue.map((q) => q.customerId));
+                    if (preparedIds.size > 0) {
+                      setRows((rs) =>
+                        rs.map((r) =>
+                          preparedIds.has(r.id)
+                            ? { ...r, status: "sent" }
+                            : r,
+                        ),
+                      );
+                    }
+                    if (res.failed > 0) {
+                      setSendNotice({
+                        kind: "generic",
+                        message:
+                          res.errors?.[0] ||
+                          `${res.failed} customer${res.failed === 1 ? "" : "s"} could not be prepared.`,
+                      });
+                    }
+                    router.refresh();
+                  });
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-forest px-5 py-2.5 text-[13.5px] font-medium text-cream hover:bg-forest-dark disabled:opacity-50"
+              >
+                {hasQueue ? <ExternalLink className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
+                {label}
+              </button>
+            );
+          })()}
         </div>
         </div>
       </div>

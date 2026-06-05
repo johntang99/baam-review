@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth/staff";
 import { relativeTime } from "@/lib/analytics/aggregate";
 import { ListsSearchInput } from "./search-input";
+import { ReviewProgressBar } from "./[id]/review/review-progress-bar";
 
 export const metadata = {
   title: "Lists — BAAM Review",
@@ -266,13 +267,17 @@ export default async function ListsPage({
         )}
       </div>
 
+      <ReviewProgressBar current={1} />
+
       {/* PAGE HEADER */}
       <div className="mb-8">
-        <p className="text-[11.5px] uppercase tracking-[0.14em] text-text-muted font-medium mb-2">
-          For managed customers
-        </p>
-        <h1 className="font-display text-[42px] leading-[1.05] tracking-tight text-ink mb-2.5">
-          Lists.
+        <h1 className="font-display text-[42px] leading-[1.05] tracking-tight mb-2.5">
+          <Link
+            href="/app/lists/new"
+            className="text-ink hover:text-forest transition-colors"
+          >
+            Add New Customer List
+          </Link>
         </h1>
         <p className="font-serif italic text-[17px] text-text-soft max-w-[600px] leading-relaxed">
           Customer batches your clients send you each week. Import once, send

@@ -18,6 +18,7 @@ import {
 import { parseTable, mapColumns } from "@/lib/lists/parse";
 import { validateRow, type Lang, type RawRow } from "@/lib/lists/normalize";
 import { createList } from "../actions";
+import { ReviewProgressBar } from "../[id]/review/review-progress-bar";
 
 export interface NewListFormProps {
   locations: { id: string; name: string; defaultLanguage: string }[];
@@ -68,7 +69,7 @@ export function NewListForm({
   );
   const [defaultLanguage, setDefaultLanguage] = useState<Lang>("zh");
 
-  const [tab, setTab] = useState<Tab>("paste");
+  const [tab, setTab] = useState<Tab>("csv");
   const [pasteText, setPasteText] = useState("");
   const [manualRows, setManualRows] = useState<ManualRow[]>([
     { ...EMPTY_MANUAL },
@@ -232,11 +233,10 @@ export function NewListForm({
         </Link>
       </div>
 
+      <ReviewProgressBar current={1} />
+
       {/* PAGE HEADER */}
       <div className="mb-8">
-        <p className="text-[11.5px] uppercase tracking-[0.14em] text-text-muted font-medium mb-2">
-          Step 1 of 2 · Import customers
-        </p>
         <h1 className="font-display text-[40px] leading-[1.05] tracking-tight text-ink mb-2.5">
           Create a new <em className="italic text-forest">list.</em>
         </h1>
