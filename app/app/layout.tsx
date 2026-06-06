@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/admin/sidebar";
+import { AskQuestionModal } from "@/components/marketing/ask-question-modal";
 import { isFullServiceCustomerReadOnly } from "@/lib/auth/staff";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import {
@@ -88,6 +89,7 @@ export default async function AppLayout({
         )}
       />
       <div className="flex min-h-screen flex-col">{children}</div>
+      <AskQuestionModal />
     </div>
   );
 }

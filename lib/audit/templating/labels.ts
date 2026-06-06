@@ -494,7 +494,7 @@ export const STRINGS: Record<
     cover_meta_subtitle: "prepared by BAAM Studio",
     hook_quote_html: "Average businesses become <em>hot and popular</em> by building reviews relentlessly.<br>Excellent businesses become <em>invisible</em> because they ignore them.",
     section_titles: {
-      "01": "Why Reviews Decide Who Wins",
+      "01": "Business owners should know: Reviews Decide Who Wins",
       "02": "Your Current Snapshot",
       "03": "Your BAAM Review Score",
       "04": "Industry Benchmarks",
@@ -503,7 +503,7 @@ export const STRINGS: Record<
       "A": "Appendix · Reference Tables",
     },
     section_headlines: {
-      "01": "The rules of getting found <em>changed.</em>",
+      "01": "All business owners should know <em>today</em>",
       "02": "Where customers <em>actually look</em> for you.",
     },
     section_decks: {
@@ -514,7 +514,7 @@ export const STRINGS: Record<
     methodology_eyebrow: "METHODOLOGY",
     methodology_text_html: "Every score is measured against published vertical benchmarks. <strong>Rating Quality</strong> uses a non-linear curve that rewards the 4.0★ threshold (where 70% of consumers filter). <strong>Review Volume</strong> compares total count to the median for your vertical. <strong>Velocity</strong> scores use BAAM Review Research healthy-pace bands. The black tick marks on each bar show where these standards sit on the 0–100 scale. <a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">Full methodology →</a>",
     velocity_drag_line_html: "The drag on your score is <em style=\"color: var(--rust-deep);\">velocity</em> — and velocity is what you can change starting Monday.",
-    forecast_eyebrow: "§ 05 · The Forecast",
+    forecast_eyebrow: "§ 04 · The Forecast",
     projection_title_html: "Your score in <em>six months</em> if you do nothing.",
     projection_deck: "Three forces work against a business that stops collecting reviews: velocity decay (mechanical), ranking decline (Sterling Sky), and competitors compounding the gap. This projection holds your current effort constant — and holds your competitors at their measured pace.",
     projection_legend_lines: [
@@ -532,7 +532,7 @@ export const STRINGS: Record<
       { range: "40 – 59", grade: "D", meaning: EN.grade_diagnoses.D, class: "g-d" },
       { range: "0 – 39", grade: "F", meaning: EN.grade_diagnoses.F, class: "g-f" },
     ],
-    upgrade_cta_section_num: "§ 04+",
+    upgrade_cta_section_num: "§ 03+",
     upgrade_cta_title: "What the paid audit unlocks",
     upgrade_cta_headline_html: "You've seen <em>where you stand.</em><br>Now see what it costs — and what to do.",
     upgrade_cta_items: [
@@ -545,12 +545,12 @@ export const STRINGS: Record<
     upgrade_cta_closing: "Every grade you saw in this report is honest about the data we had.<br>The paid audit shows you the full picture.",
     section_4_headline_html: "Translated into <em>dollars</em> and <em>customers.</em>",
     section_4_deck: "Numbers from the BAAM Review Research brief, applied to your specific category.",
-    benchmark_panel_a_eyebrow: "§ 04A · Per-Review Dollar Value",
+    benchmark_panel_a_eyebrow: "§ 05A · Per-Review Dollar Value",
     benchmark_panel_a_title_html: (v) => `One strong Google review is worth, for a ${v}…`,
     benchmark_panel_a_detail_html: (median, range) =>
       `Value compounds across three channels — Google search ranking, on-site widget trust, and friend-to-friend referral. The median per-review value for your vertical is <strong>${median}</strong>, with a typical range of <strong>${range}</strong>.`,
     benchmark_panel_a_methodology: "Methodology: baamreview.com/review-value.html",
-    benchmark_panel_b_eyebrow: "§ 04B · Healthy Velocity Range",
+    benchmark_panel_b_eyebrow: "§ 05B · Healthy Velocity Range",
     benchmark_panel_b_title_html: "A business in this vertical should be collecting…",
     benchmark_panel_b_detail_html:
       "Per BrightLocal, only <strong>9% of businesses</strong> sustain the Optimal pace — the band Google's ranking algorithm actually rewards.",
@@ -638,7 +638,7 @@ export const STRINGS: Record<
     cover_meta_subtitle: "由 BAAM Studio 編製",
     hook_quote_html: "普通的企業因勤於累積評論而<em>蒸蒸日上</em>，<br>卓越的企業卻因忽視評論而<em>逐漸沉寂</em>。",
     section_titles: {
-      "01": "為何評論決定誰能勝出",
+      "01": "商家應知道：評論決定誰能勝出",
       "02": "您目前的狀況概覽",
       "03": "您的 BAAM 評論評分",
       "04": "行業基準",
@@ -647,7 +647,7 @@ export const STRINGS: Record<
       "A": "附錄 · 參考數據表",
     },
     section_headlines: {
-      "01": "客戶尋找商家的規則 · <em>已經改變了</em>",
+      "01": "今日所有商家都應了解的<em>三件事</em>",
       "02": "客戶<em>實際在哪裡</em>查找您",
     },
     section_decks: {
@@ -658,7 +658,7 @@ export const STRINGS: Record<
     methodology_eyebrow: "方法說明",
     methodology_text_html: "每項分數均對照已發布的行業基準衡量。<strong>評分品質</strong>使用非線性曲線，重點獎勵 4.0 星門檻（70% 消費者以此篩選）。<strong>評論總數</strong>對比您行業的中位數。<strong>速率</strong>使用 BAAM Review 研究的健康節奏帶。每根柱上的黑色刻度標示這些標準在 0–100 分尺上的位置。<a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">完整方法 →</a>",
     velocity_drag_line_html: "拖累您分數的是<em style=\"color: var(--rust-deep);\">速率</em> — 而速率正是您下週一就可以開始改變的環節。",
-    forecast_eyebrow: "§ 05 · 預測",
+    forecast_eyebrow: "§ 04 · 預測",
     projection_title_html: "若您什麼都不做 · <em>六個月後的分數</em>",
     projection_deck: "停止累積評論的商家會面對三股力量：速率機械性衰減、排名下滑（Sterling Sky 研究）、競爭對手持續複利擴大差距。本預測假設您維持當前努力，競爭對手維持已測得的速率。",
     projection_legend_lines: [
@@ -676,7 +676,7 @@ export const STRINGS: Record<
       { range: "40 – 59", grade: "D", meaning: ZH.grade_diagnoses.D, class: "g-d" },
       { range: "0 – 39", grade: "F", meaning: ZH.grade_diagnoses.F, class: "g-f" },
     ],
-    upgrade_cta_section_num: "§ 04+",
+    upgrade_cta_section_num: "§ 03+",
     upgrade_cta_title: "付費審計解鎖的內容",
     upgrade_cta_headline_html: "您已看見<em>自己目前的位置</em>。<br>付費版本告訴您損失多少 · 該怎麼做。",
     upgrade_cta_items: [
@@ -689,12 +689,12 @@ export const STRINGS: Record<
     upgrade_cta_closing: "本報告中的每個等級都根據我們所有的數據誠實呈現。<br>付費版本展示完整全貌。",
     section_4_headline_html: "Reviews 轉化為<em>美元</em>與<em>客戶</em>",
     section_4_deck: "BAAM Review 研究報告中的數據，套用到您的具體行業。",
-    benchmark_panel_a_eyebrow: "§ 04A · 每則評論的美元價值",
+    benchmark_panel_a_eyebrow: "§ 05A · 每則評論的美元價值",
     benchmark_panel_a_title_html: (v) => `對於${v}，一則強而有力的 Google 評論值多少…`,
     benchmark_panel_a_detail_html: (median, range) =>
       `價值在三個渠道上複利累積 — Google 搜尋排名、官網小工具的信任度、口耳相傳的轉介。對您行業而言，每則評論的中位數價值為 <strong>${median}</strong>，典型區間 <strong>${range}</strong>。`,
     benchmark_panel_a_methodology: "方法說明：baamreview.com/review-value.html",
-    benchmark_panel_b_eyebrow: "§ 04B · 健康速率區間",
+    benchmark_panel_b_eyebrow: "§ 05B · 健康速率區間",
     benchmark_panel_b_title_html: "您行業的商家每月應該累積…",
     benchmark_panel_b_detail_html:
       "根據 BrightLocal · 只有 <strong>9% 的商家</strong>能維持理想速率 — 也就是 Google 排名演算法真正獎勵的區間。",

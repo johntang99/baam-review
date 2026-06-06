@@ -35,12 +35,10 @@ export async function GET(
   const url = new URL(request.url);
   const langParam = url.searchParams.get("lang");
 
+  // Fetch first — RLS lets anonymous visitors read when is_public=true.
+  // Auth check happens after, only if the row didn't come back (we don't
+  // know whether it's missing or private without authenticating).
   const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
   const { data, error } = await supabase
     .from("audits")
     .select(
@@ -50,6 +48,8 @@ export async function GET(
     .maybeSingle<AuditEmbedRow>();
 
   if (error || !data) {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) return new NextResponse("Unauthorized", { status: 401 });
     return new NextResponse("Not found", { status: 404 });
   }
 

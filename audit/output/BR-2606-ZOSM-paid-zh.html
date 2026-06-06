@@ -279,6 +279,64 @@
     padding-top: 8px;
   }
 
+  /* ============ MUST-KNOW GRID — compact §01 ============ */
+  .must-know-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 18px 0 8px;
+  }
+  .must-know-card {
+    background: #FFFFFF;
+    border-radius: 14px;
+    border: 1px solid var(--rule);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 18px -10px rgba(0, 0, 0, 0.08);
+    padding: 22px 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .must-know-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--cream-deep, #F4EFE2);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+  }
+  .must-know-emph {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    line-height: 1;
+    margin: 4px 0 -2px;
+  }
+  .must-know-highlight {
+    display: inline-block;
+    color: var(--ink);
+    font-size: 38px;
+    letter-spacing: -0.01em;
+  }
+  .must-know-body {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+    margin: 0;
+    flex: 1;
+  }
+  .must-know-source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+
   .closing-line {
     font-family: 'Instrument Serif', serif;
     font-style: italic;
@@ -377,6 +435,44 @@
   .health-dot.bad::before { background: var(--rust); }
   .health-dot.missing { color: var(--ink-mute); }
   .health-dot.missing::before { background: var(--ink-mute); }
+
+  /* ============ PRIMARY ROW — Google emphasis ============ */
+  .snapshot-table tr.primary-row td {
+    background: var(--cream-light);
+    padding-top: 26px;
+    padding-bottom: 26px;
+    border-top: 2px solid var(--gold);
+    border-bottom: 2px solid var(--ink);
+  }
+  .snapshot-table tr.primary-row td:first-child { padding-left: 20px; }
+  .snapshot-table tr.primary-row td:last-child  { padding-right: 20px; }
+  .snapshot-table tr.primary-row .platform-icon {
+    width: 44px; height: 44px;
+    background: var(--ink);
+    color: var(--cream-light);
+    font-size: 22px;
+    border-radius: 8px;
+  }
+  .snapshot-table tr.primary-row .platform-meta-strong { font-size: 18px; }
+  .snapshot-table tr.primary-row .platform-meta-sub {
+    color: var(--amber-deep);
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .snapshot-table tr.primary-row .star-rating {
+    font-size: 28px;
+    line-height: 1;
+  }
+  .snapshot-table tr.primary-row .star-rating .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 500;
+    margin-left: 4px;
+  }
+  .snapshot-table tr.primary-row .review-count { font-size: 24px; font-weight: 500; }
+  .snapshot-table tr.primary-row .last-review { font-size: 15px; font-weight: 500; }
+  .snapshot-table tr.primary-row .health-dot { font-size: 12.5px; font-weight: 600; }
+  .snapshot-table tr.primary-row .health-dot::before { width: 10px; height: 10px; }
 
   .insight-callout {
     background: var(--cream-deep);
@@ -843,6 +939,23 @@
     border-bottom: 1px solid var(--rule-soft);
   }
   .competitor-table td:not(:first-child) { text-align: right; }
+  /* Address column (2nd cell): widen the column so the full address fits
+     across 2 lines naturally. Line-clamp lives on an INNER .competitor-address
+     div so the <td> keeps its native display:table-cell — otherwise the row
+     borders break visually between cells. */
+  .competitor-table th:nth-child(2),
+  .competitor-table td:nth-child(2) {
+    width: 280px;
+    min-width: 240px;
+  }
+  .competitor-address {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.35;
+  }
   .competitor-table tr.you {
     background: var(--cream-deep);
   }
@@ -1368,6 +1481,342 @@
     .appendix-table td:not(:first-child), .appendix-table th:not(:first-child) { padding: 10px 0 10px 8px; font-size: 11px; }
     .appendix-table tr.highlight td:first-child::after { display: block; margin-left: 0; margin-top: 4px; }
   }
+
+  /* ============ SERVICE PREVIEW INLINE (Page 3, after grade scale) ============ */
+  .service-preview-inline {
+    margin-top: 32px;
+    padding: 18px 22px;
+    background: var(--cream);
+    border: 1px solid var(--rule-soft);
+    border-left: 3px solid var(--amber);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .service-preview-inline-text {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 540px;
+  }
+  .service-preview-inline-text strong {
+    font-family: 'Archivo', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--rust-deep);
+    font-size: 14px;
+  }
+  .service-preview-inline-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--rust-deep);
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--rust-deep);
+    padding-bottom: 1px;
+  }
+
+  /* ============ PAGE 6 ENHANCED CTA ROW ============ */
+  .cta-action-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+  .btn-svc {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 4px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    border: 1px solid transparent;
+  }
+  .btn-svc.dark { background: var(--ink); color: var(--cream); }
+  .btn-svc.amber { background: var(--amber); color: var(--ink); }
+  .cta-detail-link {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--rust-deep);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid var(--rust-deep);
+    padding-bottom: 2px;
+  }
+
+  /* ============ SERVICE OPPORTUNITY (between Page 6 and Page 7) ============ */
+  .service-opportunity-page {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 80px;
+    max-width: 920px;
+    margin: 0 auto;
+    border-left: 1px solid var(--rule-soft);
+    border-right: 1px solid var(--rule-soft);
+    position: relative;
+  }
+  .service-opportunity-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 1px;
+    background: var(--amber);
+  }
+  /* Big promise headline above the eyebrow — frames the SO block as
+     "we can grow your business" before the reader sees the specific
+     score-to-grade math. Renders bigger than the existing .so-headline
+     (which now acts as the supporting projection statement). */
+  .so-big-title {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 1.08;
+    color: var(--cream);
+    text-align: center;
+    margin: 0 auto 28px;
+    letter-spacing: -0.018em;
+    max-width: 820px;
+  }
+  .so-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    font-weight: 500;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .so-headline {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1.15;
+    color: var(--cream);
+    text-align: center;
+    margin-bottom: 18px;
+    letter-spacing: -0.015em;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .so-headline em { font-style: italic; color: var(--amber); }
+  .so-score-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 28px;
+    background: rgba(245, 240, 230, 0.08);
+    padding: 4px 14px;
+    border-radius: 8px;
+    color: var(--amber);
+    border: 1px solid rgba(212, 136, 45, 0.3);
+    font-weight: 500;
+    margin: 0 4px;
+    letter-spacing: 0.01em;
+    display: inline-block;
+    vertical-align: 4px;
+  }
+  .so-deck {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.5;
+    color: rgba(245, 240, 230, 0.78);
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 40px;
+  }
+  .so-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid rgba(245, 240, 230, 0.15);
+    border-bottom: 1px solid rgba(245, 240, 230, 0.15);
+    padding: 32px 0;
+    margin-bottom: 40px;
+  }
+  .so-stat {
+    padding: 0 24px;
+    border-right: 1px solid rgba(245, 240, 230, 0.12);
+    text-align: center;
+  }
+  .so-stat:last-child { border-right: none; }
+  .so-stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: rgba(245, 240, 230, 0.55);
+    margin-bottom: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  .so-stat-value {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 36px;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .so-stat-sub {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: rgba(245, 240, 230, 0.65);
+    line-height: 1.4;
+  }
+  .so-tiers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 32px;
+  }
+  .so-tier {
+    background: rgba(245, 240, 230, 0.04);
+    border: 1px solid rgba(245, 240, 230, 0.15);
+    border-radius: 8px;
+    padding: 24px 26px;
+    position: relative;
+  }
+  .so-tier.featured {
+    background: rgba(212, 136, 45, 0.08);
+    border-color: rgba(212, 136, 45, 0.4);
+  }
+  .so-tier-recommended {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: var(--amber);
+    color: var(--ink);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .so-tier-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(245, 240, 230, 0.1);
+  }
+  .so-tier-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+  }
+  .so-tier-name em { font-style: italic; color: var(--amber); }
+  .so-tier-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    color: var(--cream);
+    font-weight: 500;
+  }
+  .so-tier-projection {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: rgba(245, 240, 230, 0.8);
+    margin-bottom: 18px;
+  }
+  .so-tier-projection strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-weight: 500;
+    color: var(--amber);
+    font-size: 14px;
+  }
+  .so-cta-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .so-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 22px;
+    border-radius: 999px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+  }
+  .so-cta.outline {
+    color: var(--cream);
+    border-color: rgba(245, 240, 230, 0.4);
+    background: transparent;
+  }
+  .so-cta.amber {
+    background: var(--amber);
+    color: var(--ink);
+  }
+  .so-compare-link {
+    text-align: center;
+    margin-top: 14px;
+  }
+  .so-compare-link a {
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber);
+    padding-bottom: 2px;
+  }
+  .so-trust {
+    text-align: center;
+    margin-top: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    color: rgba(245, 240, 230, 0.45);
+  }
+
+  @media (max-width: 720px) {
+    .service-opportunity-page { padding: 56px 28px; }
+    .so-big-title { font-size: 34px; }
+    .so-headline { font-size: 26px; }
+    .so-score-pill { font-size: 22px; }
+    .so-grid { grid-template-columns: 1fr; padding: 24px 0; }
+    .so-stat { border-right: none; border-bottom: 1px solid rgba(245, 240, 230, 0.12); padding: 16px 0; }
+    .so-stat:last-child { border-bottom: none; }
+    .so-tiers { grid-template-columns: 1fr; }
+    .service-preview-inline { flex-direction: column; align-items: flex-start; }
+    .cta-action-row { flex-direction: column; align-items: stretch; }
+    .cta-detail-link { margin-left: 0; }
+  }
 </style>
 </head>
 <body>
@@ -1381,13 +1830,13 @@
     </div>
     <div class="doc-header-right">
       <div><strong>第 I 卷 · 第 001 號</strong></div>
-      <div>2026 年 5 月 30 日</div>
+      <div>2026 年 6 月 5 日</div>
     </div>
   </header>
 
   <div class="cover-hero">
-    <div class="cover-eyebrow">為您量身定制的診斷報告 · 共 07 頁 · 為老闆而寫，非為工程師</div>
-    <h1 class="cover-title">您一直缺少的那份<em>聲譽報告</em></h1>
+    <div class="cover-eyebrow">為您量身定制的診斷報告 · 共 06 頁 · 為老闆而寫，非為工程師</div>
+    <h1 class="cover-title">您一定要了解的 <em>Google聲譽報告</em></h1>
     <p class="cover-subtitle">您的業務當前狀況、每月損失多少、以及未來 12 個月需要採取的五項行動</p>
   </div>
 
@@ -1406,62 +1855,55 @@
     </div>
     <div class="cover-meta-item">
       <div class="cover-meta-label">審計編號</div>
-      <div class="cover-meta-value mono" style="font-size:18px;">BR-2605-ZOSM<br><span style="color:var(--ink-mute); font-size:11px;">由 BAAM Studio 編製</span></div>
+      <div class="cover-meta-value mono" style="font-size:18px;">BR-2606-ZOSM<br><span style="color:var(--ink-mute); font-size:11px;">由 BAAM Studio 編製</span></div>
     </div>
   </div>
-
-  <div class="hook-quote">
-    <p>普通的企業因勤於累積評論而<em>蒸蒸日上</em>，<br>卓越的企業卻因忽視評論而<em>逐漸沉寂</em>。</p>
-  </div>
-
-  <div class="ornament">§</div>
 
   <div class="section-marker">
     <span class="section-marker-num">§ 01</span>
-    <span class="section-marker-title">為何評論決定誰能勝出</span>
+    <span class="section-marker-title">商家應知道：評論決定誰能勝出</span>
   </div>
 
-  <h2 class="section-headline">被客戶找到的規則 · <em>已經改變了</em></h2>
-  <p class="section-deck">關於本地搜索，現在有五件事實 — 每項都有測量數據、每項都有出處引用、無一可以爭辯。</p>
-
-  <div class="fact-grid">
-    <div class="fact">
-      <div class="fact-num">01</div>
-      <div class="fact-stat">16–20<span class="unit">%</span></div>
-      <div class="fact-body">Google 本地搜索排名權重中，現在有此比例來自評論信號 —— 比五年前的約 11% 顯著上升，且每年持續增長。</div>
-      <div class="fact-source">Whitespark · 2026 本地排名因素報告</div>
+  <div class="must-know-grid">
+    <div class="must-know-card">
+      <div class="must-know-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </div>
+      <div class="must-know-emph"><span class="must-know-highlight">87%</span></div>
+      <div class="must-know-body">的本地消費者在光顧前會先查看並比較 Google 評論。</div>
+      <div class="must-know-source">BrightLocal · 2026 本地消費者評論調查</div>
     </div>
-    <div class="fact">
-      <div class="fact-num">02</div>
-      <div class="fact-stat">81<span class="unit">%</span></div>
-      <div class="fact-body">的消費者使用 Google 查看本地評論。也是唯一仍在增長的主流平台 — Yelp、Facebook、BBB 皆呈下降趨勢。</div>
-      <div class="fact-source">BrightLocal · 2026 本地消費者評論調查</div>
+    <div class="must-know-card">
+      <div class="must-know-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/>
+          <path d="M19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9z"/>
+          <path d="M5 16l.7 1.5L7 18l-1.3.5L5 20l-.7-1.5L3 18l1.3-.5z"/>
+        </svg>
+      </div>
+      <div class="must-know-emph"><span class="must-know-highlight">AI 搜索</span></div>
+      <div class="must-know-body">現在會閱讀評論。沒有強而有力的評論，客戶詢問時 AI 不會提到您。</div>
+      <div class="must-know-source">Google 透明度報告 · 2024–2026</div>
     </div>
-    <div class="fact">
-      <div class="fact-num">03</div>
-      <div class="fact-stat">+25<span class="unit">%</span></div>
-      <div class="fact-body">實體店每提高 0.1 星評分帶來的轉化率提升。4.0 星是關鍵門檻 — 70% 消費者會以此為篩選條件。</div>
-      <div class="fact-source">Uberall · 透過 BrightLocal 發布</div>
-    </div>
-    <div class="fact">
-      <div class="fact-num">04</div>
-      <div class="fact-stat">5–9<span class="unit">%</span></div>
-      <div class="fact-body">每提升 1 星評分帶來的營收增長。哈佛商學院研究證實為因果關係，並非相關性。獨立企業見此區間高端，醫療與法律行業更高。</div>
-      <div class="fact-source">Luca · 哈佛商學院</div>
-    </div>
-    <div class="fact" style="grid-column: span 2;">
-      <div class="fact-num">05</div>
-      <div class="fact-stat" style="font-size:42px;">AI 搜索現在會閱讀您的評論</div>
-      <div class="fact-body" style="max-width:680px;">ChatGPT、Perplexity、Claude 與 Google AI Overviews 都會從評論內容與評分中提取資訊，回答「附近最好的[服務]」這類問題。沒有強而有力的評論，AI 在客戶詢問時根本不會提到您的店家。</div>
-      <div class="fact-source">Google 透明度報告 · 2024–2026</div>
+    <div class="must-know-card">
+      <div class="must-know-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 17l6-6 4 4 8-9"/>
+          <path d="M14 6h7v7"/>
+        </svg>
+      </div>
+      <div class="must-know-emph"><span class="must-know-highlight">評論決定勝負</span></div>
+      <div class="must-know-body">普通商家透過持續累積評論而變得熱門火爆。</div>
+      <div class="must-know-source">BAAM Review · 2026 行業趨勢分析</div>
     </div>
   </div>
-
-  <p class="closing-line">優秀本身已經不夠，<em>能被看見</em>才決定客戶會走進誰的店門</p>
 
   <div class="doc-footer">
     <span>BAAM 評論審計 · 大唐艾灸</span>
-    <span>第 01 頁 / 共 07 頁</span>
+    <span>第 01 頁 / 共 06 頁</span>
   </div>
 </section>
 
@@ -1474,7 +1916,7 @@
     </div>
     <div class="doc-header-right">
       <div><strong>大唐艾灸</strong></div>
-      <div>紐約州Flushing · 11354 · 2026 年 5 月 30 日</div>
+      <div>紐約州Flushing · 11354 · 2026 年 6 月 5 日</div>
     </div>
   </header>
 
@@ -1483,8 +1925,7 @@
     <span class="section-marker-title">您目前的狀況概覽</span>
   </div>
 
-  <h2 class="section-headline">客戶<em>實際在哪裡</em>查找您</h2>
-  <p class="section-deck">免費版本涵蓋 Google · 約佔本地消費者觸及的 81%。付費版本加入 Yelp · Facebook · Zocdoc · Healthgrades。</p>
+  <h2 class="section-headline" style="margin-bottom: 32px;">客戶<em>實際在哪裡</em>查找您</h2>
 
   <table class="snapshot-table">
     <thead>
@@ -1497,53 +1938,33 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
+      <tr class="primary-row">
         <td>
           <div class="platform-name">
-            <div class="platform-icon">G</div>
             <div>
               <div class="platform-meta-strong">Google 商家檔案</div>
-              <div class="platform-meta-sub">主要平台 · 觸及 81% 消費者</div>
             </div>
           </div>
         </td>
-        <td><div class="star-rating"><span class="stars">★★★★★</span>☆ <span class="mono" style="font-size:15px;">5.0</span></div></td>
-        <td><div class="review-count">73</div></td>
-        <td><div class="last-review">3 天前</div></td>
+        <td><div class="star-rating"><span class="stars">★★★★★</span> <span class="mono">5.0</span></div></td>
+        <td><div class="review-count">76</div></td>
+        <td><div class="last-review">-1 天前</div></td>
         <td><div class="health-dot warn">80%</div></td>
       </tr>
     </tbody>
   </table>
 
   <div class="insight-callout">
-    <strong>這代表什麼</strong><br><br>您最近一則 Google 評論在 3 天前。 總評論數 <strong>73</strong> 則低於您行業的中位數 — 評論總量是最弱項。
+    <strong>這代表什麼</strong><br><br>您最近一則 Google 評論在 -1 天前。 總評論數 <strong>76</strong> 則低於您行業的中位數 — 評論總量是最弱項。
   </div>
 
-  <div class="doc-footer">
-    <span>BAAM 評論審計 · 大唐艾灸</span>
-    <span>第 02 頁 / 共 07 頁</span>
-  </div>
-</section>
-
-<!-- ====================== PAGE 3 — SECTION 3 SCORE + DO-NOTHING ====================== -->
-<section class="page">
-  <header class="doc-header">
-    <div class="doc-header-left">
-      <div class="doc-header-brand">BAAM · 評論審計</div>
-      <div class="doc-header-sub">§ 03 · 您的 BAAM 評論評分</div>
-    </div>
-    <div class="doc-header-right">
-      <div><strong>大唐艾灸</strong></div>
-      <div>紐約州Flushing · 11354 · 2026 年 5 月 30 日</div>
-    </div>
-  </header>
-
-  <div class="section-marker">
-    <span class="section-marker-num">§ 03</span>
-    <span class="section-marker-title">您的 BAAM 評論評分</span>
-  </div>
-
-  <div class="score-hero">
+  <!-- §03 score content merged into §02 — snapshot + score read as one
+       continuous "where you stand today" section, not two separate
+       chapters. Page break dropped; the §03 marker / doc-header removed
+       (the §02 page header already covers the whole flow). Page 3
+       physical pagination still works because the PDF renderer paginates
+       on overflow. -->
+  <div class="score-hero" style="margin-top: 40px;">
     <div class="score-number">89</div>
     <div class="score-grade-block">
       <div class="score-grade-label">等級 · B 級</div>
@@ -1587,12 +2008,12 @@
       <div class="subscore-row">
         <div class="subscore-meta">
           <div class="subscore-label">評論總數</div>
-          <div class="subscore-raw"><span class="mono-num">73</span> 則總評論</div>
+          <div class="subscore-raw"><span class="mono-num">76</span> 則總評論</div>
           <div class="subscore-meta-footnote">對比行業中位數</div>
         </div>
         <div class="subscore-bar-area">
           <div class="subscore-bar-track">
-            <div class="subscore-bar-fill " style="width: 59%;"></div>
+            <div class="subscore-bar-fill " style="width: 60%;"></div>
             <div class="subscore-mark" style="left: 50%;"></div><div class="subscore-mark" style="left: 70%;"></div><div class="subscore-mark" style="left: 100%;"></div>
           </div>
           <div class="subscore-scale">
@@ -1610,7 +2031,7 @@
               <span class="subscore-scale-tick anchor-right">300+</span>
           </div>
         </div>
-        <div class="subscore-value">59</div>
+        <div class="subscore-value">60</div>
         <div class="subscore-weight">20%</div>
       </div>
       <div class="subscore-row">
@@ -1645,8 +2066,8 @@
       <div class="subscore-row">
         <div class="subscore-meta">
           <div class="subscore-label">近 6 個月速率</div>
-          <div class="subscore-raw"><span class="mono-num">12.2 / mo</span> 平均</div>
-          <div class="subscore-meta-footnote">73 reviews ÷ 6 months</div>
+          <div class="subscore-raw"><span class="mono-num">12.7 / mo</span> 平均</div>
+          <div class="subscore-meta-footnote">76 reviews ÷ 6 months</div>
         </div>
         <div class="subscore-bar-area">
           <div class="subscore-bar-track">
@@ -1674,12 +2095,12 @@
       <div class="subscore-row">
         <div class="subscore-meta">
           <div class="subscore-label">近 12 個月速率</div>
-          <div class="subscore-raw"><span class="mono-num">6.1 / mo</span> 平均</div>
-          <div class="subscore-meta-footnote">73 reviews ÷ 12 months</div>
+          <div class="subscore-raw"><span class="mono-num">6.3 / mo</span> 平均</div>
+          <div class="subscore-meta-footnote">76 reviews ÷ 12 months</div>
         </div>
         <div class="subscore-bar-area">
           <div class="subscore-bar-track">
-            <div class="subscore-bar-fill strong" style="width: 88%;"></div>
+            <div class="subscore-bar-fill strong" style="width: 89%;"></div>
             <div class="subscore-mark" style="left: 40%;"></div><div class="subscore-mark" style="left: 75%;"></div><div class="subscore-mark" style="left: 100%;"></div>
           </div>
           <div class="subscore-scale">
@@ -1697,102 +2118,15 @@
               <span class="subscore-scale-tick anchor-right">10+/mo</span>
           </div>
         </div>
-        <div class="subscore-value">88</div>
+        <div class="subscore-value">89</div>
         <div class="subscore-weight">10%</div>
       </div>
   </div>
 
-  <div class="methodology-footer">
-    <span class="methodology-eyebrow">方法說明</span>
-    <p>每項分數均對照已發布的行業基準衡量。<strong>評分品質</strong>使用非線性曲線，重點獎勵 4.0 星門檻（70% 消費者以此篩選）。<strong>評論總數</strong>對比您行業的中位數。<strong>速率</strong>使用 BAAM Review 研究的健康節奏帶。每根柱上的黑色刻度標示這些標準在 0–100 分尺上的位置。<a href="https://www.baamreview.com/review-value.html" target="_blank">完整方法 →</a></p>
-  </div>
-
-  <p style="margin-top: 32px; font-style: italic; font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1.35; color: var(--ink); max-width: 640px;">
-    拖累您分數的是<em style="color: var(--rust-deep);">速率</em> — 而速率正是您下週一就可以開始改變的環節。
-  </p>
-
-  <div class="projection-block">
-    <div class="projection-eyebrow">§ 03.5 · 預測</div>
-    <h3 class="projection-title">若您什麼都不做 · <em>六個月後的分數</em></h3>
-    <p class="projection-deck">停止累積評論的商家會面對三股力量：速率機械性衰減、排名下滑（Sterling Sky 研究）、競爭對手持續複利擴大差距。本預測假設您維持當前努力，競爭對手維持已測得的速率。</p>
-
-    <div class="projection-chart-frame">
-      <div class="projection-svg-wrap">
-        <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
-  <line x1="50" y1="30" x2="680" y2="30" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
-  <line x1="50" y1="90" x2="680" y2="90" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
-  <line x1="50" y1="150" x2="680" y2="150" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
-  <line x1="50" y1="210" x2="680" y2="210" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
-  <line x1="50" y1="270" x2="680" y2="270" stroke="#C9BFAE" stroke-width="1"/>
-  <text x="40" y="34" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">100</text>
-  <text x="40" y="94" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">80</text>
-  <text x="40" y="154" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">60</text>
-  <text x="40" y="214" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">40</text>
-  <text x="40" y="274" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">20</text>
-  <text x="50" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">NOW</text>
-  <text x="152" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+2MO</text>
-  <text x="253" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+4MO</text>
-  <text x="355" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+6MO</text>
-  <text x="457" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+8MO</text>
-  <text x="558" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+10MO</text>
-  <text x="660" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+12MO</text>
-
-  <defs>
-    <linearGradient id="gapGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#D4882D"/>
-      <stop offset="100%" stop-color="#A4452A"/>
-    </linearGradient>
-  </defs>
-
-  <path d="M 50.00 56.40 L 100.83 97.20 L 151.67 85.20 L 202.50 70.80 L 253.33 73.20 L 304.17 75.60 L 355.00 78.00 L 405.83 78.00 L 456.67 78.00 L 507.50 78.00 L 558.33 78.00 L 609.17 78.00 L 660.00 78.00 L 660.00 181.20 L 609.17 178.80 L 558.33 176.40 L 507.50 174.00 L 456.67 171.60 L 405.83 169.20 L 355.00 166.80 L 304.17 152.40 L 253.33 152.40 L 202.50 152.40 L 151.67 152.40 L 100.83 114.00 L 50.00 56.40 Z" fill="url(#gapGradient)" opacity="0.18"/>
-
-  <path d="M 50.00 56.40 L 100.83 97.20 L 151.67 85.20 L 202.50 70.80 L 253.33 73.20 L 304.17 75.60 L 355.00 78.00 L 405.83 78.00 L 456.67 78.00 L 507.50 78.00 L 558.33 78.00 L 609.17 78.00 L 660.00 78.00" stroke="#4F7253" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 50.00 56.40 L 100.83 114.00 L 151.67 152.40 L 202.50 152.40 L 253.33 152.40 L 304.17 152.40 L 355.00 166.80 L 405.83 169.20 L 456.67 171.60 L 507.50 174.00 L 558.33 176.40 L 609.17 178.80 L 660.00 181.20" stroke="#A4452A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
-
-  <circle cx="50" cy="56.400000000000006" r="5" fill="#1A1814"/>
-  <text x="50" y="47.400000000000006" text-anchor="middle" font-family="Instrument Serif" font-size="14" fill="#1A1814" font-style="italic">89</text>
-
-  <circle cx="355" cy="166.8" r="4" fill="#A4452A"/>
-  <text x="355" y="186.8" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#A4452A" font-weight="500">43</text>
-
-  <circle cx="355" cy="78" r="4" fill="#4F7253"/>
-  <text x="355" y="68" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4F7253" font-weight="500">80</text>
-
-  <text x="660" y="70" font-family="Instrument Serif" font-size="13" fill="#4F7253" font-style="italic" text-anchor="end">80 · Tier B</text>
-  <text x="660" y="199.2" font-family="Instrument Serif" font-size="13" fill="#A4452A" font-style="italic" text-anchor="end">37 · Tier F</text>
-
-  <line x1="355" y1="30" x2="355" y2="270" stroke="#6B6259" stroke-width="0.5" stroke-dasharray="2,3"/>
-  <text x="355" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="9" letter-spacing="0.1em" fill="#6B6259">SIX MONTH MARK</text>
-
-  <text x="500" y="135" text-anchor="middle" font-family="Instrument Serif" font-size="16" fill="#1A1814" font-style="italic">— the gap —</text>
-  <text x="500" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#842F1B">$0 / 6 months</text>
-</svg>
-      </div>
-
-      <div class="projection-legend">
-        <div class="legend-item"><span class="legend-swatch red"></span> <strong>什麼都不做</strong> · 依現有努力的預測軌跡</div><div class="legend-item"><span class="legend-swatch green"></span> <strong>使用 BAAM Review</strong> · 持續收集與回覆</div>
-      </div>
-    </div>
-
-    <div class="projection-impact">
-      <div class="impact-cell">
-        <div class="impact-label">6 個月後分數</div>
-        <div class="impact-value">89 → 43</div>
-        <div class="impact-sub">從 B 級降至 D 級 · 60 天無新評論將觸發臨界下限規則</div>
-      </div>
-      <div class="impact-cell">
-        <div class="impact-label">排名位置</div>
-        <div class="impact-value">排名持平</div>
-        <div class="impact-sub">預估本地搜尋包排名下滑 · 競爭對手持續複利擴大差距</div>
-      </div>
-      <div class="impact-cell">
-        <div class="impact-label">營收損失</div>
-        <div class="impact-value">$0</div>
-        <div class="impact-sub">6 個月機會成本 · 行業每則評論價值 × 錯失的評論數</div>
-      </div>
-    </div>
-  </div>
-
+  <!-- Grade ladder moved up here (was previously below the projection
+       block). Reader sees their score → immediately understands what
+       the letter means → then dives into mechanics (methodology,
+       velocity drag, projection). -->
   <div class="grade-scale-block">
     <div class="grade-scale-eyebrow">完整等級表 · 每個等級的意義</div>
     <h3 class="grade-scale-headline">您的 <em>B</em> 級在整體中的位置 · 以及更上一層需要什麼。</h3>
@@ -1834,36 +2168,389 @@
     </table>
   </div>
 
+  <div class="methodology-footer">
+    <span class="methodology-eyebrow">方法說明</span>
+    <p>每項分數均對照已發布的行業基準衡量。<strong>評分品質</strong>使用非線性曲線，重點獎勵 4.0 星門檻（70% 消費者以此篩選）。<strong>評論總數</strong>對比您行業的中位數。<strong>速率</strong>使用 BAAM Review 研究的健康節奏帶。每根柱上的黑色刻度標示這些標準在 0–100 分尺上的位置。<a href="https://www.baamreview.com/review-value.html" target="_blank">完整方法 →</a></p>
+  </div>
+
+  <div class="service-preview-inline">
+    <p class="service-preview-inline-text"><strong>此損失可預防。</strong>大多數與您相同等級的客戶，在 BAAM Review 服務 90–120 天內即可提升一個等級。請見下方 <em>§ 服務機會</em> 區塊的預測。</p>
+    <a href="#service-opportunity" class="service-preview-inline-link">查看服務 →</a>
+  </div>
+
   <div class="doc-footer">
     <span>BAAM 評論審計 · 大唐艾灸</span>
-    <span>第 03 頁 / 共 07 頁</span>
+    <span>第 02 頁 / 共 06 頁</span>
   </div>
 </section>
 
-<!-- ====================== PAGE 4 — SECTION 4 BENCHMARKS ====================== -->
+<!-- ====================== PAGE 4 — COMPETITORS (was §5) ======================
+     Swapped UP per stakeholder request: readers want to see who's beating
+     them BEFORE the abstract industry-benchmark math. Label keys stay
+     `.[05]` / `section_5_*` / `page_label_5` so labels.ts didn't need to
+     change — only the displayed section number string in the header /
+     marker was updated to "§ 04" to match new physical position.
+============================================================================ -->
 <section class="page">
   <header class="doc-header">
     <div class="doc-header-left">
       <div class="doc-header-brand">BAAM · 評論審計</div>
-      <div class="doc-header-sub">§ 04 · 行業基準</div>
+      <div class="doc-header-sub">§ 03 · 競爭對手比較</div>
     </div>
     <div class="doc-header-right">
       <div><strong>大唐艾灸</strong></div>
-      <div>紐約州Flushing · 11354 · 2026 年 5 月 30 日</div>
+      <div>紐約州Flushing · 11354 · 2026 年 6 月 5 日</div>
     </div>
   </header>
 
   <div class="section-marker">
-    <span class="section-marker-num">§ 04</span>
+    <span class="section-marker-num">§ 03</span>
+    <span class="section-marker-title">競爭對手比較</span>
+  </div>
+
+  <h2 class="section-headline" style="white-space: nowrap;">在眾多競爭對手中，<em>客戶能看見您嗎？</em></h2>
+  <p class="section-deck" style="max-width: 760px;">由 Google Maps 在您的搜尋半徑內排名識別。我們替您挑選競爭對手 — 供您參考</p>
+
+  <table class="competitor-table">
+    <thead>
+      <tr>
+        <th>商家</th>
+        <th>地址</th>
+        <th>分數</th>
+        <th>評分</th>
+        <th>總評論</th>
+        <th>近 30 天</th>
+        <th>近 90 天</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="you">
+          <td>
+            <div class="competitor-name">
+              <span class="competitor-rank">您</span>大唐艾灸 <span class="you-tag"></span>
+              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Datang Moxibustion</span>
+            </div>
+          </td>
+          <td><div class="competitor-address">36-28A Union Street, Flushing</div></td>
+          <td><strong>89</strong></td>
+          <td>5.0 ★</td>
+          <td>76</td>
+          <td>7</td>
+          <td>32</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="competitor-name">
+              <span class="competitor-rank">02</span>华仁堂法拉盛针灸诊所纽约中医诊所物理治疗医生李伟华中医师脊椎病物理治疗尿频尿急失眠背痛痛症诊所最好的中医诊所专家推荐
+              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">HRT Best Acupuncture-   Jason Yi Dipl.Ac, LAc  | | PCOS</span>
+            </div>
+          </td>
+          <td><div class="competitor-address">136-56 39th Avenue, Flushing</div></td>
+          <td><strong>85</strong></td>
+          <td>5.0 ★</td>
+          <td>98</td>
+          <td>10</td>
+          <td>22</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="competitor-name">
+              <span class="competitor-rank">03</span>Bill Jiao Acupuncture PLLC.
+              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Bill Jiao Acupuncture PLLC.</span>
+            </div>
+          </td>
+          <td><div class="competitor-address">142-19 38th Avenue, Flushing</div></td>
+          <td><strong>72</strong></td>
+          <td>4.9 ★</td>
+          <td>86</td>
+          <td>4</td>
+          <td>9</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="competitor-name">
+              <span class="competitor-rank">04</span>Fay Acupuncture &amp; Herbal Medicine
+              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Fay Acupuncture &amp; Herbal Medicine</span>
+            </div>
+          </td>
+          <td><div class="competitor-address">69-20 Main Street, Flushing</div></td>
+          <td><strong>70</strong></td>
+          <td>5.0 ★</td>
+          <td>112</td>
+          <td>2</td>
+          <td>11</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="competitor-name">
+              <span class="competitor-rank">05</span>德誉堂癌症调理痛症不孕不育诊所推荐
+              
+            </div>
+          </td>
+          <td><div class="competitor-address">136-68 Roosevelt Avenue, Flushing</div></td>
+          <td><strong>67</strong></td>
+          <td>4.3 ★</td>
+          <td>112</td>
+          <td>4</td>
+          <td>11</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="competitor-name">
+              <span class="competitor-rank">06</span>New York Four Seasons Acupuncture PC
+              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">New York Four Seasons Acupuncture PC</span>
+            </div>
+          </td>
+          <td><div class="competitor-address">143-36 37th Avenue, Flushing</div></td>
+          <td><strong>61</strong></td>
+          <td>4.8 ★</td>
+          <td>114</td>
+          <td>1</td>
+          <td>14</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="competitor-name">
+              <span class="competitor-rank">07</span>Healthkey Group Med Spa
+              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Healthkey Group Med Spa</span>
+            </div>
+          </td>
+          <td><div class="competitor-address">38-08 Union Street, Flushing</div></td>
+          <td><strong>55</strong></td>
+          <td>4.9 ★</td>
+          <td>82</td>
+          <td>1</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="competitor-name">
+              <span class="competitor-rank">08</span>法拉盛中医诊所｜中药治疗｜寻麻疹湿疹牛皮癣头晕头疼性功能障碍失眠糖尿病并发症帕金森肠易激综合征肠化生尿频尿急更年期｜月经不调｜华仁堂张美茹医生
+              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">||| ||||| IBS|| |</span>
+            </div>
+          </td>
+          <td><div class="competitor-address">136-56 39th Avenue, Flushing</div></td>
+          <td><strong>46</strong></td>
+          <td>4.9 ★</td>
+          <td>74</td>
+          <td>0</td>
+          <td>6</td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p class="competitor-diagnosis"><strong>觀察</strong> 您在 30 天速率上超越市場所有競爭對手 — 這是您的護城河，請繼續維持。</p>
+
+  <div class="ornament">§</div>
+
+  <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.45; color: var(--ink-soft); text-align: center; max-width: 640px; margin: 0 auto;">
+    好消息：今天您勝過 7 位競爭對手中的 1 位。較難的消息：若一切不變，到第四季度您將勝過更少。
+  </p>
+
+  <div class="doc-footer">
+    <span>BAAM 評論審計 · 大唐艾灸</span>
+    <span>第 03 頁 / 共 06 頁</span>
+  </div>
+</section>
+
+<!-- ====================== SERVICE OPPORTUNITY · between Competitors and Forecast ======================
+     Moved up from its old position between Action Plan and Appendix.
+     New flow: Competitors (who's beating you) → Service Opportunity
+     (here's the lift if you act now) → Forecast (here's what happens
+     if you do nothing). The pitch lands right after the pain, while
+     the gap is fresh in the reader's mind, instead of being buried
+     after Action Plan where many readers had already dropped off.
+========================================================================================= -->
+<section class="service-opportunity-page" id="service-opportunity">
+  <h2 class="so-big-title">我們能幫您逐級攀升 — 帶動業績成長</h2>
+  <div class="so-eyebrow">§ 服務機會 · 依您的審計量身定制</div>
+  <h3 class="so-headline">從 <span class="so-score-pill">89</span> 提升至 <em>A 級</em>，僅需 90–120 天。</h3>
+  <p class="so-deck">大多數客戶在 BAAM Review 服務 90–120 天內提升一個等級。下方範圍依您的起始分數保守估算 — 並非保證，但為可信賴的預測。</p>
+
+  <div class="so-grid">
+    <div class="so-stat">
+      <div class="so-stat-label">90 天後</div>
+      <div class="so-stat-value">92–95</div>
+      <div class="so-stat-sub">進入 A 級 · 速度回升</div>
+    </div>
+    <div class="so-stat">
+      <div class="so-stat-label">180 天後</div>
+      <div class="so-stat-value">94–95</div>
+      <div class="so-stat-sub">穩固 A 級 · 縮小與競爭對手差距</div>
+    </div>
+    <div class="so-stat">
+      <div class="so-stat-label">12 個月後</div>
+      <div class="so-stat-value">95–95</div>
+      <div class="so-stat-sub">A 級 · 達成 5× 回報標準</div>
+    </div>
+  </div>
+
+  <div class="so-tiers">
+    <div class="so-tier">
+      <div class="so-tier-name-row">
+        <div class="so-tier-name"><em>自己</em>運行</div>
+        <div class="so-tier-price">$99 /月</div>
+      </div>
+      <p class="so-tier-projection">對 大唐艾灸 而言，這通常意味著 90 天分數 <strong>92–95</strong>，每月恢復 3–5 則評論。您執行計劃，我們提供平台。</p>
+      <div class="so-cta-row">
+        <a href="/signup?next=/audit/service%3Faudit%3DBR-2606-ZOSM%26plan%3Dself" target="_top" class="so-cta outline">啟動自助方案試用 →</a>
+      </div>
+    </div>
+
+    <div class="so-tier featured">
+      <span class="so-tier-recommended">推薦</span>
+      <div class="so-tier-name-row">
+        <div class="so-tier-name">由我們<em>替您</em>運行</div>
+        <div class="so-tier-price">$399 /月</div>
+      </div>
+      <p class="so-tier-projection">對 大唐艾灸 而言，這通常意味著 90 天分數 <strong>92–95</strong>，每月恢復 5–8 則評論。我們執行全部五項行動。<strong>5× 回報標準</strong>支持成果。</p>
+      <div class="so-cta-row">
+        <a href="/signup?next=/audit/service%3Faudit%3DBR-2606-ZOSM%26plan%3Dfull" target="_top" class="so-cta amber">啟動全託管試用 →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="so-compare-link">
+    <a href="/audit/service" target="_top">詳細比較兩個方案 →</a>
+  </div>
+
+  <p class="so-trust">30 天免費試用 · 需綁定卡片但不扣款 · 可隨時取消 · 沿用您現有帳號</p>
+</section>
+
+<!-- ====================== PAGE 5 — FORECAST (moved out of §3) ===================
+     Per request: competitors now sit BEFORE the do-nothing forecast.
+     Originally the projection block was inside §03 below the score; we
+     pulled it out so the reader sees Score → Grade Ladder → Who's
+     Beating You → What Happens If You Do Nothing → Benchmarks.
+============================================================================ -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · 評論審計</div>
+      <div class="doc-header-sub">§ 04 · 預測</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>大唐艾灸</strong></div>
+      <div>紐約州Flushing · 11354 · 2026 年 6 月 5 日</div>
+    </div>
+  </header>
+
+  <p style="margin-top: 16px; font-style: italic; font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1.35; color: var(--ink); max-width: 640px;">
+    拖累您分數的是<em style="color: var(--rust-deep);">速率</em> — 而速率正是您下週一就可以開始改變的環節。
+  </p>
+
+  <div class="projection-block">
+    <div class="projection-eyebrow">§ 04 · 預測</div>
+    <h3 class="projection-title">若您什麼都不做 · <em>六個月後的分數</em></h3>
+    <p class="projection-deck">停止累積評論的商家會面對三股力量：速率機械性衰減、排名下滑（Sterling Sky 研究）、競爭對手持續複利擴大差距。本預測假設您維持當前努力，競爭對手維持已測得的速率。</p>
+
+    <div class="projection-chart-frame">
+      <div class="projection-svg-wrap">
+        <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+  <line x1="50" y1="30" x2="680" y2="30" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+  <line x1="50" y1="90" x2="680" y2="90" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+  <line x1="50" y1="150" x2="680" y2="150" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+  <line x1="50" y1="210" x2="680" y2="210" stroke="#DDD3BF" stroke-width="0.5" stroke-dasharray="2,4"/>
+  <line x1="50" y1="270" x2="680" y2="270" stroke="#C9BFAE" stroke-width="1"/>
+  <text x="40" y="34" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">100</text>
+  <text x="40" y="94" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">80</text>
+  <text x="40" y="154" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">60</text>
+  <text x="40" y="214" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">40</text>
+  <text x="40" y="274" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="#6B6259">20</text>
+  <text x="50" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">NOW</text>
+  <text x="152" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+2MO</text>
+  <text x="253" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+4MO</text>
+  <text x="355" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+6MO</text>
+  <text x="457" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+8MO</text>
+  <text x="558" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+10MO</text>
+  <text x="660" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#6B6259" letter-spacing="0.1em">+12MO</text>
+
+  <defs>
+    <linearGradient id="gapGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D4882D"/>
+      <stop offset="100%" stop-color="#A4452A"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M 50.00 56.40 L 100.83 97.20 L 151.67 82.80 L 202.50 68.40 L 253.33 70.80 L 304.17 73.20 L 355.00 78.00 L 405.83 78.00 L 456.67 78.00 L 507.50 78.00 L 558.33 78.00 L 609.17 78.00 L 660.00 78.00 L 660.00 181.20 L 609.17 176.40 L 558.33 174.00 L 507.50 171.60 L 456.67 171.60 L 405.83 169.20 L 355.00 166.80 L 304.17 152.40 L 253.33 152.40 L 202.50 152.40 L 151.67 114.00 L 100.83 111.60 L 50.00 56.40 Z" fill="url(#gapGradient)" opacity="0.18"/>
+
+  <path d="M 50.00 56.40 L 100.83 97.20 L 151.67 82.80 L 202.50 68.40 L 253.33 70.80 L 304.17 73.20 L 355.00 78.00 L 405.83 78.00 L 456.67 78.00 L 507.50 78.00 L 558.33 78.00 L 609.17 78.00 L 660.00 78.00" stroke="#4F7253" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 50.00 56.40 L 100.83 111.60 L 151.67 114.00 L 202.50 152.40 L 253.33 152.40 L 304.17 152.40 L 355.00 166.80 L 405.83 169.20 L 456.67 171.60 L 507.50 171.60 L 558.33 174.00 L 609.17 176.40 L 660.00 181.20" stroke="#A4452A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
+
+  <circle cx="50" cy="56.400000000000006" r="5" fill="#1A1814"/>
+  <text x="50" y="47.400000000000006" text-anchor="middle" font-family="Instrument Serif" font-size="14" fill="#1A1814" font-style="italic">89</text>
+
+  <circle cx="355" cy="166.8" r="4" fill="#A4452A"/>
+  <text x="355" y="186.8" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#A4452A" font-weight="500">43</text>
+
+  <circle cx="355" cy="78" r="4" fill="#4F7253"/>
+  <text x="355" y="68" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4F7253" font-weight="500">80</text>
+
+  <text x="660" y="70" font-family="Instrument Serif" font-size="13" fill="#4F7253" font-style="italic" text-anchor="end">80 · Tier B</text>
+  <text x="660" y="199.2" font-family="Instrument Serif" font-size="13" fill="#A4452A" font-style="italic" text-anchor="end">37 · Tier F</text>
+
+  <line x1="355" y1="30" x2="355" y2="270" stroke="#6B6259" stroke-width="0.5" stroke-dasharray="2,3"/>
+  <text x="355" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="9" letter-spacing="0.1em" fill="#6B6259">SIX MONTH MARK</text>
+
+  <text x="500" y="135" text-anchor="middle" font-family="Instrument Serif" font-size="16" fill="#1A1814" font-style="italic">— the gap —</text>
+  <text x="500" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#842F1B">$0 / 6 months</text>
+</svg>
+      </div>
+
+      <div class="projection-legend">
+        <div class="legend-item"><span class="legend-swatch red"></span> <strong>什麼都不做</strong> · 依現有努力的預測軌跡</div><div class="legend-item"><span class="legend-swatch green"></span> <strong>使用 BAAM Review</strong> · 持續收集與回覆</div>
+      </div>
+    </div>
+
+    <div class="projection-impact">
+      <div class="impact-cell">
+        <div class="impact-label">6 個月後分數</div>
+        <div class="impact-value">89 → 43</div>
+        <div class="impact-sub">從 B 級降至 D 級 · 60 天無新評論將觸發臨界下限規則</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">排名位置</div>
+        <div class="impact-value">−2 to −3</div>
+        <div class="impact-sub">預估本地搜尋包排名下滑 · 競爭對手持續複利擴大差距</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-label">營收損失</div>
+        <div class="impact-value">$0</div>
+        <div class="impact-sub">6 個月機會成本 · 行業每則評論價值 × 錯失的評論數</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span>BAAM 評論審計 · 大唐艾灸</span>
+    <span>第 04 頁 / 共 06 頁</span>
+  </div>
+</section>
+
+<!-- ====================== PAGE 6 — INDUSTRY BENCHMARKS (was §5, now §6) ====================== -->
+<section class="page">
+  <header class="doc-header">
+    <div class="doc-header-left">
+      <div class="doc-header-brand">BAAM · 評論審計</div>
+      <div class="doc-header-sub">§ 05 · 行業基準</div>
+    </div>
+    <div class="doc-header-right">
+      <div><strong>大唐艾灸</strong></div>
+      <div>紐約州Flushing · 11354 · 2026 年 6 月 5 日</div>
+    </div>
+  </header>
+
+  <div class="section-marker">
+    <span class="section-marker-num">§ 05</span>
     <span class="section-marker-title">行業基準</span>
   </div>
 
-  <h2 class="section-headline">轉化為<em>美元</em>與<em>客戶</em></h2>
+  <h2 class="section-headline">Reviews 轉化為<em>美元</em>與<em>客戶</em></h2>
   <p class="section-deck">BAAM Review 研究報告中的數據，套用到您的具體行業。</p>
 
   <div class="benchmark-split">
     <div class="benchmark-panel">
-      <div class="benchmark-panel-eyebrow">§ 04A · 每則評論的美元價值</div>
+      <div class="benchmark-panel-eyebrow">§ 05A · 每則評論的美元價值</div>
       <h3 class="benchmark-panel-title">對於中醫診所，一則強而有力的 Google 評論值多少…</h3>
       <div class="benchmark-value-big">$1,400</div>
       <div class="benchmark-value-range">範圍：$400 — $2,400 · 24 個月時程</div>
@@ -1872,7 +2559,7 @@
     </div>
 
     <div class="benchmark-panel">
-      <div class="benchmark-panel-eyebrow">§ 04B · 健康速率區間</div>
+      <div class="benchmark-panel-eyebrow">§ 05B · 健康速率區間</div>
       <h3 class="benchmark-panel-title">您行業的商家每月應該累積…</h3>
       <div class="velocity-gauge">
         <div class="velocity-band silent">沉睡 · 0–1</div>
@@ -1891,147 +2578,12 @@
 
   <div class="money-on-table">
     <div class="money-on-table-eyebrow">§ 桌上未取的金錢</div>
-    <p class="money-on-table-text">您的市場正在沉睡 — 競爭對手平均每月 <em>0.0 則評論</em>，您為 <em>7.0</em>。第一個持續累積評論的商家將完全勝出。</p>
+    <p class="money-on-table-text">您的市場正在沉睡 — 競爭對手平均每月 <em>3.1 則評論</em>，您為 <em>7.0</em>。第一個持續累積評論的商家將完全勝出。</p>
   </div>
 
   <div class="doc-footer">
     <span>BAAM 評論審計 · 大唐艾灸</span>
-    <span>第 04 頁 / 共 07 頁</span>
-  </div>
-</section>
-
-<!-- ====================== PAGE 5 — SECTION 5 COMPETITORS ====================== -->
-<section class="page">
-  <header class="doc-header">
-    <div class="doc-header-left">
-      <div class="doc-header-brand">BAAM · 評論審計</div>
-      <div class="doc-header-sub">§ 05 · 競爭對手比較</div>
-    </div>
-    <div class="doc-header-right">
-      <div><strong>大唐艾灸</strong></div>
-      <div>紐約州Flushing · 11354 · 2026 年 5 月 30 日</div>
-    </div>
-  </header>
-
-  <div class="section-marker">
-    <span class="section-marker-num">§ 05</span>
-    <span class="section-marker-title">競爭對手比較</span>
-  </div>
-
-  <h2 class="section-headline">客戶<em>在看見您之前先看見的</em>對手</h2>
-  <p class="section-deck">由 Google Maps 在您的搜尋半徑內排名識別。我們替您挑選競爭對手 — 店主自己挑往往挑錯。</p>
-
-  <table class="competitor-table">
-    <thead>
-      <tr>
-        <th>商家</th>
-        <th>分數</th>
-        <th>評分</th>
-        <th>總評論</th>
-        <th>近 30 天</th>
-        <th>近 90 天</th>
-        <th>趨勢</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="you">
-          <td>
-            <div class="competitor-name">
-              <span class="competitor-rank">您</span>大唐艾灸 <span class="you-tag"></span>
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Datang Moxibustion</span>
-            </div>
-          </td>
-          <td><strong>89</strong></td>
-          <td>5.0 ★</td>
-          <td>73</td>
-          <td>7</td>
-          <td>31</td>
-          <td><span class="trend-arrow down">↘</span></td>
-        </tr>
-        <tr>
-          <td>
-            <div class="competitor-name">
-              <span class="competitor-rank">02</span>New York Four Seasons Acupuncture PC
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">New York Four Seasons Acupuncture PC</span>
-            </div>
-          </td>
-          <td><strong>52</strong></td>
-          <td>4.8 ★</td>
-          <td>113</td>
-          <td>0</td>
-          <td>—</td>
-          <td><span class="trend-arrow flat">→</span></td>
-        </tr>
-        <tr>
-          <td>
-            <div class="competitor-name">
-              <span class="competitor-rank">03</span>华仁堂法拉盛针灸诊所纽约中医诊所物理治疗医生李伟华中医师脊椎病物理治疗尿频尿急失眠背痛痛症诊所最好的中医诊所专家推荐
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">HRT Best Acupuncture-   Jason Yi Dipl.Ac, LAc  | | PCOS</span>
-            </div>
-          </td>
-          <td><strong>50</strong></td>
-          <td>5.0 ★</td>
-          <td>97</td>
-          <td>0</td>
-          <td>—</td>
-          <td><span class="trend-arrow flat">→</span></td>
-        </tr>
-        <tr>
-          <td>
-            <div class="competitor-name">
-              <span class="competitor-rank">04</span>Bill Jiao Acupuncture PLLC.
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Bill Jiao Acupuncture PLLC.</span>
-            </div>
-          </td>
-          <td><strong>46</strong></td>
-          <td>4.9 ★</td>
-          <td>83</td>
-          <td>0</td>
-          <td>—</td>
-          <td><span class="trend-arrow flat">→</span></td>
-        </tr>
-        <tr>
-          <td>
-            <div class="competitor-name">
-              <span class="competitor-rank">05</span>Regen Acupuncture PC
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Regen Acupuncture PC</span>
-            </div>
-          </td>
-          <td><strong>46</strong></td>
-          <td>4.9 ★</td>
-          <td>53</td>
-          <td>0</td>
-          <td>—</td>
-          <td><span class="trend-arrow flat">→</span></td>
-        </tr>
-        <tr>
-          <td>
-            <div class="competitor-name">
-              <span class="competitor-rank">06</span>Hongik Acupuncture P.C
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Hongik Acupuncture P.C</span>
-            </div>
-          </td>
-          <td><strong>46</strong></td>
-          <td>4.9 ★</td>
-          <td>55</td>
-          <td>0</td>
-          <td>—</td>
-          <td><span class="trend-arrow flat">→</span></td>
-        </tr>
-    </tbody>
-  </table>
-
-  <p class="competitor-diagnosis"><strong>觀察</strong> 您在 30 天速率上超越市場所有競爭對手 — 這是您的護城河，請繼續維持。</p>
-
-  <div class="ornament">§</div>
-
-  <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.45; color: var(--ink-soft); text-align: center; max-width: 640px; margin: 0 auto;">
-    好消息：今天您勝過 5 位競爭對手中的 2 位。較難的消息：若一切不變，到第四季度您將勝過更少。
-  </p>
-
-  <div class="doc-footer">
-    <span>BAAM 評論審計 · 大唐艾灸</span>
-    <span>第 05 頁 / 共 07 頁</span>
+    <span>第 04 頁 / 共 06 頁</span>
   </div>
 </section>
 
@@ -2044,7 +2596,7 @@
     </div>
     <div class="doc-header-right">
       <div><strong>大唐艾灸</strong></div>
-      <div>紐約州Flushing · 11354 · 2026 年 5 月 30 日</div>
+      <div>紐約州Flushing · 11354 · 2026 年 6 月 5 日</div>
     </div>
   </header>
 
@@ -2117,7 +2669,7 @@
       <li class="action-item">
         <div class="action-number">iv</div>
         <div class="action-body">
-          <div class="action-title">回覆過往 67 則未回應評論</div>
+          <div class="action-title">回覆過往 70 則未回應評論</div>
           <div class="action-why">由 AI 草擬、店主審核並個性化的歷史評論回覆。同時向 Google 與未來讀者傳遞「您在乎」的訊號 — 無需任何作假。</div>
           <div class="action-tag-row">
             <div class="action-result-block">
@@ -2180,11 +2732,17 @@
     </div>
 
     <p class="promise-line">對比 <strong>Birdeye</strong> 每月 $299 + $5,000 開通費，或 <strong>Podium</strong> 每月 $399 + 入駐流程。BAAM Review 免費起步，按月計費。</p>
+
+    <div class="cta-action-row">
+      <a href="/signup?next=/audit/service%3Faudit%3DBR-2606-ZOSM%26plan%3Dself" target="_top" class="btn-svc dark">啟動自助方案試用 →</a>
+      <a href="/signup?next=/audit/service%3Faudit%3DBR-2606-ZOSM%26plan%3Dfull" target="_top" class="btn-svc amber">啟動全託管試用 →</a>
+      <a href="/audit/service" target="_top" class="cta-detail-link">詳細比較兩個方案 →</a>
+    </div>
   </div>
 
   <div class="doc-footer">
     <span>BAAM 評論審計 · 大唐艾灸</span>
-    <span>第 06 頁 / 共 07 頁</span>
+    <span>第 05 頁 / 共 06 頁</span>
   </div>
 </section>
 
@@ -2197,7 +2755,7 @@
     </div>
     <div class="doc-header-right">
       <div><strong>大唐艾灸</strong></div>
-      <div>紐約州Flushing · 11354 · 2026 年 5 月 30 日</div>
+      <div>紐約州Flushing · 11354 · 2026 年 6 月 5 日</div>
     </div>
   </header>
 
@@ -2380,7 +2938,7 @@
 
   <div class="doc-footer">
     <span>BAAM 評論審計 · 大唐艾灸</span>
-    <span>第 07 頁 / 共 07 頁 · 完</span>
+    <span>第 06 頁 / 共 06 頁 · 完</span>
   </div>
 </section>
 

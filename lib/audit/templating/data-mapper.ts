@@ -45,7 +45,7 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
 
     doc_header_subtitle_left: t.doc_header_subtitle,
 
-    page_count_display: tier === "paid" ? "07" : "03",
+    page_count_display: tier === "paid" ? "06" : "03",
     is_paid: tier === "paid",
 
     snapshot_google: buildGooglePlatformRow(google, language),
@@ -97,7 +97,7 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
     appendix_velocity_rows: buildAppendixVelocityRows(google.vertical.inferred_vertical, language),
 
     t: buildTranslatedStrings(language, {
-      page_count_display: tier === "paid" ? "07" : "03",
+      page_count_display: tier === "paid" ? "06" : "03",
       score_grade: score.grade,
       vertical_display_name: t.verticals[google.vertical.inferred_vertical] ?? t.verticals.general_smb,
       per_review_value_median_display: `$${benchmarks.per_review_value.median_usd.toLocaleString()}`,

@@ -21,6 +21,7 @@ import {
 import { UserCard } from "./user-card";
 import { NavItem } from "./nav-item";
 import { SignOutNavItem } from "./sign-out-nav-item";
+import { AskQuestionsNavItem } from "./ask-questions-nav-item";
 import { LocationSetupNavItem } from "./location-setup-nav-item";
 import { ProductSwitcher } from "./product-switcher";
 import {
@@ -202,7 +203,11 @@ export function Sidebar({
         {operationsItems.length > 0 && (
           <NavSection label="BAAM Operations" items={operationsItems} />
         )}
-        <NavSection label="Help" items={helpItems} />
+        <NavSection
+          label="Help"
+          items={helpItems}
+          trailing={<AskQuestionsNavItem />}
+        />
         <NavSection label="Other Tools" items={otherToolsItems} />
         <NavSection
           label="Account"

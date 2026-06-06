@@ -48,54 +48,47 @@
     </div>
   </div>
 
-  <div class="hook-quote">
-    <p>{{{t.hook_quote_html}}}</p>
-  </div>
-
-  <div class="ornament">§</div>
-
   <div class="section-marker">
     <span class="section-marker-num">§ 01</span>
     <span class="section-marker-title">{{t.section_titles.[01]}}</span>
   </div>
 
-  <h2 class="section-headline">{{{t.section_headlines.[01]}}}</h2>
-  <p class="section-deck">{{t.section_decks.[01]}}</p>
-
-  <div class="fact-grid">
-    <div class="fact">
-      <div class="fact-num">01</div>
-      <div class="fact-stat">16–20<span class="unit">%</span></div>
-      <div class="fact-body">{{#if (eq language "zh")}}Google 本地搜索排名權重中，現在有此比例來自評論信號 —— 比五年前的約 11% 顯著上升，且每年持續增長。{{else}}Of Google's Local Pack ranking weight now comes from review signals — up from ~11% five years ago. The share rises every year.{{/if}}</div>
-      <div class="fact-source">Whitespark · 2026 {{#if (eq language "zh")}}本地排名因素報告{{else}}Local Ranking Factors{{/if}}</div>
+  <div class="must-know-grid">
+    <div class="must-know-card">
+      <div class="must-know-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </div>
+      <div class="must-know-emph"><span class="must-know-highlight">87%</span></div>
+      <div class="must-know-body">{{#if (eq language "zh")}}的本地消費者在光顧前會先查看並比較 Google 評論。{{else}}of local consumers check &amp; compare Google reviews before visiting a business.{{/if}}</div>
+      <div class="must-know-source">{{#if (eq language "zh")}}BrightLocal · 2026 本地消費者評論調查{{else}}BrightLocal · 2026 Local Consumer Review Survey{{/if}}</div>
     </div>
-    <div class="fact">
-      <div class="fact-num">02</div>
-      <div class="fact-stat">81<span class="unit">%</span></div>
-      <div class="fact-body">{{#if (eq language "zh")}}的消費者使用 Google 查看本地評論。也是唯一仍在增長的主流平台 — Yelp、Facebook、BBB 皆呈下降趨勢。{{else}}Of consumers use Google for local reviews. It's the only major platform whose usage is rising — Yelp, Facebook, and BBB are all declining.{{/if}}</div>
-      <div class="fact-source">BrightLocal · 2026 {{#if (eq language "zh")}}本地消費者評論調查{{else}}Local Consumer Review Survey{{/if}}</div>
+    <div class="must-know-card">
+      <div class="must-know-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/>
+          <path d="M19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9z"/>
+          <path d="M5 16l.7 1.5L7 18l-1.3.5L5 20l-.7-1.5L3 18l1.3-.5z"/>
+        </svg>
+      </div>
+      <div class="must-know-emph"><span class="must-know-highlight">{{#if (eq language "zh")}}AI 搜索{{else}}AI Search{{/if}}</span></div>
+      <div class="must-know-body">{{#if (eq language "zh")}}現在會閱讀評論。沒有強而有力的評論，客戶詢問時 AI 不會提到您。{{else}}now reads reviews. Without strong reviews, AI won&apos;t mention you when a customer asks.{{/if}}</div>
+      <div class="must-know-source">{{#if (eq language "zh")}}Google 透明度報告 · 2024–2026{{else}}Google Transparency Report · 2024–2026{{/if}}</div>
     </div>
-    <div class="fact">
-      <div class="fact-num">03</div>
-      <div class="fact-stat">+25<span class="unit">%</span></div>
-      <div class="fact-body">{{#if (eq language "zh")}}實體店每提高 0.1 星評分帶來的轉化率提升。4.0 星是關鍵門檻 — 70% 消費者會以此為篩選條件。{{else}}Conversion lift from a single 0.1-star rating increase in brick-and-mortar businesses. The 4.0 threshold is binary — 70% of consumers filter by it.{{/if}}</div>
-      <div class="fact-source">Uberall · {{#if (eq language "zh")}}透過 BrightLocal 發布{{else}}via BrightLocal{{/if}}</div>
-    </div>
-    <div class="fact">
-      <div class="fact-num">04</div>
-      <div class="fact-stat">5–9<span class="unit">%</span></div>
-      <div class="fact-body">{{#if (eq language "zh")}}每提升 1 星評分帶來的營收增長。哈佛商學院研究證實為因果關係，並非相關性。獨立企業見此區間高端，醫療與法律行業更高。{{else}}Revenue increase per 1-star rating bump. Causal, not correlational. Independent businesses see the upper end of this range; medical and legal even higher.{{/if}}</div>
-      <div class="fact-source">Luca · {{#if (eq language "zh")}}哈佛商學院{{else}}Harvard Business School{{/if}}</div>
-    </div>
-    <div class="fact" style="grid-column: span 2;">
-      <div class="fact-num">05</div>
-      <div class="fact-stat" style="font-size:42px;">{{#if (eq language "zh")}}AI 搜索現在會閱讀您的評論{{else}}AI search now reads your reviews.{{/if}}</div>
-      <div class="fact-body" style="max-width:680px;">{{#if (eq language "zh")}}ChatGPT、Perplexity、Claude 與 Google AI Overviews 都會從評論內容與評分中提取資訊，回答「附近最好的[服務]」這類問題。沒有強而有力的評論，AI 在客戶詢問時根本不會提到您的店家。{{else}}ChatGPT, Perplexity, Claude, and Google's AI Overviews pull directly from review content and ratings to answer "best [service] near me" questions. Without strong reviews, AI will literally not mention you when a customer asks.{{/if}}</div>
-      <div class="fact-source">Google {{#if (eq language "zh")}}透明度報告{{else}}Transparency Report{{/if}} · 2024–2026</div>
+    <div class="must-know-card">
+      <div class="must-know-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 17l6-6 4 4 8-9"/>
+          <path d="M14 6h7v7"/>
+        </svg>
+      </div>
+      <div class="must-know-emph"><span class="must-know-highlight">{{#if (eq language "zh")}}評論決定勝負{{else}}Review Wins{{/if}}</span></div>
+      <div class="must-know-body">{{#if (eq language "zh")}}普通商家透過持續累積評論而變得熱門火爆。{{else}}Average businesses become hot and popular by building reviews relentlessly.{{/if}}</div>
+      <div class="must-know-source">{{#if (eq language "zh")}}BAAM Review · 2026 行業趨勢分析{{else}}BAAM Review · 2026 Industry Pattern Analysis{{/if}}</div>
     </div>
   </div>
-
-  <p class="closing-line">{{#if (eq language "zh")}}優秀本身已經不夠，<em>能被看見</em>才決定客戶會走進誰的店門{{else}}Excellence isn't enough anymore. <em>Visibility</em> decides who walks through your door.{{/if}}</p>
 
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
@@ -121,7 +114,7 @@
     <span class="section-marker-title">{{t.section_titles.[02]}}</span>
   </div>
 
-  <h2 class="section-headline">{{{t.section_headlines.[02]}}}</h2>
+  <h2 class="section-headline" style="margin-bottom: 32px;">{{{t.section_headlines.[02]}}}</h2>
 
   <table class="snapshot-table">
     <thead>
@@ -134,17 +127,15 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
+      <tr class="primary-row">
         <td>
           <div class="platform-name">
-            <div class="platform-icon">{{snapshot_google.icon}}</div>
             <div>
               <div class="platform-meta-strong">{{snapshot_google.name}}</div>
-              <div class="platform-meta-sub">{{snapshot_google.meta_sub}}</div>
             </div>
           </div>
         </td>
-        <td><div class="star-rating">{{{snapshot_google.rating_stars_html}}} <span class="mono" style="font-size:15px;">{{snapshot_google.rating_value}}</span></div></td>
+        <td><div class="star-rating">{{{snapshot_google.rating_stars_html}}} <span class="mono">{{snapshot_google.rating_value}}</span></div></td>
         <td><div class="review-count">{{snapshot_google.review_count}}</div></td>
         <td><div class="last-review{{#if snapshot_google.last_review_is_stale}} stale{{/if}}">{{snapshot_google.last_review_label}}</div></td>
         <td><div class="health-dot {{snapshot_google.health_class}}">{{snapshot_google.health_label}}</div></td>
@@ -182,31 +173,13 @@
     {{{insight_callout_html}}}
   </div>
 
-  <div class="doc-footer">
-    <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_2}}</span>
-  </div>
-</section>
-
-<!-- ====================== PAGE 3 — SECTION 3 SCORE + DO-NOTHING ====================== -->
-<section class="page">
-  <header class="doc-header">
-    <div class="doc-header-left">
-      <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
-      <div class="doc-header-sub">§ 03 · {{t.section_titles.[03]}}</div>
-    </div>
-    <div class="doc-header-right">
-      <div><strong>{{business_name}}</strong></div>
-      <div>{{business_address_line_2}} · {{audit_date_display}}</div>
-    </div>
-  </header>
-
-  <div class="section-marker">
-    <span class="section-marker-num">§ 03</span>
-    <span class="section-marker-title">{{t.section_titles.[03]}}</span>
-  </div>
-
-  <div class="score-hero">
+  <!-- §03 score content merged into §02 — snapshot + score read as one
+       continuous "where you stand today" section, not two separate
+       chapters. Page break dropped; the §03 marker / doc-header removed
+       (the §02 page header already covers the whole flow). Page 3
+       physical pagination still works because the PDF renderer paginates
+       on overflow. -->
+  <div class="score-hero" style="margin-top: 40px;">
     <div class="score-number">{{score_total}}</div>
     <div class="score-grade-block">
       <div class="score-grade-label">{{#if (eq language "zh")}}等級 · {{score_grade}} 級{{else}}Grade · Tier {{score_grade}}{{/if}}</div>
@@ -264,7 +237,7 @@
 
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_3}}</span>
+    <span>{{t.page_label_2}}</span>
   </div>
 </section>
 
@@ -280,7 +253,7 @@
   <header class="doc-header">
     <div class="doc-header-left">
       <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
-      <div class="doc-header-sub">§ 04 · {{t.section_titles.[05]}}</div>
+      <div class="doc-header-sub">§ 03 · {{t.section_titles.[05]}}</div>
     </div>
     <div class="doc-header-right">
       <div><strong>{{business_name}}</strong></div>
@@ -289,12 +262,12 @@
   </header>
 
   <div class="section-marker">
-    <span class="section-marker-num">§ 04</span>
+    <span class="section-marker-num">§ 03</span>
     <span class="section-marker-title">{{t.section_titles.[05]}}</span>
   </div>
 
   <h2 class="section-headline" style="white-space: nowrap;">{{{t.section_5_headline_html}}}</h2>
-  <p class="section-deck" style="max-width: none; white-space: nowrap;">{{t.section_5_deck}}</p>
+  <p class="section-deck" style="max-width: 760px;">{{t.section_5_deck}}</p>
 
   <table class="competitor-table">
     <thead>
@@ -306,7 +279,6 @@
         <th>{{t.competitor_table_headers.total}}</th>
         <th>{{t.competitor_table_headers.last_30d}}</th>
         <th>{{t.competitor_table_headers.last_90d}}</th>
-        <th>{{t.competitor_table_headers.trend}}</th>
       </tr>
     </thead>
     <tbody>
@@ -326,7 +298,7 @@
 
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_4}}</span>
+    <span>{{t.page_label_3}}</span>
   </div>
 </section>
 
@@ -452,7 +424,7 @@
 
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_5}}</span>
+    <span>{{t.page_label_4}}</span>
   </div>
 </section>
 
@@ -461,7 +433,7 @@
   <header class="doc-header">
     <div class="doc-header-left">
       <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
-      <div class="doc-header-sub">§ 06 · {{t.section_titles.[04]}}</div>
+      <div class="doc-header-sub">§ 05 · {{t.section_titles.[04]}}</div>
     </div>
     <div class="doc-header-right">
       <div><strong>{{business_name}}</strong></div>
@@ -470,7 +442,7 @@
   </header>
 
   <div class="section-marker">
-    <span class="section-marker-num">§ 06</span>
+    <span class="section-marker-num">§ 05</span>
     <span class="section-marker-title">{{t.section_titles.[04]}}</span>
   </div>
 
@@ -512,7 +484,7 @@
 
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_5}}</span>
+    <span>{{t.page_label_4}}</span>
   </div>
 </section>
 
@@ -521,7 +493,7 @@
   <header class="doc-header">
     <div class="doc-header-left">
       <div class="doc-header-brand">BAAM · {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}}</div>
-      <div class="doc-header-sub">§ 07 · {{t.section_titles.[06]}}</div>
+      <div class="doc-header-sub">§ 06 · {{t.section_titles.[06]}}</div>
     </div>
     <div class="doc-header-right">
       <div><strong>{{business_name}}</strong></div>
@@ -530,7 +502,7 @@
   </header>
 
   <div class="section-marker">
-    <span class="section-marker-num">§ 07</span>
+    <span class="section-marker-num">§ 06</span>
     <span class="section-marker-title">{{t.section_titles.[06]}}</span>
   </div>
 
@@ -579,7 +551,7 @@
 
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_6}}</span>
+    <span>{{t.page_label_5}}</span>
   </div>
 </section>
 
@@ -669,7 +641,7 @@
 
   <div class="doc-footer">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_7}} · {{t.end_label}}</span>
+    <span>{{t.page_label_6}} · {{t.end_label}}</span>
   </div>
 </section>
 {{/if}}
@@ -696,7 +668,7 @@
 
   <div class="doc-footer" style="margin-top: auto;">
     <span>BAAM {{#if (eq language "zh")}}評論審計{{else}}Review Audit{{/if}} · {{business_name}}</span>
-    <span>{{t.page_label_4}}</span>
+    <span>{{t.page_label_3}}</span>
   </div>
 </section>
 {{/unless}}

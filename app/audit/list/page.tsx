@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { canUserAudit } from "@/lib/audit/quotas";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
+import { OpenAccessToggle } from "@/components/audit/open-access-toggle";
 import { ServiceBanner } from "./service-banner";
 
 export const metadata = { title: "Your audits · BAAM Review Audit" };
@@ -11,6 +12,7 @@ export const dynamic = "force-dynamic";
 
 interface AuditRow {
   id: string;
+  is_public: boolean;
   business_place_id: string | null;
   vertical: string | null;
   tier: string | null;
@@ -64,7 +66,7 @@ export default async function AuditListPage(props: {
   const { data: audits } = await supabase
     .from("audits")
     .select(
-      "id,business_place_id,vertical,tier,total_score,grade,languages_rendered,pdf_urls,generated_at,status,progress_stage,failed_reason,google_data,score_data",
+      "id,is_public,business_place_id,vertical,tier,total_score,grade,languages_rendered,pdf_urls,generated_at,status,progress_stage,failed_reason,google_data,score_data",
     )
     .order("generated_at", { ascending: false })
     .limit(50)
@@ -479,6 +481,11 @@ function CompletedRow({
             ↓ 中文 PDF
           </a>
         )}
+        <OpenAccessToggle
+          auditId={row.id}
+          initialIsPublic={row.is_public}
+          shareUrl={`${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:4001"}/audit/${row.id}`}
+        />
       </div>
     </div>
   );

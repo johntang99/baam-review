@@ -60,10 +60,11 @@ export async function GET(
   const format = url.searchParams.get("format") === "pdf" ? "pdf" : "html";
   const langParam = url.searchParams.get("lang");
 
+  // Same dual-mode auth as /audit/[id]: anonymous visitors can download
+  // when the audit is is_public (allowed by RLS audits_select_public).
+  // Auth fallback only kicks in when the row isn't visible, so private
+  // audits still 401 for anon and 404 for signed-in non-owners.
   const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return new NextResponse("Unauthorized", { status: 401 });
-
   const { data, error } = await supabase
     .from("audits")
     .select(
@@ -72,7 +73,11 @@ export async function GET(
     .eq("id", id)
     .maybeSingle<AuditRow>();
 
-  if (error || !data) return new NextResponse("Not found", { status: 404 });
+  if (error || !data) {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) return new NextResponse("Unauthorized", { status: 401 });
+    return new NextResponse("Not found", { status: 404 });
+  }
 
   const language: AuditLanguage = pickLanguage(langParam, data.languages_rendered);
   const benchmarks = await getBenchmarks(

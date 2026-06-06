@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 interface AuditRow {
   id: string;
   user_id: string | null;
+  is_public: boolean;
   tier: string;
   total_score: number;
   grade: string;
@@ -41,19 +42,25 @@ export default async function AuditResultPage(props: {
 
   const supabase = await createClient();
   const { data: authData } = await supabase.auth.getUser();
-  if (!authData.user) {
-    redirect(`/login?next=/audit/${id}`);
-  }
 
+  // Fetch first — RLS lets anonymous visitors read the row when
+  // is_public=true via the audits_select_public policy. If the row comes
+  // back, the visitor is either the owner, BAAM staff, or anyone holding
+  // the link to a public audit; either case may proceed. If the row is
+  // null AND the visitor isn't signed in, send them to login so they have
+  // a chance to authenticate before we 404.
   const { data, error } = await supabase
     .from("audits")
     .select(
-      "id,user_id,tier,total_score,grade,languages_rendered,pdf_urls,generated_at,google_data",
+      "id,user_id,is_public,tier,total_score,grade,languages_rendered,pdf_urls,generated_at,google_data",
     )
     .eq("id", id)
     .maybeSingle<AuditRow>();
 
-  if (error || !data) notFound();
+  if (error || !data) {
+    if (!authData.user) redirect(`/login?next=/audit/${id}`);
+    notFound();
+  }
 
   const business = data.google_data.business;
 

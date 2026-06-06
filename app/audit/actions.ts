@@ -92,6 +92,60 @@ function extractPlaceIdFromMapsUrl(input: string): string | null {
   return null;
 }
 
+/** Toggle whether an audit is anonymously viewable. RLS guarantees only
+ *  the audit owner can flip the bit; the policy in 0048_audits_public.sql
+ *  enforces user_id = auth.uid(). We don't need to re-check ownership
+ *  here, but we return a clear error if the update writes 0 rows so the
+ *  UI can revert its optimistic toggle. */
+export async function setAuditPublic(
+  auditId: string,
+  isPublic: boolean,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) return { ok: false, error: "unauthorized" };
+
+  // Cast through `unknown` because the `is_public` column is added by
+  // migration 0048_audits_public.sql — the generated database types
+  // don't include it until `supabase gen types` is re-run. We match
+  // the same pattern used in lib/audit/delivery/start-audit.ts.
+  const supabaseAny = supabase as unknown as {
+    from: (t: string) => {
+      update: (row: Record<string, unknown>) => {
+        eq: (
+          col: string,
+          val: string,
+        ) => {
+          eq: (
+            col: string,
+            val: string,
+          ) => {
+            select: (cols: string) => {
+              maybeSingle: () => Promise<{
+                data: { id: string } | null;
+                error: { message: string } | null;
+              }>;
+            };
+          };
+        };
+      };
+    };
+  };
+  const { data, error } = await supabaseAny
+    .from("audits")
+    .update({ is_public: isPublic })
+    .eq("id", auditId)
+    .eq("user_id", authData.user.id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+  if (!data) return { ok: false, error: "not_found_or_not_owner" };
+
+  revalidatePath("/audit/list");
+  return { ok: true };
+}
+
 function stripGoogleMapsUrl(input: string): string {
   if (!/^https?:\/\//.test(input)) return input;
   try {
