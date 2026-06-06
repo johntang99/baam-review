@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Check, Link as LinkIcon } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { Check, HelpCircle, Link as LinkIcon, X } from "lucide-react";
 import { setAuditPublic } from "@/app/audit/actions";
 
 interface OpenAccessToggleProps {
@@ -26,6 +26,16 @@ export function OpenAccessToggle({
   const [pending, startTransition] = useTransition();
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
+
+  useEffect(() => {
+    if (!showHelp) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setShowHelp(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showHelp]);
 
   function toggle(next: boolean) {
     setError(null);
@@ -58,9 +68,21 @@ export function OpenAccessToggle({
           onChange={(e) => toggle(e.target.checked)}
           disabled={pending}
           className="open-access-toggle-checkbox"
-          aria-label="Open access — anyone with the link can view"
+          aria-label="Share Audit — anyone with the link can view"
         />
-        <span className="open-access-toggle-text">Open</span>
+        <span className="open-access-toggle-text">Share Audit</span>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            setShowHelp(true);
+          }}
+          className="open-access-help-btn"
+          aria-label="What does 'Share Audit' do?"
+          title="What does 'Share Audit' do?"
+        >
+          <HelpCircle className="open-access-icon" />
+        </button>
       </label>
       {isPublic && (
         <button
@@ -84,6 +106,75 @@ export function OpenAccessToggle({
         </button>
       )}
       {error && <span className="open-access-error">{error}</span>}
+
+      {showHelp && (
+        <div
+          className="open-access-help-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="open-access-help-title"
+          onClick={() => setShowHelp(false)}
+        >
+          <div
+            className="open-access-help-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="open-access-help-header">
+              <h3
+                id="open-access-help-title"
+                className="open-access-help-title"
+              >
+                Share Audit — what does it do?
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowHelp(false)}
+                className="open-access-help-close"
+                aria-label="Close"
+              >
+                <X className="open-access-help-close-icon" />
+              </button>
+            </div>
+            <div className="open-access-help-body">
+              <p>
+                <strong>Share Audit</strong> makes <em>this one audit</em> viewable
+                by anyone who has the link &mdash; no signin required. Useful
+                when you want to share a report with a client, prospect, or
+                colleague who doesn&apos;t have a BAAM Review account.
+              </p>
+              <ul className="open-access-help-list">
+                <li>
+                  Check the box, then use <strong>Copy link</strong> to grab
+                  the shareable URL.
+                </li>
+                <li>
+                  Uncheck the box at any time &mdash; anonymous access is
+                  revoked immediately.
+                </li>
+                <li>
+                  Your other audits stay private. Sharing one doesn&apos;t
+                  expose any of the others.
+                </li>
+                <li>
+                  The URL itself is the secret. Don&apos;t post it anywhere
+                  truly public if you wouldn&apos;t want a stranger to read
+                  the report.
+                </li>
+              </ul>
+            </div>
+            <div className="open-access-help-footer">
+              <button
+                type="button"
+                onClick={() => setShowHelp(false)}
+                className="open-access-help-done-btn"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .open-access-toggle {
           display: inline-flex;
@@ -144,6 +235,104 @@ export function OpenAccessToggle({
           font-size: 11.5px;
           color: #a4452a;
         }
+        .open-access-help-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          margin-left: 2px;
+          border: 0;
+          background: transparent;
+          color: var(--text-muted, #888);
+          cursor: pointer;
+          line-height: 0;
+        }
+        .open-access-help-btn:hover { color: var(--ink, #1c1c1c); }
+
+        .open-access-help-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 1000;
+          background: rgba(28, 28, 28, 0.42);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          animation: open-access-fade 160ms ease-out;
+          font-family: inherit;
+        }
+        @keyframes open-access-fade {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .open-access-help-card {
+          width: 100%;
+          max-width: 480px;
+          background: var(--paper, #faf7f2);
+          border-radius: 14px;
+          box-shadow: 0 24px 56px -20px rgba(28, 28, 28, 0.35);
+          overflow: hidden;
+        }
+        .open-access-help-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 18px 22px;
+          border-bottom: 1px solid var(--rule, #ddd);
+        }
+        .open-access-help-title {
+          margin: 0;
+          font-family: 'Fraunces', 'Instrument Serif', serif;
+          font-size: 18px;
+          font-weight: 500;
+          color: var(--ink, #1c1c1c);
+        }
+        .open-access-help-close {
+          background: none;
+          border: 0;
+          padding: 4px;
+          line-height: 0;
+          color: var(--text-muted, #888);
+          cursor: pointer;
+        }
+        .open-access-help-close:hover { color: var(--ink, #1c1c1c); }
+        :global(.open-access-help-close-icon) {
+          width: 16px;
+          height: 16px;
+        }
+        .open-access-help-body {
+          padding: 18px 22px 4px;
+          font-size: 13.5px;
+          line-height: 1.6;
+          color: var(--text, #2a2a2a);
+        }
+        .open-access-help-body p { margin: 0 0 12px; }
+        .open-access-help-body em { font-style: italic; color: var(--ink, #1c1c1c); }
+        .open-access-help-list {
+          margin: 0 0 6px;
+          padding-left: 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .open-access-help-list li::marker { color: var(--forest, #2d4a3a); }
+        .open-access-help-footer {
+          display: flex;
+          justify-content: flex-end;
+          padding: 14px 22px 18px;
+        }
+        .open-access-help-done-btn {
+          padding: 8px 18px;
+          border-radius: 999px;
+          background: var(--forest, #2d4a3a);
+          color: var(--cream, #faf7f2);
+          font-size: 13px;
+          font-weight: 500;
+          font-family: inherit;
+          border: 0;
+          cursor: pointer;
+        }
+        .open-access-help-done-btn:hover { background: #1f3528; }
       `}</style>
     </div>
   );

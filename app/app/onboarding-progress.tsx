@@ -1,13 +1,20 @@
 import Link from "next/link";
 import { markRequestReviewActivated } from "./actions/onboarding";
 import type { ReviewPlan } from "@/lib/onboarding/status";
+import { BillingRequiredButton } from "./locations/billing-required-button";
 
 type StepState = "done" | "active" | "pending";
 
 type CtaConfig =
   | { kind: "link"; href: string; label: string; prefetch?: false }
   | { kind: "form"; label: string }
-  | { kind: "passive"; label: string };
+  | { kind: "passive"; label: string }
+  | {
+      kind: "billing-modal";
+      label: string;
+      locationId: string;
+      plan: ReviewPlan | null;
+    };
 
 interface StepConfig {
   index: number;
@@ -21,6 +28,13 @@ interface OnboardingProgressProps {
   hasLocation: boolean;
   hasBilling: boolean;
   hasActivatedRequest: boolean;
+  /** When this bar is rendered on /app/billing (or anywhere we already
+   * know the specific location needing billing), pass it through so the
+   * "Set up billing →" CTA can open the same modal as the table-row
+   * button — same single-click flow into Stripe Checkout, no extra hop
+   * back to /app/billing. Falls back to the default Link CTA if absent
+   * (used on the dashboard etc. where we don't know the location yet). */
+  needsBillingLocation?: { id: string; plan: ReviewPlan | null } | null;
 }
 
 /**
@@ -44,7 +58,20 @@ export function OnboardingProgress({
   hasLocation,
   hasBilling,
   hasActivatedRequest,
+  needsBillingLocation = null,
 }: OnboardingProgressProps) {
+  const billingCta: CtaConfig = needsBillingLocation
+    ? {
+        kind: "billing-modal",
+        label: "Set up billing →",
+        locationId: needsBillingLocation.id,
+        plan: needsBillingLocation.plan,
+      }
+    : {
+        kind: "link",
+        href: "/app/billing",
+        label: "Set up billing →",
+      };
   // Hide only when the user has finished every explicit step. Callers
   // additionally guard on getOnboardingStatus().showBar which also hides
   // the bar for established accounts (those that already sent review
@@ -58,11 +85,7 @@ export function OnboardingProgress({
             index: 1,
             label: "Set up billing",
             done: hasBilling,
-            cta: {
-              kind: "link",
-              href: "/app/billing",
-              label: "Set up billing →",
-            },
+            cta: billingCta,
           },
           {
             index: 2,
@@ -96,11 +119,7 @@ export function OnboardingProgress({
             index: 2,
             label: "Set up billing",
             done: hasBilling,
-            cta: {
-              kind: "link",
-              href: "/app/billing",
-              label: "Set up billing →",
-            },
+            cta: billingCta,
           },
           {
             index: 3,
@@ -232,6 +251,21 @@ function CtaRow({ cta }: { cta: CtaConfig }) {
         >
           {cta.label}
         </Link>
+      </div>
+    );
+  }
+
+  if (cta.kind === "billing-modal") {
+    // Same client component the table row uses — keeps the billing
+    // cycle / payment method picker consistent everywhere.
+    return (
+      <div className="flex flex-col items-center gap-2 pt-1">
+        <BillingRequiredButton
+          locationId={cta.locationId}
+          plan={cta.plan}
+          label={cta.label}
+          className="inline-flex items-center gap-2 rounded-full bg-forest text-cream px-5 py-2.5 text-[13.5px] font-medium hover:bg-forest-dark"
+        />
       </div>
     );
   }

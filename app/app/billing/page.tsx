@@ -189,6 +189,20 @@ export default async function BillingPage({
               hasLocation={onboarding.hasLocation}
               hasBilling={onboarding.hasBilling}
               hasActivatedRequest={onboarding.hasActivatedRequest}
+              needsBillingLocation={(() => {
+                // Find the first location whose subscription is missing or
+                // canceled — that's the next one the user needs to wire up
+                // billing for. Surfacing it on the top CTA lets the user
+                // open the Stripe-cycle picker modal in a single click,
+                // matching the smaller row-level button below.
+                const candidate = (locations ?? []).find((l) => {
+                  const s = subByLoc.get(l.id);
+                  return !s || s.subscription_status === "canceled";
+                });
+                return candidate
+                  ? { id: candidate.id, plan }
+                  : null;
+              })()}
             />
           </div>
         )}

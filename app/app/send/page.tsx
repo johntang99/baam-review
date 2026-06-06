@@ -69,6 +69,7 @@ export default async function SendPage() {
           smsEnabled={smsEnabled}
           initialLocationId={initialLocationId}
           blockedLocationIds={blockedLocationIds}
+          isStaff={internal !== null}
         />
       </div>
     </main>

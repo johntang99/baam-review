@@ -45,6 +45,11 @@ interface SendFormProps {
   smsEnabled: boolean;
   initialLocationId?: string | null;
   blockedLocationIds: string[];
+  /** BAAM internal users (admin / sales / account_manager) get the
+   * "Send via BAAM email" fallback for sending via Resend. Customers
+   * see only "Send in Gmail" — they always relay through their own
+   * Gmail. Defaults to false to be safe. */
+  isStaff?: boolean;
 }
 
 const ALL_LANGS = ["en", "zh", "es"] as const;
@@ -63,6 +68,7 @@ export function SendForm({
   smsEnabled,
   initialLocationId,
   blockedLocationIds,
+  isStaff = false,
 }: SendFormProps) {
   const initialLocation =
     locations.find((l) => l.id === initialLocationId) ?? locations[0];
@@ -87,6 +93,11 @@ export function SendForm({
     name?: string;
     email?: string;
   }>({});
+  /** Set when the user clicks "Send in Gmail" with no sender configured.
+   * Stays sticky until they either fill the sender or change the location,
+   * so the red "Sender Gmail is required" persists alongside the other
+   * field-level errors (matching the name/email pattern). */
+  const [senderMissingFlag, setSenderMissingFlag] = useState(false);
 
   const currentLocation = locations.find((l) => l.id === locationId);
   const currentGmailSender = asEmailOrEmpty(
@@ -225,6 +236,10 @@ export function SendForm({
     setLocationId(id);
     const loc = locations.find((l) => l.id === id);
     if (loc) setLanguage(loc.default_language);
+    // Reset the "sender required" flag — the new location has its own
+    // gmail_sender_email, which may or may not be set. Re-evaluation
+    // happens on the next click.
+    setSenderMissingFlag(false);
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -262,12 +277,40 @@ export function SendForm({
     setResult(null);
     setGmailError(null);
 
+    // Always-clickable guard: report the first blocker we hit instead of
+    // disabling the button. The screenshot UX was "button looks blurred,
+    // owner doesn't know why" — surfacing a concrete reminder is friendlier.
+    if (!currentLocation) {
+      setGmailError("Pick a location first.");
+      return;
+    }
+    if (billingBlocked) {
+      setGmailError(
+        "Set up billing for this location before sending review requests. Click 'Set up billing →' above.",
+      );
+      return;
+    }
+    if (!currentGmailSender) {
+      setSenderMissingFlag(true);
+      setGmailError(
+        "Add a Sender Gmail above (and Save) before opening Gmail.",
+      );
+      return;
+    }
+    setSenderMissingFlag(false);
     if (channel !== "email") {
       setGmailError("Switch to Email to open Gmail.");
       return;
     }
-    if (!currentLocation) return;
-    if (!validateEmailRequiredFields()) return;
+    if (!validateEmailRequiredFields()) {
+      // validateEmailRequiredFields already sets per-field errors; also
+      // mirror to the gmailError line so the inline-near-button message
+      // stays consistent with what the user sees up top.
+      setGmailError(
+        "Fill in Customer name and Email address before opening Gmail.",
+      );
+      return;
+    }
 
     // Open immediately on user gesture so popup isn't blocked later.
     // Don't use noopener here: we need a live Window handle to navigate
@@ -408,6 +451,7 @@ export function SendForm({
                 currentLocation.connected_via_google_email
               }
               hideLabel
+              requiredError={senderMissingFlag && !currentGmailSender}
             />
           </FormRow>
         )}
@@ -686,37 +730,34 @@ export function SendForm({
         {/* Send buttons — "Send in Gmail" is the primary action. */}
         <div className="pt-6">
           <div className="flex flex-wrap gap-3">
+            {isStaff && (
+              <Button
+                type="submit"
+                size="lg"
+                variant="secondary"
+                disabled={pending || billingBlocked}
+                onClick={(e) => {
+                  if (!validateEmailRequiredFields()) {
+                    e.preventDefault();
+                  }
+                }}
+                className="flex-1 min-w-[200px] justify-center"
+              >
+                <Send className="h-4 w-4" />
+                {pending
+                  ? "Sending…"
+                  : `Send via ${channel === "sms" ? "SMS" : "BAAM email"}`}
+              </Button>
+            )}
             <Button
               type="button"
               size="lg"
               onClick={openGmailDirectly}
-              disabled={
-                !currentLocation ||
-                billingBlocked ||
-                openingGmail ||
-                channel !== "email"
-              }
+              disabled={openingGmail}
               className="flex-1 min-w-[200px] justify-center"
             >
               <Mail className="h-4 w-4" />
               {openingGmail ? "Opening Gmail…" : "Send in Gmail"}
-            </Button>
-            <Button
-              type="submit"
-              size="lg"
-              variant="secondary"
-              disabled={pending || billingBlocked}
-              onClick={(e) => {
-                if (!validateEmailRequiredFields()) {
-                  e.preventDefault();
-                }
-              }}
-              className="flex-1 min-w-[200px] justify-center"
-            >
-              <Send className="h-4 w-4" />
-              {pending
-                ? "Sending…"
-                : `Send via ${channel === "sms" ? "SMS" : "BAAM email"}`}
             </Button>
           </div>
           {gmailError && (

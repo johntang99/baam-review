@@ -16,6 +16,12 @@ interface GmailSenderEditorProps {
   /** When this editor is wrapped in a FormRow (left-label layout), the
    * parent already renders the field label, so suppress the internal one. */
   hideLabel?: boolean;
+  /** When true, the parent has flagged this field as a required-but-missing
+   * blocker (e.g., the user clicked "Send in Gmail" with no sender set).
+   * Flips the "No sender set yet" helper line to red + makes it explicit
+   * that the field is required, matching the Customer name / Email address
+   * field-error pattern. */
+  requiredError?: boolean;
 }
 
 /**
@@ -33,6 +39,7 @@ export function GmailSenderEditor({
   initialEmail,
   connectedViaGoogleEmail,
   hideLabel = false,
+  requiredError = false,
 }: GmailSenderEditorProps) {
   const [savedEmail, setSavedEmail] = useState(initialEmail);
   const [draft, setDraft] = useState(initialEmail);
@@ -168,11 +175,21 @@ export function GmailSenderEditor({
         </p>
       )}
       {!effectiveDisplay && !error && (
-        <p className="text-[12px] text-text-muted">
-          No sender set yet. Or set it in{" "}
+        <p
+          className={`text-[12px] ${
+            requiredError ? "text-alert font-medium" : "text-text-muted"
+          }`}
+          role={requiredError ? "alert" : undefined}
+        >
+          {requiredError ? "Sender Gmail is required. " : "No sender set yet. "}
+          Or set it in{" "}
           <Link
             href={`/app/locations/${locationId}?tab=email`}
-            className="text-forest underline hover:no-underline"
+            className={
+              requiredError
+                ? "underline hover:no-underline"
+                : "text-forest underline hover:no-underline"
+            }
           >
             Location Setup
           </Link>
