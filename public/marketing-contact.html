@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF7F2;
+  --cream-deep: #F4EFE2;
+  --paper: #FBF8F1;
+  --ink: #1c1c1c;
+  --ink-soft: #3D3833;
+  --text: #2a2a2a;
+  --text-soft: #555;
+  --text-muted: #888;
+  --border: #E6DECF;
+  --rule: #DDD3BF;
+  --forest: #2D4A3A;
+  --forest-dark: #1F3528;
+  --gold: #C9A961;
+  --gold-dark: #6F5320;
+  --gold-soft: #E8D9B5;
+  --rust-deep: #842F1B;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Onest', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 15.5px;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ============ NAV (same skeleton as other marketing pages) ============ */
+.site-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250, 247, 242, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.site-nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 18px 32px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.site-nav-logo {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: 'Fraunces', serif; font-size: 21px; font-weight: 500; color: var(--ink);
+}
+.site-nav-logo-mark {
+  width: 32px; height: 32px;
+  background: var(--forest); color: var(--cream);
+  border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 600;
+}
+.nav-links { display: flex; gap: 22px; align-items: center; }
+.nav-links a { font-size: 14px; color: var(--text-soft); transition: color 0.15s; }
+.nav-links a:hover, .nav-links a.active { color: var(--ink); }
+.nav-cta { display: flex; align-items: center; gap: 14px; }
+.nav-cta-signin { font-size: 14px; color: var(--text-soft); }
+.nav-cta-primary {
+  font-size: 13.5px; font-weight: 500;
+  background: var(--forest); color: var(--cream);
+  padding: 9px 16px; border-radius: 999px;
+}
+.nav-cta-primary:hover { background: var(--forest-dark); }
+@media (max-width: 760px) { .nav-links { display: none; } }
+
+/* ============ HERO ============ */
+.contact-hero {
+  max-width: 1100px; margin: 0 auto;
+  padding: 84px 32px 30px;
+}
+.contact-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold-dark);
+  font-weight: 600; margin-bottom: 22px;
+}
+.contact-h1 {
+  font-family: 'Fraunces', serif; font-weight: 400;
+  font-size: clamp(40px, 5.2vw, 58px);
+  line-height: 1.05; letter-spacing: -0.025em;
+  color: var(--ink); margin-bottom: 22px; max-width: 760px;
+}
+.contact-h1 em { font-style: italic; color: var(--gold-dark); }
+.contact-deck {
+  font-family: 'Newsreader', serif; font-style: italic;
+  font-size: 20px; line-height: 1.55;
+  color: var(--text-soft); max-width: 640px;
+}
+
+/* ============ CONTACT GRID ============ */
+.contact-grid {
+  max-width: 1100px;
+  margin: 30px auto 0;
+  padding: 0 32px 90px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 56px;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+/* Left side — info */
+.contact-info-block {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.contact-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.contact-info-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  font-weight: 600;
+}
+.contact-info-value {
+  font-size: 15.5px;
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.45;
+}
+.contact-info-value a { color: var(--forest); }
+.contact-info-value a:hover { text-decoration: underline; }
+.contact-info-detail {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 2px;
+}
+.contact-info-divider {
+  border: 0;
+  height: 1px;
+  background: var(--border);
+}
+.contact-info-aside {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--text-soft);
+  line-height: 1.55;
+  background: var(--cream-deep);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+/* Right side — form */
+.contact-form-block {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 34px;
+}
+.contact-form-title {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.contact-form-deck {
+  font-size: 14px;
+  color: var(--text-soft);
+  margin-bottom: 22px;
+}
+.contact-form { display: flex; flex-direction: column; gap: 16px; }
+.contact-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 480px) {
+  .contact-form-row { grid-template-columns: 1fr; }
+}
+.contact-form-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-soft);
+  margin-bottom: 6px;
+}
+.contact-form-required {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+.contact-form-input,
+.contact-form-textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--cream);
+  font-family: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.contact-form-input:focus,
+.contact-form-textarea:focus {
+  outline: none;
+  border-color: var(--forest);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(45, 74, 58, 0.15);
+}
+.contact-form-textarea {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.55;
+}
+.contact-form-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.contact-form-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 22px;
+  background: var(--forest);
+  color: var(--cream);
+  border: 0;
+  border-radius: 999px;
+  font-size: 14.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.08s;
+}
+.contact-form-submit:hover:not(:disabled) { background: var(--forest-dark); }
+.contact-form-submit:active { transform: translateY(1px); }
+.contact-form-submit:disabled { opacity: 0.6; cursor: default; }
+.contact-form-error {
+  font-size: 13px;
+  color: var(--rust-deep);
+  background: rgba(132, 47, 27, 0.08);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: none;
+}
+.contact-form-error.visible { display: block; }
+.contact-form-success {
+  background: rgba(45, 74, 58, 0.06);
+  border: 1px solid rgba(45, 74, 58, 0.2);
+  border-radius: 10px;
+  padding: 18px 20px;
+  display: none;
+}
+.contact-form-success.visible { display: block; }
+.contact-form-success-title {
+  font-family: 'Fraunces', serif;
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--forest);
+  margin-bottom: 6px;
+}
+.contact-form-success-body {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.55;
+}
+.contact-form-success-body strong { color: var(--ink); }
+
+/* ============ FOOTER ============ */
+.site-footer {
+  background: var(--cream-deep);
+  border-top: 1px solid var(--border);
+  padding: 60px 0 36px;
+}
+.footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  gap: 40px; margin-bottom: 36px;
+}
+.footer-brand { display: flex; flex-direction: column; gap: 14px; }
+.footer-brand-name {
+  font-family: 'Fraunces', serif;
+  font-size: 20px; font-weight: 500; color: var(--ink);
+}
+.footer-tagline {
+  font-family: 'Newsreader', serif; font-style: italic;
+  font-size: 14.5px; line-height: 1.5;
+  color: var(--text-soft); max-width: 280px;
+}
+.footer-col-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--ink-mute);
+  font-weight: 600; margin-bottom: 16px;
+}
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 9px; }
+.footer-col a { color: var(--text-soft); font-size: 14px; transition: color 0.15s; }
+.footer-col a:hover { color: var(--ink); }
+.footer-link-btn {
+  background: none; border: 0; padding: 0;
+  color: var(--text-soft); font-size: 14px;
+  font-family: inherit; cursor: pointer; transition: color 0.15s;
+}
+.footer-link-btn:hover { color: var(--ink); }
+.footer-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 22px; border-top: 1px solid var(--border);
+  font-size: 12.5px; color: var(--text-muted);
+  flex-wrap: wrap; gap: 8px;
+}
+@media (max-width: 800px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="site-nav-logo">
+      <span class="site-nav-logo-mark">B</span>
+      BAAM Review
+    </a>
+    <div class="nav-links">
+      <a href="/about">About</a>
+      <a href="/case-studies">Case Studies</a>
+      <a href="/audit/">Free Audit</a>
+      <a href="/contact" class="active">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <div data-nav-auth-slot style="display:flex;align-items:center;gap:14px;">
+        <a href="/login?next=/contact" class="nav-cta-signin">Sign in</a>
+      </div>
+      <a href="/audit/" class="nav-cta-primary">Get free audit →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ====================== HERO ====================== -->
+<section class="contact-hero">
+  <div class="contact-eyebrow">Get in touch</div>
+  <h1 class="contact-h1">
+    Real people. <em>Real replies.</em>
+  </h1>
+  <p class="contact-deck">
+    Send us a note about anything — your business, our pricing, a tough review situation, partnership ideas. A real human reads every message and usually replies within one business day.
+  </p>
+</section>
+
+<!-- ====================== CONTACT GRID ====================== -->
+<section class="contact-grid">
+  <!-- Left: contact info -->
+  <aside class="contact-info-block">
+    <div class="contact-info-item">
+      <div class="contact-info-label">Email us</div>
+      <div class="contact-info-value">
+        <a href="mailto:service@baamplatform.com">service@baamplatform.com</a>
+      </div>
+      <div class="contact-info-detail">
+        Best for sales questions, billing, partnership inquiries.
+      </div>
+    </div>
+    <hr class="contact-info-divider">
+    <div class="contact-info-item">
+      <div class="contact-info-label">Response time</div>
+      <div class="contact-info-value">Usually within one business day.</div>
+      <div class="contact-info-detail">
+        Monday–Friday, 9am–6pm Eastern. Weekends we&apos;re slow but we do read.
+      </div>
+    </div>
+    <hr class="contact-info-divider">
+    <div class="contact-info-item">
+      <div class="contact-info-label">Already a customer?</div>
+      <div class="contact-info-value">
+        <a href="/login?next=/app">Sign in to your dashboard</a>
+      </div>
+      <div class="contact-info-detail">
+        Or message us from inside the app — the <strong>Ask Questions</strong> button in your sidebar routes straight to our queue.
+      </div>
+    </div>
+    <hr class="contact-info-divider">
+    <p class="contact-info-aside">
+      We answer the easy questions on the public site so you don&apos;t need to wait. Try <a href="/audit/" style="color:var(--forest);text-decoration:underline;">a free audit</a> or read the <a href="/case-studies" style="color:var(--forest);text-decoration:underline;">case studies</a> first if your question is about how the service actually works.
+    </p>
+  </aside>
+
+  <!-- Right: contact form -->
+  <div class="contact-form-block">
+    <h2 class="contact-form-title">Send us a note</h2>
+    <p class="contact-form-deck">
+      Mailed straight to our team inbox. We&apos;ll reply by email.
+    </p>
+
+    <form
+      class="contact-form"
+      data-contact-form
+      novalidate
+    >
+      <div class="contact-form-row">
+        <div>
+          <label class="contact-form-label" for="contact-name">
+            Your name <span class="contact-form-required">·required</span>
+          </label>
+          <input
+            class="contact-form-input"
+            type="text"
+            id="contact-name"
+            name="name"
+            autocomplete="name"
+            required
+          >
+        </div>
+        <div>
+          <label class="contact-form-label" for="contact-email">
+            Email <span class="contact-form-required">·required</span>
+          </label>
+          <input
+            class="contact-form-input"
+            type="email"
+            id="contact-email"
+            name="email"
+            autocomplete="email"
+            required
+          >
+        </div>
+      </div>
+
+      <div>
+        <label class="contact-form-label" for="contact-subject">Subject</label>
+        <input
+          class="contact-form-input"
+          type="text"
+          id="contact-subject"
+          name="subject"
+          placeholder="e.g., Pricing for multi-location"
+        >
+      </div>
+
+      <div>
+        <label class="contact-form-label" for="contact-message">
+          Your message <span class="contact-form-required">·required</span>
+        </label>
+        <textarea
+          class="contact-form-textarea"
+          id="contact-message"
+          name="question"
+          rows="6"
+          placeholder="What&apos;s on your mind?"
+          required
+        ></textarea>
+      </div>
+
+      <p class="contact-form-error" data-contact-error></p>
+
+      <div class="contact-form-submit-row">
+        <button type="submit" class="contact-form-submit" data-contact-submit>
+          Send message →
+        </button>
+      </div>
+    </form>
+
+    <div class="contact-form-success" data-contact-success>
+      <div class="contact-form-success-title">Thanks — we&apos;ve got your message.</div>
+      <p class="contact-form-success-body">
+        A confirmation copy is on its way to <strong data-contact-success-email></strong>. We typically reply within one business day.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== FOOTER ====================== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-name">BAAM Review</div>
+        <p class="footer-tagline">A Review-to-Revenue Engine for local businesses. From BAAM Studio.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Product</div>
+        <ul>
+          <li><a href="/audit/">Free Audit</a></li>
+          <li><a href="/audit/service">Service</a></li>
+          <li><a href="/#pricing">Pricing</a></li>
+          <li><a href="/case-studies">Case Studies</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Company</div>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><button type="button" data-ask-question class="footer-link-btn">Ask Questions</button></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Legal</div>
+        <ul>
+          <li><a href="/legal/privacy">Privacy</a></li>
+          <li><a href="/legal/terms">Terms</a></li>
+          <li><a href="/legal/dpa">DPA</a></li>
+          <li><a href="/legal/compliance">Compliance</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© BAAM Studio. All rights reserved.</span>
+      <span>Made for the businesses Silicon Valley ignores.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

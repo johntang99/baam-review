@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Studies — BAAM Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF7F2;
+  --cream-deep: #F4EFE2;
+  --paper: #FBF8F1;
+  --ink: #1c1c1c;
+  --ink-soft: #3D3833;
+  --text: #2a2a2a;
+  --text-soft: #555;
+  --text-muted: #888;
+  --border: #E6DECF;
+  --rule: #DDD3BF;
+  --forest: #2D4A3A;
+  --forest-dark: #1F3528;
+  --gold: #C9A961;
+  --gold-dark: #6F5320;
+  --gold-soft: #E8D9B5;
+  --sage: #6B8E6E;
+  --rust-deep: #842F1B;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Onest', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 15.5px;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ============ NAV ============ */
+.site-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250, 247, 242, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.site-nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 18px 32px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.site-nav-logo {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: 'Fraunces', serif; font-size: 21px; font-weight: 500; color: var(--ink);
+}
+.site-nav-logo-mark {
+  width: 32px; height: 32px;
+  background: var(--forest); color: var(--cream);
+  border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 600;
+}
+.nav-links { display: flex; gap: 22px; align-items: center; }
+.nav-links a { font-size: 14px; color: var(--text-soft); transition: color 0.15s; }
+.nav-links a:hover, .nav-links a.active { color: var(--ink); }
+.nav-cta { display: flex; align-items: center; gap: 14px; }
+.nav-cta-signin { font-size: 14px; color: var(--text-soft); }
+.nav-cta-primary {
+  font-size: 13.5px; font-weight: 500;
+  background: var(--forest); color: var(--cream);
+  padding: 9px 16px; border-radius: 999px;
+}
+.nav-cta-primary:hover { background: var(--forest-dark); }
+@media (max-width: 760px) { .nav-links { display: none; } }
+
+/* ============ HERO ============ */
+.cs-hero {
+  max-width: 1100px; margin: 0 auto;
+  padding: 90px 32px 50px;
+}
+.cs-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold-dark);
+  font-weight: 600; margin-bottom: 22px;
+}
+.cs-h1 {
+  font-family: 'Fraunces', serif; font-weight: 400;
+  font-size: clamp(40px, 5.5vw, 60px);
+  line-height: 1.05; letter-spacing: -0.025em;
+  color: var(--ink); margin-bottom: 26px; max-width: 880px;
+}
+.cs-h1 em { font-style: italic; color: var(--gold-dark); }
+.cs-deck {
+  font-family: 'Newsreader', serif; font-style: italic;
+  font-size: 20px; line-height: 1.55;
+  color: var(--text-soft); max-width: 640px;
+}
+
+/* ============ CASE CARDS ============ */
+.cs-list {
+  max-width: 1100px; margin: 20px auto 60px;
+  padding: 0 32px;
+  display: flex; flex-direction: column;
+  gap: 28px;
+}
+.case-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 36px 36px 32px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 36px;
+  align-items: start;
+}
+.case-card-side {
+  display: flex; flex-direction: column; gap: 18px;
+  padding-right: 12px;
+  border-right: 1px solid var(--border);
+}
+.case-card-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  align-self: flex-start;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dark); font-weight: 600;
+  background: var(--gold-soft);
+  padding: 4px 10px; border-radius: 999px;
+}
+.case-card-business {
+  font-family: 'Fraunces', serif;
+  font-size: 24px; font-weight: 500;
+  color: var(--ink); line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.case-card-meta {
+  font-size: 13.5px; color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+}
+.case-card-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  margin-top: 6px;
+}
+.case-stat {
+  background: var(--cream-deep); border-radius: 10px;
+  padding: 12px 14px;
+}
+.case-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-muted);
+  margin-bottom: 4px; font-weight: 600;
+}
+.case-stat-row {
+  display: flex; align-items: baseline; gap: 6px;
+}
+.case-stat-before {
+  font-family: 'Fraunces', serif;
+  font-size: 18px; color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-muted);
+}
+.case-stat-arrow { color: var(--text-muted); font-size: 13px; }
+.case-stat-after {
+  font-family: 'Fraunces', serif;
+  font-size: 22px; font-weight: 500;
+  color: var(--ink);
+}
+.case-stat-after.up { color: var(--sage); }
+
+.case-card-main {
+  display: flex; flex-direction: column; gap: 18px;
+}
+.case-card-quote {
+  font-family: 'Newsreader', serif;
+  font-style: italic; font-size: 19px;
+  line-height: 1.55; color: var(--ink-soft);
+  border-left: 3px solid var(--gold);
+  padding: 4px 0 4px 18px;
+}
+.case-card-attrib {
+  font-size: 13px; color: var(--text-muted);
+  margin-top: 8px; font-style: normal;
+}
+.case-card-attrib strong { color: var(--ink); font-weight: 500; }
+.case-card-summary {
+  font-family: 'Newsreader', serif;
+  font-size: 16.5px; line-height: 1.6;
+  color: var(--text);
+}
+.case-card-link {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13.5px; font-weight: 500;
+  color: var(--forest); padding: 8px 14px;
+  border: 1px solid var(--forest);
+  border-radius: 999px;
+  transition: all 0.15s;
+}
+.case-card-link:hover { background: var(--forest); color: var(--cream); }
+.case-card-placeholder {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--gold-dark);
+  background: var(--gold-soft);
+  padding: 3px 8px; border-radius: 4px;
+  display: inline-block;
+}
+@media (max-width: 760px) {
+  .case-card {
+    grid-template-columns: 1fr; gap: 24px;
+    padding: 28px 24px;
+  }
+  .case-card-side {
+    border-right: 0; border-bottom: 1px solid var(--border);
+    padding-right: 0; padding-bottom: 20px;
+  }
+}
+
+/* ============ CTA STRIP ============ */
+.cta-strip {
+  max-width: 1100px; margin: 40px auto 0;
+  padding: 0 32px 100px;
+}
+.cta-card {
+  background: var(--ink); color: var(--cream);
+  border-radius: 18px; padding: 40px;
+  display: flex; flex-wrap: wrap;
+  align-items: center; justify-content: space-between; gap: 24px;
+}
+.cta-card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 26px; line-height: 1.2;
+  max-width: 520px; letter-spacing: -0.01em;
+}
+.cta-card-title em { font-style: italic; color: var(--gold); }
+.cta-card-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.cta-btn {
+  padding: 12px 22px; border-radius: 999px;
+  font-size: 14.5px; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.cta-btn-primary { background: var(--gold); color: var(--ink); }
+.cta-btn-primary:hover { background: var(--gold-soft); }
+.cta-btn-secondary {
+  background: transparent; color: var(--cream);
+  border: 1px solid rgba(250, 247, 242, 0.3);
+}
+.cta-btn-secondary:hover { border-color: var(--cream); }
+
+/* ============ FOOTER ============ */
+.site-footer {
+  background: var(--cream-deep);
+  border-top: 1px solid var(--border);
+  padding: 60px 0 36px;
+}
+.footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  gap: 40px; margin-bottom: 36px;
+}
+.footer-brand { display: flex; flex-direction: column; gap: 14px; }
+.footer-brand-name {
+  font-family: 'Fraunces', serif;
+  font-size: 20px; font-weight: 500; color: var(--ink);
+}
+.footer-tagline {
+  font-family: 'Newsreader', serif; font-style: italic;
+  font-size: 14.5px; line-height: 1.5;
+  color: var(--text-soft); max-width: 280px;
+}
+.footer-col-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--ink-mute);
+  font-weight: 600; margin-bottom: 16px;
+}
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 9px; }
+.footer-col a { color: var(--text-soft); font-size: 14px; transition: color 0.15s; }
+.footer-col a:hover { color: var(--ink); }
+.footer-link-btn {
+  background: none; border: 0; padding: 0;
+  color: var(--text-soft); font-size: 14px;
+  font-family: inherit; cursor: pointer; transition: color 0.15s;
+}
+.footer-link-btn:hover { color: var(--ink); }
+.footer-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 22px; border-top: 1px solid var(--border);
+  font-size: 12.5px; color: var(--text-muted);
+  flex-wrap: wrap; gap: 8px;
+}
+@media (max-width: 800px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="site-nav-logo">
+      <span class="site-nav-logo-mark">B</span>
+      BAAM Review
+    </a>
+    <div class="nav-links">
+      <a href="/about">About</a>
+      <a href="/case-studies" class="active">Case Studies</a>
+      <a href="/audit/">Free Audit</a>
+      <a href="/contact">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <div data-nav-auth-slot style="display:flex;align-items:center;gap:14px;">
+        <a href="/login?next=/case-studies" class="nav-cta-signin">Sign in</a>
+      </div>
+      <a href="/audit/" class="nav-cta-primary">Get free audit →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ====================== HERO ====================== -->
+<section class="cs-hero">
+  <div class="cs-eyebrow">Case Studies · 2026</div>
+  <h1 class="cs-h1">
+    Real businesses, <em>measurable change.</em>
+  </h1>
+  <p class="cs-deck">
+    A handful of clients have agreed to let us share their numbers. Each story below is a real owner, real platform, real before-and-after — no composites, no marketing math.
+  </p>
+</section>
+
+<!-- ====================== CASE STUDY 1 ====================== -->
+<section class="cs-list">
+  <article class="case-card">
+    <div class="case-card-side">
+      <span class="case-card-tag">TCM Clinic</span>
+      <div>
+        <div class="case-card-business">
+          <span class="case-card-placeholder">{{TODO: Business Name}}</span>
+        </div>
+        <div class="case-card-meta" style="margin-top: 6px;">
+          <span class="case-card-placeholder">{{TODO: City, State}}</span>
+        </div>
+      </div>
+      <div class="case-card-stats">
+        <div class="case-stat">
+          <div class="case-stat-label">Google rating</div>
+          <div class="case-stat-row">
+            <span class="case-stat-before">4.4★</span>
+            <span class="case-stat-arrow">→</span>
+            <span class="case-stat-after up">4.9★</span>
+          </div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-label">Reviews / mo</div>
+          <div class="case-stat-row">
+            <span class="case-stat-before">1.3</span>
+            <span class="case-stat-arrow">→</span>
+            <span class="case-stat-after up">8.7</span>
+          </div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-label">Maps rank</div>
+          <div class="case-stat-row">
+            <span class="case-stat-before">#6</span>
+            <span class="case-stat-arrow">→</span>
+            <span class="case-stat-after up">#1</span>
+          </div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-label">On BAAM</div>
+          <div class="case-stat-row">
+            <span class="case-stat-after">5 mo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="case-card-main">
+      <div class="case-card-quote">
+        “<span class="case-card-placeholder">{{TODO: 2-3 sentence owner quote about the moment things turned around for them. Make it specific, not generic — what actually changed in their day-to-day.}}</span>”
+        <div class="case-card-attrib">
+          — <strong><span class="case-card-placeholder">{{TODO: Owner Name}}</span></strong>, <span class="case-card-placeholder">{{TODO: Role}}</span>
+        </div>
+      </div>
+      <p class="case-card-summary">
+        <span class="case-card-placeholder">{{TODO: 2-3 sentence summary of what happened. What was broken before? What did they do? What's true now?}}</span>
+      </p>
+      <a href="/audit/" class="case-card-link">See a sample audit →</a>
+    </div>
+  </article>
+
+  <!-- ====================== CASE STUDY 2 ====================== -->
+  <article class="case-card">
+    <div class="case-card-side">
+      <span class="case-card-tag">Dental Practice</span>
+      <div>
+        <div class="case-card-business">
+          <span class="case-card-placeholder">{{TODO: Business Name}}</span>
+        </div>
+        <div class="case-card-meta" style="margin-top: 6px;">
+          <span class="case-card-placeholder">{{TODO: City, State}}</span>
+        </div>
+      </div>
+      <div class="case-card-stats">
+        <div class="case-stat">
+          <div class="case-stat-label">Google rating</div>
+          <div class="case-stat-row">
+            <span class="case-stat-before">3.9★</span>
+            <span class="case-stat-arrow">→</span>
+            <span class="case-stat-after up">4.8★</span>
+          </div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-label">Reviews / mo</div>
+          <div class="case-stat-row">
+            <span class="case-stat-before">0.4</span>
+            <span class="case-stat-arrow">→</span>
+            <span class="case-stat-after up">11</span>
+          </div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-label">New patients</div>
+          <div class="case-stat-row">
+            <span class="case-stat-after up">+34%</span>
+          </div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-label">On BAAM</div>
+          <div class="case-stat-row">
+            <span class="case-stat-after">8 mo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="case-card-main">
+      <div class="case-card-quote">
+        “<span class="case-card-placeholder">{{TODO: 2-3 sentence owner quote. Dental owners often talk about converting strangers vs. converting existing patients — pull a specific moment.}}</span>”
+        <div class="case-card-attrib">
+          — <strong><span class="case-card-placeholder">{{TODO: Owner Name, DDS}}</span></strong>, <span class="case-card-placeholder">{{TODO: Role}}</span>
+        </div>
+      </div>
+      <p class="case-card-summary">
+        <span class="case-card-placeholder">{{TODO: What was the problem? (4.0 floor, old 1-star ranting at top, no recent reviews) What did the practice do with BAAM? (weekly batch, AI replies, monthly cleanup of negative outliers) What's true now?}}</span>
+      </p>
+      <a href="/audit/" class="case-card-link">See a sample audit →</a>
+    </div>
+  </article>
+
+  <!-- ====================== CASE STUDY 3 ====================== -->
+  <article class="case-card">
+    <div class="case-card-side">
+      <span class="case-card-tag">Day Spa / Salon</span>
+      <div>
+        <div class="case-card-business">
+          <span class="case-card-placeholder">{{TODO: Business Name}}</span>
+        </div>
+        <div class="case-card-meta" style="margin-top: 6px;">
+          <span class="case-card-placeholder">{{TODO: City, State}}</span>
+        </div>
+      </div>
+      <div class="case-card-stats">
+        <div class="case-stat">
+          <div class="case-stat-label">Google rating</div>
+          <div class="case-stat-row">
+            <span class="case-stat-before">4.5★</span>
+            <span class="case-stat-arrow">→</span>
+            <span class="case-stat-after up">4.9★</span>
+          </div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-label">Total reviews</div>
+          <div class="case-stat-row">
+            <span class="case-stat-before">38</span>
+            <span class="case-stat-arrow">→</span>
+            <span class="case-stat-after up">187</span>
+          </div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-label">Bilingual mix</div>
+          <div class="case-stat-row">
+            <span class="case-stat-after">EN + 中文</span>
+          </div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-label">On BAAM</div>
+          <div class="case-stat-row">
+            <span class="case-stat-after">11 mo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="case-card-main">
+      <div class="case-card-quote">
+        “<span class="case-card-placeholder">{{TODO: 2-3 sentence owner quote. Salon owners often talk about word-of-mouth — pull a specific moment of "people started showing up because of the reviews."}}</span>”
+        <div class="case-card-attrib">
+          — <strong><span class="case-card-placeholder">{{TODO: Owner Name}}</span></strong>, <span class="case-card-placeholder">{{TODO: Role}}</span>
+        </div>
+      </div>
+      <p class="case-card-summary">
+        <span class="case-card-placeholder">{{TODO: This is a bilingual business — call out the multilingual angle. The reviews now read naturally in both EN and 中文, and Chinese-speaking customers who used to filter out from Maps results now see relevant social proof.}}</span>
+      </p>
+      <a href="/audit/" class="case-card-link">See a sample audit →</a>
+    </div>
+  </article>
+</section>
+
+<!-- ====================== CTA STRIP ====================== -->
+<section class="cta-strip">
+  <div class="cta-card">
+    <div class="cta-card-title">
+      Curious where <em>your business</em> would land?
+    </div>
+    <div class="cta-card-actions">
+      <a href="/audit/" class="cta-btn cta-btn-primary">Get your free audit →</a>
+      <a href="/contact" class="cta-btn cta-btn-secondary">Talk to us first</a>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== FOOTER ====================== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-name">BAAM Review</div>
+        <p class="footer-tagline">A Review-to-Revenue Engine for local businesses. From BAAM Studio.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Product</div>
+        <ul>
+          <li><a href="/audit/">Free Audit</a></li>
+          <li><a href="/audit/service">Service</a></li>
+          <li><a href="/#pricing">Pricing</a></li>
+          <li><a href="/case-studies">Case Studies</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Company</div>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><button type="button" data-ask-question class="footer-link-btn">Ask Questions</button></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Legal</div>
+        <ul>
+          <li><a href="/legal/privacy">Privacy</a></li>
+          <li><a href="/legal/terms">Terms</a></li>
+          <li><a href="/legal/dpa">DPA</a></li>
+          <li><a href="/legal/compliance">Compliance</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© BAAM Studio. All rights reserved.</span>
+      <span>Made for the businesses Silicon Valley ignores.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
