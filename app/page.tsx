@@ -3,12 +3,26 @@ import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { MarketingScripts } from "@/components/marketing/marketing-scripts";
 import { AskQuestionModal } from "@/components/marketing/ask-question-modal";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { organizationSchema, websiteSchema } from "@/lib/seo/schemas";
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+  "https://baamreview.com";
 
 export const metadata: Metadata = {
   title:
     "BAAM Review — Turn happy customers into reviews, referrals, and revenue",
   description:
     "The Review-to-Revenue Engine for local businesses. Collect Google reviews in 60 seconds, display them on your website, distribute to Xiaohongshu and social, turn happy customers into referrals.",
+  alternates: {
+    canonical: BASE_URL,
+    languages: {
+      en: BASE_URL,
+      zh: `${BASE_URL}/zh`,
+      "x-default": BASE_URL,
+    },
+  },
 };
 
 export const dynamic = "force-dynamic";
@@ -35,6 +49,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd data={[organizationSchema(), websiteSchema()]} />
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <div
         style={{ display: "contents" }}

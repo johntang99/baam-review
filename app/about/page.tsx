@@ -2,11 +2,19 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { AskQuestionModal } from "@/components/marketing/ask-question-modal";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { aboutPageSchema, organizationSchema } from "@/lib/seo/schemas";
+import { applyMarketingOverrides } from "@/lib/seo/apply-cms-overrides";
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+  "https://baamreview.com";
 
 export const metadata: Metadata = {
   title: "About — BAAM Review",
   description:
     "BAAM Review builds the review-to-revenue engine local businesses deserve. From BAAM Studio.",
+  alternates: { canonical: `${BASE_URL}/about` },
 };
 
 export const dynamic = "force-dynamic";
@@ -21,12 +29,17 @@ export default async function AboutPage() {
 
   const AUTH_SLOT_RE =
     /(<div data-nav-auth-slot[^>]*>)[\s\S]*?(<\/div>)/;
-  const finalHtml = user
+  let finalHtml = user
     ? bodyHtml.replace(AUTH_SLOT_RE, `$1${renderSignedInCluster()}$2`)
     : bodyHtml;
+  // Apply any CMS overrides published via /admin/marketing for this
+  // page's editable regions. No-op when no overrides exist — the
+  // original copy stays in place.
+  finalHtml = await applyMarketingOverrides(finalHtml, "about");
 
   return (
     <>
+      <JsonLd data={[organizationSchema(), aboutPageSchema()]} />
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <div
         style={{ display: "contents" }}

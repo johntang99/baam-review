@@ -3,11 +3,22 @@ import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { AskQuestionModal } from "@/components/marketing/ask-question-modal";
 import { ContactFormHandler } from "@/components/marketing/contact-form-handler";
+import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  contactPageSchema,
+  organizationSchema,
+} from "@/lib/seo/schemas";
+import { applyMarketingOverrides } from "@/lib/seo/apply-cms-overrides";
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+  "https://baamreview.com";
 
 export const metadata: Metadata = {
   title: "Contact — BAAM Review",
   description:
     "Get in touch with the BAAM Review team. Real humans reply within one business day.",
+  alternates: { canonical: `${BASE_URL}/contact` },
 };
 
 export const dynamic = "force-dynamic";
@@ -20,12 +31,14 @@ export default async function ContactPage() {
 
   const AUTH_SLOT_RE =
     /(<div data-nav-auth-slot[^>]*>)[\s\S]*?(<\/div>)/;
-  const finalHtml = user
+  let finalHtml = user
     ? bodyHtml.replace(AUTH_SLOT_RE, `$1${renderSignedInCluster()}$2`)
     : bodyHtml;
+  finalHtml = await applyMarketingOverrides(finalHtml, "contact");
 
   return (
     <>
+      <JsonLd data={[organizationSchema(), contactPageSchema()]} />
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <div
         style={{ display: "contents" }}

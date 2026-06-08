@@ -4,6 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
 import { HeroRotation } from "@/components/service/hero-rotation";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { serviceSchema } from "@/lib/seo/schemas";
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+  "https://baamreview.com";
 /**
  * NOTE: this page used to fire Stripe Checkout directly via StartTrialButton.
  * It now routes plan-CTA clicks through /signup?plan=… for everyone:
@@ -19,6 +25,7 @@ export const metadata: Metadata = {
   title: "BAAM Review · Service — We run your review collection",
   description:
     "Two tiers: $99 self-serve or $399 full service. 30-day free trial. We send the requests, draft the responses, and report monthly.",
+  alternates: { canonical: `${BASE_URL}/audit/service` },
 };
 
 export const dynamic = "force-dynamic";
@@ -85,15 +92,23 @@ export default async function ServicePage(props: {
 
     if (audit) {
       return (
-        <StateBPersonalized
-          audit={audit}
-          requestedPlan={requestedPlan}
-        />
+        <>
+          <JsonLd data={serviceSchema()} />
+          <StateBPersonalized
+            audit={audit}
+            requestedPlan={requestedPlan}
+          />
+        </>
       );
     }
   }
 
-  return <StateAMarketing requestedPlan={requestedPlan} />;
+  return (
+    <>
+      <JsonLd data={serviceSchema()} />
+      <StateAMarketing requestedPlan={requestedPlan} />
+    </>
+  );
 }
 
 // =============================================================================
