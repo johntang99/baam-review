@@ -2,6 +2,7 @@ import "server-only";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { pingIndexNowForPath } from "@/lib/seo/indexnow";
 
 /**
  * Content data layer for the marketing/SEO admin. Backed by the
@@ -434,23 +435,47 @@ export async function getPublishedContent(
  *  than tag-based invalidation because none of our public pages use
  *  the `fetch({ next: { tags } })` pattern — they all read directly
  *  from Supabase, so path-based invalidation is what actually
- *  refreshes the rendered HTML. */
+ *  refreshes the rendered HTML.
+ *
+ *  IndexNow ping happens alongside revalidation — Bing (and via
+ *  Bing, ChatGPT/Copilot) gets notified of the URL change within
+ *  seconds. The ping is fire-and-forget and never throws, so a Bing
+ *  outage doesn't break the publish flow. */
 async function onContentMutation(kind: ContentKind, slug: string) {
-  // Specific path revalidations per kind.
+  // Paths that need revalidation + IndexNow notification per kind.
+  // Listed once and looped to keep the two side-effects in sync.
+  const paths: string[] = [];
+
   switch (kind) {
     case "blog_post":
-      revalidatePath("/blog");
-      revalidatePath(`/blog/${slug}`);
+      paths.push("/blog", `/blog/${slug}`);
       break;
     case "case_study":
-      revalidatePath("/case-studies");
+      // /case-studies renders cards from all published case studies,
+      // so any case-study save affects the index page (no per-slug
+      // public path exists).
+      paths.push("/case-studies");
       break;
     case "city_page":
-      revalidatePath(`/local/${slug}`);
+      paths.push(`/local/${slug}`);
       break;
     case "marketing_page":
-      // Marketing pages are paths like /about, /contact. Slug IS the path.
-      revalidatePath(`/${slug}`);
+      // Marketing slugs map directly to public paths (about → /about).
+      paths.push(`/${slug}`);
       break;
+  }
+
+  for (const path of paths) {
+    revalidatePath(path);
+  }
+
+  // IndexNow ping — fire and forget. We don't await Promise.all here
+  // because we don't want a slow Bing API to make the admin save feel
+  // slow; the ping resolves in the background. Errors are logged
+  // inside pingIndexNowForPath.
+  for (const path of paths) {
+    pingIndexNowForPath(path).catch(() => {
+      /* logged inside helper */
+    });
   }
 }
