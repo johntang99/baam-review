@@ -1,4 +1,5 @@
 import type { AuditProjection } from "../projection/types";
+import { gradeFromScore } from "../scoring/grade-diagnoses";
 
 const VB_W = 700;
 const VB_H = 320;
@@ -12,22 +13,26 @@ export function renderProjectionSvg(
   currentScore: number,
 ): string {
   const points = projection.timeline;
-  const doNothingPath = pathFromPoints(points.map((p) => ({ month: p.month, score: p.do_nothing_score })));
+  // Do-nothing holds flat at the current score; the story is the upside of
+  // working with BAAM Review, not a projected decline.
+  const doNothingPath = pathFromPoints(points.map((p) => ({ month: p.month, score: currentScore })));
   const withBaamPath = pathFromPoints(points.map((p) => ({ month: p.month, score: p.with_baam_score })));
 
   const gapPath = areaBetween(
     points.map((p) => ({ month: p.month, score: p.with_baam_score })),
-    points.map((p) => ({ month: p.month, score: p.do_nothing_score })),
+    points.map((p) => ({ month: p.month, score: currentScore })),
   );
 
   const sixMonthX = monthToX(6);
-  const sixMonthDoNothingY = scoreToY(projection.six_month.do_nothing_score);
+  const sixMonthDoNothingY = scoreToY(currentScore);
   const sixMonthWithBaamY = scoreToY(projection.six_month.with_baam_score);
-  const twelveMonthDoNothingY = scoreToY(projection.twelve_month.do_nothing_score);
+  const twelveMonthDoNothingY = scoreToY(currentScore);
   const twelveMonthWithBaamY = scoreToY(projection.twelve_month.with_baam_score);
   const startY = scoreToY(currentScore);
 
-  const revenueLossLabel = `$${projection.revenue_impact.six_month_loss_usd.toLocaleString()} / 6 months`;
+  const scoreLift = projection.twelve_month.with_baam_score - currentScore;
+  const scoreLiftLabel = `+${scoreLift} points / 12 months`;
+  const doNothingGrade = gradeFromScore(currentScore);
 
   return `
 <svg viewBox="0 0 ${VB_W} ${VB_H}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
@@ -51,19 +56,19 @@ export function renderProjectionSvg(
   <text x="${X_LEFT}" y="${startY - 9}" text-anchor="middle" font-family="Instrument Serif" font-size="14" fill="#1A1814" font-style="italic">${currentScore}</text>
 
   <circle cx="${sixMonthX}" cy="${sixMonthDoNothingY}" r="4" fill="#A4452A"/>
-  <text x="${sixMonthX}" y="${sixMonthDoNothingY + 20}" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#A4452A" font-weight="500">${projection.six_month.do_nothing_score}</text>
+  <text x="${sixMonthX}" y="${sixMonthDoNothingY + 20}" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#A4452A" font-weight="500">${currentScore}</text>
 
   <circle cx="${sixMonthX}" cy="${sixMonthWithBaamY}" r="4" fill="#4F7253"/>
   <text x="${sixMonthX}" y="${sixMonthWithBaamY - 10}" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4F7253" font-weight="500">${projection.six_month.with_baam_score}</text>
 
   <text x="${X_RIGHT}" y="${Math.max(20, twelveMonthWithBaamY - 8)}" font-family="Instrument Serif" font-size="13" fill="#4F7253" font-style="italic" text-anchor="end">${projection.twelve_month.with_baam_score} · Tier ${projection.twelve_month.with_baam_grade}</text>
-  <text x="${X_RIGHT}" y="${Math.min(290, twelveMonthDoNothingY + 18)}" font-family="Instrument Serif" font-size="13" fill="#A4452A" font-style="italic" text-anchor="end">${projection.twelve_month.do_nothing_score} · Tier ${projection.twelve_month.do_nothing_grade}</text>
+  <text x="${X_RIGHT}" y="${Math.min(290, twelveMonthDoNothingY + 18)}" font-family="Instrument Serif" font-size="13" fill="#A4452A" font-style="italic" text-anchor="end">${currentScore} · Tier ${doNothingGrade}</text>
 
   <line x1="${sixMonthX}" y1="${Y_TOP}" x2="${sixMonthX}" y2="${Y_BOTTOM}" stroke="#6B6259" stroke-width="0.5" stroke-dasharray="2,3"/>
   <text x="${sixMonthX}" y="${Y_TOP - 8}" text-anchor="middle" font-family="JetBrains Mono" font-size="9" letter-spacing="0.1em" fill="#6B6259">SIX MONTH MARK</text>
 
   <text x="500" y="135" text-anchor="middle" font-family="Instrument Serif" font-size="16" fill="#1A1814" font-style="italic">— the gap —</text>
-  <text x="500" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#842F1B">${revenueLossLabel}</text>
+  <text x="500" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#4F7253">${scoreLiftLabel}</text>
 </svg>
 `.trim();
 }

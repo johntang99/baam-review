@@ -29,7 +29,7 @@ interface LabelSet {
   }) => string;
   projection_floor: {
     same_grade: string;
-    dropped: (from: Grade, to: Grade) => string;
+    climbed: (from: Grade, to: Grade) => string;
   };
   ranking_hold: string;
   gauge: { silent: string; min: string; optimal: string };
@@ -64,6 +64,8 @@ interface ActionLabels {
   customers: string;
   per_review_value_label: string;
   ltv_label: string;
+  result_year_reviews: string;
+  result_year_customers: string;
   post_visit: {
     title: string;
     why: string;
@@ -149,9 +151,9 @@ const EN: LabelSet = {
     return `<strong>What this means</strong><br><br>${recent} ${w}`;
   },
   projection_floor: {
-    same_grade: "Score holds — but the gap to top competitors widens with every silent month.",
-    dropped: (from, to) =>
-      `Drops from ${from} to ${to} · the critical floor rule triggers after 60 days of no new reviews`,
+    same_grade: "Score climbs steadily as sustained collection compounds month over month.",
+    climbed: (from, to) =>
+      `Climbs from ${from} to ${to} · sustained collection and response compound over 12 months`,
   },
   ranking_hold: "Hold position",
   gauge: { silent: "Silent", min: "Min", optimal: "Optimal" },
@@ -189,6 +191,8 @@ const EN: LabelSet = {
     customers: "customers",
     per_review_value_label: "per-review value",
     ltv_label: "lifetime value",
+    result_year_reviews: "reviews / 12 months",
+    result_year_customers: "new customers / 12 months",
     post_visit: {
       title: "Activate a post-visit review request workflow",
       why: "Sending a request 24–72 hours after every visit, in the customer's language, is the single biggest lever in this audit.",
@@ -300,9 +304,9 @@ const ZH: LabelSet = {
     return `<strong>這代表什麼</strong><br><br>${recent} ${w}`;
   },
   projection_floor: {
-    same_grade: "分數暫時保持 · 但與頂級競爭對手的差距每個月都在擴大。",
-    dropped: (from, to) =>
-      `從 ${from} 級降至 ${to} 級 · 60 天無新評論將觸發臨界下限規則`,
+    same_grade: "持續累積評論逐月複利，分數穩步攀升。",
+    climbed: (from, to) =>
+      `從 ${from} 級攀升至 ${to} 級 · 持續累積與回覆評論於 12 個月內複利成長`,
   },
   ranking_hold: "排名持平",
   gauge: { silent: "沉睡", min: "最低", optimal: "理想" },
@@ -340,6 +344,8 @@ const ZH: LabelSet = {
     customers: "位客戶",
     per_review_value_label: "每則評論價值",
     ltv_label: "客戶終身價值",
+    result_year_reviews: "則新評論 / 12 個月",
+    result_year_customers: "位新客戶 / 12 個月",
     post_visit: {
       title: "啟用就診後評論請求流程",
       why: "在每次就診後 24–72 小時內，以客戶的語言發送請求 — 這是本次審計中影響最大的單一槓桿。",
@@ -406,6 +412,7 @@ export const STRINGS: Record<
     projection_deck: string;
     projection_legend_lines: string[];
     projection_impact_labels: { score: string; ranking: string; revenue: string };
+    projection_results_items: string[];
     grade_scale_eyebrow: string;
     grade_scale_headline_html: (grade: string) => string;
     grade_scale_headers: { range: string; grade: string; meaning: string };
@@ -430,7 +437,12 @@ export const STRINGS: Record<
     competitor_table_headers: { business: string; address: string; score: string; rating: string; total: string; last_30d: string; last_90d: string; trend: string };
     section_6_headline_html: string;
     section_6_deck: string;
-    summary_block_html: (added: string, lost: string) => string;
+    summary_block_html: (m: {
+      newReviews: string;
+      newCustomers: string;
+      perReviewValue: string;
+      reviewAsset: string;
+    }) => string;
     cta_eyebrow: string;
     cta_headline_html: string;
     cta_self: { label: string; title: string; price: string; desc: string };
@@ -497,7 +509,7 @@ export const STRINGS: Record<
       "01": "Business owners should know: Reviews Decide Who Wins",
       "02": "Your Current Snapshot",
       "03": "Your BAAM Review Score",
-      "04": "Industry Benchmarks",
+      "04": "Service Opportunity",
       "05": "Competitor Comparison",
       "06": "Your 12-Month Action Plan",
       "A": "Appendix · Reference Tables",
@@ -514,14 +526,20 @@ export const STRINGS: Record<
     methodology_eyebrow: "METHODOLOGY",
     methodology_text_html: "Every score is measured against published vertical benchmarks. <strong>Rating Quality</strong> uses a non-linear curve that rewards the 4.0★ threshold (where 70% of consumers filter). <strong>Review Volume</strong> compares total count to the median for your vertical. <strong>Velocity</strong> scores use BAAM Review Research healthy-pace bands. The black tick marks on each bar show where these standards sit on the 0–100 scale. <a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">Full methodology →</a>",
     velocity_drag_line_html: "The drag on your score is <em style=\"color: var(--rust-deep);\">velocity</em> — and velocity is what you can change starting Monday.",
-    forecast_eyebrow: "§ 04 · The Forecast",
-    projection_title_html: "Your score in <em>six months</em> if you do nothing.",
-    projection_deck: "Three forces work against a business that stops collecting reviews: velocity decay (mechanical), ranking decline (Sterling Sky), and competitors compounding the gap. This projection holds your current effort constant — and holds your competitors at their measured pace.",
+    forecast_eyebrow: "The Forecast",
+    projection_title_html: "Your score in <em>12 months</em> if you work with BAAM Review.",
+    projection_deck: "With sustained review collection and response your score climbs steadily — while a do-nothing path stays flat. Competitors held at their measured pace.",
     projection_legend_lines: [
-      "<span class=\"legend-swatch red\"></span> <strong>Do nothing</strong> · projected trajectory at current effort",
+      "<span class=\"legend-swatch red\"></span> <strong>Do nothing</strong> · score holds flat at current effort",
       "<span class=\"legend-swatch green\"></span> <strong>With BAAM Review</strong> · sustained collection + response",
     ],
-    projection_impact_labels: { score: "6-Month Score", ranking: "Ranking Position", revenue: "Revenue Cost" },
+    projection_impact_labels: { score: "12-Month Score", ranking: "Ranking Position", revenue: "Results" },
+    projection_results_items: [
+      "Google ranking improves",
+      "AI search visibility improves",
+      "Referral &amp; retention grow",
+      "Revenue increases",
+    ],
     grade_scale_eyebrow: "The full scale · where each grade sits",
     grade_scale_headline_html: (g) => `Your <em>${g}</em> in context — and what it would take to climb.`,
     grade_scale_headers: { range: "Score Range", grade: "Grade", meaning: "What it means in plain English" },
@@ -559,9 +577,15 @@ export const STRINGS: Record<
     section_5_deck: "Identified from Google Maps rankings within your search radius. We pick the competitors — owners almost always pick the wrong ones.",
     competitor_table_headers: { business: "Business", address: "Address", score: "Score", rating: "Rating", total: "Total Reviews", last_30d: "Last 30d", last_90d: "Last 90d", trend: "Trend" },
     section_6_headline_html: "Five things. <em>Not three. Not ten.</em>",
-    section_6_deck: "Prioritized by the lowest sub-scores in your audit. Each action targets a specific lever — and a specific dollar number.",
-    summary_block_html: (added, lost) =>
-      `Five actions, executed steadily for 12 months, modeled at <strong style=\"font-family:'JetBrains Mono', monospace; font-style: normal; font-weight: 500;\">${added}</strong> in additional lifetime customer value — versus a projected loss of <strong style=\"font-family:'JetBrains Mono', monospace; font-style: normal; font-weight: 500;\">${lost}</strong> if nothing changes.`,
+    section_6_deck: "First, the ground truth — what one review is worth in your category, and the pace a healthy business keeps. Then the five moves, prioritized by your lowest sub-scores, to close the gap.",
+    summary_block_html: (m) =>
+      `<div class=\"conclusion-eyebrow\">§ Conclusion · Modelled over 12 months</div>` +
+      `<div class=\"conclusion-title\">What this plan builds.</div>` +
+      `<div class=\"conclusion-rows\">` +
+      `<div class=\"conclusion-row\"><span class=\"conclusion-tag\">Numbers increase</span><span class=\"conclusion-text\">Five actions, executed over 12 months, add <strong class=\"summary-stat\">${m.newReviews}</strong> new reviews and <strong class=\"summary-stat\">${m.newCustomers}</strong> new customers.</span></div>` +
+      `<div class=\"conclusion-row\"><span class=\"conclusion-tag\">Asset added</span><span class=\"conclusion-text\">At <strong class=\"summary-stat\">${m.perReviewValue}</strong> per review, those <strong class=\"summary-stat\">${m.newReviews}</strong> new reviews build a <strong class=\"summary-stat\">${m.reviewAsset}</strong> review asset — a durable asset the business owns on its books, not income or revenue.</span></div>` +
+      `<div class=\"conclusion-row\"><span class=\"conclusion-tag\">Results</span><span class=\"conclusion-text\"><span class=\"conclusion-results\">Reviews → Referrals → Retention → Revenue</span></span></div>` +
+      `</div>`,
     cta_eyebrow: "Two paths · same plan",
     cta_headline_html: "You don't have to do this <em>alone.</em>",
     cta_self: {
@@ -573,8 +597,8 @@ export const STRINGS: Record<
     cta_full: {
       label: "Path B · Full Service",
       title: "We run it for you",
-      price: "$399 / month · 30-day free trial · 5× value promise",
-      desc: "Send us your weekly customer list. We handle every other step — bilingual sends, AI-assisted responses, monthly reports, the 12-month plan above. We guarantee 5× the value within 12 months.",
+      price: "$399 / month · 30-day free trial",
+      desc: "Send us your weekly customer list. We handle every other step — bilingual sends, AI-assisted responses, monthly reports, the 12-month plan above.",
     },
     cta_promise_html: "Compare with <strong>Birdeye</strong> at $299/mo + $5,000 setup, or <strong>Podium</strong> at $399/mo + onboarding. BAAM Review starts free and bills monthly.",
     cta_action_self_label: "Start Self-Serve trial →",
@@ -607,7 +631,7 @@ export const STRINGS: Record<
     so_tier_full_name_html: "We run it <em>for you</em>",
     so_tier_full_price: "$399 /mo",
     so_tier_full_projection_html: (businessName, d90) =>
-      `For ${businessName}, this typically means 90-day score <strong>${d90}</strong>, recovering 5–8 reviews/month. We execute all five actions. <strong>5× Return Standard</strong> backs the result.`,
+      `For ${businessName}, this typically means 90-day score <strong>${d90}</strong>, recovering 5–8 reviews/month. We execute all five actions.`,
     so_tier_full_cta: "Start Full Service trial →",
     so_tier_full_recommended: "Recommended",
     so_compare_link: "Compare both tiers in detail →",
@@ -641,7 +665,7 @@ export const STRINGS: Record<
       "01": "商家應知道：評論決定誰能勝出",
       "02": "您目前的狀況概覽",
       "03": "您的 BAAM 評論評分",
-      "04": "行業基準",
+      "04": "服務機會",
       "05": "競爭對手比較",
       "06": "您的 12 個月行動計劃",
       "A": "附錄 · 參考數據表",
@@ -658,14 +682,20 @@ export const STRINGS: Record<
     methodology_eyebrow: "方法說明",
     methodology_text_html: "每項分數均對照已發布的行業基準衡量。<strong>評分品質</strong>使用非線性曲線，重點獎勵 4.0 星門檻（70% 消費者以此篩選）。<strong>評論總數</strong>對比您行業的中位數。<strong>速率</strong>使用 BAAM Review 研究的健康節奏帶。每根柱上的黑色刻度標示這些標準在 0–100 分尺上的位置。<a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">完整方法 →</a>",
     velocity_drag_line_html: "拖累您分數的是<em style=\"color: var(--rust-deep);\">速率</em> — 而速率正是您下週一就可以開始改變的環節。",
-    forecast_eyebrow: "§ 04 · 預測",
-    projection_title_html: "若您什麼都不做 · <em>六個月後的分數</em>",
-    projection_deck: "停止累積評論的商家會面對三股力量：速率機械性衰減、排名下滑（Sterling Sky 研究）、競爭對手持續複利擴大差距。本預測假設您維持當前努力，競爭對手維持已測得的速率。",
+    forecast_eyebrow: "預測",
+    projection_title_html: "若您與 BAAM Review 合作 · <em>12 個月後的分數</em>",
+    projection_deck: "透過持續累積與回覆評論，您的分數穩步攀升 — 而什麼都不做則維持不變。競爭對手維持已測得的速率。",
     projection_legend_lines: [
-      "<span class=\"legend-swatch red\"></span> <strong>什麼都不做</strong> · 依現有努力的預測軌跡",
+      "<span class=\"legend-swatch red\"></span> <strong>什麼都不做</strong> · 依現有努力分數維持不變",
       "<span class=\"legend-swatch green\"></span> <strong>使用 BAAM Review</strong> · 持續收集與回覆",
     ],
-    projection_impact_labels: { score: "6 個月後分數", ranking: "排名位置", revenue: "營收損失" },
+    projection_impact_labels: { score: "12 個月後分數", ranking: "排名位置", revenue: "成果" },
+    projection_results_items: [
+      "Google 排名提升",
+      "AI 搜尋能見度提升",
+      "推薦與回頭客成長",
+      "營收成長",
+    ],
     grade_scale_eyebrow: "完整等級表 · 每個等級的意義",
     grade_scale_headline_html: (g) => `您的 <em>${g}</em> 級在整體中的位置 · 以及更上一層需要什麼。`,
     grade_scale_headers: { range: "分數區間", grade: "等級", meaning: "白話說明" },
@@ -703,9 +733,15 @@ export const STRINGS: Record<
     section_5_deck: "由 Google Maps 在您的搜尋半徑內排名識別。我們替您挑選競爭對手 — 供您參考",
     competitor_table_headers: { business: "商家", address: "地址", score: "分數", rating: "評分", total: "總評論", last_30d: "近 30 天", last_90d: "近 90 天", trend: "趨勢" },
     section_6_headline_html: "五件事 · <em>不是三件，不是十件</em>",
-    section_6_deck: "依您審計中最低的子分數排序。每項行動都針對特定的槓桿 — 與具體的美元數字。",
-    summary_block_html: (added, lost) =>
-      `穩定執行五項行動 12 個月，預計帶來 <strong style=\"font-family:'JetBrains Mono', monospace; font-style: normal; font-weight: 500;\">${added}</strong> 的額外客戶終身價值 — 對比若什麼都不做，預計損失 <strong style=\"font-family:'JetBrains Mono', monospace; font-style: normal; font-weight: 500;\">${lost}</strong>。`,
+    section_6_deck: "先看基本事實 — 在您的行業中一則評論的價值，以及健康商家維持的累積速率。接著是五項行動，依您最低的子分數排序，逐一縮小差距。",
+    summary_block_html: (m) =>
+      `<div class=\"conclusion-eyebrow\">§ 結論 · 12 個月模型推估</div>` +
+      `<div class=\"conclusion-title\">這套方案為您建立什麼。</div>` +
+      `<div class=\"conclusion-rows\">` +
+      `<div class=\"conclusion-row\"><span class=\"conclusion-tag\">數量增長</span><span class=\"conclusion-text\">五項行動執行 12 個月，新增 <strong class=\"summary-stat\">${m.newReviews}</strong> 則評論與 <strong class=\"summary-stat\">${m.newCustomers}</strong> 位客戶。</span></div>` +
+      `<div class=\"conclusion-row\"><span class=\"conclusion-tag\">資產累積</span><span class=\"conclusion-text\">以每則評論 <strong class=\"summary-stat\">${m.perReviewValue}</strong> 計算，這 <strong class=\"summary-stat\">${m.newReviews}</strong> 則新評論將累積成 <strong class=\"summary-stat\">${m.reviewAsset}</strong> 的評論資產 — 這是企業帳上持有的長期資產，並非收入或營收。</span></div>` +
+      `<div class=\"conclusion-row\"><span class=\"conclusion-tag\">成果</span><span class=\"conclusion-text\"><span class=\"conclusion-results\">評論 → 推薦 → 留存 → 營收</span></span></div>` +
+      `</div>`,
     cta_eyebrow: "兩條路徑 · 同一個計劃",
     cta_headline_html: "您不需要<em>獨自完成這一切</em>",
     cta_self: {
@@ -717,8 +753,8 @@ export const STRINGS: Record<
     cta_full: {
       label: "路徑 B · 全託管方案",
       title: "由我們替您執行",
-      price: "$399 / 月 · 30 天免費試用 · 5 倍價值承諾",
-      desc: "每週寄給我們客戶名單，其他全部由我們處理 — 雙語發送、AI 輔助回覆、每月報告、上述 12 個月計劃。我們承諾 12 個月內帶來 5 倍價值。",
+      price: "$399 / 月 · 30 天免費試用",
+      desc: "每週寄給我們客戶名單，其他全部由我們處理 — 雙語發送、AI 輔助回覆、每月報告、上述 12 個月計劃。",
     },
     cta_promise_html: "對比 <strong>Birdeye</strong> 每月 $299 + $5,000 開通費，或 <strong>Podium</strong> 每月 $399 + 入駐流程。BAAM Review 免費起步，按月計費。",
     cta_action_self_label: "啟動自助方案試用 →",
@@ -746,7 +782,7 @@ export const STRINGS: Record<
     so_tier_full_name_html: "由我們<em>替您</em>運行",
     so_tier_full_price: "$399 /月",
     so_tier_full_projection_html: (businessName, d90) =>
-      `對 ${businessName} 而言，這通常意味著 90 天分數 <strong>${d90}</strong>，每月恢復 5–8 則評論。我們執行全部五項行動。<strong>5× 回報標準</strong>支持成果。`,
+      `對 ${businessName} 而言，這通常意味著 90 天分數 <strong>${d90}</strong>，每月恢復 5–8 則評論。我們執行全部五項行動。`,
     so_tier_full_cta: "啟動全託管試用 →",
     so_tier_full_recommended: "推薦",
     so_compare_link: "詳細比較兩個方案 →",

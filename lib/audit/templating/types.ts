@@ -80,8 +80,6 @@ export interface AuditViewModel {
 
   // Section 6 — Action Plan (paid only)
   action_items: ActionItemVM[];
-  total_value_added_display: string;
-  total_value_lost_display: string;
 
   // Service Opportunity — between Section 6 and Section 7 (paid only)
   service_opportunity: ServiceOpportunityVM;
@@ -114,6 +112,7 @@ export interface TranslatedStrings {
   projection_deck: string;
   projection_legend_lines: string[];
   projection_impact_labels: { score: string; ranking: string; revenue: string };
+  projection_results_items: string[];
   ranking_drop_sub: string;
   revenue_loss_sub: string;
   grade_scale_eyebrow: string;
@@ -269,9 +268,8 @@ export interface ActionItemVM {
   result_value: string;
   owner_label: string;
   owner_is_baam: boolean;
-  value_amount_display: string;
-  value_label: string;
-  value_calc_html: string;
+  year_result_value: string; // right column: 12-month result (count), no revenue
+  year_result_label: string;
 }
 
 export interface ServiceOpportunityVM {

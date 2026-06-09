@@ -150,7 +150,7 @@ export function ProcessingClient({ auditId }: ProcessingClientProps) {
           marginBottom: 40,
         }}
       >
-        This usually takes 30–60 seconds. We're fetching real-time data from
+        This usually takes several minutes. We're fetching real-time data from
         Google, comparing against your local competitors, and rendering the PDF.
       </p>
 

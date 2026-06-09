@@ -27,6 +27,7 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
   const preparedAt = input.prepared_at ?? new Date();
   const auditId =
     input.audit_id ?? generateAuditId(google.business.place_id, preparedAt);
+  const planSummary = buildActionPlanSummary(google, benchmarks);
 
   return {
     language,
@@ -45,7 +46,7 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
 
     doc_header_subtitle_left: t.doc_header_subtitle,
 
-    page_count_display: tier === "paid" ? "06" : "03",
+    page_count_display: tier === "paid" ? "07" : "03",
     is_paid: tier === "paid",
 
     snapshot_google: buildGooglePlatformRow(google, language),
@@ -60,10 +61,12 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
     subscore_rows: buildSubscoreRows(score, benchmarks.weights, language),
 
     projection_svg: renderProjectionSvg(projection, score.total),
-    projection_six_month_score: projection.six_month.do_nothing_score,
-    projection_six_month_grade: projection.six_month.do_nothing_grade,
-    projection_six_month_drop_display: `${score.total} → ${projection.six_month.do_nothing_score}`,
-    projection_ranking_drop_display: formatRankingDrop(projection.ranking_estimate.do_nothing_six_month_drop, language),
+    // §04 forecast cells reframed as the upside of working with BAAM Review
+    // (12-month with-baam trajectory), not the do-nothing decline.
+    projection_six_month_score: projection.twelve_month.with_baam_score,
+    projection_six_month_grade: projection.twelve_month.with_baam_grade,
+    projection_six_month_drop_display: `${score.total} → ${projection.twelve_month.with_baam_score}`,
+    projection_ranking_drop_display: formatRankingGain(projection.ranking_estimate.do_nothing_six_month_drop),
     projection_revenue_loss_display: `$${projection.revenue_impact.six_month_loss_usd.toLocaleString()}`,
     projection_floor_blurb: buildProjectionFloorBlurb(score, projection, language),
 
@@ -88,8 +91,6 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
     competitor_closing_line: buildCompetitorClosingLine(google, competitors, language),
 
     action_items: buildActionItems(google, score, competitors, benchmarks, language),
-    total_value_added_display: buildTotalValueAddedDisplay(google, score, competitors, benchmarks),
-    total_value_lost_display: `$${projection.revenue_impact.six_month_loss_usd.toLocaleString()}`,
 
     service_opportunity: buildServiceOpportunity(score.total, score.grade, auditId),
 
@@ -97,13 +98,15 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
     appendix_velocity_rows: buildAppendixVelocityRows(google.vertical.inferred_vertical, language),
 
     t: buildTranslatedStrings(language, {
-      page_count_display: tier === "paid" ? "06" : "03",
+      page_count_display: tier === "paid" ? "07" : "03",
       score_grade: score.grade,
       vertical_display_name: t.verticals[google.vertical.inferred_vertical] ?? t.verticals.general_smb,
       per_review_value_median_display: `$${benchmarks.per_review_value.median_usd.toLocaleString()}`,
       per_review_value_range_display: `$${benchmarks.per_review_value.range_low_usd.toLocaleString()} — $${benchmarks.per_review_value.range_high_usd.toLocaleString()}`,
-      total_value_added_display: buildTotalValueAddedDisplay(google, score, competitors, benchmarks),
-      total_value_lost_display: `$${projection.revenue_impact.six_month_loss_usd.toLocaleString()}`,
+      summary_new_reviews: `+${planSummary.newReviews.toLocaleString()}`,
+      summary_new_customers: `+${planSummary.newCustomers.toLocaleString()}`,
+      summary_per_review_value: `$${planSummary.perReviewValue.toLocaleString()}`,
+      summary_review_asset: `$${planSummary.reviewAssetValue.toLocaleString()}`,
       service_opportunity: buildServiceOpportunity(score.total, score.grade, auditId),
       business_name_display: pickPrimaryName(google.business.name, language),
     }),
@@ -118,8 +121,10 @@ function buildTranslatedStrings(
     vertical_display_name: string;
     per_review_value_median_display: string;
     per_review_value_range_display: string;
-    total_value_added_display: string;
-    total_value_lost_display: string;
+    summary_new_reviews: string;
+    summary_new_customers: string;
+    summary_per_review_value: string;
+    summary_review_asset: string;
     service_opportunity: ServiceOpportunityVM;
     business_name_display: string;
   },
@@ -148,6 +153,7 @@ function buildTranslatedStrings(
     projection_deck: s.projection_deck,
     projection_legend_lines: s.projection_legend_lines,
     projection_impact_labels: s.projection_impact_labels,
+    projection_results_items: s.projection_results_items,
     ranking_drop_sub: isZh
       ? "預估本地搜尋包排名下滑 · 競爭對手持續複利擴大差距"
       : "Estimated Local Pack drop · competitors compounding the gap",
@@ -191,7 +197,12 @@ function buildTranslatedStrings(
     competitor_table_headers: s.competitor_table_headers,
     section_6_headline_html: s.section_6_headline_html,
     section_6_deck: s.section_6_deck,
-    summary_block_html: s.summary_block_html(ctx.total_value_added_display, ctx.total_value_lost_display),
+    summary_block_html: s.summary_block_html({
+      newReviews: ctx.summary_new_reviews,
+      newCustomers: ctx.summary_new_customers,
+      perReviewValue: ctx.summary_per_review_value,
+      reviewAsset: ctx.summary_review_asset,
+    }),
     cta_eyebrow: s.cta_eyebrow,
     cta_headline_html: s.cta_headline_html,
     cta_self: s.cta_self,
@@ -509,11 +520,11 @@ function buildScaleTicks(comp: ScoreComponent): ScaleTickVM[] {
   return ticks;
 }
 
-function formatRankingDrop(drop: number, language: AuditLanguage): string {
-  const t = LABELS[language];
-  if (drop === 0) return t.ranking_hold;
-  const abs = Math.abs(drop);
-  return `${drop > 0 ? "+" : "−"}${abs} to ${drop > 0 ? "+" : "−"}${abs + 1}`;
+// Reframed as the climb with BAAM Review: the magnitude of the projected
+// do-nothing slide becomes the positions recovered with sustained effort.
+function formatRankingGain(referenceDrop: number): string {
+  const abs = Math.max(1, Math.abs(referenceDrop));
+  return `+${abs} to +${abs + 1}`;
 }
 
 function buildProjectionFloorBlurb(
@@ -522,9 +533,9 @@ function buildProjectionFloorBlurb(
   language: AuditLanguage,
 ): string {
   const t = LABELS[language];
-  const droppedGrade = projection.six_month.do_nothing_grade !== score.grade;
-  if (!droppedGrade) return t.projection_floor.same_grade;
-  return t.projection_floor.dropped(score.grade, projection.six_month.do_nothing_grade);
+  const climbedGrade = projection.twelve_month.with_baam_grade !== score.grade;
+  if (!climbedGrade) return t.projection_floor.same_grade;
+  return t.projection_floor.climbed(score.grade, projection.twelve_month.with_baam_grade);
 }
 
 function computeVelocityPointerPct(
@@ -700,6 +711,44 @@ function buildCompetitorClosingLine(
   return t.competitor_closing(lower, competitors.competitors.length);
 }
 
+// 12-month new-customer gains per action (also summed for the section total).
+const CUSTOMER_GAIN = { respond: 10, profile: 16, recover: 6, widget: 7 } as const;
+
+function reviewVelocityGain(
+  google: AuditGoogleData,
+  benchmarks: VerticalBenchmarks,
+): { additionalPerMonth: number; annualReviewGain: number } {
+  const additionalPerMonth = Math.max(
+    benchmarks.healthy_velocity.optimal_low_per_month - (google.reviews_aggregate.velocity_30d_per_month ?? 0),
+    1,
+  );
+  return { additionalPerMonth, annualReviewGain: Math.round(additionalPerMonth * 12) };
+}
+
+export interface ActionPlanSummary {
+  newReviews: number;
+  newCustomers: number;
+  reviewAssetValue: number;
+  perReviewValue: number;
+}
+
+function buildActionPlanSummary(
+  google: AuditGoogleData,
+  benchmarks: VerticalBenchmarks,
+): ActionPlanSummary {
+  const perReviewValue = benchmarks.per_review_value.median_usd;
+  const { annualReviewGain } = reviewVelocityGain(google, benchmarks);
+  const newCustomers =
+    CUSTOMER_GAIN.respond + CUSTOMER_GAIN.profile + CUSTOMER_GAIN.recover + CUSTOMER_GAIN.widget;
+  return {
+    newReviews: annualReviewGain,
+    newCustomers,
+    // Asset = the value of the NEW reviews earned over the 12 months.
+    reviewAssetValue: annualReviewGain * perReviewValue,
+    perReviewValue,
+  };
+}
+
 function buildActionItems(
   google: AuditGoogleData,
   score: AuditScore,
@@ -708,15 +757,8 @@ function buildActionItems(
   language: AuditLanguage,
 ): ActionItemVM[] {
   const t = LABELS[language];
-  const perReviewValue = benchmarks.per_review_value.median_usd;
   const unanswered = google.reviews_aggregate.unanswered_count ?? Math.round(google.reviews_aggregate.total_count * 0.7);
-
-  const additionalPerMonth = Math.max(
-    benchmarks.healthy_velocity.optimal_low_per_month - (google.reviews_aggregate.velocity_30d_per_month ?? 0),
-    1,
-  );
-  const annualReviewGain = Math.round(additionalPerMonth * 12);
-  const action1Value = annualReviewGain * perReviewValue;
+  const { additionalPerMonth, annualReviewGain } = reviewVelocityGain(google, benchmarks);
 
   const items: Array<{
     title: string;
@@ -724,9 +766,8 @@ function buildActionItems(
     result_value: string;
     owner_label: string;
     owner_is_baam: boolean;
-    value_amount: number;
-    value_label: string;
-    value_calc_html: string;
+    year_result_value: string;
+    year_result_label: string;
   }> = [
     {
       title: t.actions.post_visit.title,
@@ -734,9 +775,8 @@ function buildActionItems(
       result_value: t.actions.post_visit.result(additionalPerMonth),
       owner_label: t.actions.owner_baam,
       owner_is_baam: true,
-      value_amount: action1Value,
-      value_label: t.actions.value_12mo,
-      value_calc_html: `${annualReviewGain} ${t.actions.reviews_per_year} × <strong>$${perReviewValue.toLocaleString()}</strong><br>${t.actions.per_review_value_label}`,
+      year_result_value: `+${annualReviewGain}`,
+      year_result_label: t.actions.result_year_reviews,
     },
     {
       title: t.actions.respond.title,
@@ -744,9 +784,8 @@ function buildActionItems(
       result_value: t.actions.respond.result,
       owner_label: t.actions.owner_baam,
       owner_is_baam: true,
-      value_amount: Math.round(perReviewValue * 10),
-      value_label: t.actions.value_12mo,
-      value_calc_html: `+10 ${t.actions.customers} × <strong>$${perReviewValue.toLocaleString()}</strong><br>${t.actions.ltv_label}`,
+      year_result_value: `+${CUSTOMER_GAIN.respond}`,
+      year_result_label: t.actions.result_year_customers,
     },
     {
       title: t.actions.profile.title,
@@ -754,9 +793,8 @@ function buildActionItems(
       result_value: t.actions.profile.result,
       owner_label: t.actions.owner_you,
       owner_is_baam: false,
-      value_amount: Math.round(perReviewValue * 16),
-      value_label: t.actions.value_12mo,
-      value_calc_html: `+16 ${t.actions.customers} × <strong>$${perReviewValue.toLocaleString()}</strong><br>${t.actions.ltv_label}`,
+      year_result_value: `+${CUSTOMER_GAIN.profile}`,
+      year_result_label: t.actions.result_year_customers,
     },
     {
       title: t.actions.recover.title(unanswered),
@@ -764,9 +802,8 @@ function buildActionItems(
       result_value: t.actions.recover.result,
       owner_label: t.actions.owner_baam,
       owner_is_baam: true,
-      value_amount: Math.round(perReviewValue * 6),
-      value_label: t.actions.value_12mo,
-      value_calc_html: `+6 ${t.actions.customers} × <strong>$${perReviewValue.toLocaleString()}</strong><br>${t.actions.ltv_label}`,
+      year_result_value: `+${CUSTOMER_GAIN.recover}`,
+      year_result_label: t.actions.result_year_customers,
     },
     {
       title: t.actions.widget.title,
@@ -774,9 +811,8 @@ function buildActionItems(
       result_value: t.actions.widget.result,
       owner_label: t.actions.owner_baam_platform,
       owner_is_baam: false,
-      value_amount: Math.round(perReviewValue * 7),
-      value_label: t.actions.value_12mo,
-      value_calc_html: `+7 ${t.actions.customers} × <strong>$${perReviewValue.toLocaleString()}</strong><br>${t.actions.ltv_label}`,
+      year_result_value: `+${CUSTOMER_GAIN.widget}`,
+      year_result_label: t.actions.result_year_customers,
     },
   ];
 
@@ -791,28 +827,12 @@ function buildActionItems(
     result_value: item.result_value,
     owner_label: item.owner_label,
     owner_is_baam: item.owner_is_baam,
-    value_amount_display: `+$${item.value_amount.toLocaleString()}`,
-    value_label: item.value_label,
-    value_calc_html: item.value_calc_html,
+    year_result_value: item.year_result_value,
+    year_result_label: item.year_result_label,
   }));
 }
 
 const ROMAN = ["i", "ii", "iii", "iv", "v"];
-
-function buildTotalValueAddedDisplay(
-  google: AuditGoogleData,
-  score: AuditScore,
-  competitors: AuditCompetitorsData,
-  benchmarks: VerticalBenchmarks,
-): string {
-  const items = buildActionItems(google, score, competitors, benchmarks, "en");
-  let total = 0;
-  for (const item of items) {
-    const m = item.value_amount_display.match(/[\d,]+/);
-    if (m) total += parseInt(m[0].replace(/,/g, ""), 10);
-  }
-  return `+$${total.toLocaleString()}`;
-}
 
 function buildAppendixValueRows(
   highlightVertical: VerticalKey,
