@@ -22,7 +22,7 @@
   html, body {
     background: var(--cream);
     color: var(--ink);
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 15px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
@@ -65,10 +65,10 @@
   }
 
   /* ============ TYPOGRAPHY ============ */
-  .display { font-family: 'Instrument Serif', serif; font-weight: 400; }
-  .display-i { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
-  .mono { font-family: 'JetBrains Mono', monospace; }
-  .body-sans { font-family: 'Archivo', sans-serif; }
+  .display { font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-weight: 400; }
+  .display-i { font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-style: italic; font-weight: 400; }
+  .mono { font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; }
+  .body-sans { font-family: 'Archivo', 'Noto Sans TC', sans-serif; }
 
   h1, h2, h3, h4 { letter-spacing: -0.01em; }
 
@@ -101,14 +101,14 @@
     border-bottom: 1px solid var(--rule);
   }
   .section-marker-num {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 13px;
     letter-spacing: 0.14em;
     color: var(--amber-deep);
     font-weight: 600;
   }
   .section-marker-title {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 17px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -124,24 +124,24 @@
     display: flex; flex-direction: column;
   }
   .cover3-rail-head {
-    font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 0.2em;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; font-size: 9.5px; letter-spacing: 0.2em;
     text-transform: uppercase; color: var(--amber-deep); margin-bottom: 28px;
     padding-bottom: 14px; border-bottom: 1px solid var(--rule);
   }
   .cover3-ev { margin-bottom: 26px; }
   .cover3-ev-stat {
-    font-family: 'Instrument Serif', serif; font-size: 32px; line-height: 1;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-size: 32px; line-height: 1;
     color: var(--ink); margin-bottom: 8px;
   }
   .cover3-ev-stat.num { color: var(--amber-deep); }
   .cover3-ev-body { font-size: 12px; line-height: 1.45; color: var(--ink-soft); }
   .cover3-ev-src {
-    font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.1em;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; font-size: 8px; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--ink-mute); margin-top: 8px;
   }
   .cover3-rail-spacer { flex: 1; }
   .cover3-rail-foot {
-    font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; font-size: 9px; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--ink-mute); line-height: 1.8;
     padding-top: 18px; border-top: 1px solid var(--rule);
   }
@@ -161,19 +161,19 @@
     margin: 44px 0 24px;
   }
   .cover3-biz {
-    font-family: 'Instrument Serif', serif; font-size: 56px; line-height: 0.94;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-size: 56px; line-height: 0.94;
     color: var(--rust-deep); letter-spacing: -0.02em;
     padding-bottom: 22px; border-bottom: 1px solid var(--rule);
   }
   .cover3-statement {
-    font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-style: italic; font-weight: 400;
     font-size: 36px; line-height: 1.04; letter-spacing: -0.01em;
     margin-top: 24px; color: var(--ink);
   }
   .cover3-statement em { font-style: italic; color: var(--rust-deep); }
   .cover3-toc { margin-top: 40px; }
   .cover3-toc-head {
-    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; font-size: 10px; letter-spacing: 0.22em;
     text-transform: uppercase; color: var(--amber-deep);
     padding-bottom: 12px; border-bottom: 1px solid var(--rule); margin-bottom: 4px;
   }
@@ -182,7 +182,7 @@
     padding: 11px 0; border-bottom: 1px solid var(--rule-soft);
   }
   .cover3-toc-num {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; font-size: 11px; font-weight: 600;
     color: var(--amber-deep); flex-shrink: 0; width: 26px; letter-spacing: 0.06em;
   }
   .cover3-toc-line { line-height: 1.5; }
@@ -197,18 +197,18 @@
     margin-top: 56px;
   }
   .cover3-meta-k {
-    font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; font-size: 9px; letter-spacing: 0.18em;
     text-transform: uppercase; color: var(--ink-mute); margin-bottom: 5px;
   }
   .cover3-meta-v { font-size: 14px; font-weight: 700; line-height: 1.3; }
-  .cover3-meta-v small { display: block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 400; color: var(--ink-mute); margin-top: 2px; }
+  .cover3-meta-v small { display: block; font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; font-size: 10px; font-weight: 400; color: var(--ink-mute); margin-top: 2px; }
 
   /* ============ COVER PAGE ============ */
   .cover-hero {
     margin-bottom: 80px;
   }
   .cover-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
@@ -216,7 +216,7 @@
     margin-bottom: 36px;
   }
   .cover-title {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 76px;
     line-height: 0.95;
     font-weight: 400;
@@ -229,7 +229,7 @@
     color: var(--rust-deep);
   }
   .cover-subtitle {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 28px;
     line-height: 1.3;
@@ -254,7 +254,7 @@
   .cover-meta-item:first-child { padding-left: 0; }
   .cover-meta-item:last-child { border-right: none; padding-right: 0; }
   .cover-meta-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -262,7 +262,7 @@
     margin-bottom: 8px;
   }
   .cover-meta-value {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 22px;
     color: var(--ink);
     line-height: 1.1;
@@ -278,7 +278,7 @@
     text-align: center;
   }
   .hook-quote p {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 38px;
     line-height: 1.2;
     max-width: 720px;
@@ -293,7 +293,7 @@
 
   /* ============ SECTION 1 — FACT GRID ============ */
   .section-headline {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 48px;
     line-height: 1.05;
     font-weight: 400;
@@ -303,7 +303,7 @@
   }
   .section-headline em { font-style: italic; color: var(--rust-deep); }
   .section-deck {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 20px;
     color: var(--ink-soft);
@@ -327,14 +327,14 @@
     position: relative;
   }
   .fact-num {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     color: var(--amber-deep);
     margin-bottom: 14px;
   }
   .fact-stat {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 56px;
     line-height: 0.95;
     color: var(--ink);
@@ -349,7 +349,7 @@
     margin-bottom: 12px;
   }
   .fact-source {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9.5px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -387,7 +387,7 @@
     flex: 0 0 38px;
   }
   .must-know-emph {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-weight: 400;
     line-height: 1;
     margin: 4px 0 -2px;
@@ -406,7 +406,7 @@
     flex: 1;
   }
   .must-know-source {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9.5px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -417,7 +417,7 @@
   }
 
   .closing-line {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 24px;
     color: var(--ink);
@@ -437,7 +437,7 @@
   }
   .snapshot-table th {
     text-align: left;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -464,14 +464,14 @@
     background: var(--cream-deep);
     border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 18px;
     color: var(--ink);
     flex-shrink: 0;
   }
   .platform-meta-strong { font-weight: 600; font-size: 15px; }
   .platform-meta-sub {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     color: var(--ink-mute);
     text-transform: uppercase;
@@ -479,12 +479,12 @@
     margin-top: 2px;
   }
   .star-rating {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 22px;
     color: var(--ink);
   }
   .star-rating .stars { color: var(--gold); letter-spacing: -0.05em; }
-  .review-count { font-family: 'JetBrains Mono', monospace; font-size: 15px; }
+  .review-count { font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; font-size: 15px; }
   .last-review {
     font-size: 13px;
     color: var(--ink-soft);
@@ -495,7 +495,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -543,7 +543,7 @@
     line-height: 1;
   }
   .snapshot-table tr.primary-row .star-rating .mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 18px;
     font-weight: 500;
     margin-left: 4px;
@@ -558,7 +558,7 @@
     border-left: 3px solid var(--amber);
     padding: 24px 28px;
     margin-top: 24px;
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 18px;
     line-height: 1.45;
@@ -566,7 +566,7 @@
   }
   .insight-callout strong {
     font-style: normal;
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-weight: 700;
     color: var(--ink);
     font-size: 15px;
@@ -584,7 +584,7 @@
     margin-bottom: 40px;
   }
   .score-number {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 200px;
     font-weight: 300;
     line-height: 0.85;
@@ -603,7 +603,7 @@
   }
   .score-grade-block { padding-left: 8px; }
   .score-grade-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -611,14 +611,14 @@
     margin-bottom: 8px;
   }
   .score-grade-letter {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 96px;
     line-height: 1;
     color: var(--rust-deep);
     margin-bottom: 12px;
   }
   .score-grade-diagnosis {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 22px;
     line-height: 1.3;
@@ -641,7 +641,7 @@
   }
   .subscore-meta { padding-top: 2px; }
   .subscore-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -649,14 +649,14 @@
     margin-bottom: 6px;
   }
   .subscore-raw {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 16px;
     color: var(--ink);
     line-height: 1.25;
   }
   .subscore-raw .mono-num {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-style: normal;
     font-weight: 500;
     font-size: 14px;
@@ -664,7 +664,7 @@
   }
   .subscore-meta-footnote {
     margin-top: 4px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9.5px;
     letter-spacing: 0.06em;
     color: var(--ink-mute);
@@ -705,7 +705,7 @@
   .subscore-scale-tick {
     position: absolute;
     transform: translateX(-50%);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9px;
     letter-spacing: 0.04em;
     color: var(--ink-mute);
@@ -718,7 +718,7 @@
   .subscore-scale-tick.anchor-left { left: 0; transform: translateX(0); }
   .subscore-scale-tick.anchor-right { left: 100%; transform: translateX(-100%); }
   .subscore-value {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 22px;
     font-weight: 500;
     text-align: right;
@@ -726,7 +726,7 @@
     padding-top: 0;
   }
   .subscore-weight {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     color: var(--ink-mute);
     text-align: right;
@@ -737,13 +737,13 @@
     margin-top: 24px;
     padding-top: 18px;
     border-top: 1px dashed var(--rule);
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 12px;
     color: var(--ink-soft);
     line-height: 1.55;
   }
   .methodology-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9.5px;
     letter-spacing: 0.2em;
     color: var(--amber-deep);
@@ -752,7 +752,7 @@
     font-weight: 500;
   }
   .methodology-footer strong {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-weight: 500;
     font-size: 11px;
     color: var(--ink);
@@ -773,7 +773,7 @@
   .forecast-page .projection-svg-wrap { max-width: 530px; margin: 0 auto; }
   .forecast-page .projection-legend { margin-top: 12px; }
   .projection-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -781,7 +781,7 @@
     margin-bottom: 12px;
   }
   .projection-title {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 38px;
     line-height: 1.1;
     color: var(--ink);
@@ -842,7 +842,7 @@
   }
   .impact-cell:last-child { border-right: none; }
   .impact-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -850,7 +850,7 @@
     margin-bottom: 10px;
   }
   .impact-value {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 32px;
     color: var(--rust-deep);
     line-height: 1.05;
@@ -896,7 +896,7 @@
   }
   .benchmark-panel:last-child { border-right: none; }
   .benchmark-panel-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -904,21 +904,21 @@
     margin-bottom: 14px;
   }
   .benchmark-panel-title {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 26px;
     line-height: 1.15;
     margin-bottom: 18px;
     color: var(--ink);
   }
   .benchmark-value-big {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 56px;
     line-height: 1;
     color: var(--rust-deep);
     margin-bottom: 6px;
   }
   .benchmark-value-range {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 12px;
     color: var(--ink-mute);
     letter-spacing: 0.05em;
@@ -945,7 +945,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -971,7 +971,7 @@
     font-size: 12px;
   }
   .velocity-pointer-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -997,7 +997,7 @@
     padding-right: 36px;
   }
   .gt-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -1005,13 +1005,13 @@
     margin-bottom: 8px;
   }
   .gt-value {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 40px;
     line-height: 1;
     color: var(--sage-darkest);
   }
   .gt-sub {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     color: var(--ink-mute);
     margin-top: 8px;
@@ -1027,7 +1027,7 @@
     position: relative;
   }
   .money-on-table-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -1035,7 +1035,7 @@
     margin-bottom: 14px;
   }
   .money-on-table-text {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 26px;
     line-height: 1.3;
     color: var(--cream-light);
@@ -1046,7 +1046,7 @@
     font-size: 1.15em;
   }
   .money-on-table-text strong {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-weight: 500;
     color: white;
     background: var(--rust-deep);
@@ -1062,7 +1062,7 @@
   }
   .competitor-table thead th {
     text-align: left;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -1108,7 +1108,7 @@
     gap: 12px;
   }
   .competitor-rank {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     color: var(--ink-mute);
     width: 20px;
@@ -1117,7 +1117,7 @@
     display: inline-block;
     background: var(--rust-deep);
     color: var(--cream-light);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -1126,7 +1126,7 @@
     border-radius: 2px;
   }
   .trend-arrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 16px;
   }
   .trend-arrow.up { color: var(--sage-deep); }
@@ -1137,14 +1137,14 @@
     background: var(--cream-deep);
     padding: 28px 32px;
     border-left: 3px solid var(--rust);
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 19px;
     line-height: 1.4;
     color: var(--ink);
   }
   .competitor-diagnosis strong {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-style: normal;
     color: var(--rust-deep);
     font-size: 15px;
@@ -1167,7 +1167,7 @@
     align-items: start;
   }
   .action-number {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 48px;
     line-height: 1;
     color: var(--rust-deep);
@@ -1175,7 +1175,7 @@
   }
   .action-body { padding-top: 2px; }
   .action-title {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 17px;
     font-weight: 600;
     color: var(--ink);
@@ -1183,7 +1183,7 @@
     line-height: 1.25;
   }
   .action-why {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 15px;
     line-height: 1.4;
@@ -1203,7 +1203,7 @@
     gap: 12px;
   }
   .action-result-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -1211,7 +1211,7 @@
     font-weight: 500;
   }
   .action-result-value {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-style: italic;
     font-size: 21px;
     color: var(--sage-darkest);
@@ -1235,7 +1235,7 @@
   .action-value-block .action-owner-pill {
     display: inline-block;
     margin-top: 14px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
   }
   .action-value-block {
@@ -1243,7 +1243,7 @@
     text-align: right;
   }
   .summary-stat {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-style: normal;
     font-weight: 500;
   }
@@ -1254,7 +1254,7 @@
     border-left: 3px solid var(--sage);
   }
   .conclusion-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -1262,7 +1262,7 @@
     margin-bottom: 8px;
   }
   .conclusion-title {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 30px;
     line-height: 1.05;
     color: var(--ink);
@@ -1282,7 +1282,7 @@
     border-top: 1px solid var(--rule);
   }
   .conclusion-tag {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -1290,14 +1290,14 @@
     font-weight: 600;
   }
   .conclusion-text {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 18px;
     line-height: 1.45;
     color: var(--ink);
   }
   .conclusion-results {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-style: normal;
     font-weight: 700;
     font-size: 18px;
@@ -1305,7 +1305,7 @@
     color: var(--sage-darkest);
   }
   .action-value-amount {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 32px;
     color: var(--sage-darkest);
     font-weight: 800;
@@ -1313,7 +1313,7 @@
     letter-spacing: -0.02em;
   }
   .action-value-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -1324,7 +1324,7 @@
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px dashed var(--rule);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10.5px;
     color: var(--ink-soft);
     letter-spacing: 0.02em;
@@ -1343,7 +1343,7 @@
     border-top: 1px solid var(--ink);
   }
   .cta-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
@@ -1351,7 +1351,7 @@
     margin-bottom: 18px;
   }
   .cta-headline {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 42px;
     line-height: 1.1;
     color: var(--ink);
@@ -1371,7 +1371,7 @@
   }
   .cta-path:last-child { border-right: none; }
   .cta-path-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -1379,13 +1379,13 @@
     margin-bottom: 10px;
   }
   .cta-path-title {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 26px;
     margin-bottom: 8px;
     color: var(--ink);
   }
   .cta-path-price {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 13px;
     color: var(--ink-mute);
     margin-bottom: 14px;
@@ -1406,7 +1406,7 @@
 
   .promise-line {
     margin-top: 32px;
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 18px;
     text-align: center;
@@ -1415,7 +1415,7 @@
   }
   .promise-line strong {
     font-style: normal;
-    font-family: 'Archivo';
+    font-family: 'Archivo', 'Noto Sans TC';
     color: var(--ink);
     font-weight: 600;
   }
@@ -1427,7 +1427,7 @@
     border-top: 1px solid var(--rule);
     display: flex;
     justify-content: space-between;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9.5px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1438,7 +1438,7 @@
   .ornament {
     text-align: center;
     margin: 32px 0;
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 24px;
     color: var(--amber);
@@ -1452,7 +1452,7 @@
     border-top: 1px solid var(--ink);
   }
   .grade-scale-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -1461,7 +1461,7 @@
     font-weight: 500;
   }
   .grade-scale-headline {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 26px;
     line-height: 1.2;
     color: var(--ink);
@@ -1476,7 +1476,7 @@
   }
   .grade-scale-table th {
     text-align: left;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -1499,7 +1499,7 @@
     border-bottom: 1.5px solid var(--ink);
   }
   .grade-scale-table .score-range {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 14px;
     color: var(--ink);
     letter-spacing: 0.02em;
@@ -1509,7 +1509,7 @@
     width: 80px;
   }
   .grade-letter-pill {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 36px;
     line-height: 1;
     display: inline-block;
@@ -1520,7 +1520,7 @@
   .grade-letter-pill.g-d { color: var(--rust); }
   .grade-letter-pill.g-f { color: var(--ink); opacity: 0.6; }
   .grade-meaning {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 17px;
     line-height: 1.35;
@@ -1530,7 +1530,7 @@
     display: inline-block;
     background: var(--rust-deep);
     color: var(--cream-light);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -1551,7 +1551,7 @@
   }
   .appendix-block:last-of-type { margin-bottom: 32px; }
   .appendix-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -1560,7 +1560,7 @@
     font-weight: 500;
   }
   .appendix-title {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 30px;
     line-height: 1.15;
     margin-bottom: 8px;
@@ -1568,7 +1568,7 @@
     letter-spacing: -0.01em;
   }
   .appendix-deck {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 17px;
     color: var(--ink-soft);
@@ -1583,7 +1583,7 @@
   }
   .appendix-table th {
     text-align: left;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -1604,7 +1604,7 @@
   .appendix-table td:not(:first-child) {
     text-align: right;
     padding: 14px 0 14px 16px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 13px;
   }
   .appendix-table tr.highlight {
@@ -1619,7 +1619,7 @@
     display: inline-block;
     background: var(--rust-deep);
     color: var(--cream-light);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 8.5px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -1633,7 +1633,7 @@
     margin-top: 32px;
     padding-top: 20px;
     border-top: 1px solid var(--rule);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1706,7 +1706,7 @@
     gap: 16px;
   }
   .service-preview-inline-text {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 16px;
     line-height: 1.5;
@@ -1714,14 +1714,14 @@
     max-width: 540px;
   }
   .service-preview-inline-text strong {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-style: normal;
     font-weight: 600;
     color: var(--rust-deep);
     font-size: 14px;
   }
   .service-preview-inline-link {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -1750,7 +1750,7 @@
     gap: 8px;
     padding: 12px 22px;
     border-radius: 4px;
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 13.5px;
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -1761,7 +1761,7 @@
   .btn-svc.amber { background: var(--amber); color: var(--ink); }
   .cta-detail-link {
     margin-left: auto;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -1811,7 +1811,7 @@
      score-to-grade math. Renders bigger than the existing .so-headline
      (which now acts as the supporting projection statement). */
   .so-big-title {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-weight: 400;
     font-size: 42px;
     line-height: 1.08;
@@ -1822,7 +1822,7 @@
     max-width: 820px;
   }
   .so-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -1832,7 +1832,7 @@
     text-align: center;
   }
   .so-headline {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-weight: 400;
     font-size: 34px;
     line-height: 1.15;
@@ -1846,7 +1846,7 @@
   }
   .so-headline em { font-style: italic; color: var(--amber); }
   .so-score-pill {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-style: normal;
     font-size: 28px;
     background: rgba(245, 240, 230, 0.08);
@@ -1861,7 +1861,7 @@
     vertical-align: 4px;
   }
   .so-deck {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 18px;
     line-height: 1.5;
@@ -1886,7 +1886,7 @@
   }
   .so-stat:last-child { border-right: none; }
   .so-stat-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10px;
     letter-spacing: 0.18em;
     color: rgba(245, 240, 230, 0.55);
@@ -1895,7 +1895,7 @@
     text-transform: uppercase;
   }
   .so-stat-value {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-weight: 400;
     font-size: 30px;
     color: var(--cream);
@@ -1904,7 +1904,7 @@
     letter-spacing: -0.02em;
   }
   .so-stat-sub {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 14px;
     color: rgba(245, 240, 230, 0.65);
@@ -1935,7 +1935,7 @@
     color: var(--ink);
     padding: 4px 10px;
     border-radius: 999px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 9.5px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1950,20 +1950,20 @@
     border-bottom: 1px solid rgba(245, 240, 230, 0.1);
   }
   .so-tier-name {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-size: 22px;
     color: var(--cream);
     letter-spacing: -0.01em;
   }
   .so-tier-name em { font-style: italic; color: var(--amber); }
   .so-tier-price {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 20px;
     color: var(--cream);
     font-weight: 500;
   }
   .so-tier-projection {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
     font-style: italic;
     font-size: 15.5px;
     line-height: 1.55;
@@ -1971,7 +1971,7 @@
     margin-bottom: 18px;
   }
   .so-tier-projection strong {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-style: normal;
     font-weight: 500;
     color: var(--amber);
@@ -1991,7 +1991,7 @@
     justify-content: center;
     padding: 11px 22px;
     border-radius: 999px;
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
@@ -2011,7 +2011,7 @@
     margin-top: 14px;
   }
   .so-compare-link a {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 13px;
     color: var(--amber);
     text-decoration: none;
@@ -2021,7 +2021,7 @@
   .so-trust {
     text-align: center;
     margin-top: 20px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 10.5px;
     letter-spacing: 0.08em;
     color: rgba(245, 240, 230, 0.45);

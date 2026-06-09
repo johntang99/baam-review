@@ -5,7 +5,7 @@
 <title>BAAM Review Audit · {{business_name}}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>{{{styles}}}</style>
 </head>
 <body>
@@ -153,7 +153,7 @@
     </div>
   </div>
 
-  <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 14px;">{{#if (eq language "zh")}}分數細項 · 為何是這個數字{{else}}Score breakdown · Why your number is what it is{{/if}}</div>
+  <div style="font-family: 'JetBrains Mono', 'Noto Sans TC', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 14px;">{{#if (eq language "zh")}}分數細項 · 為何是這個數字{{else}}Score breakdown · Why your number is what it is{{/if}}</div>
 
   <div class="subscores">
     {{#each subscore_rows}}
@@ -246,7 +246,7 @@
 
   <div class="ornament">§</div>
 
-  <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 20px; line-height: 1.45; color: var(--ink-soft); text-align: center; max-width: 640px; margin: 0 auto;">
+  <p style="font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-style: italic; font-size: 20px; line-height: 1.45; color: var(--ink-soft); text-align: center; max-width: 640px; margin: 0 auto;">
     {{competitor_closing_line}}
   </p>
 
@@ -522,12 +522,12 @@
 
   <div class="appendix-source">
     {{{t.appendix_source_html}}}<br>
-    <span style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 14px; letter-spacing: 0; text-transform: none; color: var(--ink-mute);">{{#if (eq language "zh")}}完整引用於{{else}}Full citations at{{/if}} <a href="https://www.baamreview.com/review-value.html#sources" target="_blank">baamreview.com/review-value.html#sources</a></span>
+    <span style="font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-style: italic; font-size: 14px; letter-spacing: 0; text-transform: none; color: var(--ink-mute);">{{#if (eq language "zh")}}完整引用於{{else}}Full citations at{{/if}} <a href="https://www.baamreview.com/review-value.html#sources" target="_blank">baamreview.com/review-value.html#sources</a></span>
   </div>
 
   <div class="ornament">§</div>
 
-  <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; line-height: 1.4; color: var(--ink); text-align: center; max-width: 640px; margin: 0 auto;">
+  <p style="font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-style: italic; font-size: 22px; line-height: 1.4; color: var(--ink); text-align: center; max-width: 640px; margin: 0 auto;">
     {{{t.appendix_closing_quote_html}}}
   </p>
 
@@ -554,7 +554,7 @@
     {{/each}}
   </ul>
 
-  <p style="font-family: 'Instrument Serif', serif; font-size: 22px; font-style: italic; max-width: 580px; color: var(--ink); margin: 24px 0;">
+  <p style="font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-size: 22px; font-style: italic; max-width: 580px; color: var(--ink); margin: 24px 0;">
     {{{t.upgrade_cta_closing}}}
   </p>
 
