@@ -31,8 +31,11 @@ export function renderProjectionSvg(
   const startY = scoreToY(currentScore);
 
   const scoreLift = projection.twelve_month.with_baam_score - currentScore;
-  const scoreLiftLabel = `+${scoreLift} points / 12 months`;
   const doNothingGrade = gradeFromScore(currentScore);
+  const scoreLiftLabel =
+    scoreLift > 0
+      ? `+${scoreLift} points / 12 months`
+      : `holds Grade ${doNothingGrade} / 12 months`;
 
   return `
 <svg viewBox="0 0 ${VB_W} ${VB_H}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">

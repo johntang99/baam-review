@@ -44,8 +44,24 @@ export async function renderHtmlToPdf(html: string): Promise<PdfRenderResult> {
 
   try {
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "load" });
-    await page.evaluateHandle("document.fonts.ready");
+
+    // Load the DOM + stylesheets, but never let a slow/unreachable font CDN
+    // stall the render. Both waits are capped so generation can't hang
+    // forever (the failure mode: document.fonts.ready never resolves when a
+    // web font request hangs instead of failing). Worst case we render with
+    // whatever fonts loaded rather than blocking the whole pipeline.
+    await page
+      .setContent(html, { waitUntil: "load", timeout: 25000 })
+      .catch((e: unknown) => {
+        console.warn(
+          "[pdf] setContent did not fully settle, continuing:",
+          e instanceof Error ? e.message : String(e),
+        );
+      });
+    await Promise.race([
+      page.evaluateHandle("document.fonts.ready"),
+      new Promise((resolve) => setTimeout(resolve, 12000)),
+    ]);
 
     const pdfBuffer = await page.pdf({
       format: "Letter",

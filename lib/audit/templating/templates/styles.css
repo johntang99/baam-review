@@ -1,3 +1,24 @@
+  /* Self-hosted fonts — served from our own domain so PDF rendering never
+     depends on reaching Google Fonts (which can be slow/blocked in some
+     regions and would otherwise stall the render). __FONT_BASE__ is
+     replaced at render time with the app origin. */
+  @font-face { font-family: 'Instrument Serif'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/instrument-serif-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Instrument Serif'; font-style: italic; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/instrument-serif-400-italic.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 300; font-display: swap; src: url('__FONT_BASE__/fonts/archivo-300.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/archivo-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 500; font-display: swap; src: url('__FONT_BASE__/fonts/archivo-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 600; font-display: swap; src: url('__FONT_BASE__/fonts/archivo-600.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 700; font-display: swap; src: url('__FONT_BASE__/fonts/archivo-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 800; font-display: swap; src: url('__FONT_BASE__/fonts/archivo-800.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/jetbrains-mono-400.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('__FONT_BASE__/fonts/jetbrains-mono-500.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('__FONT_BASE__/fonts/jetbrains-mono-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Serif TC'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/noto-serif-tc-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Serif TC'; font-style: normal; font-weight: 700; font-display: swap; src: url('__FONT_BASE__/fonts/noto-serif-tc-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/noto-sans-tc-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 500; font-display: swap; src: url('__FONT_BASE__/fonts/noto-sans-tc-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 700; font-display: swap; src: url('__FONT_BASE__/fonts/noto-sans-tc-700.woff2') format('woff2'); }
+
   :root {
     --cream: #F5F0E6;
     --cream-light: #FAF7F0;

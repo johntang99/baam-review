@@ -18,10 +18,17 @@ export function renderAuditHtml(view: AuditViewModel): string {
   ensureRegistered();
 
   if (cachedStyles === null || DEV_NO_CACHE) {
-    cachedStyles = fs.readFileSync(
-      path.join(TEMPLATES_DIR, "styles.css"),
-      "utf-8",
-    );
+    // Self-hosted fonts are referenced by absolute URL so they resolve both
+    // in the served embed and in the headless-PDF render (which has no base
+    // URL). In production they come from our own domain; in dev from the
+    // local server.
+    const fontBase =
+      process.env.NODE_ENV === "production"
+        ? (process.env.NEXT_PUBLIC_APP_URL ?? "https://baamreview.com")
+        : "http://localhost:4001";
+    cachedStyles = fs
+      .readFileSync(path.join(TEMPLATES_DIR, "styles.css"), "utf-8")
+      .replace(/__FONT_BASE__/g, fontBase);
   }
 
   if (compiledTemplate === null || DEV_NO_CACHE) {

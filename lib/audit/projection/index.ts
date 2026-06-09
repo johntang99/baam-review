@@ -18,6 +18,10 @@ export function computeProjection(
   benchmarks: VerticalBenchmarks,
 ): AuditProjection {
   const timeline: ProjectionPoint[] = [];
+  // The "with BAAM" line never drops below today's score and never decreases
+  // month-over-month — the service holds or improves a business, it does not
+  // make it worse. Capped at 100.
+  let withBaamFloor = currentScore.total;
   for (let month = 0; month <= 12; month++) {
     const do_nothing_score =
       month === 0
@@ -26,7 +30,11 @@ export function computeProjection(
     const with_baam_score =
       month === 0
         ? currentScore.total
-        : projectWithBaamScore(month, google, benchmarks);
+        : Math.min(
+            100,
+            Math.max(withBaamFloor, projectWithBaamScore(month, google, benchmarks)),
+          );
+    withBaamFloor = with_baam_score;
 
     timeline.push({
       month,

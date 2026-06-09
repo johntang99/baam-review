@@ -534,9 +534,14 @@ function buildProjectionFloorBlurb(
   language: AuditLanguage,
 ): string {
   const t = LABELS[language];
-  const climbedGrade = projection.twelve_month.with_baam_grade !== score.grade;
-  if (!climbedGrade) return t.projection_floor.same_grade;
-  return t.projection_floor.climbed(score.grade, projection.twelve_month.with_baam_grade);
+  const endGrade = projection.twelve_month.with_baam_grade;
+  if (endGrade !== score.grade) {
+    return t.projection_floor.climbed(score.grade, endGrade);
+  }
+  // Already in the top grade with little room to climb — frame as defending
+  // the lead rather than a generic "climbs steadily".
+  if (score.grade === "A") return t.projection_floor.maintain(score.grade);
+  return t.projection_floor.same_grade;
 }
 
 function computeVelocityPointerPct(
@@ -715,15 +720,30 @@ function buildCompetitorClosingLine(
 // 12-month new-customer gains per action (also summed for the section total).
 const CUSTOMER_GAIN = { respond: 10, profile: 16, recover: 6, widget: 7 } as const;
 
+// Review-quantity target by where the business sits in its vertical's velocity
+// bands (minimum → optimal_low → optimal_high → aggressive). Each position
+// aims at the next meaningful rung so the projected gain is always real:
+//   • below optimal_low      → target optimal_high  (climb into the healthy band)
+//   • optimal_low..aggressive → target aggressive   (push toward dominant)
+//   • at/above aggressive     → +15% stretch         (extend an existing lead)
 function reviewVelocityGain(
   google: AuditGoogleData,
   benchmarks: VerticalBenchmarks,
 ): { additionalPerMonth: number; annualReviewGain: number } {
-  const additionalPerMonth = Math.max(
-    benchmarks.healthy_velocity.optimal_low_per_month - (google.reviews_aggregate.velocity_30d_per_month ?? 0),
-    1,
-  );
-  return { additionalPerMonth, annualReviewGain: Math.round(additionalPerMonth * 12) };
+  const hv = benchmarks.healthy_velocity;
+  const v = google.reviews_aggregate.velocity_30d_per_month ?? 0;
+
+  let target: number;
+  if (v < hv.optimal_low_per_month) {
+    target = hv.optimal_high_per_month;
+  } else if (v < hv.aggressive_per_month) {
+    target = hv.aggressive_per_month;
+  } else {
+    target = v * 1.15;
+  }
+
+  const additionalPerMonth = Math.max(Math.round(target - v), 1);
+  return { additionalPerMonth, annualReviewGain: additionalPerMonth * 12 };
 }
 
 export interface ActionPlanSummary {

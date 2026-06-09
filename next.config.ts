@@ -36,6 +36,21 @@ const nextConfig: NextConfig = {
       "./node_modules/.pnpm/@sparticuz+chromium@*/node_modules/@sparticuz/chromium/**",
     ],
   },
+
+  // Self-hosted audit fonts are loaded cross-origin by the headless-PDF
+  // renderer (its page has an about:blank origin), so the font files must
+  // send a permissive CORS header or the browser blocks them.
+  async headers() {
+    return [
+      {
+        source: "/fonts/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

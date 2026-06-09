@@ -14,7 +14,14 @@ export function projectWithBaamScore(
   google: AuditGoogleData,
   benchmarks: VerticalBenchmarks,
 ): number {
-  const targetVelocity = benchmarks.healthy_velocity.optimal_low_per_month;
+  // Target the healthy pace, but never below what the business is already
+  // doing — otherwise a high-velocity business is modelled as slowing down,
+  // which drags its projected score below today's (making the service look
+  // harmful). With BAAM, a strong collector at least holds their pace.
+  const targetVelocity = Math.max(
+    google.reviews_aggregate.velocity_30d_per_month ?? 0,
+    benchmarks.healthy_velocity.optimal_low_per_month,
+  );
   const rampMonths = benchmarks.projection?.ramp_months_with_baam ?? 3;
   const newReviewsPerMonth = Math.min(
     targetVelocity,

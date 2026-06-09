@@ -30,6 +30,7 @@ interface LabelSet {
   projection_floor: {
     same_grade: string;
     climbed: (from: Grade, to: Grade) => string;
+    maintain: (grade: Grade) => string;
   };
   ranking_hold: string;
   gauge: { silent: string; min: string; optimal: string };
@@ -154,6 +155,8 @@ const EN: LabelSet = {
     same_grade: "Score climbs steadily as sustained collection compounds month over month.",
     climbed: (from, to) =>
       `Climbs from ${from} to ${to} · sustained collection and response compound over 12 months`,
+    maintain: (grade) =>
+      `Already at the top — sustained collection defends your Grade ${grade} lead and edges toward 100`,
   },
   ranking_hold: "Hold position",
   gauge: { silent: "Silent", min: "Min", optimal: "Optimal" },
@@ -307,6 +310,8 @@ const ZH: LabelSet = {
     same_grade: "持續累積評論逐月複利，分數穩步攀升。",
     climbed: (from, to) =>
       `從 ${from} 級攀升至 ${to} 級 · 持續累積與回覆評論於 12 個月內複利成長`,
+    maintain: (grade) =>
+      `已處於領先 — 持續累積評論鞏固您的 ${grade} 級優勢，並向 100 分邁進`,
   },
   ranking_hold: "排名持平",
   gauge: { silent: "沉睡", min: "最低", optimal: "理想" },
