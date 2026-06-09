@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { auditIdFilter, shortAuditId } from "@/lib/audit/audit-id";
 import { getBenchmarks } from "@/lib/audit/benchmarks";
 import {
   buildAuditViewModel,
@@ -64,14 +65,23 @@ export async function GET(
   // when the audit is is_public (allowed by RLS audits_select_public).
   // Auth fallback only kicks in when the row isn't visible, so private
   // audits still 401 for anon and 404 for signed-in non-owners.
+  const idFilter = auditIdFilter(id);
+  if (!idFilter) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("audits")
     .select(
       "id,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data",
-    )
-    .eq("id", id)
-    .maybeSingle<AuditRow>();
+    );
+  query =
+    "exact" in idFilter
+      ? query.eq("id", idFilter.exact)
+      : query.gte("id", idFilter.lo).lte("id", idFilter.hi).limit(1);
+
+  const { data, error } = await query.maybeSingle<AuditRow>();
 
   if (error || !data) {
     const { data: auth } = await supabase.auth.getUser();
@@ -142,12 +152,6 @@ function pickLanguage(
   if (rendered.includes("en")) return "en";
   if (rendered.includes("zh")) return "zh";
   return "en";
-}
-
-function shortAuditId(id: string): string {
-  // Mirror the format shown in the subbar so the downloaded filename
-  // matches what the user sees on screen ("BR-4D8D-D102").
-  return `${id.slice(0, 4)}-${id.slice(4, 8)}`.toUpperCase();
 }
 
 function slugify(s: string): string {

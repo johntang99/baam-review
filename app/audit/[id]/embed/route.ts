@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { auditIdFilter } from "@/lib/audit/audit-id";
 import { getBenchmarks } from "@/lib/audit/benchmarks";
 import {
   buildAuditViewModel,
@@ -38,14 +39,23 @@ export async function GET(
   // Fetch first — RLS lets anonymous visitors read when is_public=true.
   // Auth check happens after, only if the row didn't come back (we don't
   // know whether it's missing or private without authenticating).
+  const idFilter = auditIdFilter(id);
+  if (!idFilter) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("audits")
     .select(
       "id,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data",
-    )
-    .eq("id", id)
-    .maybeSingle<AuditEmbedRow>();
+    );
+  query =
+    "exact" in idFilter
+      ? query.eq("id", idFilter.exact)
+      : query.gte("id", idFilter.lo).lte("id", idFilter.hi).limit(1);
+
+  const { data, error } = await query.maybeSingle<AuditEmbedRow>();
 
   if (error || !data) {
     const { data: auth } = await supabase.auth.getUser();

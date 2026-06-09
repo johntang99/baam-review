@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
 import { AuditResultSubBar } from "@/components/audit/audit-result-subbar";
+import { auditIdFilter, shortAuditId } from "@/lib/audit/audit-id";
 import { AuditEmbed } from "./audit-embed";
 
 export const metadata = { title: "Your audit — BAAM Review Audit" };
@@ -28,10 +29,6 @@ interface AuditRow {
   };
 }
 
-function shortAuditId(id: string): string {
-  return `BR-${id.slice(0, 4)}-${id.slice(4, 8)}`.toUpperCase();
-}
-
 export default async function AuditResultPage(props: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ lang?: string }>;
@@ -49,13 +46,20 @@ export default async function AuditResultPage(props: {
   // the link to a public audit; either case may proceed. If the row is
   // null AND the visitor isn't signed in, send them to login so they have
   // a chance to authenticate before we 404.
-  const { data, error } = await supabase
+  const idFilter = auditIdFilter(id);
+  if (!idFilter) notFound();
+
+  let query = supabase
     .from("audits")
     .select(
       "id,user_id,is_public,tier,total_score,grade,languages_rendered,pdf_urls,generated_at,google_data",
-    )
-    .eq("id", id)
-    .maybeSingle<AuditRow>();
+    );
+  query =
+    "exact" in idFilter
+      ? query.eq("id", idFilter.exact)
+      : query.gte("id", idFilter.lo).lte("id", idFilter.hi).limit(1);
+
+  const { data, error } = await query.maybeSingle<AuditRow>();
 
   if (error || !data) {
     if (!authData.user) redirect(`/login?next=/audit/${id}`);

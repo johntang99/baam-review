@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { canUserAudit } from "@/lib/audit/quotas";
+import { shortAuditId } from "@/lib/audit/audit-id";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
 import { OpenAccessToggle } from "@/components/audit/open-access-toggle";
 import { ServiceBanner } from "./service-banner";
@@ -240,7 +241,7 @@ export default async function AuditListPage(props: {
                 dangerouslySetInnerHTML={{ __html: latestInsight.text }}
               />
               <Link
-                href={`/audit/${latestInsight.auditId}#action-01`}
+                href={`/audit/${shortAuditId(latestInsight.auditId)}#action-01`}
                 className="insights-bar-cta"
               >
                 See action 1 →
@@ -458,7 +459,7 @@ function CompletedRow({
       </div>
 
       <div className="audit-row-actions">
-        <Link href={`/audit/${row.id}`} className="audit-row-action primary">
+        <Link href={`/audit/${shortAuditId(row.id)}`} className="audit-row-action primary">
           View report
         </Link>
         {enUrl && (
@@ -484,7 +485,7 @@ function CompletedRow({
         <OpenAccessToggle
           auditId={row.id}
           initialIsPublic={row.is_public}
-          shareUrl={`${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:4001"}/audit/${row.id}`}
+          shareUrl={`${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:4001"}/audit/${shortAuditId(row.id)}`}
         />
       </div>
     </div>

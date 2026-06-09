@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { canUserAudit } from "@/lib/audit/quotas";
+import { shortAuditId } from "@/lib/audit/audit-id";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
 
 export const metadata: Metadata = {
@@ -231,7 +232,7 @@ function StateBHub({
                   return (
                     <Link
                       key={a.id}
-                      href={`/audit/${a.id}`}
+                      href={`/audit/${shortAuditId(a.id)}`}
                       className="hub-audit-row"
                     >
                       <div className="hub-audit-row-mark">{initial}</div>
