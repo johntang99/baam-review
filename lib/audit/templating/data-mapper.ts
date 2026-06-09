@@ -139,6 +139,7 @@ function buildTranslatedStrings(
     cover_subtitle: s.cover_subtitle,
     cover_meta_labels: s.cover_meta_labels,
     cover_meta_subtitle: s.cover_meta_subtitle,
+    cover_toc: s.cover_toc,
     hook_quote_html: s.hook_quote_html,
     section_titles: s.section_titles as TranslatedStrings["section_titles"],
     section_headlines: s.section_headlines as TranslatedStrings["section_headlines"],

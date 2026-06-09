@@ -98,6 +98,7 @@ export interface TranslatedStrings {
   cover_subtitle: string;
   cover_meta_labels: { business: string; location: string; vertical: string; audit_id: string };
   cover_meta_subtitle: string;
+  cover_toc: Array<{ num: string; title: string; sub: string }>;
   hook_quote_html: string;
   section_titles: { "01": string; "02": string; "03": string; "04": string; "05": string; "06": string; A: string };
   section_headlines: { "01": string; "02": string };

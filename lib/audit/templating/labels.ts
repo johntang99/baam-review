@@ -398,6 +398,7 @@ export const STRINGS: Record<
     cover_subtitle: string;
     cover_meta_labels: { business: string; location: string; vertical: string; audit_id: string };
     cover_meta_subtitle: string;
+    cover_toc: Array<{ num: string; title: string; sub: string }>;
     hook_quote_html: string;
     section_titles: Record<string, string>;
     section_headlines: Record<string, string>;
@@ -500,10 +501,18 @@ export const STRINGS: Record<
   en: {
     page_label: (n, total) => `Page ${String(n).padStart(2, "0")} / ${total}`,
     cover_eyebrow: (pages) => `A personalized diagnostic · ${pages} pages · for the owner, not the developer`,
-    cover_title_html: "The reputation report you've been <em>missing.</em>",
+    cover_title_html: "Customers can't choose you <em>if they can't find you.</em>",
     cover_subtitle: "Where your business stands today, what it costs you each month, and the five things to do in the next 12 months.",
     cover_meta_labels: { business: "Business", location: "Location", vertical: "Vertical", audit_id: "Audit ID" },
     cover_meta_subtitle: "prepared by BAAM Studio",
+    cover_toc: [
+      { num: "02", title: "Your current snapshot", sub: "Score, grade, and the full breakdown" },
+      { num: "03", title: "Competitor comparison", sub: "The names customers see before yours" },
+      { num: "04", title: "Service opportunity", sub: "Climbing the grade ladder in 90–120 days" },
+      { num: "05", title: "The 12-month forecast", sub: "Your projected score with BAAM Review" },
+      { num: "06", title: "Your action plan", sub: "Five moves, prioritized by sub-score" },
+      { num: "A", title: "Appendix · reference tables", sub: "The full methodology in two tables" },
+    ],
     hook_quote_html: "Average businesses become <em>hot and popular</em> by building reviews relentlessly.<br>Excellent businesses become <em>invisible</em> because they ignore them.",
     section_titles: {
       "01": "Business owners should know: Reviews Decide Who Wins",
@@ -605,7 +614,7 @@ export const STRINGS: Record<
     cta_action_full_label: "Start Full Service trial →",
     cta_action_compare_label: "Compare tiers in detail →",
     so_big_title:
-      "We can help you climb the grade ladder — and grow your business.",
+      "We help you climb the grade ladder — grow your business",
     so_eyebrow: "§ Service opportunity · Tailored to your audit",
     so_headline_html: (startingScore, d180Grade, m12Grade) => {
       const base = `From <span class="so-score-pill">${startingScore}</span> to <em>Grade ${d180Grade}</em> in 90–120 days`;
@@ -656,10 +665,18 @@ export const STRINGS: Record<
   zh: {
     page_label: (n, total) => `第 ${String(n).padStart(2, "0")} 頁 / 共 ${total} 頁`,
     cover_eyebrow: (pages) => `為您量身定制的診斷報告 · 共 ${pages} 頁 · 為老闆而寫，非為工程師`,
-    cover_title_html: "您一定要了解的 <em>Google聲譽報告</em>",
+    cover_title_html: "客戶找不到您，<em>就無法選擇您。</em>",
     cover_subtitle: "您的業務當前狀況、每月損失多少、以及未來 12 個月需要採取的五項行動",
     cover_meta_labels: { business: "商家", location: "地址", vertical: "行業", audit_id: "審計編號" },
     cover_meta_subtitle: "由 BAAM Studio 編製",
+    cover_toc: [
+      { num: "02", title: "您目前的狀況概覽", sub: "分數、等級與完整細項" },
+      { num: "03", title: "競爭對手比較", sub: "客戶比您先看到的名字" },
+      { num: "04", title: "服務機會", sub: "90–120 天內提升一個等級" },
+      { num: "05", title: "12 個月預測", sub: "與 BAAM Review 合作的預測分數" },
+      { num: "06", title: "您的行動計劃", sub: "五項行動，依子分數排序" },
+      { num: "A", title: "附錄 · 參考數據表", sub: "完整方法論，兩張表呈現" },
+    ],
     hook_quote_html: "普通的企業因勤於累積評論而<em>蒸蒸日上</em>，<br>卓越的企業卻因忽視評論而<em>逐漸沉寂</em>。",
     section_titles: {
       "01": "商家應知道：評論決定誰能勝出",
@@ -761,7 +778,7 @@ export const STRINGS: Record<
     cta_action_full_label: "啟動全託管試用 →",
     cta_action_compare_label: "詳細比較兩個方案 →",
     so_big_title:
-      "我們能幫您逐級攀升 — 帶動業績成長",
+      "我們幫您逐級攀升 — 帶動業績成長",
     so_eyebrow: "§ 服務機會 · 依您的審計量身定制",
     so_headline_html: (startingScore, d180Grade, m12Grade) => {
       const base = `從 <span class="so-score-pill">${startingScore}</span> 提升至 <em>${d180Grade} 級</em>，僅需 90–120 天`;
