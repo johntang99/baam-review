@@ -72,6 +72,8 @@ export const AuditGoogleDataSchema = z.object({
   vertical: z.object({
     google_categories: z.array(z.string()),
     primary_category: z.string(),
+    // Human-readable GBP primary category, e.g. "Acupuncture Clinic".
+    primary_category_display: z.string().nullish(),
     inferred_vertical: VerticalKeySchema,
     confidence: z.number().min(0).max(1),
   }),

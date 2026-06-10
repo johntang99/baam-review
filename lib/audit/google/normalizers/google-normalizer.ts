@@ -93,6 +93,7 @@ export function normalizeGoogleData(input: NormalizeInput): AuditGoogleData {
     vertical: {
       google_categories: types,
       primary_category: rawPlace.primaryType ?? verticalMatch.primary_category,
+      primary_category_display: rawPlace.primaryTypeDisplayName?.text ?? null,
       inferred_vertical: verticalMatch.inferred_vertical,
       confidence: verticalMatch.confidence,
     },

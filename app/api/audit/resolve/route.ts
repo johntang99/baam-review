@@ -65,6 +65,14 @@ export async function POST(request: Request) {
       is_chinese_business: google.language.is_chinese_business,
       detected_vertical: detectedVertical,
       detected_service: detectedService,
+      // Actual Google Business Profile categorization (for display/context).
+      google_category:
+        google.vertical.primary_category_display ||
+        humanizeCategory(google.vertical.primary_category),
+      google_categories: humanizeCategories(
+        google.vertical.google_categories,
+        google.vertical.primary_category,
+      ),
       vertical_options: VERTICAL_KEYS,
       website_match: websiteMatch,
     });
@@ -79,6 +87,31 @@ export async function POST(request: Request) {
     console.error("[resolve] failed:", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
+}
+
+// Google `types` mixes real categories with structural ones; drop the noise.
+const GENERIC_TYPES = new Set([
+  "establishment",
+  "point_of_interest",
+  "premise",
+  "geocode",
+  "food",
+  "store",
+  "health",
+]);
+
+function humanizeCategory(type: string): string {
+  return type
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** Additional GBP categories (excluding the primary + generic types),
+ *  humanized for display. */
+function humanizeCategories(types: string[], primary: string): string[] {
+  return types
+    .filter((t) => t !== primary && !GENERIC_TYPES.has(t))
+    .map(humanizeCategory);
 }
 
 function matchWebsite(

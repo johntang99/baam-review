@@ -301,8 +301,8 @@ function formatDate(d: Date, language: AuditLanguage): string {
 function pickPrimaryName(fullName: string, language: AuditLanguage): string {
   const ascii = fullName.replace(/[^\x00-\x7F]+/g, "").replace(/[()（）]/g, "").trim();
   const cjk = fullName.replace(/[\x00-\x7F]+/g, "").replace(/[()（）]/g, "").trim();
-  if (language === "zh" && cjk) return cjk;
-  return ascii || fullName;
+  if (language === "zh") return cjk || ascii || fullName.trim();
+  return ascii || cjk || fullName.trim();
 }
 
 function pickSecondaryName(
@@ -311,6 +311,9 @@ function pickSecondaryName(
 ): string {
   const ascii = business.name.replace(/[^\x00-\x7F]+/g, "").replace(/[()（）]/g, "").trim();
   const cjk = business.name.replace(/[\x00-\x7F]+/g, "").replace(/[()（）]/g, "").trim();
+  // A secondary name only exists when the listing has BOTH scripts
+  // (e.g. "德誉堂 Deyu TCM"). A single-script name has no second line.
+  if (!ascii || !cjk) return "";
   if (language === "zh") return ascii;
   return cjk;
 }
@@ -662,8 +665,19 @@ function buildCompetitorRows(
   const all = [...compRows, youRow].sort((a, b) => b.score - a.score);
   return all.map((row, idx) => ({
     ...row,
+    // Competitor listings are often keyword-stuffed names that wrap the
+    // narrow column character-by-character. Clamp to keep the table readable.
+    name: clampName(row.name),
+    name_secondary: row.name_secondary ? clampName(row.name_secondary) : row.name_secondary,
     rank: row.is_you ? t.you_tag : String(idx + 1).padStart(2, "0"),
   }));
+}
+
+/** Trim an over-long business name (keyword-stuffed listings) to a readable
+ *  length, with an ellipsis. Code-point safe for CJK. */
+function clampName(name: string, max = 24): string {
+  const chars = [...name.trim()];
+  return chars.length > max ? `${chars.slice(0, max).join("").trim()}…` : name.trim();
 }
 
 function roughScoreEstimate(c: AuditCompetitor, benchmarks: VerticalBenchmarks): number {

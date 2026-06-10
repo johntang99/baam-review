@@ -1,8 +1,8 @@
 <tr{{#if is_you}} class="you"{{/if}}>
   <td>
     <div class="competitor-name">
-      <span class="competitor-rank">{{rank}}</span>{{name}}{{#if is_you}} <span class="you-tag">{{../t.you_tag}}</span>{{/if}}
-      {{#if name_secondary}}<br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">{{name_secondary}}</span>{{/if}}
+      <span class="competitor-rank">{{rank}}</span>
+      <span class="competitor-name-text">{{name}}{{#if is_you}} <span class="you-tag">{{../t.you_tag}}</span>{{/if}}{{#if name_secondary}}<br><span class="competitor-name-sec">{{name_secondary}}</span>{{/if}}</span>
     </div>
   </td>
   <td><div class="competitor-address">{{address}}</div></td>

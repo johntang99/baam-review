@@ -1093,6 +1093,10 @@
     border-bottom: 1.5px solid var(--ink);
   }
   .competitor-table th:not(:first-child) { text-align: right; }
+  /* Keep the business (1st) column from collapsing to a 1-char vertical
+     strip when a competitor's name is long (CJK breaks at every char). */
+  .competitor-table th:first-child,
+  .competitor-table td:first-child { min-width: 170px; }
   .competitor-table td {
     padding: 18px 12px;
     border-bottom: 1px solid var(--rule-soft);
@@ -1125,8 +1129,18 @@
   }
   .competitor-name {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 12px;
+  }
+  /* The name + optional secondary line live in one flex item so the line
+     break stacks them vertically (a bare <br> inside the flex row would
+     instead lay name and secondary out side-by-side). min-width:0 lets it
+     wrap within the column instead of forcing it wider. */
+  .competitor-name-text { min-width: 0; line-height: 1.35; }
+  .competitor-name-sec {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 12px;
+    color: var(--ink-mute);
   }
   .competitor-rank {
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;

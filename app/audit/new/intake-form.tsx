@@ -51,6 +51,8 @@ interface ResolvedBusiness {
   is_chinese_business: boolean;
   detected_vertical: string;
   detected_service: string;
+  google_category: string | null;
+  google_categories: string[];
   vertical_options: string[];
   website_match: "match" | "mismatch" | "no_user_input" | "no_google_data";
 }
@@ -209,6 +211,37 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               ★ {resolved.rating.toFixed(1)} · {resolved.total_count} reviews
             </div>
           </div>
+
+          {resolved.google_category && (
+            <div
+              style={{
+                margin: "0 0 14px",
+                padding: "10px 14px",
+                background: "var(--cream-deep, #EBE3D2)",
+                borderRadius: 6,
+                fontSize: 13,
+                color: "var(--ink-soft)",
+                lineHeight: 1.5,
+              }}
+            >
+              <span
+                className="mono"
+                style={{
+                  fontSize: 10,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "var(--ink-mute)",
+                }}
+              >
+                On Google Business Profile
+              </span>
+              <br />
+              <strong style={{ color: "var(--ink)" }}>{resolved.google_category}</strong>
+              {resolved.google_categories.length > 0 && (
+                <> · also {resolved.google_categories.join(", ")}</>
+              )}
+            </div>
+          )}
 
           <div className="detection-row">
             <div className="detection-item">

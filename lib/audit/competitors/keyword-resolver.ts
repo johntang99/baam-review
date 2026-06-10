@@ -147,7 +147,9 @@ export function resolveServiceKeyword(primary: AuditGoogleData): string {
   const fallback = KEYWORD_BY_VERTICAL[vertical];
   if (fallback) return fallback;
 
-  return primary.vertical.primary_category || "business";
+  // Last resort: Google's raw primary category (e.g. "medical_clinic").
+  // Humanize it so it reads as a search term, not a snake_case type.
+  return (primary.vertical.primary_category || "business").replace(/_/g, " ");
 }
 
 export function resolvePrimaryKeyword(
