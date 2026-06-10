@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { auditIdFilter } from "@/lib/audit/audit-id";
 import { getBenchmarks } from "@/lib/audit/benchmarks";
+import { computeProjection } from "@/lib/audit/projection";
 import {
   buildAuditViewModel,
   renderAuditHtml,
@@ -82,7 +83,16 @@ export async function GET(
     google: data.google_data,
     competitors: data.competitors_data,
     score: data.score_data,
-    projection: data.projection_data,
+    // Recompute the forecast from the stored data with the current model
+    // rather than trusting the snapshot stored at generation time — the
+    // projection is a forward-looking model and should always reflect the
+    // latest logic (the measured score stays a snapshot).
+    projection: computeProjection(
+      data.google_data,
+      data.competitors_data,
+      data.score_data,
+      benchmarks,
+    ),
     benchmarks,
     platforms,
     tier: data.tier as "free" | "paid",

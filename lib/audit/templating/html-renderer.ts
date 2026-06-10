@@ -23,9 +23,10 @@ export function renderAuditHtml(view: AuditViewModel): string {
     // URL). In production they come from our own domain; in dev from the
     // local server.
     const fontBase =
-      process.env.NODE_ENV === "production"
+      process.env.AUDIT_FONT_BASE ??
+      (process.env.NODE_ENV === "production"
         ? (process.env.NEXT_PUBLIC_APP_URL ?? "https://baamreview.com")
-        : "http://localhost:4001";
+        : "http://localhost:4001");
     cachedStyles = fs
       .readFileSync(path.join(TEMPLATES_DIR, "styles.css"), "utf-8")
       .replace(/__FONT_BASE__/g, fontBase);
