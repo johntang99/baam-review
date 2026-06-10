@@ -182,11 +182,6 @@ export default async function ReviewLandingPage({
   const initialLetter = loc.display_name.charAt(0).toUpperCase();
   const brandColor = loc.brand_color ?? "#1F4D3F";
 
-  const feedbackParams = new URLSearchParams();
-  if (token) feedbackParams.set("t", token);
-  feedbackParams.set("lang", lang);
-  const privateFeedbackHref = `/r/${loc.slug}/feedback?${feedbackParams.toString()}`;
-
   return (
     <main className="min-h-screen bg-cream py-6 px-4 sm:py-10">
       <div className="mx-auto max-w-md space-y-6">
@@ -219,7 +214,6 @@ export default async function ReviewLandingPage({
             yelpUrl={loc.yelp_url}
             customUrl={loc.custom_url}
             customUrlLabel={customLabel}
-            privateFeedbackHref={privateFeedbackHref}
             consentDisplayEnabled={loc.consent_display_enabled}
             trackingToken={token ?? null}
           />

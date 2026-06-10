@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import {
   ArrowRight,
   ExternalLink,
-  Lock,
   Sparkles,
   AlertCircle,
 } from "lucide-react";
@@ -29,7 +27,6 @@ interface ReviewFlowProps {
   yelpUrl: string | null;
   customUrl: string | null;
   customUrlLabel: string | null;
-  privateFeedbackHref: string;
   consentDisplayEnabled: boolean;
   trackingToken: string | null;
 }
@@ -46,7 +43,6 @@ export function ReviewFlow({
   yelpUrl,
   customUrl,
   customUrlLabel,
-  privateFeedbackHref,
   consentDisplayEnabled,
   trackingToken,
 }: ReviewFlowProps) {
@@ -263,16 +259,6 @@ export function ReviewFlow({
             <ExternalLink className="h-3.5 w-3.5" />
           </button>
         )}
-      </div>
-
-      <div className="border-t border-border-base pt-5">
-        <Link
-          href={privateFeedbackHref}
-          className="inline-flex items-center gap-1.5 text-[13px] text-text-soft hover:text-text"
-        >
-          <Lock className="h-3.5 w-3.5" />
-          {s.private_link}
-        </Link>
       </div>
     </div>
   );
