@@ -548,10 +548,30 @@ function computeVelocityPointerPct(
   velocity: number | null,
   benchmarks: VerticalBenchmarks,
 ): number {
-  const v = velocity ?? 0;
-  const ceiling = benchmarks.healthy_velocity.aggressive_per_month * 1.1;
-  const pct = (v / ceiling) * 100;
-  return Math.max(0, Math.min(100, pct));
+  const v = Math.max(0, velocity ?? 0);
+  const hv = benchmarks.healthy_velocity;
+
+  // The gauge bands are laid out by CSS flex weights, NOT by their numeric
+  // widths — so the pointer has to be placed segment-by-segment to land in
+  // the right band. These weights MUST match styles.css `.velocity-band.*`:
+  //   silent 1.5 · min 1.2 · optimal 1.5 · aggressive 1   (total 5.2)
+  const T = 5.2;
+  const segments = [
+    { vFrom: 0, vTo: hv.minimum_per_month, pFrom: 0, pTo: 1.5 / T },
+    { vFrom: hv.minimum_per_month, vTo: hv.optimal_low_per_month, pFrom: 1.5 / T, pTo: 2.7 / T },
+    { vFrom: hv.optimal_low_per_month, vTo: hv.optimal_high_per_month, pFrom: 2.7 / T, pTo: 4.2 / T },
+    // Aggressive band is open-ended; map up to 1.5× the aggressive threshold.
+    { vFrom: hv.optimal_high_per_month, vTo: hv.aggressive_per_month * 1.5, pFrom: 4.2 / T, pTo: 1 },
+  ];
+
+  for (const s of segments) {
+    if (v <= s.vTo) {
+      const t = s.vTo === s.vFrom ? 0 : (v - s.vFrom) / (s.vTo - s.vFrom);
+      const pct = (s.pFrom + t * (s.pTo - s.pFrom)) * 100;
+      return Math.max(0, Math.min(100, pct));
+    }
+  }
+  return 100;
 }
 
 function buildVelocityPointerLabel(

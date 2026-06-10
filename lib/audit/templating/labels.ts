@@ -506,7 +506,7 @@ export const STRINGS: Record<
   en: {
     page_label: (n, total) => `Page ${String(n).padStart(2, "0")} / ${total}`,
     cover_eyebrow: (pages) => `A personalized diagnostic · ${pages} pages · for the owner, not the developer`,
-    cover_title_html: "Customers can't choose you <em>if they can't find you.</em>",
+    cover_title_html: "Customers can't choose you <em>if they can't find you</em>",
     cover_subtitle: "Where your business stands today, what it costs you each month, and the five things to do in the next 12 months.",
     cover_meta_labels: { business: "Business", location: "Location", vertical: "Vertical", audit_id: "Audit ID" },
     cover_meta_subtitle: "prepared by BAAM Studio",
@@ -588,9 +588,9 @@ export const STRINGS: Record<
       "Per BrightLocal, only <strong>9% of businesses</strong> sustain the Optimal pace — the band Google's ranking algorithm actually rewards.",
     money_on_table_eyebrow: "§ The Money on the Table",
     section_5_headline_html: "The names customers <em>see before yours.</em>",
-    section_5_deck: "Identified from Google Maps rankings within your search radius. We pick the competitors — owners almost always pick the wrong ones.",
+    section_5_deck: "Competitors are identified from Google Maps rankings within your search radius — they may not all be exact matches, but they're a useful point of reference.",
     competitor_table_headers: { business: "Business", address: "Address", score: "Score", rating: "Rating", total: "Total Reviews", last_30d: "Last 30d", last_90d: "Last 90d", trend: "Trend" },
-    section_6_headline_html: "Five things. <em>Not three. Not ten.</em>",
+    section_6_headline_html: "Five moves to more reviews — <em>and more customers.</em>",
     section_6_deck: "First, the ground truth — what one review is worth in your category, and the pace a healthy business keeps. Then the five moves, prioritized by your lowest sub-scores, to close the gap.",
     summary_block_html: (m) =>
       `<div class=\"conclusion-eyebrow\">§ Conclusion · Modelled over 12 months</div>` +
@@ -670,7 +670,7 @@ export const STRINGS: Record<
   zh: {
     page_label: (n, total) => `第 ${String(n).padStart(2, "0")} 頁 / 共 ${total} 頁`,
     cover_eyebrow: (pages) => `為您量身定制的診斷報告 · 共 ${pages} 頁 · 為老闆而寫，非為工程師`,
-    cover_title_html: "客戶找不到您，<em>就無法選擇您。</em>",
+    cover_title_html: "客戶找不到您，<em>就無法選擇您</em>",
     cover_subtitle: "您的業務當前狀況、每月損失多少、以及未來 12 個月需要採取的五項行動",
     cover_meta_labels: { business: "商家", location: "地址", vertical: "行業", audit_id: "審計編號" },
     cover_meta_subtitle: "由 BAAM Studio 編製",
@@ -752,9 +752,9 @@ export const STRINGS: Record<
       "根據 BrightLocal · 只有 <strong>9% 的商家</strong>能維持理想速率 — 也就是 Google 排名演算法真正獎勵的區間。",
     money_on_table_eyebrow: "§ 桌上未取的金錢",
     section_5_headline_html: "在眾多競爭對手中，<em>客戶能看見您嗎？</em>",
-    section_5_deck: "由 Google Maps 在您的搜尋半徑內排名識別。我們替您挑選競爭對手 — 供您參考",
+    section_5_deck: "競爭對手依您搜尋範圍內的 Google 地圖排名識別 — 未必完全精準，但可供您參考。",
     competitor_table_headers: { business: "商家", address: "地址", score: "分數", rating: "評分", total: "總評論", last_30d: "近 30 天", last_90d: "近 90 天", trend: "趨勢" },
-    section_6_headline_html: "五件事 · <em>不是三件，不是十件</em>",
+    section_6_headline_html: "五項行動 · 更多評論<em>，更多客戶</em>",
     section_6_deck: "先看基本事實 — 在您的行業中一則評論的價值，以及健康商家維持的累積速率。接著是五項行動，依您最低的子分數排序，逐一縮小差距。",
     summary_block_html: (m) =>
       `<div class=\"conclusion-eyebrow\">§ 結論 · 12 個月模型推估</div>` +
