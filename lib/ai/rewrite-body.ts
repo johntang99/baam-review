@@ -81,6 +81,20 @@ export interface RewriteResult {
   error?: string;
 }
 
+/** Normalize punctuation that models routinely swap so a business-name match
+ *  isn't defeated by a curly vs straight apostrophe, smart quotes, or a fancy
+ *  dash. e.g. "Angie’s Academy" (U+2019) vs the model's "Angie's Academy"
+ *  (U+0027) must compare equal. Case-insensitive; whitespace collapsed. */
+function normalizeForMatch(s: string): string {
+  return s
+    .replace(/[‘’‚‛`´]/g, "'") // single quotes / accents → '
+    .replace(/[“”„‟]/g, '"') // double quotes → "
+    .replace(/[‐-―−]/g, "-") // hyphens / dashes / minus → -
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
 function extractJsonObject(raw: string): { subject?: string; body?: string } | null {
   // Strip optional markdown fences the model might add despite instructions.
   const trimmed = raw.replace(/^```(?:json)?\s*|\s*```$/g, "").trim();
@@ -166,7 +180,9 @@ export async function rewriteReviewRequestBody(
       // recipient would see the literal greeting ("Dear Customer", "尊敬的顾客")
       // and lose the personal touch. Subject just needs to be non-empty and
       // not unreasonably long.
-      const hasBusinessName = body.includes(inputs.businessName);
+      const hasBusinessName = normalizeForMatch(body).includes(
+        normalizeForMatch(inputs.businessName),
+      );
       const hasSlug = body.includes("<slug>");
       const hasToken = body.includes("<token>");
       const hasName = body.includes("{name}");
