@@ -20,10 +20,14 @@ export function LocationSetupNavItem({
   const pathname = usePathname();
   const hasSelectedLocation = Boolean(selectedLocationId);
 
+  // Only active when an actual location is selected and we're on its setup
+  // page. With no location selected this item is a no-op (it just prompts to
+  // connect one), so it must not highlight on /app/locations — that path
+  // belongs to "Manage all locations" (which would otherwise both light up).
   const isActive = hasSelectedLocation
     ? pathname === `/app/locations/${selectedLocationId}` ||
       pathname.startsWith(`/app/locations/${selectedLocationId}/`)
-    : pathname === "/app/locations";
+    : false;
 
   function onClick() {
     if (hasSelectedLocation && selectedLocationId) {

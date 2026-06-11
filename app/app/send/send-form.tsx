@@ -368,10 +368,11 @@ export function SendForm({
           Connect a Google Business Profile first.
         </p>
         <Link
-          href="/app/locations"
+          href="/api/auth/google/start"
+          prefetch={false}
           className="mt-4 inline-block text-[13px] font-medium text-forest hover:underline"
         >
-          Go to Locations →
+          Connect a new location →
         </Link>
       </div>
     );

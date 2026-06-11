@@ -52,6 +52,9 @@ interface LocationsTableProps {
   perPage: number;
   total: number;
   pathname?: string;
+  /** BAAM internal staff only. Gates the "Managed by" / "Connected by"
+   *  columns so external customers never see internal staff names. */
+  isInternal: boolean;
 }
 
 const BILLING_CLS: Record<
@@ -154,6 +157,7 @@ export function LocationsTable({
   page,
   perPage,
   total,
+  isInternal,
 }: LocationsTableProps) {
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const pages = pageNumbers(page, totalPages);
@@ -203,12 +207,16 @@ export function LocationsTable({
                 >
                   Contract
                 </SortHeader>
-                <th className="px-3.5 py-2.5 font-medium hidden md:table-cell">
-                  Managed by
-                </th>
-                <th className="px-3.5 py-2.5 font-medium hidden xl:table-cell">
-                  Connected by
-                </th>
+                {isInternal && (
+                  <th className="px-3.5 py-2.5 font-medium hidden md:table-cell">
+                    Managed by
+                  </th>
+                )}
+                {isInternal && (
+                  <th className="px-3.5 py-2.5 font-medium hidden xl:table-cell">
+                    Connected by
+                  </th>
+                )}
                 <th className="px-3.5 py-2.5 font-medium text-right">
                   Actions
                 </th>
@@ -217,13 +225,14 @@ export function LocationsTable({
             <tbody>
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center">
+                  <td colSpan={isInternal ? 8 : 6} className="px-6 py-12 text-center">
                     <MapPin className="h-5 w-5 text-text-muted mx-auto mb-2" />
                     <p className="text-[14px] text-ink">
                       No locations match the current filters.
                     </p>
                     <p className="text-[12.5px] text-text-muted mt-1">
-                      Clear filters or connect a new GBP to get started.
+                      Clear filters or connect a new Google Business Profile to
+                      get started.
                     </p>
                   </td>
                 </tr>
@@ -342,48 +351,52 @@ export function LocationsTable({
                   </td>
 
                   {/* Managed by */}
-                  <td className="px-3.5 py-3 hidden md:table-cell">
-                    {loc.assignments.length === 0 ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11.5px] text-text-muted border border-dashed border-border-base">
-                        {loc.plan === "self_service"
-                          ? "Self-managed"
-                          : "Unassigned"}
-                      </span>
-                    ) : (
-                      <div className="flex flex-wrap gap-1">
-                        {loc.assignments.map((a) => (
-                          <span
-                            key={a.user_id}
-                            className="inline-flex items-center gap-1 rounded-full bg-sage-soft px-2 py-0.5 text-[11.5px] text-forest-dark"
-                            title={a.email}
-                          >
-                            {a.full_name || a.email.split("@")[0]}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </td>
+                  {isInternal && (
+                    <td className="px-3.5 py-3 hidden md:table-cell">
+                      {loc.assignments.length === 0 ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11.5px] text-text-muted border border-dashed border-border-base">
+                          {loc.plan === "self_service"
+                            ? "Self-managed"
+                            : "Unassigned"}
+                        </span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1">
+                          {loc.assignments.map((a) => (
+                            <span
+                              key={a.user_id}
+                              className="inline-flex items-center gap-1 rounded-full bg-sage-soft px-2 py-0.5 text-[11.5px] text-forest-dark"
+                              title={a.email}
+                            >
+                              {a.full_name || a.email.split("@")[0]}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  )}
 
                   {/* Connected by */}
-                  <td className="px-3.5 py-3 hidden xl:table-cell">
-                    {loc.connected_by_name ? (
-                      <div className="flex flex-col leading-tight">
-                        <span
-                          className="text-[12px] text-ink"
-                          title={loc.connected_by_user_id ?? ""}
-                        >
-                          {loc.connected_by_name}
-                        </span>
-                        {loc.connected_via_google_email && (
-                          <span className="text-[11px] text-text-muted">
-                            via {loc.connected_via_google_email}
+                  {isInternal && (
+                    <td className="px-3.5 py-3 hidden xl:table-cell">
+                      {loc.connected_by_name ? (
+                        <div className="flex flex-col leading-tight">
+                          <span
+                            className="text-[12px] text-ink"
+                            title={loc.connected_by_user_id ?? ""}
+                          >
+                            {loc.connected_by_name}
                           </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-text-muted text-[12px]">—</span>
-                    )}
-                  </td>
+                          {loc.connected_via_google_email && (
+                            <span className="text-[11px] text-text-muted">
+                              via {loc.connected_via_google_email}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-text-muted text-[12px]">—</span>
+                      )}
+                    </td>
+                  )}
 
                   {/* Actions */}
                   <td className="px-3.5 py-3">

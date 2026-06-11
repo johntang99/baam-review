@@ -68,9 +68,9 @@ export function OpenAccessToggle({
           onChange={(e) => toggle(e.target.checked)}
           disabled={pending}
           className="open-access-toggle-checkbox"
-          aria-label="Share Audit — anyone with the link can view"
+          aria-label="Share Report — anyone with the link can view"
         />
-        <span className="open-access-toggle-text">Share Audit</span>
+        <span className="open-access-toggle-text">Share Report</span>
         <button
           type="button"
           onClick={(e) => {
@@ -78,8 +78,8 @@ export function OpenAccessToggle({
             setShowHelp(true);
           }}
           className="open-access-help-btn"
-          aria-label="What does 'Share Audit' do?"
-          title="What does 'Share Audit' do?"
+          aria-label="What does 'Share Report' do?"
+          title="What does 'Share Report' do?"
         >
           <HelpCircle className="open-access-icon" />
         </button>
@@ -124,7 +124,7 @@ export function OpenAccessToggle({
                 id="open-access-help-title"
                 className="open-access-help-title"
               >
-                Share Audit — what does it do?
+                Share Report — what does it do?
               </h3>
               <button
                 type="button"
@@ -137,7 +137,7 @@ export function OpenAccessToggle({
             </div>
             <div className="open-access-help-body">
               <p>
-                <strong>Share Audit</strong> makes <em>this one audit</em> viewable
+                <strong>Share Report</strong> makes <em>this one audit</em> viewable
                 by anyone who has the link &mdash; no signin required. Useful
                 when you want to share a report with a client, prospect, or
                 colleague who doesn&apos;t have a BAAM Review account.
@@ -178,9 +178,9 @@ export function OpenAccessToggle({
       <style jsx>{`
         .open-access-toggle {
           display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          flex-wrap: wrap;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 6px;
         }
         .open-access-toggle-label {
           display: inline-flex;
@@ -190,8 +190,8 @@ export function OpenAccessToggle({
           font-size: 12.5px;
           color: var(--text-soft, #555);
           font-weight: 500;
-          padding: 4px 8px;
-          border-radius: 6px;
+          padding: 6px 10px;
+          border-radius: 8px;
           border: 1px solid var(--rule, #ddd);
           background: var(--paper, #fff);
         }
@@ -208,16 +208,17 @@ export function OpenAccessToggle({
           cursor: wait;
           opacity: 0.6;
         }
-        .open-access-toggle-text { color: var(--ink, #1c1c1c); }
+        .open-access-toggle-text { color: var(--ink, #1c1c1c); margin-right: auto; }
         .open-access-copy-btn {
           display: inline-flex;
           align-items: center;
+          justify-content: center;
           gap: 5px;
-          padding: 4px 10px;
-          border-radius: 999px;
+          padding: 6px 10px;
+          border-radius: 8px;
           border: 1px solid var(--rule, #ddd);
           background: var(--paper, #fff);
-          font-size: 11.5px;
+          font-size: 12px;
           font-weight: 500;
           color: var(--text-soft, #555);
           cursor: pointer;

@@ -104,6 +104,10 @@ export default async function LocationsPage({
 
   // ── Visibility filter ─────────────────────────────────────────────────
   const internal = await getInternalContext(supabase, user.id);
+  // External customers must never see BAAM-internal staff identities. This
+  // flag gates the "Managed by" / "Connected by" filters + columns and the
+  // staff names in each row's payload.
+  const isInternal = internal !== null;
 
   // Self-service customers who connected a location but never picked a
   // plan end up here with all billing columns showing "—" and no path
@@ -269,17 +273,20 @@ export default async function LocationsPage({
       business_type: l.business_type,
       brand_color: l.brand_color,
       logo_url: l.logo_url,
-      connected_by_user_id: l.connected_by_user_id,
-      connected_by_name: l.connected_by_user_id
-        ? connectorById.get(l.connected_by_user_id) ?? null
+      connected_by_user_id: isInternal ? l.connected_by_user_id : null,
+      connected_by_name:
+        isInternal && l.connected_by_user_id
+          ? connectorById.get(l.connected_by_user_id) ?? null
+          : null,
+      connected_via_google_email: isInternal
+        ? l.connected_via_google_email
         : null,
-      connected_via_google_email: l.connected_via_google_email,
       plan: billing?.accountPlan ?? null,
       billing_status: status,
       contract_start: contractDates.start,
       contract_next_or_end: contractDates.nextOrEnd,
       contract_next_amount_cents: contractDates.nextAmountCents,
-      assignments: assignmentsByLocation.get(l.id) ?? [],
+      assignments: isInternal ? assignmentsByLocation.get(l.id) ?? [] : [],
       canAssign: showAssign,
       _created_at: l.created_at,
       _reviews_synced_at: l.reviews_synced_at,
@@ -415,7 +422,7 @@ export default async function LocationsPage({
           <Link href="/api/auth/google/start" prefetch={false}>
             <Button>
               <Plus className="h-4 w-4" />
-              Connect Google
+              Connect Google Business Profile
             </Button>
           </Link>
         )}
@@ -469,9 +476,10 @@ export default async function LocationsPage({
         total={total}
         rangeStart={rangeStart}
         rangeEnd={rangeEnd}
-        managers={managerOptions}
-        connectors={connectorOptions}
+        managers={isInternal ? managerOptions : []}
+        connectors={isInternal ? connectorOptions : []}
         canConnectGoogle={internal?.opsRole !== "account_manager"}
+        isInternal={isInternal}
       />
 
       {view === "list" ? (
@@ -479,15 +487,16 @@ export default async function LocationsPage({
           rows={paged}
           sort={sort}
           searchParamsString={searchParamsString}
-          managers={managerOptions}
+          managers={isInternal ? managerOptions : []}
           page={page}
           perPage={PER_PAGE}
           total={total}
+          isInternal={isInternal}
         />
       ) : (
         <GridView
           rows={paged}
-          managers={managerOptions}
+          managers={isInternal ? managerOptions : []}
           billingMap={billingMap}
         />
       )}

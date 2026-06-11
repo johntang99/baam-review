@@ -392,7 +392,7 @@ nav.scrolled { border-color: var(--border); }
 /* ============ FILTERS ============ */
 .list-filters {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 16px;
   gap: 20px;
@@ -464,7 +464,7 @@ nav.scrolled { border-color: var(--border); }
 /* ============ AUDIT LIST ============ */
 .audit-list {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto auto auto;
   background: var(--paper);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -631,6 +631,15 @@ nav.scrolled { border-color: var(--border); }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.audit-row-view {
+  display: flex;
+  justify-content: flex-end;
+}
+.audit-row-share {
+  display: flex;
+  justify-content: flex-end;
+}
+/* Actions container kept for generating / failed (simple) rows. */
 .audit-row-actions {
   display: flex;
   gap: 8px;
@@ -842,7 +851,8 @@ footer {
   .service-banner { grid-template-columns: 1fr; gap: 18px; }
   .audit-list { grid-template-columns: minmax(0, 1fr) auto; }
   .audit-row { column-gap: 14px; padding: 18px 20px; }
-  .audit-row-grade-block, .audit-row-date-block, .audit-row-user-block { display: none; }
+  .audit-row-grade-block, .audit-row-date-block, .audit-row-user-block,
+  .audit-row-view, .audit-row-share { display: none; }
   .audit-row-actions { display: none; }
   .bottom-actions { grid-template-columns: 1fr; gap: 32px; }
   .list-filters { flex-direction: column; align-items: flex-start; }

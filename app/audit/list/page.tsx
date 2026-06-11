@@ -8,6 +8,7 @@ import { shortAuditId } from "@/lib/audit/audit-id";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
 import { OpenAccessToggle } from "@/components/audit/open-access-toggle";
 import { ServiceBanner } from "./service-banner";
+import { SortDropdown } from "./sort-dropdown";
 
 export const metadata = { title: "Your audits · BAAM Review Audit" };
 export const dynamic = "force-dynamic";
@@ -52,7 +53,7 @@ const VERTICAL_LABELS: Record<string, string> = {
 };
 
 export default async function AuditListPage(props: {
-  searchParams: Promise<{ business?: string }>;
+  searchParams: Promise<{ business?: string; sort?: string }>;
 }) {
   const supabase = await createClient();
   const { data: authData } = await supabase.auth.getUser();
@@ -62,6 +63,10 @@ export default async function AuditListPage(props: {
 
   const params = await props.searchParams;
   const businessFilter = params.business ?? null;
+  const SORT_KEYS = ["newest", "score_desc", "score_asc", "name"] as const;
+  const sortKey = (SORT_KEYS as readonly string[]).includes(params.sort ?? "")
+    ? (params.sort as (typeof SORT_KEYS)[number])
+    : "newest";
 
   const { css } = readMarketingDoc("audit-list.html");
   const quota = await canUserAudit(authData.user.id);
@@ -130,6 +135,28 @@ export default async function AuditListPage(props: {
   const filteredRows = businessFilter
     ? displayRows.filter((d) => d.row.business_place_id === businessFilter)
     : displayRows;
+
+  // Apply sort. "newest" keeps the DB order (generated_at desc). Rows without a
+  // score (generating / failed) sort to the bottom of score sorts; rows without
+  // a name sort to the bottom of the alphabetical sort.
+  const sortName = (d: (typeof filteredRows)[number]) =>
+    d.row.google_data?.business?.name?.trim() || "￿";
+  const sortedRows =
+    sortKey === "score_desc"
+      ? [...filteredRows].sort(
+          (a, b) => (b.row.total_score ?? -1) - (a.row.total_score ?? -1),
+        )
+      : sortKey === "score_asc"
+        ? [...filteredRows].sort(
+            (a, b) =>
+              (a.row.total_score ?? Number.POSITIVE_INFINITY) -
+              (b.row.total_score ?? Number.POSITIVE_INFINITY),
+          )
+        : sortKey === "name"
+          ? [...filteredRows].sort((a, b) =>
+              sortName(a).localeCompare(sortName(b)),
+            )
+          : filteredRows;
 
   // Filter chips: one per unique business + "All audits".
   const uniqueBusinesses = Array.from(
@@ -272,30 +299,8 @@ export default async function AuditListPage(props: {
 
           {totalCompleted > 0 && (
             <div className="list-filters">
-              <div className="list-filters-left">
-                <span className="filter-label">Filter</span>
-                <div className="filter-chips">
-                  <Link
-                    href="/audit/list"
-                    className={`filter-chip${businessFilter === null ? " active" : ""}`}
-                  >
-                    All audits{" "}
-                    <span className="filter-chip-count">{totalCompleted}</span>
-                  </Link>
-                  {uniqueBusinesses.map((b) => (
-                    <Link
-                      key={b.place_id}
-                      href={`/audit/list?business=${encodeURIComponent(b.place_id)}`}
-                      className={`filter-chip${businessFilter === b.place_id ? " active" : ""}`}
-                    >
-                      {b.name}{" "}
-                      <span className="filter-chip-count">{b.count}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
               <div className="list-filters-right">
-                <span className="list-sort">Sorted: Newest first</span>
+                <SortDropdown current={sortKey} />
               </div>
             </div>
           )}
@@ -304,7 +309,7 @@ export default async function AuditListPage(props: {
             <EmptyState />
           ) : (
             <div className="audit-list">
-              {filteredRows.map(({ row, isReAudit, trendDelta, isBilingual }) =>
+              {sortedRows.map(({ row, isReAudit, trendDelta, isBilingual }) =>
                 row.status === "generating" ? (
                   <GeneratingRow key={row.id} row={row} />
                 ) : row.status === "failed" ? (
@@ -431,9 +436,6 @@ function CompletedRow({
   });
   const ago = daysAgo(date);
 
-  const enUrl = row.pdf_urls?.en;
-  const zhUrl = row.pdf_urls?.zh;
-
   return (
     <div className="audit-row">
       <div className="audit-row-info">
@@ -490,30 +492,13 @@ function CompletedRow({
         <span className="audit-row-user-name">{generatorName}</span>
       </div>
 
-      <div className="audit-row-actions">
+      <div className="audit-row-view">
         <Link href={`/audit/${shortAuditId(row.id)}`} className="audit-row-action primary">
           View report
         </Link>
-        {enUrl && (
-          <a
-            href={enUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="audit-row-action"
-          >
-            ↓ {isBilingual ? "EN PDF" : "PDF"}
-          </a>
-        )}
-        {zhUrl && (
-          <a
-            href={zhUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="audit-row-action"
-          >
-            ↓ 中文 PDF
-          </a>
-        )}
+      </div>
+
+      <div className="audit-row-share">
         <OpenAccessToggle
           auditId={row.id}
           initialIsPublic={row.is_public}

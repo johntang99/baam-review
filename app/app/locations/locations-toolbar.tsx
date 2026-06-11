@@ -49,6 +49,9 @@ interface ToolbarProps {
   managers: PersonOption[];
   connectors: PersonOption[];
   canConnectGoogle: boolean;
+  /** BAAM internal staff only. Gates the internal-ops filters ("Managed by",
+   *  "Connected by") so external customers never see internal staff names. */
+  isInternal: boolean;
 }
 
 const SORT_LABELS: Record<SortOption, string> = {
@@ -90,6 +93,7 @@ export function LocationsToolbar({
   managers,
   connectors,
   canConnectGoogle,
+  isInternal,
 }: ToolbarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -170,38 +174,42 @@ export function LocationsToolbar({
         onChange={(v) => updateParam({ billing: v || null })}
       />
 
-      <FilterSelect
-        label="Managed by"
-        value={managedBy}
-        valueLabel={
-          managedBy === "unassigned"
-            ? "Unassigned"
-            : managerNameById.get(managedBy) || "Any"
-        }
-        options={[
-          { value: "", label: "Any" },
-          { value: "unassigned", label: "Unassigned" },
-          ...managers.map((m) => ({
-            value: m.user_id,
-            label: m.full_name || m.email,
-          })),
-        ]}
-        onChange={(v) => updateParam({ managed_by: v || null })}
-      />
+      {isInternal && (
+        <FilterSelect
+          label="Managed by"
+          value={managedBy}
+          valueLabel={
+            managedBy === "unassigned"
+              ? "Unassigned"
+              : managerNameById.get(managedBy) || "Any"
+          }
+          options={[
+            { value: "", label: "Any" },
+            { value: "unassigned", label: "Unassigned" },
+            ...managers.map((m) => ({
+              value: m.user_id,
+              label: m.full_name || m.email,
+            })),
+          ]}
+          onChange={(v) => updateParam({ managed_by: v || null })}
+        />
+      )}
 
-      <FilterSelect
-        label="Connected by"
-        value={connectedBy}
-        valueLabel={connectorNameById.get(connectedBy) || "Any"}
-        options={[
-          { value: "", label: "Any" },
-          ...connectors.map((c) => ({
-            value: c.user_id,
-            label: c.full_name || c.email,
-          })),
-        ]}
-        onChange={(v) => updateParam({ connected_by: v || null })}
-      />
+      {isInternal && (
+        <FilterSelect
+          label="Connected by"
+          value={connectedBy}
+          valueLabel={connectorNameById.get(connectedBy) || "Any"}
+          options={[
+            { value: "", label: "Any" },
+            ...connectors.map((c) => ({
+              value: c.user_id,
+              label: c.full_name || c.email,
+            })),
+          ]}
+          onChange={(v) => updateParam({ connected_by: v || null })}
+        />
+      )}
 
       <FilterSelect
         label="Sort"
