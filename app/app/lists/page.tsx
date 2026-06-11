@@ -104,6 +104,43 @@ export default async function ListsPage({
     (locations ?? []).map((l) => [l.id, l.display_name]),
   );
 
+  // No locations connected yet → bulk review requests need a location to send
+  // from. Prompt to connect one, same as the other workspace pages.
+  if ((locations ?? []).length === 0) {
+    return (
+      <main className="px-10 py-8 pb-16 max-w-[1280px]">
+        <div className="flex items-center justify-between gap-4 mb-7">
+          <p className="text-[12px] uppercase tracking-[0.08em] text-text-muted font-medium">
+            Workspace · Bulk Review Requests
+          </p>
+        </div>
+        <div className="mb-8">
+          <h1 className="font-display text-[42px] leading-[1.05] tracking-tight mb-2.5">
+            Add New Customer List
+          </h1>
+          <p className="font-serif italic text-[17px] text-text-soft max-w-[600px] leading-relaxed">
+            Customer batches your clients send you each week. Import once, send
+            to all, track every step, resend only to the right people.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-dashed border-border-base bg-paper/60 p-8 text-center max-w-2xl">
+          <h2 className="font-display text-[20px] text-ink">No locations yet</h2>
+          <p className="mt-1.5 text-[14px] text-text-soft leading-relaxed">
+            Connect a Google Business Profile first to start sending bulk review
+            requests.
+          </p>
+          <Link
+            href="/api/auth/google/start"
+            prefetch={false}
+            className="mt-4 inline-block text-[13.5px] font-medium text-forest hover:underline"
+          >
+            Connect a new location →
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
   // Per-list customer state. Aggregated in JS — lists never exceed ~500 rows
   // each and the managed-service footprint is a handful of lists, so this is
   // well within the plan's client-side-aggregation guidance (§2.2).

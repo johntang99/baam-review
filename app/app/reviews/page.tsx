@@ -66,6 +66,37 @@ export default async function ReviewsPage({
     : null;
   // Cap every cross-location query to visible ids.
   const allowedLocationIds = (locations ?? []).map((l) => l.id);
+
+  // No locations connected yet → reviews can't exist. Prompt to connect one
+  // instead of showing empty tabs and a generic "no reviews" message.
+  if (allowedLocationIds.length === 0) {
+    return (
+      <main className="px-10 py-10 space-y-6">
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <PageHeader
+            eyebrow="Inbox"
+            title="Reviews"
+            description="Google reviews, private feedback, and click-throughs land here."
+          />
+          <SyncButton />
+        </div>
+        <div className="rounded-2xl border border-dashed border-border-base bg-paper/60 p-8 text-center max-w-2xl">
+          <h2 className="font-display text-[20px] text-ink">No locations yet</h2>
+          <p className="mt-1.5 text-[14px] text-text-soft leading-relaxed">
+            Connect a Google Business Profile first to start collecting reviews
+            and feedback.
+          </p>
+          <Link
+            href="/api/auth/google/start"
+            prefetch={false}
+            className="mt-4 inline-block text-[13.5px] font-medium text-forest hover:underline"
+          >
+            Connect a new location →
+          </Link>
+        </div>
+      </main>
+    );
+  }
   const idFilter =
     allowedLocationIds.length > 0
       ? allowedLocationIds

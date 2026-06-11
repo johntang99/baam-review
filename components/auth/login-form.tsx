@@ -12,7 +12,11 @@ import { PasswordInput } from "./password-input";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/app";
+  // Treat "/" (the marketing home, e.g. its "Sign in" link sends ?next=/) as
+  // "no specific intent" and fall back to the dashboard — a freshly logged-in
+  // user wants /app, not to bounce back to the marketing site.
+  const rawNext = searchParams.get("next");
+  const next = rawNext && rawNext.startsWith("/") && rawNext !== "/" ? rawNext : "/app";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

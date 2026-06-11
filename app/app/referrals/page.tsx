@@ -110,10 +110,11 @@ export default async function ReferralsPage({
             attach the reward and offer to.
           </p>
           <Link
-            href="/app/locations"
+            href="/api/auth/google/start"
+            prefetch={false}
             className="mt-4 inline-block text-[13.5px] font-medium text-forest hover:underline"
           >
-            Go to Locations →
+            Connect a new location →
           </Link>
         </div>
       </main>
