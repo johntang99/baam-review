@@ -86,20 +86,28 @@ export async function assignManager(
   const authz = await authorizeOnLocation(service, ctx, locationId);
   if (!authz.ok) return { ok: false, error: authz.error };
 
-  // Verify the target is actually an account_manager (not a sales / admin
-  // / customer). Prevents accidental assignments to the wrong role.
+  // Verify the target's role. Account managers can be assigned by admin or
+  // sales; sales can ALSO be assigned, but only by an admin. Anything else
+  // (admin / customer) is rejected.
   const { data: target } = await service
     .from("users")
     .select("id, ops_role")
     .eq("id", managerUserId)
     .maybeSingle();
   if (!target) {
-    return { ok: false, error: "Manager not found" };
+    return { ok: false, error: "Assignee not found" };
   }
-  if (target.ops_role !== "account_manager") {
+  if (target.ops_role === "sales") {
+    if (ctx.opsRole !== "admin") {
+      return {
+        ok: false,
+        error: "Only admins can assign a location to a sales person",
+      };
+    }
+  } else if (target.ops_role !== "account_manager") {
     return {
       ok: false,
-      error: "Selected user is not an account manager",
+      error: "Selected user is not an account manager or sales person",
     };
   }
 

@@ -57,11 +57,22 @@ export async function getVisibleLocationIds(
   if (internal.opsRole === "admin" || internal.opsRole === null) return null;
 
   if (internal.opsRole === "sales") {
-    const { data } = await supabase
-      .from("locations")
-      .select("id")
-      .eq("connected_by_user_id", internal.userId);
-    return (data ?? []).map((r) => r.id);
+    // Sales see clients they connected PLUS clients an admin has assigned to
+    // them (admin-only assignment, but once assigned they get full ops access).
+    const [connected, assigned] = await Promise.all([
+      supabase
+        .from("locations")
+        .select("id")
+        .eq("connected_by_user_id", internal.userId),
+      supabase
+        .from("location_assignments")
+        .select("location_id")
+        .eq("user_id", internal.userId),
+    ]);
+    const ids = new Set<string>();
+    for (const r of connected.data ?? []) ids.add(r.id);
+    for (const r of assigned.data ?? []) ids.add(r.location_id);
+    return Array.from(ids);
   }
   if (internal.opsRole === "account_manager") {
     const { data } = await supabase
@@ -87,13 +98,21 @@ export async function canAccessLocation(
   if (internal.opsRole === "admin" || internal.opsRole === null) return true;
 
   if (internal.opsRole === "sales") {
-    const { data } = await supabase
+    // Connected by them, OR assigned to them by an admin.
+    const { data: conn } = await supabase
       .from("locations")
       .select("id")
       .eq("id", locationId)
       .eq("connected_by_user_id", internal.userId)
       .maybeSingle();
-    return !!data;
+    if (conn) return true;
+    const { data: asg } = await supabase
+      .from("location_assignments")
+      .select("location_id")
+      .eq("user_id", internal.userId)
+      .eq("location_id", locationId)
+      .maybeSingle();
+    return !!asg;
   }
   if (internal.opsRole === "account_manager") {
     const { data } = await supabase

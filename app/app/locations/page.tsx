@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
-import { getInternalContext } from "@/lib/auth/staff";
+import { getInternalContext, getVisibleLocationIds } from "@/lib/auth/staff";
 import {
   AssignManagerModal,
   type AccountManagerOption,
@@ -132,25 +132,11 @@ export default async function LocationsPage({
     }
   }
 
-  // Build the *base* set of visible location ids (before filters).
-  let baseVisibleIds: string[] | null;
-  if (!internal || internal.opsRole === null || internal.opsRole === "admin") {
-    baseVisibleIds = null; // no extra filter; RLS handles tenant scoping
-  } else if (internal.opsRole === "sales") {
-    const { data } = await supabase
-      .from("locations")
-      .select("id")
-      .eq("connected_by_user_id", internal.userId);
-    baseVisibleIds = (data ?? []).map((r) => r.id);
-  } else if (internal.opsRole === "account_manager") {
-    const { data } = await supabase
-      .from("location_assignments")
-      .select("location_id")
-      .eq("user_id", internal.userId);
-    baseVisibleIds = (data ?? []).map((r) => r.location_id);
-  } else {
-    baseVisibleIds = [];
-  }
+  // Build the *base* set of visible location ids (before filters). Shared with
+  // every other workspace page via getVisibleLocationIds so the rules never
+  // drift: admin/null → all (null); sales → connected ∪ admin-assigned;
+  // account_manager → assigned.
+  const baseVisibleIds = await getVisibleLocationIds(supabase, internal);
 
   // ── Fetch every visible location's full data (we sort/filter in JS so
   //    we can express "Needs attention first" cleanly). Bounded set per
@@ -215,16 +201,24 @@ export default async function LocationsPage({
     assignmentsByLocation.set(row.location_id, existing);
   }
 
-  // ── Account manager pool for the Assign modal + Managed by filter ────
+  // ── Assignee pool for the Assign modal + Managed by filter ───────────
+  // Account managers are always assignable. Admins can ALSO assign a location
+  // to a sales person (who then gains ops access to it), so they see sales in
+  // the pool too. Sales assigners keep assigning account managers only.
+  const assigneeRoles: ("account_manager" | "sales")[] =
+    internal?.opsRole === "admin"
+      ? ["account_manager", "sales"]
+      : ["account_manager"];
   const { data: managers } = await service
     .from("users")
-    .select("id, full_name")
-    .eq("ops_role", "account_manager")
+    .select("id, full_name, ops_role")
+    .in("ops_role", assigneeRoles)
     .order("full_name", { ascending: true });
   const managerOptions: AccountManagerOption[] = (managers ?? []).map((m) => ({
     user_id: m.id,
     full_name: m.full_name,
     email: emailByUserId.get(m.id) ?? "",
+    role: (m.ops_role as "account_manager" | "sales" | null) ?? null,
   }));
 
   // ── Connector pool (admin + sales who actually connected a location) ─

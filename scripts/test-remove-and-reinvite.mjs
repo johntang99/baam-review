@@ -112,7 +112,7 @@ ok(`location_assignments rows gone via cascade`);
 console.log("\n── Step 5: re-invite the same email ──");
 const { data: invited, error: inviteErr } =
   await sb.auth.admin.inviteUserByEmail(testEmail, {
-    redirectTo: "https://review.baamplatform.com/auth/callback?next=/reset-password",
+    redirectTo: "https://baamreview.com/auth/callback?next=/reset-password",
   });
 if (inviteErr) fail(`re-invite failed: ${inviteErr.message}`);
 ok(`re-invite created new auth.users row (id ${invited.user.id.slice(0, 8)}…)`);

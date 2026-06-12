@@ -19,7 +19,7 @@ for (const line of fs.readFileSync(".env.local", "utf8").split("\n")) {
 }
 
 const email = process.argv[2];
-const base = process.argv[3] ?? "https://review.baamplatform.com";
+const base = process.argv[3] ?? "https://baamreview.com";
 if (!email) {
   console.error("Usage: node scripts/resend-recovery.mjs <email> [<base-url>]");
   process.exit(1);

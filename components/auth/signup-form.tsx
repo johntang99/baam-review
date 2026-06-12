@@ -40,6 +40,7 @@ export function SignupForm({
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailExists, setEmailExists] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   // Resend confirmation email state. Supabase rate-limits resends to ~60s
@@ -83,7 +84,7 @@ export function SignupForm({
 
     const supabase = createClient();
     const origin = window.location.origin;
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -99,6 +100,18 @@ export function SignupForm({
 
     if (error) {
       setError(error.message);
+      setPending(false);
+      return;
+    }
+
+    // Supabase obscures existing-email signups for enumeration safety: instead
+    // of an error it returns a "success" whose user has an EMPTY identities
+    // array (and no session). Treat that as "this email already has an
+    // account" and stop here, rather than showing the confirm-email screen
+    // for an account that already exists.
+    if (data.user && (data.user.identities?.length ?? 0) === 0) {
+      setEmailExists(true);
+      setError(null);
       setPending(false);
       return;
     }
@@ -196,7 +209,10 @@ export function SignupForm({
           autoComplete="email"
           required
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (emailExists) setEmailExists(false);
+          }}
         />
       </div>
 
@@ -213,13 +229,39 @@ export function SignupForm({
         <p className="text-xs text-text-muted">At least 8 characters.</p>
       </div>
 
+      {emailExists && (
+        <div
+          className="rounded-lg border border-alert/30 bg-alert/5 p-3 text-sm text-alert"
+          role="alert"
+        >
+          An account with <strong className="font-medium">{email}</strong>{" "}
+          already exists.{" "}
+          <Link
+            href={
+              next === "/app"
+                ? `/login?email=${encodeURIComponent(email)}`
+                : `/login?next=${encodeURIComponent(next)}&email=${encodeURIComponent(email)}`
+            }
+            className="font-medium underline"
+          >
+            Log in instead
+          </Link>{" "}
+          or use a different email.
+        </div>
+      )}
+
       {error && (
         <p className="text-sm text-alert" role="alert">
           {error}
         </p>
       )}
 
-      <Button type="submit" size="lg" className="w-full" disabled={pending}>
+      <Button
+        type="submit"
+        size="lg"
+        className="w-full"
+        disabled={pending || emailExists}
+      >
         {pending ? "Creating account…" : "Create account"}
       </Button>
 

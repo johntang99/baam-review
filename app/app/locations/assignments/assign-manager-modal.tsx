@@ -9,6 +9,14 @@ export interface AccountManagerOption {
   user_id: string;
   full_name: string | null;
   email: string;
+  /** Assignee's ops role, so the dropdown can label sales vs. account mgr. */
+  role?: "account_manager" | "sales" | null;
+}
+
+function roleLabel(role: AccountManagerOption["role"]): string {
+  if (role === "sales") return "Sales";
+  if (role === "account_manager") return "Account mgr";
+  return "";
 }
 
 export interface AssignedManager {
@@ -20,7 +28,8 @@ export interface AssignedManager {
 interface AssignManagerModalProps {
   locationId: string;
   locationName: string;
-  /** Account managers available to add (already filtered to ops_role='account_manager'). */
+  /** People available to assign — account managers, plus sales when an admin
+   *  is viewing (the page scopes the pool by the viewer's role). */
   managers: AccountManagerOption[];
   /** Currently assigned managers for this location. */
   currentAssignments: AssignedManager[];
@@ -133,7 +142,7 @@ export function AssignManagerModal({
             <div className="flex items-start justify-between px-6 pt-5 pb-3 border-b border-border-base">
               <div>
                 <h2 className="font-display text-[19px] text-ink leading-tight">
-                  Assign manager
+                  Assign
                 </h2>
                 <p className="text-[12.5px] text-text-soft mt-0.5 truncate max-w-[280px]">
                   {locationName}
@@ -153,7 +162,7 @@ export function AssignManagerModal({
               {/* Add form */}
               <form onSubmit={onAdd} className="space-y-2">
                 <label className="block text-[12.5px] font-medium text-ink">
-                  Add an account manager
+                  Assign a person
                 </label>
                 <div className="flex gap-2">
                   <select
@@ -164,14 +173,20 @@ export function AssignManagerModal({
                   >
                     <option value="">
                       {available.length === 0
-                        ? "All account managers assigned"
-                        : "Choose a manager…"}
+                        ? "Everyone already assigned"
+                        : "Choose a person…"}
                     </option>
-                    {available.map((m) => (
-                      <option key={m.user_id} value={m.user_id}>
-                        {m.full_name ? `${m.full_name} (${m.email})` : m.email}
-                      </option>
-                    ))}
+                    {available.map((m) => {
+                      const who = m.full_name
+                        ? `${m.full_name} (${m.email})`
+                        : m.email;
+                      const rl = roleLabel(m.role);
+                      return (
+                        <option key={m.user_id} value={m.user_id}>
+                          {rl ? `${who} — ${rl}` : who}
+                        </option>
+                      );
+                    })}
                   </select>
                   <Button
                     type="submit"

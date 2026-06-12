@@ -90,7 +90,7 @@ The same query rule applies everywhere a "list of clients" appears (sidebar, das
 | Your `ops_role` | A location shows up when |
 |---|---|
 | `admin` (or NULL) | always (within your account) |
-| `sales` | `locations.connected_by_user_id = your.user_id` |
+| `sales` | `locations.connected_by_user_id = your.user_id` **OR** a `location_assignments` row exists with `user_id = your.user_id` (admin-assigned) |
 | `account_manager` | a `location_assignments` row exists with `user_id = your.user_id` |
 | (not internal) | account-scoped RLS — you see only your own business |
 
@@ -105,11 +105,11 @@ The "All locations" card shows a small **"Managed by …"** subtitle listing the
 | Question | Admin | Sales | Account manager |
 |---|---|---|---|
 | Can click Assign on a client card? | Yes — any client | Yes — only clients they connected | No, button is hidden |
-| Who appears in the Assign dropdown? | Every account_manager | Every account_manager | — |
-| Can BE assigned as a manager? | No | No | Yes — only eligible role |
+| Who appears in the Assign dropdown? | Account managers + sales | Every account_manager | — |
+| Can BE assigned to a client? | No | Yes — but only an admin may assign them | Yes — assignable by admin or sales |
 | Can remove an assigned manager? | Yes — any client | Yes — only clients they connected | No |
 | Can reassign to a different manager? | Yes — remove + add in modal | Yes — only own clients | No |
-| What changes after the assignment lands? | Nothing (admin sees all) | Nothing — connector sees the client forever | Client appears in their All locations; can do daily ops |
+| What changes after the assignment lands? | Nothing (admin sees all) | Connector still sees their own clients; if an admin assigns them a client, it also appears in their locations | Client appears in their All locations; can do daily ops |
 | Notification on being assigned? | — | — | No automatic email — sales tells them in person |
 
 ### Who may click Assign on a card
@@ -215,7 +215,7 @@ In addition to hiding sidebar items, each route also enforces its own server-sid
 
 Every workspace page applies the same role-based filter via `getVisibleLocationIds(supabase, internal)` ([lib/auth/staff.ts](../lib/auth/staff.ts)). That function returns:
 - `null` for admin / customer logins (no extra filter — RLS handles tenant scoping).
-- `[location_ids]` for sales (locations where `connected_by_user_id = me`).
+- `[location_ids]` for sales (locations where `connected_by_user_id = me`, plus locations in `location_assignments` for me when an admin assigned them).
 - `[location_ids]` for account_manager (locations in `location_assignments` for me).
 
 Pages that apply it (every metric / row / dropdown filtered accordingly):
@@ -303,7 +303,7 @@ The pattern is identical — single helper, applied at the page level. Server ac
 ## 11) FAQ
 
 **Q. Can a sales reassign a client to another sales?**
-No. Only account managers can be assigned. If you need a hand-off between sales, ask admin.
+No — sales can only assign account managers. Assigning a client to a sales person is **admin-only**. Once an admin assigns a sales person, that client appears in their locations (full ops access), in addition to clients they connected.
 
 **Q. Can an account manager promote themselves to sales?**
 No. Role changes are admin-only via `/app/admin/staff`.

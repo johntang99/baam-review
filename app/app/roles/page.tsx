@@ -61,7 +61,7 @@ export default async function RolesPage() {
             <li>Sees every client across the whole agency.</li>
             <li>Invites / promotes / removes staff and sets their role.</li>
             <li>Connects GBPs for Start Now customers using the shared <code>baamplatform@gmail.com</code> Google account.</li>
-            <li>Assigns or reassigns any client to any account manager.</li>
+            <li>Assigns or reassigns any client to any account manager or sales person.</li>
             <li>Manages billing on any client.</li>
           </RoleCard>
 
@@ -72,7 +72,7 @@ export default async function RolesPage() {
             short="Acquires clients. Adds managers to help."
             color="gold"
           >
-            <li>Sees only clients they personally connected (forever — the connector tag never moves).</li>
+            <li>Sees clients they personally connected (forever — the connector tag never moves), plus any client an admin assigns to them.</li>
             <li>Connects GBPs using their own gmail (Regular Sales flow) or via Onboarding queue (Start Now).</li>
             <li>Adds account managers to their clients so daily ops gets handled.</li>
             <li>Removes managers from their own clients.</li>
@@ -372,15 +372,15 @@ const ASSIGNMENT_ROWS: {
   },
   {
     label: "Who appears in the Assign dropdown?",
-    admin: "Every user with ops_role = account_manager",
+    admin: "Account managers + sales",
     sales: "Every user with ops_role = account_manager",
     am: "—",
   },
   {
-    label: "Can be assigned as a manager?",
+    label: "Can be assigned to a client?",
     admin: "No",
-    sales: "No",
-    am: "Yes — only role that's eligible",
+    sales: "Yes — but only an admin can assign them",
+    am: "Yes — assignable by admin or sales",
   },
   {
     label: "Can remove an assigned manager?",
@@ -397,7 +397,8 @@ const ASSIGNMENT_ROWS: {
   {
     label: "What changes for them after an assignment?",
     admin: "Nothing — sees everything regardless",
-    sales: "Nothing — still sees the client (connector forever)",
+    sales:
+      "If assigned by an admin, the client appears in their locations too (in addition to ones they connected)",
     am: "Client appears in their All locations; can do daily ops",
   },
   {

@@ -57,32 +57,37 @@ try {
   if (sErr) throw sErr;
   const jwt = signin.session.access_token;
 
-  const ownPublic = audits.filter((a) => a.user_id === createdUserId || a.is_public).length; // 0 own + public
+  // Post-0051 model: a shared (is_public) audit is NOT visible to other users
+  // via RLS — it's served to clients through the link routes only. So a
+  // non-admin sees ONLY their own audits. The temp user owns none → 0.
+  const own = audits.filter((a) => a.user_id === createdUserId).length; // 0
 
   console.log("\n=== RLS branches (same temp user, role flipped in DB) ===");
 
   // Branch 1: external signup (ops_role null, is_baam_internal false)
   let r = await countAsUser(jwt);
-  let ok = r.total === ownPublic;
+  let ok = r.total === own;
   pass &&= ok;
-  console.log(`- external signup    sees ${r.total} / expected ${ownPublic} (own+public)            ${ok ? "✅" : "❌"}`);
+  console.log(`- external signup    sees ${r.total} / expected ${own} (own only, no public)   ${ok ? "✅" : "❌"}`);
 
   // Branch 2: admin → sees ALL
   await svc.from("users").update({ ops_role: "admin" }).eq("id", createdUserId);
   r = await countAsUser(jwt);
   ok = r.total === totalAudits;
   pass &&= ok;
-  console.log(`- admin              sees ${r.total} / expected ${totalAudits} (ALL)                    ${ok ? "✅" : "❌"}`);
+  console.log(`- admin              sees ${r.total} / expected ${totalAudits} (ALL)                ${ok ? "✅" : "❌"}`);
 
-  // Branch 3: internal staff (sales, is_baam_internal=true, NOT admin) → own+public only
+  // Branch 3: internal staff (sales, is_baam_internal=true, NOT admin) → own only
   await svc.from("users").update({ ops_role: "sales" }).eq("id", createdUserId);
   await svc.from("accounts").update({ is_baam_internal: true }).eq("id", accountId);
   r = await countAsUser(jwt);
-  ok = r.total === ownPublic;
+  ok = r.total === own;
   pass &&= ok;
-  console.log(`- internal staff(sales) sees ${r.total} / expected ${ownPublic} (own+public, NOT all)  ${ok ? "✅" : "❌"}`);
+  console.log(`- internal staff(sales) sees ${r.total} / expected ${own} (own only, NOT all/public) ${ok ? "✅" : "❌"}`);
   if (r.total === totalAudits) {
-    console.log("   ⚠️  staff sees ALL → migration 0050 is NOT applied yet (old audits_select_internal still active).");
+    console.log("   ⚠️  staff sees ALL → migration 0050 not applied (old audits_select_internal active).");
+  } else if (r.total > own) {
+    console.log("   ⚠️  staff sees public audits → migration 0051 not applied (audits_select_public still active).");
   }
 } catch (e) {
   console.error("\nTest error:", e.message || e);

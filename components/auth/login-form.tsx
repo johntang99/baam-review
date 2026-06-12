@@ -18,7 +18,9 @@ export function LoginForm() {
   const rawNext = searchParams.get("next");
   const next = rawNext && rawNext.startsWith("/") && rawNext !== "/" ? rawNext : "/app";
 
-  const [email, setEmail] = useState("");
+  // Pre-fill the email when arriving from the signup form's "already exists"
+  // prompt (?email=…), so the user only has to type their password.
+  const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
