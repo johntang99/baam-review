@@ -1,5 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
+import { resolveAuditViewer, canViewAudit } from "@/lib/audit/audit-access";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
 import { AuditResultSubBar } from "@/components/audit/audit-result-subbar";
 import { auditIdFilter, shortAuditId } from "@/lib/audit/audit-id";
@@ -38,18 +40,18 @@ export default async function AuditResultPage(props: {
   const lang = params.lang === "zh" ? "zh" : "en";
 
   const supabase = await createClient();
-  const { data: authData } = await supabase.auth.getUser();
+  const viewer = await resolveAuditViewer(supabase);
 
-  // Fetch first — RLS lets anonymous visitors read the row when
-  // is_public=true via the audits_select_public policy. If the row comes
-  // back, the visitor is either the owner, BAAM staff, or anyone holding
-  // the link to a public audit; either case may proceed. If the row is
-  // null AND the visitor isn't signed in, send them to login so they have
-  // a chance to authenticate before we 404.
   const idFilter = auditIdFilter(id);
   if (!idFilter) notFound();
 
-  let query = supabase
+  // Fetch with the service client (RLS bypassed) and authorize explicitly in
+  // canViewAudit: a shared (is_public) audit is openable by anyone with the
+  // link — the client-facing share — while every other audit is visible only
+  // to its owner or an admin, exactly like a private audit. Anonymous visitors
+  // who can't view get a login chance before we 404.
+  const service = createServiceClient();
+  let query = service
     .from("audits")
     .select(
       "id,user_id,is_public,tier,total_score,grade,languages_rendered,pdf_urls,generated_at,google_data",
@@ -61,8 +63,8 @@ export default async function AuditResultPage(props: {
 
   const { data, error } = await query.maybeSingle<AuditRow>();
 
-  if (error || !data) {
-    if (!authData.user) redirect(`/login?next=/audit/${id}`);
+  if (error || !data || !canViewAudit(data, viewer)) {
+    if (!viewer.viewerId) redirect(`/login?next=/audit/${id}`);
     notFound();
   }
 

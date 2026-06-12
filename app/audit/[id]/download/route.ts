@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
+import { resolveAuditViewer, canViewAudit } from "@/lib/audit/audit-access";
 import { auditIdFilter, shortAuditId } from "@/lib/audit/audit-id";
 import { getBenchmarks } from "@/lib/audit/benchmarks";
 import { computeProjection } from "@/lib/audit/projection";
@@ -31,12 +33,13 @@ import type { AuditLanguage } from "@/lib/audit/templating/types";
  * mirrors what the embed iframe displays at /audit/<id>; the PDF format
  * runs that same HTML through puppeteer-core + @sparticuz/chromium.
  *
- * Auth: same as the embed route — must be signed in. We don't gate on
- * ownership beyond that because audit rows are by default user-private
- * and the staff-shared `is_baam_internal` paths already see everything.
+ * Auth: same as the embed route — a shared (is_public) audit downloads for
+ * anyone with the link (clients); otherwise only the owner or an admin.
  */
 interface AuditRow {
   id: string;
+  user_id: string | null;
+  is_public: boolean | null;
   tier: string;
   vertical: string;
   region: string;
@@ -62,20 +65,22 @@ export async function GET(
   const format = url.searchParams.get("format") === "pdf" ? "pdf" : "html";
   const langParam = url.searchParams.get("lang");
 
-  // Same dual-mode auth as /audit/[id]: anonymous visitors can download
-  // when the audit is is_public (allowed by RLS audits_select_public).
-  // Auth fallback only kicks in when the row isn't visible, so private
-  // audits still 401 for anon and 404 for signed-in non-owners.
   const idFilter = auditIdFilter(id);
   if (!idFilter) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
 
+  // Same dual-mode auth as /audit/[id]: fetch with the service client and
+  // authorize via canViewAudit — shared (is_public) audits download for anyone
+  // with the link (clients); private audits 401 for anon, 404 for signed-in
+  // non-owners.
   const supabase = await createClient();
-  let query = supabase
+  const viewer = await resolveAuditViewer(supabase);
+  const service = createServiceClient();
+  let query = service
     .from("audits")
     .select(
-      "id,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data",
+      "id,user_id,is_public,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data",
     );
   query =
     "exact" in idFilter
@@ -84,9 +89,8 @@ export async function GET(
 
   const { data, error } = await query.maybeSingle<AuditRow>();
 
-  if (error || !data) {
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) return new NextResponse("Unauthorized", { status: 401 });
+  if (error || !data || !canViewAudit(data, viewer)) {
+    if (!viewer.viewerId) return new NextResponse("Unauthorized", { status: 401 });
     return new NextResponse("Not found", { status: 404 });
   }
 

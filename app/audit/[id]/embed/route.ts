@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
+import { resolveAuditViewer, canViewAudit } from "@/lib/audit/audit-access";
 import { auditIdFilter } from "@/lib/audit/audit-id";
 import { getBenchmarks } from "@/lib/audit/benchmarks";
 import { computeProjection } from "@/lib/audit/projection";
@@ -18,6 +20,8 @@ import type { AuditLanguage } from "@/lib/audit/templating/types";
 
 interface AuditEmbedRow {
   id: string;
+  user_id: string | null;
+  is_public: boolean | null;
   tier: string;
   vertical: string;
   region: string;
@@ -37,19 +41,21 @@ export async function GET(
   const url = new URL(request.url);
   const langParam = url.searchParams.get("lang");
 
-  // Fetch first — RLS lets anonymous visitors read when is_public=true.
-  // Auth check happens after, only if the row didn't come back (we don't
-  // know whether it's missing or private without authenticating).
   const idFilter = auditIdFilter(id);
   if (!idFilter) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
 
+  // Fetch with the service client (RLS bypassed) and authorize via
+  // canViewAudit: shared (is_public) audits open for anyone with the link
+  // (clients), everything else only for the owner or an admin.
   const supabase = await createClient();
-  let query = supabase
+  const viewer = await resolveAuditViewer(supabase);
+  const service = createServiceClient();
+  let query = service
     .from("audits")
     .select(
-      "id,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data",
+      "id,user_id,is_public,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data",
     );
   query =
     "exact" in idFilter
@@ -58,9 +64,8 @@ export async function GET(
 
   const { data, error } = await query.maybeSingle<AuditEmbedRow>();
 
-  if (error || !data) {
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) return new NextResponse("Unauthorized", { status: 401 });
+  if (error || !data || !canViewAudit(data, viewer)) {
+    if (!viewer.viewerId) return new NextResponse("Unauthorized", { status: 401 });
     return new NextResponse("Not found", { status: 404 });
   }
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { getInternalContext } from "@/lib/auth/staff";
 import { readMarketingDoc } from "@/lib/marketing/render";
 import { canUserAudit } from "@/lib/audit/quotas";
 import { shortAuditId } from "@/lib/audit/audit-id";
@@ -71,14 +72,25 @@ export default async function AuditListPage(props: {
   const { css } = readMarketingDoc("audit-list.html");
   const quota = await canUserAudit(authData.user.id);
 
-  const { data: audits } = await supabase
+  // Only admins see every audit. Everyone else sees ONLY their own — without
+  // this explicit filter the query would also return all `is_public = true`
+  // audits (the audits_select_public RLS policy that powers share links),
+  // leaking other users' shared audits into this "My audits" list. Shared
+  // audits remain viewable by anyone via their direct link / embed / download.
+  const internal = await getInternalContext(supabase, authData.user.id);
+  const isAdmin = internal?.opsRole === "admin";
+
+  let auditsQuery = supabase
     .from("audits")
     .select(
       "id,user_id,is_public,business_place_id,vertical,tier,total_score,grade,languages_rendered,pdf_urls,generated_at,status,progress_stage,failed_reason,google_data,score_data",
     )
     .order("generated_at", { ascending: false })
-    .limit(50)
-    .returns<AuditRow[]>();
+    .limit(50);
+  if (!isAdmin) {
+    auditsQuery = auditsQuery.eq("user_id", authData.user.id);
+  }
+  const { data: audits } = await auditsQuery.returns<AuditRow[]>();
 
   const allRows = audits ?? [];
   const completed = allRows.filter((r) => r.status === "complete");
