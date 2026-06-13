@@ -4,6 +4,7 @@ import {
   Mail,
   Send,
   ClipboardCheck,
+  Workflow,
   ArrowRight,
 } from "lucide-react";
 
@@ -44,6 +45,14 @@ const CATEGORIES: Category[] = [
     label: "Setup & onboarding",
     description: "Configure a new location or new client.",
     guides: [
+      {
+        href: "/app/docs/integrations-and-intake",
+        title: "Connecting client systems (POS / CRM)",
+        blurb:
+          "How to ask, which door to use, and how to feed contacts from a client's POS / CRM / checkout into the review pipeline. Intake SOP + decision tree + per-system tutorials.",
+        icon: Workflow,
+        badge: "New",
+      },
       {
         href: "/app/docs/custom-sender-setup",
         title: "Custom sender domain",

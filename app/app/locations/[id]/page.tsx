@@ -12,6 +12,8 @@ import { getLocationBillingMap } from "@/lib/billing/access";
 import { PageHeader } from "@/components/admin/page-header";
 import { InContentLocationPicker } from "@/components/locations/in-content-location-picker";
 import { SettingsForm } from "./settings-form";
+import { listApiKeys } from "@/lib/integrations/api-keys";
+import { ApiKeysManager } from "./api-keys-manager";
 
 export const metadata = {
   title: "Location setup — BAAM Review",
@@ -94,6 +96,10 @@ export default async function LocationSettingsPage({
   const defaultFromAddress =
     process.env.RESEND_FROM ?? "no-reply@baamplatform.com";
 
+  const apiKeys = await listApiKeys(location.id);
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://baamreview.com";
+
   return (
     <main className="px-10 py-10">
       <div className="max-w-4xl space-y-6">
@@ -128,6 +134,12 @@ export default async function LocationSettingsPage({
           defaultFromAddress={defaultFromAddress}
           billingSummary={billingSummary}
           billingInterval={billingInterval}
+        />
+
+        <ApiKeysManager
+          locationId={location.id}
+          appUrl={appUrl}
+          initialKeys={apiKeys}
         />
       </div>
     </main>

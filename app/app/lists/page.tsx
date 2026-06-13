@@ -403,9 +403,18 @@ export default async function ListsPage({
             const elig = eligibleForResend(l);
             const isDraft = l.status === "draft";
             const isCompleted = l.status === "completed";
-            const href = isDraft
-              ? `/app/lists/${l.id}/review`
-              : `/app/lists/${l.id}`;
+            // Any list with not-yet-sent ("pending") contacts links to the
+            // send/review screen so they're actionable — not just drafts. This
+            // is what makes the rolling integration list (created "active",
+            // continuously fed pending contacts) sendable instead of dumping
+            // staff on the read-only tracking page.
+            const pendingToSend = (custByList.get(l.id) ?? []).filter(
+              (c) => c.status === "pending",
+            ).length;
+            const href =
+              isDraft || pendingToSend > 0
+                ? `/app/lists/${l.id}/review`
+                : `/app/lists/${l.id}`;
             return (
               <Link
                 key={l.id}

@@ -335,6 +335,34 @@ export interface Database {
         >;
         Relationships: [];
       };
+      location_api_keys: {
+        Row: {
+          id: string;
+          location_id: string;
+          name: string;
+          key_prefix: string;
+          key_hash: string;
+          last_used_at: string | null;
+          created_by: string | null;
+          created_at: string;
+          revoked_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          name?: string;
+          key_prefix: string;
+          key_hash: string;
+          last_used_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          revoked_at?: string | null;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["location_api_keys"]["Insert"]
+        >;
+        Relationships: [];
+      };
       customer_records: {
         Row: {
           id: string;
@@ -692,6 +720,7 @@ export interface Database {
           name: string;
           default_language: "en" | "zh" | "es";
           status: "draft" | "sending" | "active" | "completed" | "archived";
+          source: "manual" | "integration";
           customer_count: number;
           sent_at: string | null;
           completed_at: string | null;
@@ -708,6 +737,7 @@ export interface Database {
           name: string;
           default_language?: "en" | "zh" | "es";
           status?: "draft" | "sending" | "active" | "completed" | "archived";
+          source?: "manual" | "integration";
           customer_count?: number;
           sent_at?: string | null;
           completed_at?: string | null;
@@ -755,6 +785,7 @@ export interface Database {
           send_request_id: string | null;
           review_id: string | null;
           variant_index: number | null;
+          external_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -791,6 +822,7 @@ export interface Database {
           send_request_id?: string | null;
           review_id?: string | null;
           variant_index?: number | null;
+          external_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
