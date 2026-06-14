@@ -27,7 +27,7 @@ export default async function SendPage() {
   let locationsQuery = supabase
     .from("locations")
     .select(
-      "id, slug, display_name, default_language, supported_languages, gmail_sender_email, connected_via_google_email",
+      "id, slug, display_name, default_language, supported_languages, gmail_sender_email, connected_via_google_email, address",
     )
     .order("created_at", { ascending: false });
   if (visibleIds !== null) {
@@ -70,6 +70,7 @@ export default async function SendPage() {
           initialLocationId={initialLocationId}
           blockedLocationIds={blockedLocationIds}
           isStaff={internal !== null}
+          companyAddressFallback={process.env.BAAM_POSTAL_ADDRESS ?? null}
         />
       </div>
     </main>

@@ -38,11 +38,15 @@ interface LocationOption {
   supported_languages: string[];
   gmail_sender_email?: string | null;
   connected_via_google_email?: string | null;
+  address?: string | null;
 }
 
 interface SendFormProps {
   locations: LocationOption[];
   smsEnabled: boolean;
+  /** Company-wide postal address used in the footer when a location has none
+   *  (mirrors the server's BAAM_POSTAL_ADDRESS fallback) — for accurate preview. */
+  companyAddressFallback?: string | null;
   initialLocationId?: string | null;
   blockedLocationIds: string[];
   /** BAAM internal users (admin / sales / account_manager) get the
@@ -69,6 +73,7 @@ export function SendForm({
   initialLocationId,
   blockedLocationIds,
   isStaff = false,
+  companyAddressFallback = null,
 }: SendFormProps) {
   const initialLocation =
     locations.find((l) => l.id === initialLocationId) ?? locations[0];
@@ -121,6 +126,13 @@ export function SendForm({
     name: previewName,
     businessName: currentLocation?.display_name ?? "",
     link: previewLink,
+    // Show the real CAN-SPAM footer in the preview — address + unsubscribe —
+    // using the same <token> placeholder the body link uses (the actual token
+    // is substituted at send). Address falls back to the company address so
+    // the preview matches what actually goes out.
+    unsubscribeUrl: `${appUrl}/api/unsubscribe?t=<token>`,
+    businessAddress:
+      currentLocation?.address?.trim() || companyAddressFallback || undefined,
   };
   const previewLang: Language = isLang(language) ? language : "en";
 
@@ -217,7 +229,7 @@ export function SendForm({
     if (!bodyTouched) setBody(fresh.body);
     // intentionally narrow deps — recompute on the inputs that drive the template
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [previewLang, channel, previewName, currentLocation?.display_name]);
+  }, [previewLang, channel, previewName, currentLocation?.display_name, currentLocation?.address]);
 
   function resetPreview() {
     setSubjectTouched(false);

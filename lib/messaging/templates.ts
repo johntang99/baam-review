@@ -61,23 +61,29 @@ export function buildEmail(lang: Language, vars: TemplateVars): EmailOutput {
   switch (lang) {
     case "zh":
       return emailHtml({
-        subject: `${first}，能耽误您一分钟吗？`,
-        greeting: `${first}，您好：`,
-        body: `感谢您今天来到${vars.businessName}。如果方便，能花一分钟跟我们说说您的体验吗？以下链接里有几个快速选项：`,
-        sign: `${vars.businessName} 团队`,
-        footer: "如不想收到此类邮件，可点击下方退订。",
+        subject: `${first}，方便分享您的體驗嗎？`,
+        greeting: `${first} 您好：`,
+        body: `非常感謝您選擇 ${vars.businessName}。我們由衷希望您有一次愉快的體驗；若您願意撥冗分享您的回饋，我們將非常感激。
+
+您的一則評論對我們意義重大——它能幫助更多人認識我們，也讓我們不斷進步。當您有空時，歡迎點擊以下連結分享您的想法：`,
+        closing: `衷心感謝您的時間與支持，謝謝您。`,
+        sign: `誠摯問候，\n${vars.businessName} 團隊`,
+        footer: "如不想再收到此類郵件，可點此退訂：",
         link: vars.link,
         businessAddress: vars.businessAddress,
         unsubscribe: vars.unsubscribeUrl
-          ? { label: "退订", url: vars.unsubscribeUrl }
+          ? { label: "退訂", url: vars.unsubscribeUrl }
           : undefined,
       });
     case "es":
       return emailHtml({
-        subject: `${first}, ¿tendrá un minuto?`,
-        greeting: `Hola ${first},`,
-        body: `Gracias por su visita a ${vars.businessName}. Si tiene un minuto, ¿podría contarnos cómo le fue? Le dejamos un enlace con algunas opciones rápidas:`,
-        sign: `El equipo de ${vars.businessName}`,
+        subject: `${first}, ¿un momento para compartir su experiencia?`,
+        greeting: `Estimado/a ${first}:`,
+        body: `Muchas gracias por elegir ${vars.businessName}. Esperamos de verdad que haya tenido una gran experiencia con nosotros, y le agradeceríamos mucho que dedicara unos minutos a compartir su opinión.
+
+Una breve reseña significa muchísimo: ayuda a que otras personas nos encuentren y nos permite seguir mejorando. Cuando tenga un momento, siga el enlace de abajo para compartir sus comentarios:`,
+        closing: `Le agradecemos sinceramente su tiempo y su apoyo. ¡Gracias!`,
+        sign: `Un cordial saludo,\nEl equipo de ${vars.businessName}`,
         footer: "Si prefiere no recibir más, puede cancelar la suscripción:",
         link: vars.link,
         businessAddress: vars.businessAddress,
@@ -88,10 +94,13 @@ export function buildEmail(lang: Language, vars: TemplateVars): EmailOutput {
     case "en":
     default:
       return emailHtml({
-        subject: `${first}, do you have a minute?`,
-        greeting: `Hi ${first},`,
-        body: `Thanks for stopping by ${vars.businessName} today. If you have a minute, we'd love to hear how it went — there are a few quick options at this link:`,
-        sign: `The team at ${vars.businessName}`,
+        subject: `${first}, a moment to share your experience?`,
+        greeting: `Dear ${first},`,
+        body: `Thank you so much for choosing ${vars.businessName}. We truly hope you had a great experience with us, and we would be very grateful if you could take a few moments to share your feedback.
+
+A quick review means a great deal — it helps others find us and helps us keep improving. Whenever you have a moment, please follow the link below to share your thoughts:`,
+        closing: `We sincerely appreciate your time and your support — thank you.`,
+        sign: `Warm regards,\nThe team at ${vars.businessName}`,
         footer: "If you'd rather not hear from us, you can unsubscribe:",
         link: vars.link,
         businessAddress: vars.businessAddress,
@@ -106,6 +115,8 @@ function emailHtml(parts: {
   subject: string;
   greeting: string;
   body: string;
+  /** Optional line shown AFTER the link, before the sign-off. */
+  closing?: string;
   sign: string;
   footer: string;
   link: string;
@@ -125,14 +136,16 @@ function emailHtml(parts: {
   const textFooter =
     textFooterLines.length > 0 ? `\n\n—\n${textFooterLines.join("\n")}` : "";
 
+  const closing = parts.closing?.trim() || null;
+
   // Plain-text first. Gmail Promotions classifier strongly weights HTML-heavy
-  // marketing-style emails. Keep this looking like a personal note.
+  // marketing-style emails. Keep this looking like a normal personal note.
   const text = `${parts.greeting}
 
 ${parts.body}
 
 ${parts.link}
-
+${closing ? `\n${closing}\n` : ""}
 ${parts.sign}${textFooter}`;
 
   const htmlFooter =
@@ -147,15 +160,26 @@ ${parts.sign}${textFooter}`;
     }</p>`
       : "";
 
+  // Body may contain multiple paragraphs (blank-line separated) — render each
+  // as its own <p> so HTML matches the plain-text spacing.
+  const bodyHtml = parts.body
+    .split(/\n\s*\n/)
+    .map((p) => `<p style="margin: 0 0 14px 0;">${escapeHtml(p.trim())}</p>`)
+    .join("\n    ");
+
   // Minimal HTML: same content, system font, single sentence link. No
   // buttons, no card chrome, no images. Reads like a normal email.
   const html = `<!doctype html>
 <html>
   <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1A1F1C; line-height: 1.55; max-width: 560px; margin: 0; padding: 16px;">
     <p style="margin: 0 0 14px 0;">${escapeHtml(parts.greeting)}</p>
-    <p style="margin: 0 0 14px 0;">${escapeHtml(parts.body)}</p>
-    <p style="margin: 0 0 14px 0;"><a href="${parts.link}" style="color: #1F4D3F;">${escapeHtml(parts.link)}</a></p>
-    <p style="margin: 0 0 22px 0;">${escapeHtml(parts.sign)}</p>${htmlFooter}
+    ${bodyHtml}
+    <p style="margin: 0 0 14px 0;"><a href="${parts.link}" style="color: #1F4D3F;">${escapeHtml(parts.link)}</a></p>${
+      closing
+        ? `\n    <p style="margin: 0 0 14px 0;">${escapeHtml(closing)}</p>`
+        : ""
+    }
+    <p style="margin: 0 0 22px 0;">${escapeHtml(parts.sign).replace(/\n/g, "<br>")}</p>${htmlFooter}
   </body>
 </html>`;
 
@@ -178,7 +202,7 @@ function escapeHtml(s: string): string {
  */
 const UNSUBSCRIBE_FOOTER_TEXT: Record<Language, string> = {
   en: "If you'd rather not hear from us, you can unsubscribe:",
-  zh: "如不想收到此类邮件，可点击下方退订：",
+  zh: "如不想再收到此類郵件，可點此退訂：",
   es: "Si prefiere no recibir más, puede cancelar la suscripción:",
 };
 
