@@ -12,6 +12,8 @@ import {
   Info,
   Sparkles,
   Undo2,
+  Eye,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,6 +67,25 @@ const LANG_LABEL: Record<string, string> = {
 
 function isLang(s: string): s is Language {
   return (ALL_LANGS as readonly string[]).includes(s);
+}
+
+/** Render an edited plain-text body into the same minimal HTML the email uses:
+ *  blank lines → paragraphs, single newlines → <br>, URLs linkified. For the
+ *  in-app preview only. */
+function toEmailPreviewHtml(text: string): string {
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return text
+    .split(/\n\s*\n/)
+    .map((para) => {
+      const withBreaks = esc(para.trim()).replace(/\n/g, "<br>");
+      const linked = withBreaks.replace(
+        /(https?:\/\/[^\s<]+)/g,
+        '<a href="$1" style="color:#1F4D3F;">$1</a>',
+      );
+      return `<p style="margin:0 0 14px 0;">${linked}</p>`;
+    })
+    .join("");
 }
 
 export function SendForm({
@@ -159,6 +180,7 @@ export function SendForm({
   const [rewriting, setRewriting] = useState(false);
   const [rewriteHistory, setRewriteHistory] = useState<RewriteSnapshot[]>([]);
   const [rewriteError, setRewriteError] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   async function rewriteBodyWithAI() {
     if (!currentLocation || rewriting) return;
@@ -650,6 +672,14 @@ export function SendForm({
           htmlFor="message_body"
         >
           <div className="flex items-center justify-end gap-1.5 pb-2">
+            <button
+              type="button"
+              onClick={() => setShowPreview(true)}
+              className="mr-auto inline-flex items-center gap-1.5 rounded-md bg-forest px-3 py-1.5 text-[12.5px] font-semibold text-cream shadow-sm hover:bg-forest-dark"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              Preview
+            </button>
             <select
               value={tone}
               onChange={(e) => setTone(e.target.value as Tone)}
@@ -729,6 +759,83 @@ export function SendForm({
             message is sent. Other text sends exactly as written.
           </p>
         </FormRow>
+
+        {showPreview &&
+          (() => {
+            // Substitute the send-time placeholders so the preview reads like a
+            // real message the recipient receives.
+            const fill = (s: string) =>
+              s
+                .replaceAll("<slug>", currentLocation?.slug ?? "your-business")
+                .replaceAll("<token>", "sampletoken")
+                .replaceAll("{name}", previewName);
+            const pSubject = fill(subject);
+            const pBody = fill(body);
+            return (
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Message preview"
+                className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) setShowPreview(false);
+                }}
+              >
+                <div className="w-full max-w-xl max-h-[85vh] overflow-auto rounded-2xl bg-paper shadow-2xl">
+                  <div className="flex items-center justify-between border-b border-border-base px-5 py-3">
+                    <div className="text-[13px] font-medium text-ink">
+                      {channel === "sms" ? "Text message preview" : "Email preview"}
+                      <span className="ml-2 text-[11.5px] font-normal text-text-muted">
+                        as {previewName} sees it
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowPreview(false)}
+                      aria-label="Close preview"
+                      className="text-text-muted hover:text-ink p-1 -m-1"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="p-5">
+                    {channel === "sms" ? (
+                      <div className="max-w-[320px] rounded-2xl bg-forest/10 px-4 py-3 text-[14px] text-ink whitespace-pre-wrap leading-relaxed">
+                        {pBody}
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-border-base bg-white">
+                        <div className="border-b border-border-soft px-4 py-2.5">
+                          <div className="text-[11px] uppercase tracking-wide text-text-muted">
+                            Subject
+                          </div>
+                          <div className="text-[14px] font-medium text-ink">
+                            {pSubject}
+                          </div>
+                          {currentGmailSender && (
+                            <div className="text-[11.5px] text-text-muted mt-1">
+                              From: {currentGmailSender}
+                            </div>
+                          )}
+                        </div>
+                        <div
+                          className="px-4 py-4 text-[13.5px] leading-relaxed text-ink"
+                          style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}
+                          dangerouslySetInnerHTML={{ __html: toEmailPreviewHtml(pBody) }}
+                        />
+                      </div>
+                    )}
+                    <p className="mt-3 text-[11px] text-text-muted">
+                      Sample values shown for{" "}
+                      <code className="font-mono">&lt;slug&gt;</code>,{" "}
+                      <code className="font-mono">&lt;token&gt;</code> and the name;
+                      real values are filled in per recipient at send.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
         {result && !result.ok && (
           <div
