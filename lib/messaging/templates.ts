@@ -19,6 +19,10 @@ export interface TemplateVars {
    *  opt-out link instead of "just ignore this email" (CAN-SPAM + Gmail
    *  / Yahoo bulk-sender requirements). */
   unsubscribeUrl?: string;
+  /** Physical postal address shown in the footer — CAN-SPAM requires a valid
+   *  physical address in every commercial email. The business's own address
+   *  (falls back to a company address at the call site). */
+  businessAddress?: string;
 }
 
 interface MessageOutput {
@@ -63,6 +67,7 @@ export function buildEmail(lang: Language, vars: TemplateVars): EmailOutput {
         sign: `${vars.businessName} 团队`,
         footer: "如不想收到此类邮件，可点击下方退订。",
         link: vars.link,
+        businessAddress: vars.businessAddress,
         unsubscribe: vars.unsubscribeUrl
           ? { label: "退订", url: vars.unsubscribeUrl }
           : undefined,
@@ -75,6 +80,7 @@ export function buildEmail(lang: Language, vars: TemplateVars): EmailOutput {
         sign: `El equipo de ${vars.businessName}`,
         footer: "Si prefiere no recibir más, puede cancelar la suscripción:",
         link: vars.link,
+        businessAddress: vars.businessAddress,
         unsubscribe: vars.unsubscribeUrl
           ? { label: "Cancelar suscripción", url: vars.unsubscribeUrl }
           : undefined,
@@ -88,6 +94,7 @@ export function buildEmail(lang: Language, vars: TemplateVars): EmailOutput {
         sign: `The team at ${vars.businessName}`,
         footer: "If you'd rather not hear from us, you can unsubscribe:",
         link: vars.link,
+        businessAddress: vars.businessAddress,
         unsubscribe: vars.unsubscribeUrl
           ? { label: "Unsubscribe", url: vars.unsubscribeUrl }
           : undefined,
@@ -103,18 +110,20 @@ function emailHtml(parts: {
   footer: string;
   link: string;
   unsubscribe?: { label: string; url: string };
+  businessAddress?: string;
 }): EmailOutput {
-  // Only emit the footer line when there's a real unsubscribe URL to
-  // attach. Otherwise the editor preview ends with "If you'd rather
-  // not hear from us, you can unsubscribe:" with nothing after it,
-  // which (a) confuses staff and (b) caused ensureUnsubscribeFooter()
-  // to append a duplicate footer on send because it couldn't detect
-  // the existing one had no URL. At send time the action always passes
-  // a real URL, so the default template body always carries a working
-  // footer; for the preview we just hide it.
-  const footerLine = parts.unsubscribe
+  // Footer carries the CAN-SPAM essentials: the sender's physical postal
+  // address + a working unsubscribe link. The unsubscribe LINE is only shown
+  // when a real URL is present (the preview passes none, to avoid a dangling
+  // "unsubscribe:" with no URL); at send time a URL is always supplied. The
+  // address shows whenever provided.
+  const addr = parts.businessAddress?.trim() || null;
+  const unsubLine = parts.unsubscribe
     ? `${parts.footer} ${parts.unsubscribe.url}`
     : null;
+  const textFooterLines = [addr, unsubLine].filter(Boolean);
+  const textFooter =
+    textFooterLines.length > 0 ? `\n\n—\n${textFooterLines.join("\n")}` : "";
 
   // Plain-text first. Gmail Promotions classifier strongly weights HTML-heavy
   // marketing-style emails. Keep this looking like a personal note.
@@ -124,7 +133,19 @@ ${parts.body}
 
 ${parts.link}
 
-${parts.sign}${footerLine ? `\n\n—\n${footerLine}` : ""}`;
+${parts.sign}${textFooter}`;
+
+  const htmlFooter =
+    addr || parts.unsubscribe
+      ? `
+    <p style="font-size: 12px; color: #8A938E; margin: 0;">${
+      addr ? `${escapeHtml(addr)}<br>` : ""
+    }${
+      parts.unsubscribe
+        ? `${escapeHtml(parts.footer)} <a href="${parts.unsubscribe.url}" style="color: #8A938E;">${escapeHtml(parts.unsubscribe.label)}</a>`
+        : ""
+    }</p>`
+      : "";
 
   // Minimal HTML: same content, system font, single sentence link. No
   // buttons, no card chrome, no images. Reads like a normal email.
@@ -134,12 +155,7 @@ ${parts.sign}${footerLine ? `\n\n—\n${footerLine}` : ""}`;
     <p style="margin: 0 0 14px 0;">${escapeHtml(parts.greeting)}</p>
     <p style="margin: 0 0 14px 0;">${escapeHtml(parts.body)}</p>
     <p style="margin: 0 0 14px 0;"><a href="${parts.link}" style="color: #1F4D3F;">${escapeHtml(parts.link)}</a></p>
-    <p style="margin: 0 0 22px 0;">${escapeHtml(parts.sign)}</p>${
-      parts.unsubscribe
-        ? `
-    <p style="font-size: 12px; color: #8A938E; margin: 0;">${escapeHtml(parts.footer)} <a href="${parts.unsubscribe.url}" style="color: #8A938E;">${escapeHtml(parts.unsubscribe.label)}</a></p>`
-        : ""
-    }
+    <p style="margin: 0 0 22px 0;">${escapeHtml(parts.sign)}</p>${htmlFooter}
   </body>
 </html>`;
 
@@ -193,13 +209,22 @@ export function ensureUnsubscribeFooter(
   body: string,
   unsubscribeUrl: string | null | undefined,
   language: Language,
+  businessAddress?: string | null,
 ): string {
-  if (!unsubscribeUrl) return body;
-  if (body.includes("/api/unsubscribe?t=")) return body;
+  let out = body;
 
-  const footerText =
-    UNSUBSCRIBE_FOOTER_TEXT[language] ?? UNSUBSCRIBE_FOOTER_TEXT.en;
-  // Two newlines + em dash + footer line mirrors the visual rhythm
-  // buildEmail() uses for the default template footer.
-  return `${body.trimEnd()}\n\n—\n${footerText} ${unsubscribeUrl}`;
+  // 1) Unsubscribe link (CAN-SPAM + bulk-sender filters). Append if missing.
+  if (unsubscribeUrl && !out.includes("/api/unsubscribe?t=")) {
+    const footerText =
+      UNSUBSCRIBE_FOOTER_TEXT[language] ?? UNSUBSCRIBE_FOOTER_TEXT.en;
+    out = `${out.trimEnd()}\n\n—\n${footerText} ${unsubscribeUrl}`;
+  }
+
+  // 2) Physical postal address (CAN-SPAM). Append if a staff edit dropped it.
+  const addr = businessAddress?.trim();
+  if (addr && !out.includes(addr)) {
+    out = `${out.trimEnd()}\n${addr}`;
+  }
+
+  return out;
 }

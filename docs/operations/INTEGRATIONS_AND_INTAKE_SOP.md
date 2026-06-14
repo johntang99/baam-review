@@ -359,5 +359,42 @@ Two flavors:
 
 ---
 
+## 11. Comparing with Birdeye (staff talking points)
+
+Prospects often say *"Birdeye connects to 2,000–3,000 integrations — do you?"* Here's how to answer honestly and confidently.
+
+### What Birdeye's "3,000 integrations" actually is
+That headline number is **real as a count, but it's mostly the Zapier ecosystem — not 3,000 hand‑built connectors.** It's three tiers:
+1. **A native core** — genuinely deep connectors for big systems (Salesforce, HubSpot, common POS, some industry PMS/EHR). Realistically dozens to low‑hundreds.
+2. **The Zapier/middleware ecosystem** — "works with Zapier" instantly inherits Zapier's **6,000+ apps**. This is where most of the big number comes from.
+3. **A generic API + webhooks** for anything custom.
+
+The mechanism is the same as ours: an event in the source system → pull the customer → send a review request.
+
+### Our range is comparable — because the big number *is* Zapier, and we use Zapier too
+| Mechanism | Reaches | Us |
+|---|---|---|
+| Zapier / Make / n8n | the same ~6,000+ apps that make up most of Birdeye's count | ✅ |
+| Direct webhook + API key | any system that can POST | ✅ |
+| Native adapters | Shopify, Calendly, Acuity (more on demand) | ✅ |
+| CSV / QR / manual | the long tail + no‑system / walk‑in businesses | ✅ |
+
+So **we can connect essentially the same universe of apps.** Don't concede on "range."
+
+### Where Birdeye is genuinely ahead — and how to frame it
+It's **polish + niche breadth, not capability:**
+- More **pre‑built one‑click connector UIs** (client picks "Square" from a list vs. setting up a Zap). We have a few native + reach the rest via Zapier/managed setup.
+- Some **niche industry connectors** (specific dental PMS / healthcare EHR) we haven't built. *If a system has no webhook/API/Zapier app, neither vendor can connect it.* When a specific system recurs among our clients, we build that one native connector (small task on our framework).
+
+### Our genuine advantages (lead with these)
+- **Deliverability:** we send review‑request emails **one‑by‑one from the business's own Gmail → Primary inbox.** Birdeye (and most tools) blast via an ESP → Promotions/Spam. This is our biggest differentiator — say it first.
+- **No fake reviews / human‑in‑the‑loop**, AI‑personalized per recipient.
+- **Bilingual (EN/中文/ES)** and tuned for our client base (TCM, dental, beauty), many of whom book by phone/WeChat/walk‑in — where **QR + managed setup beats 3,000 connectors they'd never use.**
+
+### One‑liner for sales
+> "Their 3,000 'integrations' are mostly Zapier — which we also use, so we reach the same apps. The difference that matters is the *other* direction: our review emails land in the **Primary inbox**, sent one‑by‑one from your own Gmail, instead of the Promotions tab. We connect to what you use **and** actually get seen."
+
+---
+
 ### TL;DR for the team
 Ask **"do you capture email/phone?"** and **"what system do you use?"** → pick a door from the tree. Every door does the same thing: **drops the customer's contact into our queue.** We send it — SMS automatically, email by hand from their Gmail — and own everything after. Build the **universal webhook (Phase 2)** first; add native connectors only where clients pile up.

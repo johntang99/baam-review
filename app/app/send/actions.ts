@@ -10,6 +10,7 @@ import {
   buildEmail,
   ensureUnsubscribeFooter,
 } from "@/lib/messaging/templates";
+import { postalAddress } from "@/lib/messaging/postal";
 import { sendSmsViaTwilio, isTwilioConfigured } from "@/lib/messaging/twilio";
 import { sendEmailViaResend } from "@/lib/messaging/resend";
 import { checkVelocity } from "@/lib/messaging/velocity";
@@ -216,7 +217,7 @@ export async function createGmailDraftRequest(
 
   const { data: location } = await supabase
     .from("locations")
-    .select("id, slug, display_name, default_language, supported_languages")
+    .select("id, slug, display_name, default_language, supported_languages, address")
     .eq("id", locationId)
     .maybeSingle();
   if (!location) return { ok: false, error: "Location not found." };
@@ -268,25 +269,27 @@ export async function createGmailDraftRequest(
 
   const overrideSubjectRaw = getString(formData, "message_subject");
   const overrideBodyRaw = getString(formData, "message_body");
+  const businessAddress = postalAddress(location.address);
   const vars = {
     name: recipientName,
     businessName: location.display_name,
     link: trackingUrl,
     unsubscribeUrl,
+    businessAddress,
   };
   const defaultEmail = buildEmail(language, vars);
   const subjectText = overrideSubjectRaw
     ? applyVars(overrideSubjectRaw)
     : defaultEmail.subject;
-  // Always include a working unsubscribe link. If the user edited the
-  // body and removed (or never had) the footer, append it automatically
-  // — non-negotiable for CAN-SPAM compliance and Gmail / Yahoo bulk
-  // sender reputation. The helper no-ops when the URL is already
-  // present, so editing the default body is unaffected.
+  // Always include a working unsubscribe link + physical address. If the user
+  // edited the body and removed (or never had) the footer, append it
+  // automatically — non-negotiable for CAN-SPAM compliance and Gmail / Yahoo
+  // bulk-sender reputation. The helper no-ops when they're already present.
   const bodyText = ensureUnsubscribeFooter(
     overrideBodyRaw ? applyVars(overrideBodyRaw) : defaultEmail.body,
     unsubscribeUrl,
     language,
+    businessAddress,
   );
   const now = new Date().toISOString();
   const flaggedAt =
@@ -394,7 +397,7 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
   const { data: location } = await supabase
     .from("locations")
     .select(
-      "id, slug, display_name, default_language, supported_languages, sender_email, sender_name, sender_verified_at",
+      "id, slug, display_name, default_language, supported_languages, sender_email, sender_name, sender_verified_at, address",
     )
     .eq("id", locationId)
     .maybeSingle();
@@ -465,11 +468,13 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
   const overrideSubjectRaw = getString(formData, "message_subject");
   const overrideBodyRaw = getString(formData, "message_body");
 
+  const businessAddress = postalAddress(location.address);
   const vars = {
     name: recipientName,
     businessName: location.display_name,
     link: trackingUrl,
     unsubscribeUrl,
+    businessAddress,
   };
 
   let messageBody: string;
@@ -500,6 +505,7 @@ export async function sendReviewRequest(formData: FormData): Promise<SendResult>
       overrideBodyRaw ? applyVars(overrideBodyRaw) : defaultEmail.body,
       unsubscribeUrl,
       language,
+      businessAddress,
     );
     messageBody = bodyText;
     const html = bodyText === defaultEmail.body ? defaultEmail.html : plainToHtml(bodyText);

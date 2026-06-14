@@ -18,7 +18,12 @@ import {
   personalizeVariant,
   type ListVariant,
 } from "@/lib/ai/list-variants";
-import { buildEmail, buildSmsBody } from "@/lib/messaging/templates";
+import {
+  buildEmail,
+  buildSmsBody,
+  ensureUnsubscribeFooter,
+} from "@/lib/messaging/templates";
+import { postalAddress } from "@/lib/messaging/postal";
 import {
   asEmailOrEmpty,
   buildGmailComposeHref,
@@ -618,11 +623,12 @@ export async function getPreparedGmailDraftQueue(
 
   const { data: location } = await supabase
     .from("locations")
-    .select("id, slug, display_name, gmail_sender_email, connected_via_google_email")
+    .select("id, slug, display_name, gmail_sender_email, connected_via_google_email, address")
     .eq("id", list.location_id)
     .maybeSingle();
   if (!location) return { ok: false, drafts: [], error: "Location not found." };
 
+  const businessAddress = postalAddress(location.address);
   const senderGmail = asEmailOrEmpty(
     location.gmail_sender_email || location.connected_via_google_email || "",
   );
@@ -683,14 +689,23 @@ export async function getPreparedGmailDraftQueue(
         unsubscribeUrl,
       }).subject;
     }
-    const body =
+    const rawBody =
       rr.message_sent ||
       buildEmail(rr.language, {
         name: c.name,
         businessName: location.display_name,
         link: trackingUrl,
         unsubscribeUrl,
+        businessAddress,
       }).body;
+    // Guarantee CAN-SPAM footer (address + unsubscribe) on the FINAL body —
+    // covers AI-variant bodies that may omit it. No-ops when already present.
+    const body = ensureUnsubscribeFooter(
+      rawBody,
+      unsubscribeUrl,
+      rr.language,
+      businessAddress,
+    );
 
     drafts.push({
       customerId: c.id,

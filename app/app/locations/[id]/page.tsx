@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
@@ -130,6 +130,18 @@ export default async function LocationSettingsPage({
             description={location.address ?? undefined}
           />
         </div>
+
+        {!location.address?.trim() && (
+          <div className="flex items-start gap-2.5 rounded-xl border border-gold/40 bg-gold/[0.08] px-4 py-3 text-[13px] text-ink">
+            <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0 text-gold-dark" />
+            <p className="leading-relaxed">
+              <span className="font-medium">Add this location&apos;s business address.</span>{" "}
+              Review-request emails must include a physical postal address
+              (US CAN-SPAM law). Until you set one here, emails fall back to the
+              company address.
+            </p>
+          </div>
+        )}
 
         <SettingsForm
           location={location}
