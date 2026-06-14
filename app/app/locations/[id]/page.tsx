@@ -13,7 +13,9 @@ import { PageHeader } from "@/components/admin/page-header";
 import { InContentLocationPicker } from "@/components/locations/in-content-location-picker";
 import { SettingsForm } from "./settings-form";
 import { listApiKeys } from "@/lib/integrations/api-keys";
+import { listConnectedProviders } from "@/lib/integrations/connections";
 import { ApiKeysManager } from "./api-keys-manager";
+import { ConnectionsManager } from "./connections-manager";
 
 export const metadata = {
   title: "Location setup — BAAM Review",
@@ -97,6 +99,7 @@ export default async function LocationSettingsPage({
     process.env.RESEND_FROM ?? "no-reply@baamplatform.com";
 
   const apiKeys = await listApiKeys(location.id);
+  const connectedProviders = await listConnectedProviders(location.id);
   const appUrl =
     process.env.NEXT_PUBLIC_APP_URL ?? "https://baamreview.com";
 
@@ -140,6 +143,12 @@ export default async function LocationSettingsPage({
           locationId={location.id}
           appUrl={appUrl}
           initialKeys={apiKeys}
+        />
+
+        <ConnectionsManager
+          locationId={location.id}
+          appUrl={appUrl}
+          acuityConnected={connectedProviders.includes("acuity")}
         />
       </div>
     </main>

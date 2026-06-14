@@ -335,6 +335,32 @@ export interface Database {
         >;
         Relationships: [];
       };
+      location_integrations: {
+        Row: {
+          id: string;
+          location_id: string;
+          provider: string;
+          credentials: Json;
+          status: string;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          provider: string;
+          credentials?: Json;
+          status?: string;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["location_integrations"]["Insert"]
+        >;
+        Relationships: [];
+      };
       location_api_keys: {
         Row: {
           id: string;

@@ -97,13 +97,9 @@ An "integration" with an outside system does **one job only: deliver the custome
 - `GET /api/integrations/ping` — connection test returning `{ ok, location }` so each tool's "Test connection" shows the business. ([route](../../app/api/integrations/ping/route.ts), test: `test-ping.mts`)
 - Clients connect via each tool's **generic HTTP action** today (recipes in §6, Door 5) — reaches thousands of apps with no per‑connector code. A branded directory app is a later productization step.
 
-### Phase 4 — Native connectors (surgical, by vertical) — *not built; demand‑driven*
-- **Build only where our clients concentrate.** Each = OAuth app + subscribe to their transaction/appointment webhook → call Phase‑2 endpoint internally. Candidate first connectors:
-  - **Square / Clover / Toast** (restaurants, retail, salons)
-  - **Calendly / Acuity / Square Appointments** (appointment businesses)
-  - **One dental/medical PMS** (if clinics dominate the book)
-  - **Shopify / WooCommerce** (e‑commerce / pickup)
-- **Acceptance:** client clicks "Connect Square," authorizes, a test sale enqueues a request with no further setup.
+### Phase 4 — Native connectors (surgical, by vertical)
+- **(a) Direct webhook adapters — ✅ shipped.** `POST /api/integrations/<provider>?key=<key>` → a per-provider mapper (`lib/integrations/providers/`) translates the vendor's native webhook → the queue. No Zapier, no OAuth — for vendors whose payload carries the contact. Live: **Shopify** (`orders/fulfilled`), **Calendly** (`invitee.created`). Adding one = a single adapter file. Tested: `scripts/test-providers.mts`. See §6 Door 6.
+- **(b) Credential connectors — Acuity ✅ shipped.** Vendors whose webhook returns only an id need stored creds + an API fetch. **Acuity** is live via API-key mode (client pastes User ID + API Key in Location Setup → Native connectors; `location_integrations` store, migration 0056). **Square / Clover** need OAuth (vendor dev app) — use Zapier today, build native on demand.
 
 ### Phase 5 — Managed onboarding (ops, our default delivery)
 The operational layer that makes "cover every client" real. Runbook below (§5.1).
@@ -288,12 +284,31 @@ All three call the same endpoint; pick whichever the client uses. **Auth** in ea
 
 **Managed variant:** for clients who can't self‑serve, we build the Zapier Zap or the n8n workflow *for* them (Phase 5). The contact still lands in their queue; email still goes out one‑by‑one from their Gmail.
 
+#### Recipes for Square / Clover / Acuity (via Zapier — works today)
+These three vendors' webhooks return only a customer id, so a *direct* webhook can't get the email. But Zapier's vendor triggers **do** include the contact (Zapier handles the vendor login and fetches the customer), so route them through Zapier → our **generic** endpoint (`/api/integrations/review-request`). Action in every case = **Webhooks by Zapier → Custom Request**: `POST`, header `Authorization: Bearer <key>`, JSON body mapping the trigger fields.
+
+| Vendor | Zapier trigger to use | Map to our body |
+|---|---|---|
+| **Acuity Scheduling** | "Appointment Scheduled" | `name` ← First+Last, `email` ← Email, `phone` ← Phone, `service` ← Appointment Type, `external_id` ← Appointment ID |
+| **Square** | "New Order" / "New Customer" / (Square Appointments) "New Appointment" — pick the one carrying the customer email | `name` ← Customer name, `email` ← Customer email, `phone` ← Customer phone, `external_id` ← Order/Appointment ID |
+| **Clover** | "New Order" / "New Payment" / "New Customer" | `name`/`email`/`phone` ← Customer fields, `external_id` ← Order/Payment ID |
+
+Same pattern in **Make** (HTTP module) or **n8n** (HTTP Request node). This is the recommended path for these vendors today — no developer app, no OAuth on our side. (Acuity also has a *native* connector — see Door 6.)
+
 > A branded "BAAM Review" Zapier/Make app (so clients pick it from the directory instead of the generic HTTP module) is a later productization step — build it once the generic‑HTTP path shows real demand. The endpoints above are already everything such an app would wrap.
 
 ### Door 6 — Native connector (Phase 4)
-1. Location Setup → **Connect [Square/Clover/…]** → OAuth authorize.
-2. We auto‑subscribe to their transaction/appointment webhook → enqueue on each event.
-3. Verify with a test sale.
+Two flavors:
+
+**(a) Direct webhook adapters — shipped, no OAuth.** For vendors whose webhook already carries the customer's contact, the client points that vendor's *own* webhook straight at us (no Zapier). We translate the payload with a per-provider adapter.
+- URL: `POST https://baamreview.com/api/integrations/<provider>?key=<LOCATION_KEY>`
+- Live providers: **`shopify`** (subscribe `orders/fulfilled`), **`calendly`** (subscribe `invitee.created`).
+- Setup: generate a key (Location Setup → Integrations · API keys) → in the vendor's webhook settings, add the URL above with `?key=…` → send a test → it lands in this week's queue. Auth + rate‑limit + dedupe are identical to the generic endpoint.
+- Adding a provider = one adapter file in `lib/integrations/providers/` (id, label, `map(payload)→contact`). Tested by `scripts/test-providers.mts`.
+
+**(b) Credential connectors — for vendors whose webhook returns only an id.** We store the client's credentials and call the vendor's API to resolve the customer.
+- **Acuity — ✅ shipped (API-key mode, no OAuth app needed).** Location Setup → **Native connectors → Acuity**: client pastes their **User ID + API Key** (Acuity → Account → Integrations → API). Then in Acuity → Integrations → **Webhooks**, add `POST https://baamreview.com/api/integrations/acuity?key=<location key>` for *Appointment Scheduled*. We fetch the appointment via Acuity's API and enqueue. (`lib/integrations/providers/acuity.ts`; tested in `test-providers.mts`.)
+- **Square / Clover — OAuth, not built.** These need a vendor developer app + OAuth (their tokens, not a simple API key). Use the **Zapier recipe** above today; build native only when a client's volume justifies it.
 
 ### Door 7 — Managed onboarding (Full Service)
 1. Run §5 discovery → pick door.
