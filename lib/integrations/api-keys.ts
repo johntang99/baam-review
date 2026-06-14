@@ -14,6 +14,10 @@ import { createServiceClient } from "@/lib/supabase/service";
 
 const KEY_PREFIX = "brk_"; // BAAM Review Key
 
+/** Per-key burst cap (requests/minute). The daily cap is per-location
+ *  (location_api_keys.daily_limit, default 5000) and enforced in the DB. */
+export const RATE_LIMIT_PER_MINUTE = 120;
+
 function hashKey(raw: string): string {
   return createHash("sha256").update(raw).digest("hex");
 }
@@ -107,4 +111,30 @@ export async function verifyApiKey(
     .eq("id", data.id)
     .then(() => {});
   return { locationId: data.location_id, keyId: data.id };
+}
+
+export type ConsumeResult =
+  | { ok: true; locationId: string } // verified + within limits
+  | { ok: false; reason: "invalid" } // unknown / revoked key
+  | { ok: false; reason: "rate_limited" }; // valid key, over its limit
+
+/**
+ * Verify a key AND consume one rate-limit token, atomically (the DB function
+ * row-locks the key, so it's race-safe across serverless instances). Use this
+ * at the public endpoint instead of verifyApiKey.
+ */
+export async function consumeApiKey(
+  raw: string | null | undefined,
+): Promise<ConsumeResult> {
+  if (!raw || !raw.startsWith(KEY_PREFIX)) return { ok: false, reason: "invalid" };
+  const svc = createServiceClient();
+  const { data, error } = await svc.rpc("api_key_consume", {
+    p_key_hash: hashKey(raw),
+    p_minute_limit: RATE_LIMIT_PER_MINUTE,
+  });
+  if (error) throw new Error(`api_key_consume failed: ${error.message}`);
+  const row = data?.[0];
+  if (!row) return { ok: false, reason: "invalid" };
+  if (!row.allowed) return { ok: false, reason: "rate_limited" };
+  return { ok: true, locationId: row.location_id };
 }

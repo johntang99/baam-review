@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { verifyApiKey } from "@/lib/integrations/api-keys";
+import { consumeApiKey } from "@/lib/integrations/api-keys";
 import { enqueueReviewRequest } from "@/lib/integrations/enqueue";
 
 /**
@@ -26,12 +26,22 @@ function readKey(request: NextRequest): string | null {
 }
 
 export async function POST(request: NextRequest) {
-  const verified = await verifyApiKey(readKey(request));
-  if (!verified) {
+  const auth = await consumeApiKey(readKey(request));
+  if (!auth.ok && auth.reason === "invalid") {
     return NextResponse.json(
       { ok: false, error: "Invalid or missing API key" },
       { status: 401 },
     );
+  }
+  if (!auth.ok && auth.reason === "rate_limited") {
+    return NextResponse.json(
+      { ok: false, error: "Rate limit exceeded — slow down and retry." },
+      { status: 429, headers: { "Retry-After": "60" } },
+    );
+  }
+  // Narrow to the success case for TypeScript.
+  if (!auth.ok) {
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
   let body: {
@@ -53,7 +63,7 @@ export async function POST(request: NextRequest) {
   }
 
   const result = await enqueueReviewRequest({
-    location: verified.locationId, // bound to the key, never from the body
+    location: auth.locationId, // bound to the key, never from the body
     name: body.name ?? null,
     email: body.email ?? null,
     phone: body.phone ?? null,

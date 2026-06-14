@@ -346,6 +346,11 @@ export interface Database {
           created_by: string | null;
           created_at: string;
           revoked_at: string | null;
+          daily_limit: number;
+          rate_minute_window: string | null;
+          rate_minute_count: number;
+          rate_day_window: string | null;
+          rate_day_count: number;
         };
         Insert: {
           id?: string;
@@ -357,6 +362,11 @@ export interface Database {
           created_by?: string | null;
           created_at?: string;
           revoked_at?: string | null;
+          daily_limit?: number;
+          rate_minute_window?: string | null;
+          rate_minute_count?: number;
+          rate_day_window?: string | null;
+          rate_day_count?: number;
         };
         Update: Partial<
           Database["public"]["Tables"]["location_api_keys"]["Insert"]
@@ -1051,6 +1061,10 @@ export interface Database {
       current_account_id: {
         Args: Record<string, never>;
         Returns: string | null;
+      };
+      api_key_consume: {
+        Args: { p_key_hash: string; p_minute_limit: number };
+        Returns: { location_id: string; allowed: boolean }[];
       };
     };
     Enums: Record<string, never>;

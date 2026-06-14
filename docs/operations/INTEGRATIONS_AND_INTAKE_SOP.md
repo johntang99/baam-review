@@ -223,22 +223,52 @@ System is in our native list? ── Yes ─► Native connector (Square/…)(Ph
 2. Generate variations → send in Gmail one‑by‑one / auto‑SMS.
 3. For recurring: client exports weekly from their system → upload (or automate the export via Zapier in Door 4).
 
-### Door 4 — Generic webhook / API (Phase 2)
-1. Location Setup → **API keys** → generate a key (copy once).
-2. Give the client (or their developer/Zapier) the endpoint + payload:
-   ```
-   POST https://baamreview.com/api/integrations/review-request
-   Authorization: Bearer <LOCATION_API_KEY>
-   Content-Type: application/json
-   { "name":"Jane Doe","email":"jane@x.com","phone":"+1555...","service":"...","external_id":"txn-1" }
-   ```
-3. Trigger it on their **fulfillment/visit‑complete** event (not payment auth).
-4. Verify: send a test → it appears in the Bulk queue with an AI variation.
+### Endpoints reference (Phase 2/3)
+Two endpoints, authenticated by a per‑location key (`Authorization: Bearer <key>` or `x-api-key: <key>`):
 
-### Door 5 — Zapier / Make (no‑code)
-1. Client creates a Zap: **Trigger** = their app's "appointment completed / order fulfilled / deal won"; **Action** = BAAM "Create review request" (wraps Door 4).
-2. Map fields name/email/phone → BAAM. Turn on. Test one record.
-3. (Managed variant: we build the same flow in our self‑hosted **n8n** on the client's behalf.)
+| Method · Path | Use |
+|---|---|
+| `GET /api/integrations/ping` | **Connection test.** Returns `{ ok, location: { id, name } }` so a tool's "Test connection" shows the business. Doesn't consume rate budget. |
+| `POST /api/integrations/review-request` | **Send a contact.** Body below. `201` queued · `200` skipped (duplicate/opted_out/no_contact) · `401` bad key · `429` rate‑limited (120/min; daily cap per location). |
+
+Body for POST (email and/or phone required; everything else optional):
+```json
+{ "name":"Jane Doe", "email":"jane@x.com", "phone":"+15551234567",
+  "service":"Haircut", "language":"en", "transacted_at":"2026-06-13T18:30:00Z",
+  "external_id":"txn-123" }
+```
+Trigger on the **fulfillment / visit‑complete** event (not payment auth). `external_id` makes retries idempotent. Location is derived from the key — never sent in the body.
+
+### Door 4 — Generic webhook / API (Phase 2)
+1. Location Setup → **Integrations · API keys** → generate a key (copy once).
+2. Give the client/developer the endpoint + payload above.
+3. Trigger on their fulfillment/visit‑complete event.
+4. Verify: `curl` the `ping` endpoint → confirms the location; then POST a test contact → it appears in the location's "Incoming — from integrations" queue.
+
+### Door 5 — No‑code: Zapier / Make / n8n
+All three call the same endpoint; pick whichever the client uses. **Auth** in each = a header `Authorization: Bearer <LOCATION_API_KEY>`; **connection test** = `GET …/ping`.
+
+**Zapier** (best for non‑technical clients — biggest app directory):
+1. New Zap → **Trigger** = the client's app event ("Appointment completed", "Order fulfilled", "Invoice paid", "Deal won").
+2. **Action** = **Webhooks by Zapier → Custom Request**.
+   - Method `POST`, URL `https://baamreview.com/api/integrations/review-request`
+   - Headers: `Authorization: Bearer <KEY>`, `Content-Type: application/json`
+   - Data (JSON): map trigger fields → `name`, `email`, `phone`, `service`, `external_id` (use the trigger's record id).
+3. **Test** the step → expect `201` / `{"status":"queued"}`. Turn on.
+
+**Make (Integromat):**
+1. Scenario → trigger module = the client's app.
+2. Add an **HTTP → Make a request** module: `POST` the URL, add the `Authorization` header, body = JSON with mapped fields.
+3. Run once to test → `201`. Schedule on.
+
+**n8n** (self‑host; our internal managed engine, or a technical client):
+1. Trigger node = the client's app (or a Schedule + their API).
+2. **HTTP Request** node: `POST` the URL, Authentication = "Header Auth" (`Authorization: Bearer <KEY>`), JSON body with mapped fields.
+3. Execute to test → `201`. Activate.
+
+**Managed variant:** for clients who can't self‑serve, we build the Zapier Zap or the n8n workflow *for* them (Phase 5). The contact still lands in their queue; email still goes out one‑by‑one from their Gmail.
+
+> A branded "BAAM Review" Zapier/Make app (so clients pick it from the directory instead of the generic HTTP module) is a later productization step — build it once the generic‑HTTP path shows real demand. The endpoints above are already everything such an app would wrap.
 
 ### Door 6 — Native connector (Phase 4)
 1. Location Setup → **Connect [Square/Clover/…]** → OAuth authorize.
