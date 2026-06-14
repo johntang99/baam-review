@@ -61,6 +61,7 @@ export interface ApiKeyRow {
   last_used_at: string | null;
   created_at: string;
   revoked_at: string | null;
+  daily_limit: number;
 }
 
 /** List a location's keys (no secrets — prefix + metadata only). */
@@ -68,10 +69,24 @@ export async function listApiKeys(locationId: string): Promise<ApiKeyRow[]> {
   const svc = createServiceClient();
   const { data } = await svc
     .from("location_api_keys")
-    .select("id, name, key_prefix, last_used_at, created_at, revoked_at")
+    .select("id, name, key_prefix, last_used_at, created_at, revoked_at, daily_limit")
     .eq("location_id", locationId)
     .order("created_at", { ascending: false });
   return data ?? [];
+}
+
+/** Update a key's per-day request cap. Scoped to the location. */
+export async function setApiKeyDailyLimit(
+  locationId: string,
+  keyId: string,
+  dailyLimit: number,
+): Promise<void> {
+  const svc = createServiceClient();
+  await svc
+    .from("location_api_keys")
+    .update({ daily_limit: dailyLimit })
+    .eq("id", keyId)
+    .eq("location_id", locationId);
 }
 
 /** Revoke a key (soft — keeps the audit row). Scoped to the location. */

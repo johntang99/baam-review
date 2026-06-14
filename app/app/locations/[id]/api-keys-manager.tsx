@@ -12,7 +12,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ApiKeyRow } from "@/lib/integrations/api-keys";
-import { createKeyAction, revokeKeyAction } from "./api-keys-actions";
+import {
+  createKeyAction,
+  revokeKeyAction,
+  updateKeyLimitAction,
+} from "./api-keys-actions";
 
 interface Props {
   locationId: string;
@@ -54,6 +58,7 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
           last_used_at: null,
           created_at: new Date().toISOString(),
           revoked_at: null,
+          daily_limit: 5000,
         },
         ...prev,
       ]);
@@ -74,6 +79,28 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
           k.id === keyId ? { ...k, revoked_at: new Date().toISOString() } : k,
         ),
       );
+    });
+  }
+
+  function onLimitChange(keyId: string, value: number) {
+    setKeys((prev) =>
+      prev.map((k) => (k.id === keyId ? { ...k, daily_limit: value } : k)),
+    );
+  }
+
+  function onLimitSave(keyId: string) {
+    const k = keys.find((x) => x.id === keyId);
+    if (!k) return;
+    setError(null);
+    startTransition(async () => {
+      const res = await updateKeyLimitAction(locationId, keyId, k.daily_limit || 1);
+      if (res.ok) {
+        setKeys((prev) =>
+          prev.map((x) => (x.id === keyId ? { ...x, daily_limit: res.dailyLimit } : x)),
+        );
+      } else {
+        setError(res.error);
+      }
     });
   }
 
@@ -221,6 +248,24 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
                       ? `Last used ${new Date(k.last_used_at).toLocaleString()}`
                       : "Never used"}
                   </div>
+                  {!k.revoked_at && (
+                    <div className="mt-1 flex items-center gap-1.5 text-[11.5px] text-text-muted">
+                      <span>Daily cap</span>
+                      <input
+                        type="number"
+                        min={1}
+                        value={k.daily_limit}
+                        disabled={pending}
+                        onChange={(e) => onLimitChange(k.id, Number(e.target.value))}
+                        onBlur={() => onLimitSave(k.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                        }}
+                        className="w-20 rounded border border-border-base bg-paper px-1.5 py-0.5 text-[11.5px] text-ink focus:border-forest focus:outline-none disabled:opacity-50"
+                      />
+                      <span>requests/day</span>
+                    </div>
+                  )}
                 </div>
                 {!k.revoked_at && (
                   <button

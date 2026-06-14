@@ -731,6 +731,7 @@ export interface Database {
           default_language: "en" | "zh" | "es";
           status: "draft" | "sending" | "active" | "completed" | "archived";
           source: "manual" | "integration";
+          window_key: string | null;
           customer_count: number;
           sent_at: string | null;
           completed_at: string | null;
@@ -748,6 +749,7 @@ export interface Database {
           default_language?: "en" | "zh" | "es";
           status?: "draft" | "sending" | "active" | "completed" | "archived";
           source?: "manual" | "integration";
+          window_key?: string | null;
           customer_count?: number;
           sent_at?: string | null;
           completed_at?: string | null;

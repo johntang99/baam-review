@@ -7,6 +7,7 @@ import { getInternalContext, canAccessLocation } from "@/lib/auth/staff";
 import {
   createApiKey,
   revokeApiKey,
+  setApiKeyDailyLimit,
   type CreatedApiKey,
 } from "@/lib/integrations/api-keys";
 
@@ -74,4 +75,22 @@ export async function revokeKeyAction(
   await revokeApiKey(locationId, keyId);
   revalidatePath(`/app/locations/${locationId}`);
   return { ok: true };
+}
+
+export async function updateKeyLimitAction(
+  locationId: string,
+  keyId: string,
+  dailyLimit: number,
+): Promise<{ ok: true; dailyLimit: number } | { ok: false; error: string }> {
+  const authz = await authorize(locationId);
+  if (!authz.ok) return { ok: false, error: authz.error };
+
+  // Clamp to a sane range (1 … 1,000,000/day).
+  const clamped = Math.max(1, Math.min(1_000_000, Math.round(dailyLimit)));
+  if (!Number.isFinite(clamped)) {
+    return { ok: false, error: "Invalid daily limit" };
+  }
+  await setApiKeyDailyLimit(locationId, keyId, clamped);
+  revalidatePath(`/app/locations/${locationId}`);
+  return { ok: true, dailyLimit: clamped };
 }

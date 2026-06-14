@@ -108,11 +108,16 @@ try {
   // Verify the rolling integration list + the one queued customer.
   const { data: list } = await svc
     .from("lists")
-    .select("id, source, status, customer_count")
+    .select("id, source, status, customer_count, window_key, name")
     .eq("location_id", locationId)
     .eq("source", "integration")
     .maybeSingle();
   check("integration list created", !!list, list ? `count=${list.customer_count}` : "missing");
+  check(
+    "weekly window_key set + dated name",
+    !!list?.window_key && /^\d{4}-\d{2}-\d{2}$/.test(list.window_key) && /week of/.test(list.name),
+    list ? `window=${list.window_key} name="${list.name}"` : "",
+  );
 
   const { data: custs } = await svc
     .from("list_customers")

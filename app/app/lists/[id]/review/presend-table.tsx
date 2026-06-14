@@ -97,13 +97,23 @@ export function PresendTable({
   const emailCount = rows.filter(
     (r) => r.selected && !r.excludedReason && r.status === "pending" && r.channel === "email",
   ).length;
-  const smsCount = rows.filter(
+  const smsBlockingRows = rows.filter(
     (r) => r.selected && !r.excludedReason && r.status === "pending" && r.channel === "sms",
-  ).length;
+  );
+  const smsCount = smsBlockingRows.length;
   const sentCount = rows.filter(
     (r) => r.status === "sent" && !r.excludedReason,
   ).length;
   const gmailBlockedBySms = smsCount > 0;
+  // Names of the selected SMS rows that block Gmail drafting (Gmail = email
+  // only), so the hint + button tooltip can say exactly which rows to fix.
+  const smsBlockingNames = smsBlockingRows.map((r) => r.name);
+  const smsBlockReason =
+    smsBlockingNames.length === 0
+      ? ""
+      : `${smsBlockingNames.slice(0, 3).join(", ")}${
+          smsBlockingNames.length > 3 ? ` +${smsBlockingNames.length - 3} more` : ""
+        } ${smsBlockingNames.length === 1 ? "is an SMS row" : "are SMS rows"} — Gmail drafts are email-only. Unselect ${smsBlockingNames.length === 1 ? "it" : "them"} or switch to Email (needs an email address), then send by SMS separately.`;
   // Customers still waiting to be opened in Gmail — used to differentiate
   // "draft prepared" (in queue) from "actually sent" (popped off queue, so
   // user has opened the compose tab and presumably hit Send).
@@ -529,9 +539,8 @@ export function PresendTable({
             </span>
           )}
           {!readOnly && gmailBlockedBySms && (
-            <span className="text-[12px] text-text-soft mr-2">
-              Gmail drafts only support email rows. Switch SMS rows to Email or
-              unselect them first.
+            <span className="text-[12px] text-warn mr-2 max-w-[420px]">
+              {smsBlockReason}
             </span>
           )}
           {!readOnly && selectedCount > 0 && (
@@ -563,9 +572,17 @@ export function PresendTable({
                   : `Send next in Gmail (${gmailQueue.length} left)`
                 : "Prepare Send in Gmail";
 
+            const blockedTooltip =
+              !hasQueue && gmailBlockedBySms
+                ? smsBlockReason
+                : !hasQueue && emailCount === 0
+                  ? "No email rows selected to draft in Gmail."
+                  : undefined;
+
             return (
               <button
                 type="button"
+                title={blockedTooltip}
                 disabled={
                   preparingGmail ||
                   (hasQueue ? onCooldown : emailCount === 0 || gmailBlockedBySms)

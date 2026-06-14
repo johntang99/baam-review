@@ -66,11 +66,12 @@ An "integration" with an outside system does **one job only: deliver the custome
 | QR poster + embeddable widget | `app/app/share/`, `/api/qr/[slug]`, `/api/widget`, `/api/embed.js` |
 | Tokenized review link + flow | `/r/<slug>?t=<token>` |
 
-**New pieces to build (the only net‑new work):**
+**The net‑new pieces (all shipped):**
 
-1. **A "Ready‑to‑send" queue** — an inbound contact lands here as a pending request tied to a location. This is just the existing bulk‑list/`review_requests` model with a `source` of `integration`. The staff queue UI = the existing Bulk Review Requests screen, auto‑populated instead of CSV‑uploaded.
-2. **`POST /api/integrations/review-request`** — the universal door. Auth via a **per‑location API key**, validates payload, dedupes on `external_id`, suppresses opt‑outs, appends to the queue. Returns 200 + the created request id.
-3. **Per‑location API keys** — generate/rotate/revoke in Location Setup; stored hashed.
+1. **The "Ready‑to‑send" queue** — an inbound contact lands as a pending `list_customers` row in a `source='integration'` list, **rolled weekly** (`window_key`), so it shows in the existing Bulk Review Requests screen auto‑populated instead of CSV‑uploaded.
+2. **`POST /api/integrations/review-request`** — the universal door. Per‑location API key auth, dedupes on `external_id`, suppresses opt‑outs, rate‑limited (120/min + daily cap), appends to the queue.
+3. **`GET /api/integrations/ping`** — connection test for no‑code tools.
+4. **Per‑location API keys** — generate/reveal‑once/revoke + editable daily cap in Location Setup; stored hashed.
 
 ---
 
@@ -82,21 +83,21 @@ An "integration" with an outside system does **one job only: deliver the custome
 - Manual single send, "Send in Gmail," bulk CSV lists, QR poster + widget, SMS, tracking, opt‑outs, per‑location Gmail.
 - **This already serves the low‑tech long tail today.** No client is blocked.
 
-### Phase 1 — Queue contract (foundation)
-- **Build:** the "Ready‑to‑send" queue entry point — a single internal function `enqueueReviewRequest(payload)` that: maps `location`, dedupes (`external_id`/contact+window), checks `opt_outs`, creates a `review_requests` row with `source='integration'`, and surfaces it in the Bulk Review Requests UI.
-- **Channel split:** if `phone` present and SMS enabled → optionally auto‑send SMS now; email always goes to the **draft/queue** for one‑by‑one Gmail send.
-- **Acceptance:** a JSON payload passed to `enqueueReviewRequest` appears in the location's send queue with an AI variation ready, respecting opt‑outs and dedupe.
+### Phase 1 — Queue contract (foundation) ✅ shipped
+- `enqueueReviewRequest(payload)` ([lib/integrations/enqueue.ts](../../lib/integrations/enqueue.ts)): maps `location` (slug or id), normalizes contact, checks `opt_outs`, real **60‑day dedupe**, idempotent on `external_id`, appends a pending `list_customers` row.
+- **Rolling weekly:** contacts land in that location's **current‑week** integration list (`source='integration'`, `window_key` = that Monday), named `"Incoming · week of <Mon>"`. Each week is a bounded batch; the list never grows unbounded. (migrations 0052, 0055)
+- Email → the one‑by‑one Gmail queue; channel defaults to email when present. Tested: `scripts/test-enqueue.mts`.
 
-### Phase 2 — Universal webhook/API + keys (highest leverage) ⭐
-- **Build:** `POST /api/integrations/review-request` (calls `enqueueReviewRequest`) + per‑location API key management in Location Setup (generate / reveal once / rotate / revoke, stored hashed) + rate limiting + idempotency on `external_id`.
-- **Docs:** a public "Send us a contact" integration page (payload, auth header, examples in curl/JS).
-- **Acceptance:** an external `curl` with a valid key enqueues a request; bad key → 401; duplicate `external_id` → 200 no‑dup; opted‑out contact → 200 skipped.
+### Phase 2 — Universal webhook/API + keys (highest leverage) ⭐ ✅ shipped
+- `POST /api/integrations/review-request` — `Bearer <key>` → location derived from the key → `enqueueReviewRequest`. `201` queued · `200` skipped (duplicate/opted_out/no_contact) · `401` bad key · `429` rate‑limited. ([route](../../app/api/integrations/review-request/route.ts))
+- Per‑location API keys (hash‑only) + **Location Setup → Integrations · API keys** UI: generate / reveal‑once / revoke + **editable per‑key daily cap**. (migrations 0053, 0054)
+- **Rate limiting:** 120/min burst + per‑location daily cap (default 5,000, editable) via the atomic `api_key_consume` DB function. Tested: `test-intake-endpoint.mts`, `test-rate-limit.mts`.
 
-### Phase 3 — No‑code glue (Zapier / Make; n8n internal)
-- **Build:** a Zapier/Make app (single action: "Create review request") wrapping the Phase‑2 endpoint. Optionally a self‑hosted **n8n** instance as our *internal managed* engine for clients we set up ourselves.
-- **Acceptance:** a non‑technical client connects e.g. Calendly/Jobber → BAAM in Zapier with no code; new appointment → queued request.
+### Phase 3 — No‑code (Zapier / Make / n8n) ✅ shipped
+- `GET /api/integrations/ping` — connection test returning `{ ok, location }` so each tool's "Test connection" shows the business. ([route](../../app/api/integrations/ping/route.ts), test: `test-ping.mts`)
+- Clients connect via each tool's **generic HTTP action** today (recipes in §6, Door 5) — reaches thousands of apps with no per‑connector code. A branded directory app is a later productization step.
 
-### Phase 4 — Native connectors (surgical, by vertical)
+### Phase 4 — Native connectors (surgical, by vertical) — *not built; demand‑driven*
 - **Build only where our clients concentrate.** Each = OAuth app + subscribe to their transaction/appointment webhook → call Phase‑2 endpoint internally. Candidate first connectors:
   - **Square / Clover / Toast** (restaurants, retail, salons)
   - **Calendly / Acuity / Square Appointments** (appointment businesses)
@@ -105,8 +106,9 @@ An "integration" with an outside system does **one job only: deliver the custome
 - **Acceptance:** client clicks "Connect Square," authorizes, a test sale enqueues a request with no further setup.
 
 ### Phase 5 — Managed onboarding (ops, our default delivery)
-- **Build:** an internal runbook + the discovery form (§5). For Full‑Service clients, **our team** sets up whichever door fits (scheduled CSV, Zapier/n8n flow, or webhook), tests, and hands over.
-- **Acceptance:** onboarding can take any client from "what do you use?" to "requests flowing" using only this SOP.
+The operational layer that makes "cover every client" real. Runbook below (§5.1).
+
+> **Coverage is already complete (Phases 0–3).** Every client connects through one of: no‑code (Zapier/Make/n8n → thousands of apps), direct webhook + key, CSV, or QR/manual — plus our team doing setup. Native connectors (Phase 4) are an *optional convenience* for recurring systems, not how breadth is achieved. Don't chase a connector per system.
 
 ---
 
@@ -205,6 +207,24 @@ System is in our native list? ── Yes ─► Native connector (Square/…)(Ph
 - **QR poster + review link** for in‑store walk‑ins, even when an integration exists (catches the contacts the system misses).
 - Confirm the **business's Gmail is connected** (per‑location) so sends come from them → Primary inbox + recognition.
 
+### 5.1 Managed onboarding runbook (per client — Phase 5)
+The end‑to‑end process the team runs for each new client. Works for **any** client because every branch lands in the same queue.
+
+1. **Triage** — ask Q1/Q2/Q3 (above) → pick a door from the decision tree.
+2. **Connect the location's Gmail** (Location Setup → Email Sender) and send yourself a test → confirm it lands in **Primary**. *(Deliverability prerequisite — do this before anything else.)*
+3. **Generate the QR poster** (Widget & QR poster) — always, regardless of door.
+4. **Set up the chosen door:**
+   - *No system / walk‑ins* → poster only. Done.
+   - *Spreadsheet* → import CSV (or a recurring export).
+   - *Has a SaaS, non‑technical* → **we build their Zapier/Make/n8n flow** (Door 5): trigger in their app → HTTP `POST` to the endpoint with their key. (Generate the key in Location Setup → Integrations · API keys.)
+   - *Has a dev / custom system* → hand them the key + the endpoints reference (§6); they call it directly.
+5. **Set the daily cap** if the client is high‑volume (Location Setup → Integrations · API keys → edit "Daily cap" on the key; default 5,000/day).
+6. **Verify end‑to‑end:** `GET …/ping` shows the right business → push one **test contact** → it appears in this week's **"Incoming · week of …"** list → generate variations → it's ready to Send in Gmail. Then delete the test contact.
+7. **Show the owner/staff** the Bulk Review Requests queue and the one‑by‑one "Send in Gmail" step (email) / "SMS all" (text).
+8. **Hand off** + note the door used on the client record.
+
+Use the **go‑live checklist (§9)** to confirm nothing's missed. After this, contacts flow in automatically (weekly batches), the team reviews + sends, and the second‑touch/resend logic handles non‑responders.
+
 ---
 
 ## 6. Setup tutorials (how to make the connection)
@@ -243,7 +263,7 @@ Trigger on the **fulfillment / visit‑complete** event (not payment auth). `ext
 1. Location Setup → **Integrations · API keys** → generate a key (copy once).
 2. Give the client/developer the endpoint + payload above.
 3. Trigger on their fulfillment/visit‑complete event.
-4. Verify: `curl` the `ping` endpoint → confirms the location; then POST a test contact → it appears in the location's "Incoming — from integrations" queue.
+4. Verify: `curl` the `ping` endpoint → confirms the location; then POST a test contact → it appears in the current week's "Incoming · week of …" queue.
 
 ### Door 5 — No‑code: Zapier / Make / n8n
 All three call the same endpoint; pick whichever the client uses. **Auth** in each = a header `Authorization: Bearer <LOCATION_API_KEY>`; **connection test** = `GET …/ping`.

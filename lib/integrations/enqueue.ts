@@ -24,8 +24,28 @@ import {
  * See docs/operations/INTEGRATIONS_AND_INTAKE_SOP.md.
  */
 
-const INTEGRATION_LIST_NAME = "Incoming — from integrations";
 const DEDUPE_WINDOW_DAYS = 60;
+
+/** Monday (UTC) of the week containing `d`, as YYYY-MM-DD — the rolling
+ *  integration list's window key. */
+function weekKeyOf(d: Date): string {
+  const x = new Date(
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()),
+  );
+  const dow = (x.getUTCDay() + 6) % 7; // Mon=0 … Sun=6
+  x.setUTCDate(x.getUTCDate() - dow);
+  return x.toISOString().slice(0, 10);
+}
+
+/** Human label for the list name, e.g. "Jun 9". */
+function weekLabel(weekKey: string): string {
+  const [y, m, day] = weekKey.split("-").map(Number);
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  ];
+  return `${months[m - 1]} ${day}, ${y}`;
+}
 
 export interface EnqueueInput {
   /** BAAM location slug or uuid (which business this contact belongs to). */
@@ -123,7 +143,7 @@ export async function enqueueReviewRequest(
     return { status: "skipped", reason: "duplicate" };
   }
 
-  // ── Find-or-create the rolling integration list for this location ───────
+  // ── Find-or-create THIS WEEK's rolling integration list for the location ─
   const listId = await getOrCreateIntegrationList(svc, loc.id, language);
 
   // ── Append the pending customer ─────────────────────────────────────────
@@ -168,15 +188,17 @@ async function getOrCreateIntegrationList(
   locationId: string,
   language: "en" | "zh" | "es",
 ): Promise<string> {
+  const wk = weekKeyOf(new Date());
   const { data: existing } = await svc
     .from("lists")
     .select("id, status")
     .eq("location_id", locationId)
     .eq("source", "integration")
+    .eq("window_key", wk)
     .maybeSingle();
   if (existing) {
-    // A rolling queue must never get stuck "completed" (which hides it and
-    // strands newly-fed contacts) — keep it live whenever we append.
+    // Within the same week, keep the list live so a newly-fed contact after a
+    // staff "mark complete" doesn't get stranded in a completed list.
     if (existing.status !== "active") {
       await svc
         .from("lists")
@@ -190,22 +212,24 @@ async function getOrCreateIntegrationList(
     .from("lists")
     .insert({
       location_id: locationId,
-      name: INTEGRATION_LIST_NAME,
+      name: `Incoming · week of ${weekLabel(wk)}`,
       default_language: language,
       status: "active",
       source: "integration",
+      window_key: wk,
       customer_count: 0,
     })
     .select("id")
     .single();
 
   if (error) {
-    // Lost the create race — another request made it first; re-read.
+    // Lost the create race — another request made this week's list first.
     const { data: again } = await svc
       .from("lists")
       .select("id")
       .eq("location_id", locationId)
       .eq("source", "integration")
+      .eq("window_key", wk)
       .maybeSingle();
     if (again) return again.id;
     throw new Error(`integration list create failed: ${error.message}`);
