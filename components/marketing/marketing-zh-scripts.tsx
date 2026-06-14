@@ -79,6 +79,73 @@ export function MarketingZhScripts() {
     document.addEventListener("click", onStartNow);
     cleanups.push(() => document.removeEventListener("click", onStartNow));
 
+    // ── Audit sample card: count-up score, fill competitor bars, draw
+    //    trajectory. Faithful port of the page's stripped #audit-report inline
+    //    script. Without it the score stays "0" and the bars/trajectory (which
+    //    start at width:0 / undrawn) never animate in.
+    const auditReport = document.getElementById("audit-report");
+    if (auditReport) {
+      const animateAudit = () => {
+        const scoreEl =
+          auditReport.querySelector<HTMLElement>(".audit-score-number");
+        if (scoreEl) {
+          const target = parseInt(scoreEl.dataset.count || "0", 10) || 0;
+          const dur = 1100;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const p = Math.min((now - start) / dur, 1);
+            const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+            scoreEl.textContent = String(Math.round(target * eased));
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+        // Competitor bars — staggered fill (CSS width transition).
+        auditReport
+          .querySelectorAll<HTMLElement>(".cbar-fill")
+          .forEach((el, i) => {
+            const t = window.setTimeout(() => {
+              el.style.width = `${el.dataset.w || 0}%`;
+            }, 150 + i * 90);
+            cleanups.push(() => window.clearTimeout(t));
+          });
+        // Trajectory line draw + dots.
+        auditReport
+          .querySelectorAll<SVGGeometryElement>(".traj-line")
+          .forEach((line) => {
+            const len = line.getTotalLength();
+            line.style.strokeDasharray = String(len);
+            line.style.strokeDashoffset = String(len);
+            void line.getBoundingClientRect();
+            line.classList.add("draw");
+          });
+        const dotsT = window.setTimeout(() => {
+          auditReport
+            .querySelectorAll(".traj-dot")
+            .forEach((d) => d.classList.add("show"));
+        }, 1500);
+        cleanups.push(() => window.clearTimeout(dotsT));
+      };
+
+      if ("IntersectionObserver" in window) {
+        const aObs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                animateAudit();
+                aObs.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.3 },
+        );
+        aObs.observe(auditReport);
+        cleanups.push(() => aObs.disconnect());
+      } else {
+        animateAudit();
+      }
+    }
+
     // ── Reveal on scroll ──
     const reveals = document.querySelectorAll<HTMLElement>(".reveal");
     if ("IntersectionObserver" in window) {

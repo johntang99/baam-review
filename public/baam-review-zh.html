@@ -7,7 +7,7 @@
 <meta name="description" content="谷歌评价是企业最被低估的资产。BAAM Review 用 60 秒、AI 协助、中英双语,把您 90% 沉默的满意顾客,变成可见的好评、可追溯的营收。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --ink: #1a1612;
@@ -1996,6 +1996,203 @@ footer {
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
 }
 
+/* ===== Audit Section ===== */
+.audit-bg {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(161, 122, 58, 0.05) 0%, transparent 42%),
+    radial-gradient(circle at 85% 90%, rgba(183, 50, 37, 0.04) 0%, transparent 45%),
+    var(--paper-light);
+}
+.audit-report {
+  max-width: 1080px;
+  margin: 0 auto;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px -28px rgba(26, 22, 18, 0.22);
+  overflow: hidden;
+}
+.audit-report-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  padding: 16px 28px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; letter-spacing: 0.08em;
+}
+.audit-report-bar .arb-id { color: var(--gold-soft); }
+.audit-report-bar .arb-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  text-transform: uppercase; letter-spacing: 0.14em;
+}
+.audit-report-bar .arb-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4caf72; box-shadow: 0 0 0 4px rgba(76, 175, 114, 0.18);
+}
+.audit-report-body { padding: 48px 48px 40px; }
+
+/* — Score hero — */
+.audit-score-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 52px;
+  align-items: center;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--rule);
+}
+.audit-score-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 168px;
+  font-weight: 300;
+  line-height: 0.82;
+  color: var(--ink);
+  letter-spacing: -0.04em;
+  position: relative;
+}
+.audit-score-number::after {
+  content: '/100';
+  font-size: 22px;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-left: 6px;
+}
+.audit-grade-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 10px;
+}
+.audit-grade-letter {
+  font-family: 'Fraunces', serif;
+  font-size: 84px; line-height: 1;
+  color: var(--vermilion); margin-bottom: 14px;
+}
+.audit-grade-diagnosis {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 21px; line-height: 1.45;
+  color: var(--ink); white-space: nowrap;
+}
+.audit-grade-diagnosis em { font-style: normal; color: var(--vermilion); }
+
+/* — Three diagnostic cards — */
+.audit-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 40px 0;
+}
+.audit-card {
+  background: var(--paper-light);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 26px 24px;
+}
+.audit-card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; letter-spacing: 0.18em; color: var(--gold);
+  margin-bottom: 14px;
+}
+.audit-card-title {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700; font-size: 19px; color: var(--ink);
+  margin-bottom: 10px;
+}
+.audit-card-text { font-size: 14.5px; line-height: 1.7; color: var(--ink-soft); }
+.audit-card-text strong { color: var(--vermilion); font-weight: 600; }
+
+/* — Competitor benchmark — */
+.audit-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 44px;
+  margin-top: 8px;
+}
+.audit-block-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 22px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--rule);
+}
+.cbar-row {
+  display: grid;
+  grid-template-columns: 116px 1fr 52px;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.cbar-name {
+  font-size: 13.5px; color: var(--ink-soft);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cbar-track {
+  height: 10px; border-radius: 5px;
+  background: var(--paper-deep); overflow: hidden;
+}
+.cbar-fill {
+  height: 100%; border-radius: 5px;
+  background: var(--gold-soft);
+  width: 0;
+  transition: width 1.1s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.cbar-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; text-align: right; color: var(--ink-soft);
+}
+.cbar-row.you .cbar-name { color: var(--vermilion); font-weight: 700; }
+.cbar-row.you .cbar-fill { background: var(--vermilion); }
+.cbar-row.you .cbar-val { color: var(--vermilion); font-weight: 700; }
+
+/* — Trajectory — */
+.audit-traj { position: relative; }
+.audit-traj-svg { width: 100%; height: auto; display: block; }
+.traj-line {
+  fill: none; stroke-width: 2.5;
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+}
+.traj-line.draw { animation: trajDraw 1.6s ease forwards; }
+@keyframes trajDraw { to { stroke-dashoffset: 0; } }
+.traj-flat { stroke: var(--muted); stroke-dasharray: 4 4; opacity: 0.5; }
+.traj-grow { stroke: var(--vermilion); }
+.traj-dot { fill: var(--vermilion); opacity: 0; }
+.traj-dot.show { animation: trajDot 0.4s ease forwards; }
+@keyframes trajDot { to { opacity: 1; } }
+.audit-traj-gain {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: var(--vermilion); font-weight: 700;
+  margin-top: 14px; text-align: center; letter-spacing: 0.04em;
+}
+.audit-traj-legend {
+  display: flex; gap: 24px; justify-content: center;
+  margin-top: 10px; font-size: 12.5px; color: var(--muted);
+}
+.audit-traj-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.tl-swatch { width: 18px; height: 2.5px; border-radius: 2px; }
+.tl-swatch.grow { background: var(--vermilion); }
+.tl-swatch.flat { background: var(--muted); opacity: 0.6; }
+
+/* — CTA — */
+.audit-cta {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  justify-content: center; align-items: center;
+  margin-top: 44px; padding-top: 36px;
+  border-top: 1px solid var(--rule);
+}
+.audit-cta-note {
+  width: 100%; text-align: center;
+  font-size: 13px; color: var(--muted); margin-top: 14px;
+}
+
+@media (max-width: 768px) {
+  .audit-report-body { padding: 32px 22px 30px; }
+  .audit-score-hero { grid-template-columns: 1fr; gap: 24px; text-align: center; }
+  .audit-score-number { font-size: 116px; }
+  .audit-grade-diagnosis { margin: 0 auto; white-space: normal; font-size: 18px; }
+  .audit-cards { grid-template-columns: 1fr; }
+  .audit-split { grid-template-columns: 1fr; gap: 36px; }
+  .cbar-row { grid-template-columns: 96px 1fr 44px; gap: 10px; }
+}
+
 /* ===== Reveal animations ===== */
 .reveal {
   opacity: 0;
@@ -2291,6 +2488,7 @@ footer {
       BAAM Review
     </a>
     <nav class="nav-links">
+      <a href="#audit">审计诊断</a>
       <a href="#why">为何重要</a>
       <a href="#value">行业价值</a>
       <a href="#velocity">评价节奏</a>
@@ -2495,6 +2693,137 @@ footer {
       <div>
         <div class="stat-num">5<span class="x">倍</span></div>
         <div class="stat-label">「评价营收」回报<br>按行业中位数测算</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUDIT DIAGNOSIS ============ -->
+<section id="audit" class="audit-bg">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-num">免费口碑诊断</div>
+      <h2>最完整的报告：<em>BAAM Review Audit</em> 帮助您了解全貌</h2>
+      <p class="section-lede">
+        在您投入一分钱之前,我们先为您出具一份<strong style="color:var(--vermilion);font-weight:500;">免费的口碑审计报告</strong>——
+        为您的 Google 口碑打分、把您和周边竞争对手并排对比,
+        并给出一条「12 个月内追上对手」的可执行路线图。
+      </p>
+    </div>
+
+    <div class="audit-report reveal" id="audit-report">
+      <div class="audit-report-bar">
+        <span class="arb-id">审计编号 · BR-SAMPLE-52A6</span>
+        <span class="arb-tag"><span class="arb-dot"></span>示范报告 · 数据已匿名</span>
+      </div>
+
+      <div class="audit-report-body">
+
+        <!-- Score hero -->
+        <div class="audit-score-hero">
+          <div class="audit-score-number" data-count="41">0</div>
+          <div>
+            <div class="audit-grade-label">综合评级 · D 级</div>
+            <div class="audit-grade-letter">D</div>
+            <div class="audit-grade-diagnosis">
+              「每一周,都在把客户<em>拱手让给</em>评价更好的竞争对手。」
+            </div>
+          </div>
+        </div>
+
+        <!-- Three diagnostic cards -->
+        <div class="audit-cards">
+          <div class="audit-card">
+            <div class="audit-card-num">01 · 现状诊断</div>
+            <div class="audit-card-title">你的口碑值多少分</div>
+            <div class="audit-card-text">
+              评分、评论数量、回复率、近半年增长速率——
+              一个 <strong>0–100 分</strong>的综合体检,看清你在 Google 上的真实位置。
+            </div>
+          </div>
+          <div class="audit-card">
+            <div class="audit-card-num">02 · 竞品对标</div>
+            <div class="audit-card-title">对手在哪里领先</div>
+            <div class="audit-card-text">
+              依你搜索范围内的 Google 地图排名,识别<strong>真实竞争对手</strong>,
+              把分数、评分、评论增速并排摆出——差距一目了然。
+            </div>
+          </div>
+          <div class="audit-card">
+            <div class="audit-card-num">03 · 增长路径</div>
+            <div class="audit-card-title">12 个月路线图</div>
+            <div class="audit-card-text">
+              从当前分数到目标等级的月度计划:
+              <strong>90–120 天升一级</strong>,一年内进入 B 级,差距由我们替你补上。
+            </div>
+          </div>
+        </div>
+
+        <div class="audit-split">
+          <!-- Competitor benchmark -->
+          <div class="audit-bench">
+            <div class="audit-block-label">竞品对标 · 你 vs 周边四家</div>
+            <div class="cbar-row">
+              <div class="cbar-name">窗帘世家</div>
+              <div class="cbar-track"><div class="cbar-fill" data-w="66"></div></div>
+              <div class="cbar-val">66</div>
+            </div>
+            <div class="cbar-row">
+              <div class="cbar-name">帘艺大道</div>
+              <div class="cbar-track"><div class="cbar-fill" data-w="66"></div></div>
+              <div class="cbar-val">66</div>
+            </div>
+            <div class="cbar-row">
+              <div class="cbar-name">百叶即购</div>
+              <div class="cbar-track"><div class="cbar-fill" data-w="62"></div></div>
+              <div class="cbar-val">62</div>
+            </div>
+            <div class="cbar-row">
+              <div class="cbar-name">布艺仓库</div>
+              <div class="cbar-track"><div class="cbar-fill" data-w="58"></div></div>
+              <div class="cbar-val">58</div>
+            </div>
+            <div class="cbar-row you">
+              <div class="cbar-name">你的商家</div>
+              <div class="cbar-track"><div class="cbar-fill" data-w="41"></div></div>
+              <div class="cbar-val">41</div>
+            </div>
+          </div>
+
+          <!-- Trajectory -->
+          <div class="audit-traj">
+            <div class="audit-block-label">12 个月预测 · 与 BAAM Review 合作</div>
+            <svg class="audit-traj-svg" viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" aria-label="12 个月分数趋势">
+              <!-- gridlines -->
+              <line x1="0" y1="20" x2="360" y2="20" stroke="var(--rule)" stroke-width="1"/>
+              <line x1="0" y1="70" x2="360" y2="70" stroke="var(--rule)" stroke-width="1"/>
+              <line x1="0" y1="120" x2="360" y2="120" stroke="var(--rule)" stroke-width="1"/>
+              <line x1="0" y1="170" x2="360" y2="170" stroke="var(--rule)" stroke-width="1"/>
+              <!-- flat: do nothing (41 across) -->
+              <path class="traj-line traj-flat" d="M 20 154 L 340 154"/>
+              <!-- growth: 41 -> 70 -> 75  (y = 180 - score*1.6) -->
+              <path class="traj-line traj-grow" d="M 20 154 L 180 116 L 340 60"/>
+              <!-- dots -->
+              <circle class="traj-dot" cx="20" cy="154" r="4.5"/>
+              <circle class="traj-dot" cx="340" cy="60" r="4.5"/>
+              <!-- labels -->
+              <text x="20" y="174" font-family="JetBrains Mono, monospace" font-size="11" fill="var(--muted)">现在 41</text>
+              <text x="340" y="50" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="var(--vermilion)">75 · B 级</text>
+            </svg>
+            <div class="audit-traj-gain">+34 分 / 12 个月</div>
+            <div class="audit-traj-legend">
+              <span><span class="tl-swatch grow"></span>使用 BAAM Review</span>
+              <span><span class="tl-swatch flat"></span>什么都不做</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="audit-cta">
+          <a href="/audit" class="btn btn-primary">领取你的免费口碑诊断 <span class="btn-arrow"></span></a>
+          <a href="/audit/sample" class="btn btn-ghost">查看诊断报告样本</a>
+        </div>
+
       </div>
     </div>
   </div>
@@ -3634,6 +3963,47 @@ if ('IntersectionObserver' in window) {
     });
   }, { threshold: 0.15 });
   reveals.forEach(r => obs.observe(r));
+}
+
+// Audit report: count-up score, bar fills, trajectory draw
+const auditReport = document.getElementById('audit-report');
+if (auditReport && 'IntersectionObserver' in window) {
+  const animateAudit = () => {
+    // score count-up
+    const scoreEl = auditReport.querySelector('.audit-score-number');
+    if (scoreEl) {
+      const target = parseInt(scoreEl.dataset.count, 10) || 0;
+      const dur = 1100; const start = performance.now();
+      const tick = (now) => {
+        const p = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        scoreEl.textContent = Math.round(target * eased);
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+    // competitor bars
+    auditReport.querySelectorAll('.cbar-fill').forEach((el, i) => {
+      setTimeout(() => { el.style.width = (el.dataset.w || 0) + '%'; }, 150 + i * 90);
+    });
+    // trajectory lines + dots
+    auditReport.querySelectorAll('.traj-line').forEach(line => {
+      const len = line.getTotalLength();
+      line.style.strokeDasharray = len;
+      line.style.strokeDashoffset = len;
+      void line.getBoundingClientRect();
+      line.classList.add('draw');
+    });
+    setTimeout(() => {
+      auditReport.querySelectorAll('.traj-dot').forEach(d => d.classList.add('show'));
+    }, 1500);
+  };
+  const auditObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { animateAudit(); auditObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.3 });
+  auditObs.observe(auditReport);
 }
 </script>
 </body>
