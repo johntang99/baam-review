@@ -6,6 +6,7 @@ import {
   getGoogleBusinessData,
 } from "@/lib/audit/google";
 import { resolveServiceKeyword } from "@/lib/audit/competitors/keyword-resolver";
+import { reconcileServiceDecision } from "@/lib/audit/service-reconciler";
 import { VERTICAL_KEYS } from "@/lib/audit/google/types";
 import type { VerticalKey } from "@/lib/audit/google/types";
 
@@ -48,6 +49,10 @@ export async function POST(request: Request) {
     const google = await getGoogleBusinessData({ textQuery }, "free");
     const detectedVertical: VerticalKey = google.vertical.inferred_vertical;
     const detectedService = resolveServiceKeyword(google);
+    const serviceDecision = reconcileServiceDecision({
+      google,
+      bsService: detectedService,
+    });
     const websiteMatch = matchWebsite(body.website, google.business.website);
 
     return NextResponse.json({
@@ -65,6 +70,11 @@ export async function POST(request: Request) {
       is_chinese_business: google.language.is_chinese_business,
       detected_vertical: detectedVertical,
       detected_service: detectedService,
+      gs_service: serviceDecision.gs_service,
+      bs_service: serviceDecision.bs_service,
+      cs_recommended_service: serviceDecision.cs_recommended_service,
+      cs_confidence: serviceDecision.cs_confidence,
+      cs_reason_codes: serviceDecision.cs_reason_codes,
       // Actual Google Business Profile categorization (for display/context).
       google_category:
         google.vertical.primary_category_display ||

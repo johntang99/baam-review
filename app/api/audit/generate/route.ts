@@ -6,6 +6,7 @@ import {
 } from "@/lib/audit/delivery/start-audit";
 import { canUserAudit, incrementAuditCount } from "@/lib/audit/quotas";
 import { VERTICAL_KEYS, type VerticalKey } from "@/lib/audit/google/types";
+import { logServiceResolutionLearning } from "@/lib/audit/service-learning";
 
 export const runtime = "nodejs";
 // Paid (Outscraper) scrapes of the business + ~7 competitors can legitimately
@@ -27,6 +28,14 @@ interface GenerateRequest {
   /** Report-language choice from the intake form. "auto" defers to the
    *  language router (Chinese businesses → both, else English). */
   language_choice?: "auto" | "en" | "zh" | "both";
+  /** V1 gate: user must explicitly confirm service before generation. */
+  service_confirmed?: boolean;
+  /** V2 learning payload from reconcile step. */
+  gs_service?: string;
+  bs_service?: string;
+  cs_recommended_service?: string;
+  cs_confidence?: number;
+  cs_reason_codes?: string[];
 }
 
 export async function POST(request: Request) {
@@ -57,6 +66,14 @@ export async function POST(request: Request) {
 
   const verticalOverride = parseVerticalOverride(body.vertical_override);
   const serviceOverride = (body.service_override ?? "").trim() || undefined;
+  const serviceConfirmed = body.service_confirmed === true;
+
+  if (!serviceConfirmed) {
+    return NextResponse.json(
+      { error: "service_confirmation_required" },
+      { status: 400 },
+    );
+  }
 
   const quota = await canUserAudit(auth.user.id);
   if (!quota.allowed) {
@@ -85,6 +102,26 @@ export async function POST(request: Request) {
   };
 
   const result = await startAuditGeneration(pipelineInput);
+
+  await logServiceResolutionLearning({
+    audit_id: result.audit_id,
+    user_id: auth.user.id,
+    business_place_id: body.place_id?.trim() || undefined,
+    gs_service: (body.gs_service ?? "").trim() || undefined,
+    bs_service: (body.bs_service ?? "").trim() || undefined,
+    cs_recommended_service:
+      (body.cs_recommended_service ?? "").trim() || undefined,
+    cs_confidence:
+      typeof body.cs_confidence === "number" ? body.cs_confidence : undefined,
+    cs_reason_codes: Array.isArray(body.cs_reason_codes)
+      ? body.cs_reason_codes.filter(
+          (item): item is string =>
+            typeof item === "string" && item.trim().length > 0,
+        )
+      : [],
+    user_final_service: serviceOverride,
+    user_final_vertical: verticalOverride,
+  });
 
   // Run the heavy pipeline AFTER the response is sent. Works in
   // serverless (Vercel keeps the function alive until after() callbacks

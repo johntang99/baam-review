@@ -15,6 +15,8 @@ const ERROR_LABELS: Record<string, string> = {
   monthly_limit: "You've used your 2 audits for this month. Quota resets on the 1st.",
   lifetime_limit: "You've reached your lifetime audit allowance.",
   unauthorized: "You need to sign in again to continue.",
+  service_confirmation_required:
+    "Please confirm (or adjust) industry and main service before generating the audit.",
   email_not_verified:
     "Please verify your email first — check your inbox for the verification link, then refresh this page.",
 };
@@ -51,6 +53,11 @@ interface ResolvedBusiness {
   is_chinese_business: boolean;
   detected_vertical: string;
   detected_service: string;
+  gs_service: string;
+  bs_service: string;
+  cs_recommended_service: string;
+  cs_confidence: number;
+  cs_reason_codes: string[];
   google_category: string | null;
   google_categories: string[];
   vertical_options: string[];
@@ -66,6 +73,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
   const [resolved, setResolved] = useState<ResolvedBusiness | null>(null);
   const [vertical, setVertical] = useState("");
   const [service, setService] = useState("");
+  const [serviceConfirmed, setServiceConfirmed] = useState(false);
   const [languageChoice, setLanguageChoice] =
     useState<"auto" | "en" | "zh" | "both">("auto");
   const [isPending, setIsPending] = useState(false);
@@ -128,7 +136,8 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
       }
       setResolved(data);
       setVertical(data.detected_vertical);
-      setService(data.detected_service);
+      setService(data.cs_recommended_service || data.detected_service);
+      setServiceConfirmed(false);
       setStep("confirm");
     } catch (err) {
       console.error("[intake] resolve failed:", err);
@@ -152,6 +161,12 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           vertical_override: vertical,
           service_override: service.trim(),
           language_choice: languageChoice,
+          gs_service: resolved.gs_service,
+          bs_service: resolved.bs_service,
+          cs_recommended_service: resolved.cs_recommended_service,
+          cs_confidence: resolved.cs_confidence,
+          cs_reason_codes: resolved.cs_reason_codes,
+          service_confirmed: serviceConfirmed,
         }),
       });
       if (!res.ok) {
@@ -248,7 +263,10 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               <div className="detection-item-label">Industry</div>
               <select
                 value={vertical}
-                onChange={(e) => setVertical(e.target.value)}
+                onChange={(e) => {
+                  setVertical(e.target.value);
+                  setServiceConfirmed(false);
+                }}
                 disabled={isPending}
                 style={{
                   width: "100%",
@@ -278,7 +296,10 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               <input
                 type="text"
                 value={service}
-                onChange={(e) => setService(e.target.value)}
+                onChange={(e) => {
+                  setService(e.target.value);
+                  setServiceConfirmed(false);
+                }}
                 disabled={isPending}
                 placeholder="e.g., bridal boutique, pediatric dentist"
                 style={{
@@ -298,6 +319,69 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               </div>
             </div>
           </div>
+
+          <div
+            style={{
+              marginTop: 14,
+              padding: "10px 12px",
+              border: "1px solid var(--rule)",
+              borderRadius: 8,
+              background: "var(--cream-light, #FAF7F0)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                textTransform: "uppercase",
+                letterSpacing: 0.5,
+                color: "var(--ink-mute)",
+                marginBottom: 8,
+              }}
+            >
+              Service decision (GS vs BS)
+            </div>
+            <div style={{ display: "grid", gap: 6, fontSize: 13, color: "var(--ink-soft)" }}>
+              <div>
+                <strong style={{ color: "var(--ink)" }}>GS (Google):</strong> {resolved.gs_service}
+              </div>
+              <div>
+                <strong style={{ color: "var(--ink)" }}>BS (BAAM):</strong> {resolved.bs_service}
+              </div>
+              <div>
+                <strong style={{ color: "var(--ink)" }}>CS (Recommended):</strong>{" "}
+                {resolved.cs_recommended_service}{" "}
+                <span style={{ color: "var(--ink-mute)" }}>
+                  · confidence {(resolved.cs_confidence * 100).toFixed(0)}%
+                </span>
+              </div>
+            </div>
+            {resolved.cs_confidence < 0.75 ? (
+              <div style={{ marginTop: 6, fontSize: 12, color: "#8A4B1F" }}>
+                Confidence is moderate. Please review and confirm before generating.
+              </div>
+            ) : null}
+          </div>
+
+          <label
+            style={{
+              marginTop: 12,
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 10,
+              fontSize: 13,
+              color: "var(--ink)",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={serviceConfirmed}
+              onChange={(e) => setServiceConfirmed(e.target.checked)}
+              disabled={isPending}
+              style={{ marginTop: 2 }}
+            />
+            I confirm the selected <strong>Industry</strong> and <strong>Main service</strong>{" "}
+            for this audit.
+          </label>
 
           <fieldset
             style={{
@@ -432,7 +516,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
             <button
               type="submit"
               className="found-action-generate"
-              disabled={isPending || !service.trim()}
+              disabled={isPending || !service.trim() || !serviceConfirmed}
             >
               {isPending ? "Starting audit…" : "Generate audit →"}
             </button>
