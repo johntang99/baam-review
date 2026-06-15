@@ -36,6 +36,7 @@ export {
 export async function getGoogleBusinessData(
   input: BusinessReference,
   tier: Tier,
+  options: { reviewsTimeoutMs?: number } = {},
 ): Promise<AuditGoogleData> {
   const parsed = BusinessReferenceSchema.safeParse(input);
   if (!parsed.success) throw new InvalidBusinessReferenceError();
@@ -69,7 +70,9 @@ export async function getGoogleBusinessData(
   if (tier === "paid") {
     try {
       const client = new OutscraperGoogleReviewsClient(config.outscraperApiKey);
-      outscraperReviews = await client.fetchReviews(placeId);
+      outscraperReviews = await client.fetchReviews(placeId, {
+        timeoutMs: options.reviewsTimeoutMs,
+      });
     } catch (err) {
       outscraperReviews = null;
       degraded = {

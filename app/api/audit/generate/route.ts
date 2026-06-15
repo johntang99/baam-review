@@ -8,7 +8,11 @@ import { canUserAudit, incrementAuditCount } from "@/lib/audit/quotas";
 import { VERTICAL_KEYS, type VerticalKey } from "@/lib/audit/google/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+// Paid (Outscraper) scrapes of the business + ~7 competitors can legitimately
+// take a couple of minutes; 120s occasionally killed the function mid-run,
+// leaving the audit stuck on "generating" forever. 300s (matches the
+// sync-reviews cron) gives the pipeline room to finish.
+export const maxDuration = 300;
 
 interface GenerateRequest {
   /** Free-form business identifier (URL, text query, place_id). Used

@@ -150,8 +150,10 @@ export function ProcessingClient({ auditId }: ProcessingClientProps) {
           marginBottom: 40,
         }}
       >
-        This usually takes several minutes. We're fetching real-time data from
-        Google, comparing against your local competitors, and rendering the PDF.
+        This usually takes a minute or two — but for businesses with lots of
+        reviews or many local competitors it can take up to 5 minutes. We're
+        fetching real-time data from Google, comparing against your local
+        competitors, and rendering the PDF.
       </p>
 
       <ol style={{ listStyle: "none", padding: 0, margin: 0 }}>
@@ -240,7 +242,8 @@ export function ProcessingClient({ auditId }: ProcessingClientProps) {
           textAlign: "center",
         }}
       >
-        Don't close this tab. We'll redirect you when the audit is ready.
+        Don't close this tab — some audits take up to 5 minutes. We'll redirect
+        you automatically when the report is ready.
       </p>
     </div>
   );

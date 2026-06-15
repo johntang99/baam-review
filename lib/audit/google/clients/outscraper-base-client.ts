@@ -10,6 +10,11 @@ export abstract class OutscraperBaseClient {
   protected async getJson<T>(
     path: string,
     params: Record<string, string | number | boolean>,
+    // Per-call abort budget. Defaults to the generous SYNC_TIMEOUT_MS for the
+    // essential primary-business fetch; callers that fetch optional data (e.g.
+    // competitor reviews) pass a shorter value so one slow scrape can't eat the
+    // serverless time budget — it just degrades to Google reviews instead.
+    timeoutMs: number = SYNC_TIMEOUT_MS,
   ): Promise<T> {
     const url = new URL(`${BASE_URL}${path}`);
     for (const [key, value] of Object.entries(params)) {
@@ -17,7 +22,7 @@ export abstract class OutscraperBaseClient {
     }
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), SYNC_TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       const response = await fetch(url.toString(), {
@@ -36,7 +41,7 @@ export abstract class OutscraperBaseClient {
       if (err instanceof OutscraperError) throw err;
       if (err instanceof Error && err.name === "AbortError") {
         throw new OutscraperError(
-          `request timed out after ${SYNC_TIMEOUT_MS}ms`,
+          `request timed out after ${timeoutMs}ms`,
         );
       }
       throw new OutscraperError(

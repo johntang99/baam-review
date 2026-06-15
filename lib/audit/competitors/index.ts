@@ -132,9 +132,15 @@ async function fetchCompetitorsInParallel(
       // reviews_30d unreliable (typically reads 0 even for active
       // businesses). Paid tier uses Outscraper's full chronological
       // history → accurate velocity numbers for the comparison table.
+      //
+      // Competitors are secondary data: cap their Outscraper review fetch at
+      // 30s so one slow/hung scrape can't push the whole pipeline past the
+      // serverless time limit. On timeout it degrades to Google reviews (the
+      // competitor still appears) rather than stalling generation.
       const data = await getGoogleBusinessData(
         { placeId: candidate.id },
         tier,
+        { reviewsTimeoutMs: 30_000 },
       );
 
       const distance_miles =

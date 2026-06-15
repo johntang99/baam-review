@@ -27,7 +27,7 @@ interface OutscraperReviewsResponse {
 export class OutscraperGoogleReviewsClient extends OutscraperBaseClient {
   async fetchReviews(
     placeId: string,
-    options: { limit?: number } = {},
+    options: { limit?: number; timeoutMs?: number } = {},
   ): Promise<RawOutscraperReview[]> {
     const response = await this.getJson<OutscraperReviewsResponse>(
       "/maps/reviews-v3",
@@ -38,6 +38,7 @@ export class OutscraperGoogleReviewsClient extends OutscraperBaseClient {
         language: "en",
         async: false,
       },
+      options.timeoutMs,
     );
 
     if (response.status !== "Success") {
