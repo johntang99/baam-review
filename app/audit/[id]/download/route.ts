@@ -49,6 +49,7 @@ interface AuditRow {
   competitors_data: AuditCompetitorsData;
   score_data: AuditScore;
   projection_data: AuditProjection;
+  platforms_data: import("@/lib/audit/platforms/types").AuditPlatformsData | null;
 }
 
 export const dynamic = "force-dynamic";
@@ -80,7 +81,7 @@ export async function GET(
   let query = service
     .from("audits")
     .select(
-      "id,user_id,is_public,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data",
+      "id,user_id,is_public,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data,platforms_data",
     );
   query =
     "exact" in idFilter
@@ -100,13 +101,18 @@ export async function GET(
     data.region as RegionKey,
   );
 
-  // Same Yelp / platforms lazy-load as the embed route — keeps the
-  // downloaded artifact identical to what the user sees inline.
-  const { getAllPlatformsData } = await import("@/lib/audit/platforms");
-  const platforms = await getAllPlatformsData(
-    data.google_data,
-    data.tier as "free" | "paid",
-  ).catch(() => undefined);
+  // Platforms are frozen on the audit row at generation; read them off the
+  // snapshot. Older audits predate platforms_data — fall back to the cache
+  // (cacheOnly so a download never triggers a slow live fetch).
+  let platforms = data.platforms_data ?? undefined;
+  if (!platforms) {
+    const { getAllPlatformsData } = await import("@/lib/audit/platforms");
+    platforms = await getAllPlatformsData(
+      data.google_data,
+      data.tier as "free" | "paid",
+      { cacheOnly: true },
+    ).catch(() => undefined);
+  }
 
   const input: RenderAuditInput = {
     google: data.google_data,

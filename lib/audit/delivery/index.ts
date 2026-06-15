@@ -165,6 +165,7 @@ export async function renderAndDeliverAudit(
         score: input.score,
         projection: input.projection,
         benchmarks: input.benchmarks,
+        platforms: input.platforms,
         languages_rendered: languages,
         pdfs: stored,
         email_sent,

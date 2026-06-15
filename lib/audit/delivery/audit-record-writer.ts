@@ -5,6 +5,7 @@ import type { AuditGoogleData } from "../google/types";
 import type { AuditProjection } from "../projection/types";
 import type { AuditScore } from "../scoring/types";
 import type { VerticalBenchmarks } from "../benchmarks/types";
+import type { AuditPlatformsData } from "../platforms/types";
 import type { AuditLanguage } from "../templating/types";
 import type { StoredPdf } from "./pdf-storage";
 
@@ -18,6 +19,9 @@ export interface AuditRecordInput {
   score: AuditScore;
   projection: AuditProjection;
   benchmarks: VerticalBenchmarks;
+  /** Secondary-platform data (Yelp, etc.) frozen into the audit snapshot so
+   * later views/downloads never re-fetch it. */
+  platforms?: AuditPlatformsData;
   languages_rendered: AuditLanguage[];
   pdfs: StoredPdf[];
   email_sent: boolean;
@@ -54,6 +58,7 @@ export async function writeAuditRecord(
     competitors_data: input.competitors,
     score_data: input.score,
     projection_data: input.projection,
+    platforms_data: input.platforms ?? null,
     generation_time_ms: input.generation_time_ms,
   };
 

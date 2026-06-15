@@ -18,6 +18,12 @@ import type { AuditScore } from "@/lib/audit/scoring/types";
 import type { RegionKey } from "@/lib/audit/benchmarks/types";
 import type { AuditLanguage } from "@/lib/audit/templating/types";
 
+export const runtime = "nodejs";
+// A report view should be fast (cache reads + pure rendering). This is only a
+// safety net so an unexpected slow path can't hit an aggressively low default
+// and render the report iframe blank.
+export const maxDuration = 30;
+
 interface AuditEmbedRow {
   id: string;
   user_id: string | null;
@@ -31,6 +37,7 @@ interface AuditEmbedRow {
   competitors_data: AuditCompetitorsData;
   score_data: AuditScore;
   projection_data: AuditProjection;
+  platforms_data: import("@/lib/audit/platforms/types").AuditPlatformsData | null;
 }
 
 export async function GET(
@@ -55,7 +62,7 @@ export async function GET(
   let query = service
     .from("audits")
     .select(
-      "id,user_id,is_public,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data",
+      "id,user_id,is_public,tier,vertical,region,generated_at,languages_rendered,google_data,competitors_data,score_data,projection_data,platforms_data",
     );
   query =
     "exact" in idFilter
@@ -75,14 +82,19 @@ export async function GET(
     data.region as RegionKey,
   );
 
-  // Lazy-load any cached platform data for this place (currently Yelp only).
-  // Platforms aren't stored on the audits row; we re-read from
-  // audit_platform_data cache to surface them inline at render time.
-  const { getAllPlatformsData } = await import("@/lib/audit/platforms");
-  const platforms = await getAllPlatformsData(
-    data.google_data,
-    data.tier as "free" | "paid",
-  ).catch(() => undefined);
+  // Platforms (Yelp, etc.) are frozen onto the audit row at generation time,
+  // so a view just reads them off the snapshot — no external dependency.
+  // Older audits predate platforms_data; fall back to the cache (cacheOnly so a
+  // view never triggers a live fetch — that's what rendered the report blank).
+  let platforms = data.platforms_data ?? undefined;
+  if (!platforms) {
+    const { getAllPlatformsData } = await import("@/lib/audit/platforms");
+    platforms = await getAllPlatformsData(
+      data.google_data,
+      data.tier as "free" | "paid",
+      { cacheOnly: true },
+    ).catch(() => undefined);
+  }
 
   const input: RenderAuditInput = {
     google: data.google_data,

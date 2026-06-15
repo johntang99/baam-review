@@ -18,6 +18,11 @@ export { PLATFORM_VERTICAL_RELEVANCE } from "./platform-relevance";
 export async function getAllPlatformsData(
   business: AuditGoogleData,
   tier: Tier,
+  // cacheOnly: never make a live external call. Report VIEWS pass this so a
+  // page load can't trigger a slow Outscraper/Yelp fetch (which would blow the
+  // route's timeout and render the report iframe blank). On a cache miss the
+  // platform is simply omitted from the report — graceful, not fatal.
+  options: { cacheOnly?: boolean } = {},
 ): Promise<AuditPlatformsData> {
   const relevance =
     PLATFORM_VERTICAL_RELEVANCE[business.vertical.inferred_vertical] ??
@@ -32,7 +37,7 @@ export async function getAllPlatformsData(
   if (relevance.yelp) {
     platforms_attempted.push("yelp");
     try {
-      yelp = await safeFetchYelp(business, tier);
+      yelp = await safeFetchYelp(business, tier, options.cacheOnly);
       if (yelp) platforms_succeeded.push("yelp");
       else platforms_not_found.push("yelp");
     } catch (err) {
@@ -61,6 +66,7 @@ export async function getAllPlatformsData(
 async function safeFetchYelp(
   business: AuditGoogleData,
   tier: Tier,
+  cacheOnly = false,
 ): Promise<AuditPlatformData | null> {
   const placeId = business.business.place_id;
   const config = getAuditGoogleConfig();
@@ -71,6 +77,9 @@ async function safeFetchYelp(
 
   if (cached) {
     yelpUrl = cached.yelp_url;
+  } else if (cacheOnly) {
+    // A report view must never resolve the Yelp URL live — omit Yelp instead.
+    return null;
   } else {
     const resolved = await resolveYelpUrl(business, config.outscraperApiKey);
     yelpUrl = resolved.url;
@@ -86,6 +95,10 @@ async function safeFetchYelp(
   // 2. Try data cache before re-fetching reviews
   const cachedData = await readCachedPlatformData({ placeId, platform: "yelp", tier });
   if (cachedData) return cachedData;
+
+  // A report view must never re-fetch reviews live (the slow path that timed
+  // out the embed route and rendered the report blank). Omit Yelp instead.
+  if (cacheOnly) return null;
 
   // 3. Fetch from Outscraper
   const client = new YelpReviewsClient(config.outscraperApiKey);
