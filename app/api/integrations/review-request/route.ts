@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { consumeApiKey } from "@/lib/integrations/api-keys";
 import { enqueueReviewRequest } from "@/lib/integrations/enqueue";
+import { parseWebhookBody, pickField } from "@/lib/integrations/parse-body";
 
 /**
  * Universal intake endpoint (Phase 2 of the Integrations & Contact Intake SOP).
@@ -44,33 +45,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: {
-    name?: string;
-    email?: string;
-    phone?: string;
-    language?: string;
-    service?: string;
-    transacted_at?: string;
-    external_id?: string;
-  };
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json(
-      { ok: false, error: "Invalid JSON body" },
-      { status: 400 },
-    );
-  }
+  // Accept JSON or form-encoded (Zapier/Make/n8n/POS all differ), and tolerate
+  // common field-name aliases so non-technical Zap setups still map cleanly.
+  const body = await parseWebhookBody(request);
 
   const result = await enqueueReviewRequest({
     location: auth.locationId, // bound to the key, never from the body
-    name: body.name ?? null,
-    email: body.email ?? null,
-    phone: body.phone ?? null,
-    language: body.language ?? null,
-    service: body.service ?? null,
-    transactedAt: body.transacted_at ?? null,
-    externalId: body.external_id ?? null,
+    name: pickField(body, "name", "full_name", "customer_name", "first_name"),
+    email: pickField(body, "email", "email_address"),
+    phone: pickField(body, "phone", "phone_number", "mobile", "tel"),
+    language: pickField(body, "language", "lang"),
+    service: pickField(body, "service", "service_name", "item"),
+    transactedAt: pickField(
+      body,
+      "transacted_at",
+      "transactedAt",
+      "appointment_at",
+      "date",
+    ),
+    externalId: pickField(body, "external_id", "externalId", "id"),
   });
 
   if (result.status === "queued") {
