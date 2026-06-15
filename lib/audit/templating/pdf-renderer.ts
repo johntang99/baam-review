@@ -18,23 +18,69 @@ export interface PdfRenderResult {
  *   environments, ~50MB compressed). This is the only combination that
  *   fits inside Vercel's serverless function size limit.
  */
-async function launchBrowser() {
+/**
+ * Launch can throw `spawn ETXTBSY` ("text file busy") in production: the
+ * @sparticuz/chromium binary is extracted to /tmp and then executed, and the
+ * OS refuses to spawn it while its write handle isn't fully flushed/closed —
+ * or while a concurrent audit is extracting to the same path. It's transient,
+ * so retry a few times with a short backoff before giving up.
+ */
+async function launchWithRetry<T>(
+  launch: () => Promise<T>,
+  attempts = 4,
+): Promise<T> {
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await launch();
+    } catch (e) {
+      lastErr = e;
+      const msg = e instanceof Error ? e.message : String(e);
+      if (!/ETXTBSY/i.test(msg)) throw e; // only retry the binary-busy race
+      console.warn(
+        `[pdf] chromium launch hit ETXTBSY (attempt ${i + 1}/${attempts}); retrying`,
+      );
+      await new Promise((r) => setTimeout(r, 200 * (i + 1)));
+    }
+  }
+  throw lastErr;
+}
+
+async function doLaunch() {
   if (process.env.NODE_ENV === "production") {
     const [{ default: chromium }, puppeteer] = await Promise.all([
       import("@sparticuz/chromium"),
       import("puppeteer-core"),
     ]);
-    return puppeteer.launch({
-      args: chromium.args,
-      executablePath: await chromium.executablePath(),
-      headless: true,
-    });
+    const executablePath = await chromium.executablePath();
+    return launchWithRetry(() =>
+      puppeteer.launch({
+        args: chromium.args,
+        executablePath,
+        headless: true,
+      }),
+    );
   }
   const puppeteer = await import("puppeteer");
-  return puppeteer.default.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
+  return launchWithRetry(() =>
+    puppeteer.default.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    }),
+  );
+}
+
+// Serialize launches within a single (warm) serverless instance. The ETXTBSY
+// race is two concurrent invocations extracting + spawning the same /tmp
+// Chromium binary at once; chaining launches means only one extracts/spawns at
+// a time (subsequent launches find the binary already extracted → fast). This
+// + launchWithRetry makes the launch effectively race-free.
+let launchGate: Promise<unknown> = Promise.resolve();
+
+async function launchBrowser() {
+  const run = launchGate.then(doLaunch, doLaunch);
+  launchGate = run.catch(() => {}); // next launch waits regardless of outcome
+  return run;
 }
 
 export async function renderHtmlToPdf(html: string): Promise<PdfRenderResult> {
