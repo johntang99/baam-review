@@ -53,6 +53,12 @@ const TYPE_REFINEMENTS: Array<{ type: string; keyword: string }> = [
   { type: "endodontist", keyword: "endodontist" },
   { type: "ophthalmologist", keyword: "eye doctor" },
   { type: "dermatologist", keyword: "dermatologist" },
+  // Contractor / home-improvement refinements
+  { type: "cabinet_maker", keyword: "cabinet maker" },
+  { type: "kitchen_remodeler", keyword: "kitchen remodeler" },
+  { type: "countertop_store", keyword: "countertop store" },
+  { type: "countertop_contractor", keyword: "countertop contractor" },
+  { type: "manufacturer", keyword: "manufacturer" },
 ];
 
 // Name-token refinements for cases where Google's types are too generic.
@@ -92,6 +98,11 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
   { pattern: /\b(body shop|collision)\b/i, keyword: "auto body shop" },
   { pattern: /\b(tire)\b/i, keyword: "tire shop" },
   { pattern: /\b(dealer(ship)?)\b/i, keyword: "car dealer" },
+
+  // Contractor / home-improvement sub-types
+  { pattern: /\b(cabinet|cabinetry)\b/i, keyword: "cabinet maker" },
+  { pattern: /\b(countertop|granite|quartz)\b/i, keyword: "countertop contractor" },
+  { pattern: /\b(remodel|renovation|kitchen\s*&\s*bath|kitchen and bath)\b/i, keyword: "kitchen remodeler" },
 
   // Food sub-types (when vertical is restaurant but cuisine wasn't tagged)
   { pattern: /\b(pizz)/i, keyword: "pizza restaurant" },
