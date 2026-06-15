@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { authorizeLocationManagement } from "@/lib/integrations/location-access";
 import {
   createApiKey,
+  revealApiKey,
   revokeApiKey,
   setApiKeyDailyLimit,
   type CreatedApiKey,
@@ -26,6 +27,23 @@ export async function createKeyAction(
   });
   revalidatePath(`/app/locations/${locationId}`);
   return { ok: true, created };
+}
+
+export async function revealKeyAction(
+  locationId: string,
+  keyId: string,
+): Promise<{ ok: true; key: string } | { ok: false; error: string }> {
+  const authz = await authorize(locationId);
+  if (!authz.ok) return { ok: false, error: authz.error };
+
+  const key = await revealApiKey(locationId, keyId);
+  if (!key) {
+    return {
+      ok: false,
+      error: "This key can't be shown again — regenerate it to get a copyable key.",
+    };
+  }
+  return { ok: true, key };
 }
 
 export async function revokeKeyAction(

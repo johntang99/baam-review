@@ -9,11 +9,14 @@ import {
   Trash2,
   AlertCircle,
   Webhook,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ApiKeyRow } from "@/lib/integrations/api-keys";
 import {
   createKeyAction,
+  revealKeyAction,
   revokeKeyAction,
   updateKeyLimitAction,
 } from "./api-keys-actions";
@@ -35,6 +38,9 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<"key" | "curl" | null>(null);
+  // Per-row reveal: keyId → decrypted plaintext (fetched on demand).
+  const [revealed, setRevealed] = useState<Record<string, string>>({});
+  const [copiedRow, setCopiedRow] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const endpoint = `${appUrl.replace(/\/$/, "")}/api/integrations/review-request`;
@@ -59,6 +65,7 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
           created_at: new Date().toISOString(),
           revoked_at: null,
           daily_limit: 5000,
+          revealable: true,
         },
         ...prev,
       ]);
@@ -114,6 +121,49 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
     }
   }
 
+  // Fetch (decrypt) a key on demand, return its plaintext, and cache it.
+  async function ensureRevealed(keyId: string): Promise<string | null> {
+    if (revealed[keyId]) return revealed[keyId];
+    const res = await revealKeyAction(locationId, keyId);
+    if (!res.ok) {
+      setError(res.error);
+      return null;
+    }
+    setRevealed((prev) => ({ ...prev, [keyId]: res.key }));
+    return res.key;
+  }
+
+  function onToggleReveal(keyId: string) {
+    setError(null);
+    if (revealed[keyId]) {
+      // Hide it again.
+      setRevealed((prev) => {
+        const next = { ...prev };
+        delete next[keyId];
+        return next;
+      });
+      return;
+    }
+    startTransition(async () => {
+      await ensureRevealed(keyId);
+    });
+  }
+
+  function onCopyRow(keyId: string) {
+    setError(null);
+    startTransition(async () => {
+      const key = await ensureRevealed(keyId);
+      if (!key) return;
+      try {
+        await navigator.clipboard.writeText(key);
+        setCopiedRow(keyId);
+        setTimeout(() => setCopiedRow(null), 1600);
+      } catch {
+        /* ignore */
+      }
+    });
+  }
+
   const curlSnippet = `curl -X POST ${endpoint} \\
   -H "Authorization: Bearer ${justCreated ?? "<YOUR_API_KEY>"}" \\
   -H "Content-Type: application/json" \\
@@ -150,11 +200,11 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
       {justCreated && (
         <div className="rounded-lg border border-forest/30 bg-forest/[0.05] p-3.5 space-y-2">
           <div className="flex items-center gap-2 text-[13px] font-medium text-forest">
-            <Check className="h-4 w-4" /> New key created — copy it now
+            <Check className="h-4 w-4" /> New key created
           </div>
           <p className="text-[12px] text-text-soft">
-            This is the only time the full key is shown. Store it in your
-            integration; you won&apos;t be able to see it again.
+            Copy it into your integration. You can also reveal and copy it again
+            anytime from the list below.
           </p>
           <div className="flex items-center gap-2">
             <code className="flex-1 rounded-md border border-border-base bg-paper px-2.5 py-1.5 text-[12.5px] text-ink break-all">
@@ -243,6 +293,13 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
                       <span className="text-[10.5px] uppercase tracking-wide text-alert">Revoked</span>
                     )}
                   </div>
+                  {revealed[k.id] && (
+                    <div className="mt-1 flex items-center gap-2">
+                      <code className="flex-1 rounded border border-border-base bg-paper px-2 py-1 text-[11.5px] text-ink break-all">
+                        {revealed[k.id]}
+                      </code>
+                    </div>
+                  )}
                   <div className="text-[11.5px] text-text-muted">
                     {k.last_used_at
                       ? `Last used ${new Date(k.last_used_at).toLocaleString()}`
@@ -267,6 +324,30 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
                     </div>
                   )}
                 </div>
+                {!k.revoked_at && k.revealable && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => onToggleReveal(k.id)}
+                      disabled={pending}
+                      className="text-text-muted hover:text-ink disabled:opacity-40"
+                      title={revealed[k.id] ? "Hide key" : "Reveal key"}
+                      aria-label={revealed[k.id] ? `Hide ${k.name}` : `Reveal ${k.name}`}
+                    >
+                      {revealed[k.id] ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onCopyRow(k.id)}
+                      disabled={pending}
+                      className="text-text-muted hover:text-ink disabled:opacity-40"
+                      title="Copy key"
+                      aria-label={`Copy ${k.name}`}
+                    >
+                      {copiedRow === k.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                    </button>
+                  </>
+                )}
                 {!k.revoked_at && (
                   <button
                     type="button"

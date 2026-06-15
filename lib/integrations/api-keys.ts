@@ -1,6 +1,7 @@
 import "server-only";
 import { randomBytes, createHash } from "node:crypto";
 import { createServiceClient } from "@/lib/supabase/service";
+import { encryptApiKey, decryptApiKey } from "./key-crypto";
 
 /**
  * Per-location API keys for the universal intake endpoint
@@ -44,6 +45,7 @@ export async function createApiKey(
       name: opts?.name?.trim() || "Integration key",
       key_prefix: prefix,
       key_hash: hashKey(raw),
+      key_encrypted: encryptApiKey(raw),
       created_by: opts?.createdByUserId ?? null,
     })
     .select("id")
@@ -62,17 +64,50 @@ export interface ApiKeyRow {
   created_at: string;
   revoked_at: string | null;
   daily_limit: number;
+  /** Whether the full key can be revealed/copied again (i.e. it was stored
+   *  encrypted). Keys created before encryption was added are not revealable. */
+  revealable: boolean;
 }
 
-/** List a location's keys (no secrets — prefix + metadata only). */
+/** List a location's keys (prefix + metadata only — never the secret itself). */
 export async function listApiKeys(locationId: string): Promise<ApiKeyRow[]> {
   const svc = createServiceClient();
   const { data } = await svc
     .from("location_api_keys")
-    .select("id, name, key_prefix, last_used_at, created_at, revoked_at, daily_limit")
+    .select(
+      "id, name, key_prefix, last_used_at, created_at, revoked_at, daily_limit, key_encrypted",
+    )
     .eq("location_id", locationId)
     .order("created_at", { ascending: false });
-  return data ?? [];
+  return (data ?? []).map((k) => {
+    const { key_encrypted, ...rest } = k as typeof k & { key_encrypted: string | null };
+    return { ...rest, revealable: !!key_encrypted } as ApiKeyRow;
+  });
+}
+
+/**
+ * Decrypt and return a key's full plaintext value for reveal/copy. Scoped to
+ * the location. Returns null if the key doesn't exist or predates encryption.
+ * The CALLER must authorize (see api-keys-actions.ts).
+ */
+export async function revealApiKey(
+  locationId: string,
+  keyId: string,
+): Promise<string | null> {
+  const svc = createServiceClient();
+  const { data } = await svc
+    .from("location_api_keys")
+    .select("key_encrypted")
+    .eq("id", keyId)
+    .eq("location_id", locationId)
+    .maybeSingle();
+  const blob = (data as { key_encrypted: string | null } | null)?.key_encrypted;
+  if (!blob) return null;
+  try {
+    return decryptApiKey(blob);
+  } catch {
+    return null;
+  }
 }
 
 /** Update a key's per-day request cap. Scoped to the location. */
