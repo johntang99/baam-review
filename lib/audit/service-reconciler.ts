@@ -368,11 +368,6 @@ function inferDetailedIndustryCandidate({
     .map((category) => category.replace(/_/g, " "))
     .join(" ");
   const websiteKeywordSignal = extractWebsiteKeywordSignal(google.business.website);
-  const reviewSignalText = (google.reviews ?? [])
-    .slice(0, 8)
-    .map((review) => review.text ?? "")
-    .join(" ")
-    .slice(0, 1500);
   const textBlob = normalizeEvidenceText(
     [
       google.business.name,
@@ -383,7 +378,6 @@ function inferDetailedIndustryCandidate({
       gbpDescription ?? "",
       websiteSignalText ?? "",
       websiteKeywordSignal,
-      reviewSignalText,
       gsService,
       bsService,
     ].join(" "),

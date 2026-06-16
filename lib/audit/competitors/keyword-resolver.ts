@@ -412,11 +412,6 @@ function buildIndustryEvidenceText(primary: AuditGoogleData) {
     .map((type) => type.replace(/_/g, " "))
     .join(" ");
   const websiteSignal = extractWebsiteKeywordSignal(primary.business.website);
-  const reviewSignal = (primary.reviews ?? [])
-    .slice(0, 8)
-    .map((review) => review.text ?? "")
-    .join(" ")
-    .slice(0, 1200);
   return normalizeEvidenceText(
     [
       primary.business.name,
@@ -425,7 +420,6 @@ function buildIndustryEvidenceText(primary: AuditGoogleData) {
       primary.vertical.primary_category ?? "",
       categories,
       websiteSignal,
-      reviewSignal,
     ].join(" "),
   );
 }
