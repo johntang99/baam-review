@@ -54,6 +54,7 @@ export const AuditGoogleDataSchema = z.object({
   business: z.object({
     name: z.string(),
     name_secondary: z.string().optional(),
+    description: z.string().optional(),
     formatted_address: z.string(),
     address_lines: z.array(z.string()),
     street: z.string(),

@@ -2,7 +2,12 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { isFullServiceCustomerReadOnly } from "@/lib/auth/staff";
+import { createServiceClient } from "@/lib/supabase/service";
+import {
+  isFullServiceCustomerReadOnly,
+  getInternalContext,
+  getVisibleLocationIds,
+} from "@/lib/auth/staff";
 import { PresendTable, type PresendCustomer } from "./presend-table";
 import { VariantsPanel, type ListVariant } from "./variants-panel";
 import { DefaultContentPanel } from "./default-content-panel";
@@ -32,7 +37,13 @@ export default async function ReviewPage({
 
   const readOnly = await isFullServiceCustomerReadOnly(supabase, user.id);
 
-  const { data: list } = await supabase
+  // Internal staff read across accounts via the service client (gated below);
+  // customers stay on the RLS-bound user client (own account only).
+  const internal = await getInternalContext(supabase, user.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+  const db = internal ? createServiceClient() : supabase;
+
+  const { data: list } = await db
     .from("lists")
     .select(
       "id, name, status, default_language, customer_count, created_at, location_id, template_variants",
@@ -40,14 +51,16 @@ export default async function ReviewPage({
     .eq("id", id)
     .maybeSingle();
   if (!list) notFound();
+  // Internal non-admins (sales/account_manager) may only open their locations.
+  if (internal && visibleIds && !visibleIds.includes(list.location_id)) notFound();
 
   const [{ data: location }, { data: customers }] = await Promise.all([
-    supabase
+    db
       .from("locations")
       .select("display_name")
       .eq("id", list.location_id)
       .maybeSingle(),
-    supabase
+    db
       .from("list_customers")
       .select(
         "id, name, email, phone, language, channel, visit_date, notes, status, selected, excluded_reason",

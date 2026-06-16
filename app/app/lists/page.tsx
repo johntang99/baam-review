@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Plus, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { isFullServiceCustomerReadOnly } from "@/lib/auth/staff";
 import {
   getInternalContext,
@@ -9,6 +10,7 @@ import {
 } from "@/lib/auth/staff";
 import { relativeTime } from "@/lib/analytics/aggregate";
 import { ListsSearchInput } from "./search-input";
+import { LocationFilter } from "./location-filter";
 import { ReviewProgressBar } from "./[id]/review/review-progress-bar";
 
 export const metadata = {
@@ -60,9 +62,15 @@ interface CustomerRow {
 export default async function ListsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ filter?: string; flash?: string; q?: string }>;
+  searchParams: Promise<{
+    filter?: string;
+    flash?: string;
+    q?: string;
+    location?: string;
+  }>;
 }) {
-  const { filter: filterRaw, flash, q: qRaw } = await searchParams;
+  const { filter: filterRaw, flash, q: qRaw, location: locRaw } = await searchParams;
+  const selectedLocation = (locRaw ?? "").trim();
   const filter: Filter =
     FILTERS.find((f) => f.id === filterRaw)?.id ?? "all";
   const q = (qRaw ?? "").trim().toLowerCase();
@@ -83,15 +91,21 @@ export default async function ListsPage({
         ? visibleIds
         : ["00000000-0000-0000-0000-000000000000"];
 
-  let listsQuery = supabase
+  // Internal staff (admin/sales/account_manager) read across accounts via the
+  // service client, gated by getVisibleLocationIds (admin → all, others → their
+  // set). Customers stay on the RLS-bound user client (own account only).
+  const db = internal ? createServiceClient() : supabase;
+
+  let listsQuery = db
     .from("lists")
     .select(
       "id, name, status, default_language, customer_count, sent_at, completed_at, created_at, max_touches, location_id",
     )
     .order("created_at", { ascending: false });
   if (idFilter) listsQuery = listsQuery.in("location_id", idFilter);
+  if (selectedLocation) listsQuery = listsQuery.eq("location_id", selectedLocation);
 
-  let locationsQuery = supabase.from("locations").select("id, display_name");
+  let locationsQuery = db.from("locations").select("id, display_name");
   if (idFilter) locationsQuery = locationsQuery.in("id", idFilter);
 
   const [{ data: lists }, { data: locations }] = await Promise.all([
@@ -103,6 +117,9 @@ export default async function ListsPage({
   const locName = new Map(
     (locations ?? []).map((l) => [l.id, l.display_name]),
   );
+  const locationOptions = (locations ?? [])
+    .map((l) => ({ id: l.id, name: l.display_name ?? "Unnamed location" }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   // No locations connected yet → bulk review requests need a location to send
   // from. Prompt to connect one, same as the other workspace pages.
@@ -148,14 +165,14 @@ export default async function ListsPage({
   let customers: CustomerRow[] = [];
   let lastSendByCustomer = new Map<string, number>();
   if (listIds.length > 0) {
-    const { data: custRows } = await supabase
+    const { data: custRows } = await db
       .from("list_customers")
       .select("id, list_id, status, touches")
       .in("list_id", listIds);
     customers = (custRows ?? []) as CustomerRow[];
 
     // Most-recent send/resend event per customer → drives resend eligibility.
-    const { data: sendEvents } = await supabase
+    const { data: sendEvents } = await db
       .from("list_events")
       .select("list_customer_id, occurred_at, event_type")
       .in("list_id", listIds)
@@ -390,7 +407,12 @@ export default async function ListsPage({
             );
           })}
         </div>
-        <ListsSearchInput initial={qRaw ?? ""} />
+        <div className="ml-auto flex items-center gap-2">
+          {locationOptions.length > 1 && (
+            <LocationFilter locations={locationOptions} selected={selectedLocation} />
+          )}
+          <ListsSearchInput initial={qRaw ?? ""} />
+        </div>
       </div>
 
       {/* LIST CARDS */}

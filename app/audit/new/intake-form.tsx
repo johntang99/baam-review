@@ -16,7 +16,7 @@ const ERROR_LABELS: Record<string, string> = {
   lifetime_limit: "You've reached your lifetime audit allowance.",
   unauthorized: "You need to sign in again to continue.",
   service_confirmation_required:
-    "Please confirm (or adjust) industry and main service before generating the audit.",
+    "Please confirm (or adjust) Industry and RS (Recommended service) before generating the audit.",
   email_not_verified:
     "Please verify your email first — check your inbox for the verification link, then refresh this page.",
 };
@@ -79,6 +79,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [shakeField, setShakeField] = useState<"address" | "website" | null>(null);
+  const [showConfirmReminder, setShowConfirmReminder] = useState(false);
 
   const error = localError ?? initialError ?? null;
 
@@ -150,6 +151,10 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
   async function handleGenerate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!resolved) return;
+    if (!serviceConfirmed) {
+      setShowConfirmReminder(true);
+      return;
+    }
     setLocalError(null);
     setIsPending(true);
     try {
@@ -186,263 +191,411 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
   }
 
   if (step === "confirm" && resolved) {
+    const flowSteps = [
+      {
+        title: "Match GBP profile",
+        desc: "Confirm Name, Address, Website, and Rating from Google.",
+      },
+      {
+        title: "Choose report language",
+        desc: "Select output language for this audit report.",
+      },
+      {
+        title: "Set final service",
+        desc: "Use Google and BAAM evidence, then finalize the Recommended Service.",
+      },
+      {
+        title: "Confirm and generate",
+        desc: "Check confirmation, then generate the audit.",
+      },
+    ] as const;
+
+    const languageOptions = [
+      {
+        value: "auto" as const,
+        label: "Auto (recommended)",
+        hint: resolved.is_chinese_business
+          ? "Chinese detected -> English + Traditional Chinese"
+          : "English only",
+      },
+      { value: "en" as const, label: "English only", hint: "EN PDF + HTML" },
+      { value: "zh" as const, label: "Chinese only", hint: "ZH PDF + HTML" },
+      {
+        value: "both" as const,
+        label: "Both English and Chinese",
+        hint: "Bilingual: EN + ZH",
+      },
+    ];
+
+    const confidencePct = Math.round(resolved.cs_confidence * 100);
+    const isModerateConfidence = resolved.cs_confidence < 0.75;
+    const finalService = service.trim() || "—";
+
     return (
       <form onSubmit={handleGenerate}>
-        <div className="state-found" style={{ marginTop: 0 }}>
-          <h3 className="found-business-name">{resolved.name}</h3>
-          {resolved.name_secondary && (
-            <div className="found-business-name-secondary">{resolved.name_secondary}</div>
-          )}
-
-          <div className="found-confirmation-grid">
-            <div className="found-confirmation-label">Name on Google</div>
-            <div className="found-confirmation-value">
-              {resolved.name}
-              <span className="found-confirmation-value-match">✓ matched</span>
-            </div>
-
-            <div className="found-confirmation-label">Address on Google</div>
-            <div className="found-confirmation-value">
-              {resolved.formatted_address}
-              <span className="found-confirmation-value-match">✓ matched</span>
-            </div>
-
-            <div className="found-confirmation-label">Website</div>
-            <div
-              className="found-confirmation-value"
-              style={resolved.website_match === "mismatch" ? { color: "var(--rust-deep)" } : undefined}
-            >
-              {resolved.website_on_google ?? "No website on Google profile"}
-              {resolved.website_match === "match" && (
-                <span className="found-confirmation-value-match">✓ matches your input</span>
-              )}
-              {resolved.website_match === "mismatch" && (
-                <span className="found-confirmation-value-mismatch">⚠ you entered {website}</span>
-              )}
-            </div>
-
-            <div className="found-confirmation-label">Google rating</div>
-            <div className="found-confirmation-value">
-              ★ {resolved.rating.toFixed(1)} · {resolved.total_count} reviews
-            </div>
-          </div>
-
-          {resolved.google_category && (
-            <div
-              style={{
-                margin: "0 0 14px",
-                padding: "10px 14px",
-                background: "var(--cream-deep, #EBE3D2)",
-                borderRadius: 6,
-                fontSize: 13,
-                color: "var(--ink-soft)",
-                lineHeight: 1.5,
-              }}
-            >
-              <span
-                className="mono"
-                style={{
-                  fontSize: 10,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color: "var(--ink-mute)",
-                }}
-              >
-                On Google Business Profile
-              </span>
-              <br />
-              <strong style={{ color: "var(--ink)" }}>{resolved.google_category}</strong>
-              {resolved.google_categories.length > 0 && (
-                <> · also {resolved.google_categories.join(", ")}</>
-              )}
-            </div>
-          )}
-
-          <div className="detection-row">
-            <div className="detection-item">
-              <div className="detection-item-label">Industry</div>
-              <select
-                value={vertical}
-                onChange={(e) => {
-                  setVertical(e.target.value);
-                  setServiceConfirmed(false);
-                }}
-                disabled={isPending}
-                style={{
-                  width: "100%",
-                  marginTop: 8,
-                  padding: "10px 12px",
-                  border: "1px solid var(--rule)",
-                  borderRadius: 6,
-                  background: "var(--cream-light, #FAF7F0)",
-                  fontFamily: "inherit",
-                  fontSize: 14,
-                  color: "var(--ink)",
-                }}
-              >
-                {resolved.vertical_options.map((v) => (
-                  <option key={v} value={v}>
-                    {VERTICAL_LABELS[v] ?? v}
-                  </option>
-                ))}
-              </select>
-              <div style={{ marginTop: 6, fontSize: 11, color: "var(--ink-mute)" }}>
-                Drives benchmarks (per-review value, healthy velocity).
-              </div>
-            </div>
-
-            <div className="detection-item">
-              <div className="detection-item-label">Main service</div>
-              <input
-                type="text"
-                value={service}
-                onChange={(e) => {
-                  setService(e.target.value);
-                  setServiceConfirmed(false);
-                }}
-                disabled={isPending}
-                placeholder="e.g., bridal boutique, pediatric dentist"
-                style={{
-                  width: "100%",
-                  marginTop: 8,
-                  padding: "10px 12px",
-                  border: "1px solid var(--rule)",
-                  borderRadius: 6,
-                  background: "var(--cream-light, #FAF7F0)",
-                  fontFamily: "inherit",
-                  fontSize: 14,
-                  color: "var(--ink)",
-                }}
-              />
-              <div style={{ marginTop: 6, fontSize: 11, color: "var(--ink-mute)" }}>
-                Drives competitor search: <em>&quot;{service.trim() || "—"} {resolved.city}&quot;</em>
-              </div>
-            </div>
-          </div>
-
-          <div
+        <div className="state-found" style={{ marginTop: 0, borderColor: "var(--rule)" }}>
+          <h3
             style={{
-              marginTop: 14,
-              padding: "10px 12px",
-              border: "1px solid var(--rule)",
-              borderRadius: 8,
-              background: "var(--cream-light, #FAF7F0)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 12,
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-                color: "var(--ink-mute)",
-                marginBottom: 8,
-              }}
-            >
-              Service decision (GS vs BS)
-            </div>
-            <div style={{ display: "grid", gap: 6, fontSize: 13, color: "var(--ink-soft)" }}>
-              <div>
-                <strong style={{ color: "var(--ink)" }}>GS (Google):</strong> {resolved.gs_service}
-              </div>
-              <div>
-                <strong style={{ color: "var(--ink)" }}>BS (BAAM):</strong> {resolved.bs_service}
-              </div>
-              <div>
-                <strong style={{ color: "var(--ink)" }}>CS (Recommended):</strong>{" "}
-                {resolved.cs_recommended_service}{" "}
-                <span style={{ color: "var(--ink-mute)" }}>
-                  · confidence {(resolved.cs_confidence * 100).toFixed(0)}%
-                </span>
-              </div>
-            </div>
-            {resolved.cs_confidence < 0.75 ? (
-              <div style={{ marginTop: 6, fontSize: 12, color: "#8A4B1F" }}>
-                Confidence is moderate. Please review and confirm before generating.
-              </div>
-            ) : null}
-          </div>
-
-          <label
-            style={{
-              marginTop: 12,
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 10,
-              fontSize: 13,
+              margin: 0,
+              fontFamily: "'Instrument Serif', serif",
+              fontSize: 42,
+              lineHeight: 1.05,
               color: "var(--ink)",
             }}
           >
-            <input
-              type="checkbox"
-              checked={serviceConfirmed}
-              onChange={(e) => setServiceConfirmed(e.target.checked)}
-              disabled={isPending}
-              style={{ marginTop: 2 }}
-            />
-            I confirm the selected <strong>Industry</strong> and <strong>Main service</strong>{" "}
-            for this audit.
-          </label>
-
-          <fieldset
+            Make the business service as accurate as possible
+          </h3>
+          <p
             style={{
-              marginTop: 18,
-              padding: "14px 16px",
-              border: "1px solid var(--rule)",
-              borderRadius: 8,
-              background: "var(--cream-light, #FAF7F0)",
+              marginTop: 12,
+              maxWidth: 840,
+              fontSize: 16,
+              lineHeight: 1.5,
+              color: "var(--ink-soft)",
             }}
           >
-            <legend
+            This page shows Google Service and BAAM-generated Service as evidence,
+            then lets you confirm the Recommended Service before generating the audit.
+          </p>
+
+          <div
+            style={{
+              marginTop: 18,
+              display: "grid",
+              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+              gap: 10,
+            }}
+          >
+            {flowSteps.map((stepItem, index) => (
+              <div
+                key={stepItem.title}
+                style={{
+                  border: "1px solid var(--rule)",
+                  borderRadius: 8,
+                  background: "var(--cream-light)",
+                  padding: "11px 11px 10px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 999,
+                      background: "var(--ink)",
+                      color: "var(--cream-light)",
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: 13,
+                      fontWeight: 800,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {index + 1}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: "var(--ink)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {stepItem.title}
+                  </span>
+                </div>
+                <p
+                  style={{
+                    marginTop: 6,
+                    fontSize: 12,
+                    lineHeight: 1.35,
+                    color: "var(--ink-mute)",
+                  }}
+                >
+                  {stepItem.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <section
+            style={{
+              marginTop: 18,
+              border: "1px solid var(--rule)",
+              borderRadius: 10,
+              padding: 16,
+              background: "#fff",
+            }}
+          >
+            <h4
               style={{
-                padding: "0 8px",
-                fontSize: 12,
-                fontWeight: 600,
+                margin: 0,
+                fontSize: 13,
                 textTransform: "uppercase",
-                letterSpacing: 0.4,
-                color: "var(--ink-soft)",
+                letterSpacing: "0.1em",
+                color: "var(--ink-mute)",
+                fontWeight: 700,
               }}
             >
-              Report language
-            </legend>
+              <span style={{ color: "var(--ink)" }}>Step 1</span> · GBP matched profile
+            </h4>
             <div
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                gap: 8,
-                marginTop: 4,
+                marginTop: 12,
+                border: "1px solid var(--rule-soft)",
+                borderRadius: 10,
+                background: "var(--cream-light)",
+                padding: 14,
               }}
             >
-              {(
-                [
-                  {
-                    value: "auto",
-                    label: "Auto (recommended)",
-                    hint: resolved.is_chinese_business
-                      ? "中文名稱 detected → English + 繁體中文"
-                      : "English only",
-                  },
-                  { value: "en", label: "English only", hint: "EN PDF + HTML" },
-                  { value: "zh", label: "中文 only", hint: "ZH PDF + HTML" },
-                  {
-                    value: "both",
-                    label: "Both English and 中文",
-                    hint: "Bilingual: EN + ZH",
-                  },
-                ] as const
-              ).map((opt) => {
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "var(--sage-deep)",
+                  color: "var(--cream-light)",
+                  borderRadius: 999,
+                  padding: "3px 9px",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: 10,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                }}
+              >
+                ✓ Found · Match confirmed
+              </span>
+              <h5
+                style={{
+                  margin: "10px 0 0",
+                  fontFamily: "'Instrument Serif', serif",
+                  fontSize: 34,
+                  lineHeight: 1.08,
+                  color: "var(--ink)",
+                }}
+              >
+                {resolved.name}
+              </h5>
+              {resolved.name_secondary ? (
+                <div
+                  style={{
+                    marginTop: 4,
+                    fontSize: 16,
+                    color: "var(--ink-mute)",
+                    fontStyle: "italic",
+                  }}
+                >
+                  {resolved.name_secondary}
+                </div>
+              ) : null}
+              <div
+                style={{
+                  marginTop: 12,
+                  display: "grid",
+                  gridTemplateColumns: "140px 1fr",
+                  gap: "10px 12px",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-mute)",
+                    fontWeight: 700,
+                    paddingTop: 3,
+                  }}
+                >
+                  Name on Google
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    lineHeight: 1.35,
+                    fontFamily: "'Instrument Serif', serif",
+                    color: "var(--ink)",
+                  }}
+                >
+                  {resolved.name}
+                  <span
+                    style={{
+                      marginLeft: 8,
+                      color: "var(--sage-deep)",
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: 11,
+                      letterSpacing: "0.05em",
+                      fontWeight: 700,
+                    }}
+                  >
+                    ✓ matched
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-mute)",
+                    fontWeight: 700,
+                    paddingTop: 3,
+                  }}
+                >
+                  Address on Google
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    lineHeight: 1.35,
+                    fontFamily: "'Instrument Serif', serif",
+                    color: "var(--ink)",
+                  }}
+                >
+                  {resolved.formatted_address}
+                  <span
+                    style={{
+                      marginLeft: 8,
+                      color: "var(--sage-deep)",
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: 11,
+                      letterSpacing: "0.05em",
+                      fontWeight: 700,
+                    }}
+                  >
+                    ✓ matched
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-mute)",
+                    fontWeight: 700,
+                    paddingTop: 3,
+                  }}
+                >
+                  Website
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    lineHeight: 1.35,
+                    fontFamily: "'Instrument Serif', serif",
+                    color:
+                      resolved.website_match === "mismatch"
+                        ? "var(--rust-deep)"
+                        : "var(--ink)",
+                  }}
+                >
+                  {resolved.website_on_google ?? "No website on Google profile"}
+                  {resolved.website_match === "match" ? (
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        color: "var(--sage-deep)",
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 11,
+                        letterSpacing: "0.05em",
+                        fontWeight: 700,
+                      }}
+                    >
+                      ✓ matched
+                    </span>
+                  ) : null}
+                  {resolved.website_match === "mismatch" ? (
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        color: "var(--rust-deep)",
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 11,
+                        letterSpacing: "0.05em",
+                        fontWeight: 700,
+                      }}
+                    >
+                      ⚠ input: {website || "N/A"}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-mute)",
+                    fontWeight: 700,
+                    paddingTop: 3,
+                  }}
+                >
+                  Google rating
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    lineHeight: 1.35,
+                    fontFamily: "'Instrument Serif', serif",
+                    color: "var(--ink)",
+                  }}
+                >
+                  ★ {resolved.rating.toFixed(1)} · {resolved.total_count} reviews
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            style={{
+              marginTop: 14,
+              border: "1px solid var(--rule)",
+              borderRadius: 10,
+              padding: 16,
+              background: "#fff",
+            }}
+          >
+            <h4
+              style={{
+                margin: 0,
+                fontSize: 13,
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--ink-mute)",
+                fontWeight: 700,
+              }}
+            >
+              <span style={{ color: "var(--ink)" }}>Step 2</span> · Report language
+            </h4>
+            <div
+              style={{
+                marginTop: 12,
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: 10,
+              }}
+            >
+              {languageOptions.map((opt) => {
                 const checked = languageChoice === opt.value;
                 return (
                   <label
                     key={opt.value}
                     style={{
-                      display: "flex",
-                      gap: 10,
-                      alignItems: "flex-start",
-                      padding: "10px 12px",
                       border: `1px solid ${checked ? "var(--ink)" : "var(--rule)"}`,
-                      borderRadius: 6,
-                      background: checked ? "#fff" : "transparent",
+                      borderRadius: 8,
+                      background: checked ? "#fff" : "var(--cream-light)",
+                      padding: "11px 12px",
                       cursor: isPending ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 10,
                     }}
                   >
                     <input
@@ -452,14 +605,14 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       checked={checked}
                       onChange={() => setLanguageChoice(opt.value)}
                       disabled={isPending}
-                      style={{ marginTop: 3 }}
+                      style={{ marginTop: 2 }}
                     />
                     <span>
                       <span
                         style={{
                           display: "block",
-                          fontSize: 13,
-                          fontWeight: 600,
+                          fontSize: 14,
+                          fontWeight: 700,
                           color: "var(--ink)",
                         }}
                       >
@@ -467,9 +620,9 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       </span>
                       <span
                         style={{
-                          display: "block",
                           marginTop: 2,
-                          fontSize: 11,
+                          display: "block",
+                          fontSize: 12,
                           color: "var(--ink-mute)",
                         }}
                       >
@@ -480,7 +633,350 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 );
               })}
             </div>
-          </fieldset>
+          </section>
+
+          <section
+            style={{
+              marginTop: 14,
+              border: "1px solid var(--rule)",
+              borderRadius: 10,
+              padding: 16,
+              background: "#fff",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                marginBottom: 12,
+                flexWrap: "wrap",
+              }}
+            >
+              <h4
+                style={{
+                  margin: 0,
+                  fontSize: 13,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  color: "var(--ink-mute)",
+                  fontWeight: 700,
+                }}
+              >
+                <span style={{ color: "var(--ink)" }}>Step 3</span> · Service evidence and recommended service
+              </h4>
+              <span
+                style={{
+                  border: "1px solid #e1c89f",
+                  color: "var(--amber-deep)",
+                  background: "#fbf0df",
+                  borderRadius: 999,
+                  padding: "4px 10px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
+                Confidence {confidencePct}% {isModerateConfidence ? "· Moderate" : ""}
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                gap: 12,
+              }}
+            >
+              <article
+                style={{
+                  border: "1px solid var(--rule-soft)",
+                  borderRadius: 8,
+                  padding: 12,
+                  background: "var(--cream-light)",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-mute)",
+                  }}
+                >
+                  Google Service
+                </div>
+                <div
+                  style={{
+                    marginTop: 6,
+                    fontSize: 24,
+                    lineHeight: 1.12,
+                    fontFamily: "'Instrument Serif', serif",
+                    color: "var(--ink)",
+                    textTransform: "lowercase",
+                  }}
+                >
+                  {resolved.gs_service}
+                </div>
+                <p style={{ marginTop: 8, fontSize: 12, color: "var(--ink-soft)" }}>
+                  From Google Business Profile category signals.
+                </p>
+              </article>
+
+              <article
+                style={{
+                  border: "1px solid var(--rule-soft)",
+                  borderRadius: 8,
+                  padding: 12,
+                  background: "var(--cream-light)",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-mute)",
+                  }}
+                >
+                  BAAM-generated Service
+                </div>
+                <div
+                  style={{
+                    marginTop: 6,
+                    fontSize: 24,
+                    lineHeight: 1.12,
+                    fontFamily: "'Instrument Serif', serif",
+                    color: "var(--ink)",
+                    textTransform: "lowercase",
+                  }}
+                >
+                  {resolved.bs_service}
+                </div>
+                <p style={{ marginTop: 8, fontSize: 12, color: "var(--ink-soft)" }}>
+                  From BAAM vertical and keyword inference rules.
+                </p>
+              </article>
+            </div>
+
+            <div
+              style={{
+                marginTop: 12,
+                border: "1px solid var(--sage-deep)",
+                background: "#e8f0e8",
+                borderRadius: 10,
+                padding: 14,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "var(--sage-deep)",
+                }}
+              >
+                Recommended Service (final audit input)
+              </div>
+              <p style={{ marginTop: 6, fontSize: 13, color: "var(--ink-soft)" }}>
+                Edit if needed. This exact value is used for competitor query and
+                final audit generation.
+              </p>
+
+              <div
+                style={{
+                  marginTop: 10,
+                  display: "grid",
+                  gridTemplateColumns: "1.2fr 1fr",
+                  gap: 10,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: "var(--ink-mute)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Industry
+                  </div>
+                  <select
+                    value={vertical}
+                    onChange={(e) => {
+                      setVertical(e.target.value);
+                      setServiceConfirmed(false);
+                      setShowConfirmReminder(false);
+                    }}
+                    disabled={isPending}
+                    style={{
+                      width: "100%",
+                      marginTop: 6,
+                      padding: "10px 12px",
+                      border: "1px solid var(--rule)",
+                      borderRadius: 8,
+                      background: "#fff",
+                      fontFamily: "inherit",
+                      fontSize: 14,
+                      color: "var(--ink)",
+                    }}
+                  >
+                    {resolved.vertical_options.map((v) => (
+                      <option key={v} value={v}>
+                        {VERTICAL_LABELS[v] ?? v}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: "var(--ink-mute)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Recommended Service
+                  </div>
+                  <input
+                    type="text"
+                    value={service}
+                    onChange={(e) => {
+                      setService(e.target.value);
+                      setServiceConfirmed(false);
+                      setShowConfirmReminder(false);
+                    }}
+                    disabled={isPending}
+                    placeholder="e.g., bridal boutique, pediatric dentist"
+                    style={{
+                      width: "100%",
+                      marginTop: 6,
+                      border: "1px solid var(--rule)",
+                      background: "#fff",
+                      borderRadius: 8,
+                      padding: "11px 12px",
+                      fontSize: 18,
+                      fontFamily: "'Instrument Serif', serif",
+                      color: "var(--ink)",
+                      textTransform: "lowercase",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {isModerateConfidence ? (
+                <div
+                  style={{
+                    marginTop: 10,
+                    border: "1px solid #e1c89f",
+                    background: "#fbf0df",
+                    borderRadius: 8,
+                    padding: "10px 11px",
+                    color: "var(--amber-deep)",
+                    fontSize: 13,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  Confidence is moderate. You can refine the Recommended Service
+                  to improve service accuracy. Confirm it before generating the audit.
+                </div>
+              ) : null}
+            </div>
+          </section>
+
+          <section
+            style={{
+              marginTop: 14,
+              border: "1px solid var(--rule)",
+              borderRadius: 10,
+              padding: 16,
+              background: "#fff",
+            }}
+          >
+            <h4
+              style={{
+                margin: 0,
+                fontSize: 13,
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--ink-mute)",
+                fontWeight: 700,
+              }}
+            >
+              <span style={{ color: "var(--ink)" }}>Step 4</span> · Confirmation gate
+            </h4>
+
+            <div
+              style={{
+                marginTop: 12,
+                display: "grid",
+                gridTemplateColumns: "1.2fr 1fr",
+                gap: 14,
+              }}
+            >
+              <div
+                style={{
+                  border: "1px solid var(--rule-soft)",
+                  background: "#fff",
+                  borderRadius: 8,
+                  padding: 12,
+                }}
+              >
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 10,
+                    fontSize: 14,
+                    color: "var(--ink)",
+                    lineHeight: 1.35,
+                  }}
+                >
+                  <input
+                    id="service-confirm-checkbox"
+                    type="checkbox"
+                    checked={serviceConfirmed}
+                    onChange={(e) => {
+                      setServiceConfirmed(e.target.checked);
+                      if (e.target.checked) setShowConfirmReminder(false);
+                    }}
+                    disabled={isPending}
+                    style={{ marginTop: 2 }}
+                  />
+                  <span>
+                    I confirm the selected <strong>Industry</strong> and{" "}
+                    <strong>Recommended Service</strong> for this audit.
+                  </span>
+                </label>
+              </div>
+
+              <div
+                style={{
+                  border: "1px solid var(--rule-soft)",
+                  borderRadius: 8,
+                  padding: 12,
+                  background: "var(--cream-light)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
+                  Final service used now: <b>{finalService}</b>
+                </div>
+                <div style={{ fontSize: 12, color: "var(--ink-mute)" }}>
+                  Generate is blocked until confirmation is checked.
+                </div>
+              </div>
+            </div>
+          </section>
 
           {error && (
             <div
@@ -516,12 +1012,97 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
             <button
               type="submit"
               className="found-action-generate"
-              disabled={isPending || !service.trim() || !serviceConfirmed}
+              disabled={isPending || !service.trim()}
             >
               {isPending ? "Starting audit…" : "Generate audit →"}
             </button>
           </div>
         </div>
+        {showConfirmReminder && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-reminder-title"
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(14, 22, 30, 0.45)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 60,
+              padding: "20px",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                maxWidth: 520,
+                borderRadius: 10,
+                border: "1px solid var(--rule)",
+                background: "var(--paper, #fff)",
+                boxShadow: "0 20px 45px rgba(9, 15, 22, 0.22)",
+                padding: "18px 20px",
+              }}
+            >
+              <h3
+                id="confirm-reminder-title"
+                style={{ margin: 0, fontSize: 18, color: "var(--ink)" }}
+              >
+                Please confirm before generating
+              </h3>
+              <p style={{ margin: "10px 0 0", fontSize: 14, color: "var(--ink-soft)" }}>
+                Review Industry and Recommended Service, then check the confirmation box to continue.
+              </p>
+              <div
+                style={{
+                  marginTop: 16,
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: 10,
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmReminder(false)}
+                  style={{
+                    border: "1px solid var(--rule)",
+                    borderRadius: 8,
+                    background: "var(--paper, #fff)",
+                    color: "var(--ink)",
+                    padding: "8px 12px",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Got it
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowConfirmReminder(false);
+                    document
+                      .getElementById("service-confirm-checkbox")
+                      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }}
+                  style={{
+                    border: "1px solid var(--ink)",
+                    borderRadius: 8,
+                    background: "var(--ink)",
+                    color: "var(--cream, #f8f4ea)",
+                    padding: "8px 12px",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Go to confirmation
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </form>
     );
   }

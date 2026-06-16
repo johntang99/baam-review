@@ -76,6 +76,7 @@ export function normalizeGoogleData(input: NormalizeInput): AuditGoogleData {
     business: {
       name,
       name_secondary: extractSecondaryName(name) ?? undefined,
+      description: rawPlace.editorialSummary?.text?.trim() || undefined,
       formatted_address: rawPlace.formattedAddress ?? "",
       address_lines: (rawPlace.formattedAddress ?? "")
         .split(",")
@@ -114,6 +115,7 @@ export function normalizeGoogleData(input: NormalizeInput): AuditGoogleData {
       url: rawPlace.googleMapsUri,
       formatted_phone_number: rawPlace.nationalPhoneNumber,
       website: rawPlace.websiteUri,
+      description: rawPlace.editorialSummary?.text,
       opening_hours: rawPlace.regularOpeningHours,
       types: rawPlace.types,
       photos: rawPlace.photos,

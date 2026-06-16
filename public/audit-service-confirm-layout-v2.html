@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audit Service Confirmation Layout V2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --cream: #f5f0e6;
+      --cream-light: #faf7f0;
+      --cream-deep: #ebe3d2;
+      --ink: #1a1814;
+      --ink-soft: #3d3833;
+      --ink-mute: #6b6259;
+      --rule: #c9bfae;
+      --rule-soft: #ddd3bf;
+      --sage: #4f7253;
+      --sage-soft: #e8f0e8;
+      --rust: #842f1b;
+      --rust-soft: #f6e7e3;
+      --warning: #a56a1f;
+      --warning-soft: #fbf0df;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--cream-light);
+      color: var(--ink);
+      font-family: "Archivo", sans-serif;
+      line-height: 1.5;
+      padding: 40px 18px 80px;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      border: 1px solid var(--ink);
+      background: #fff;
+      padding: 28px 26px 24px;
+    }
+
+    .eyebrow {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+
+    .title {
+      margin-top: 8px;
+      font-family: "Instrument Serif", serif;
+      font-size: 36px;
+      line-height: 1.08;
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      color: var(--ink-soft);
+      font-size: 14px;
+      max-width: 740px;
+    }
+
+    .flow {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .flow-step {
+      border: 1px solid var(--rule);
+      background: var(--cream-light);
+      border-radius: 8px;
+      padding: 11px 11px 10px;
+    }
+
+    .flow-step-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--cream-light);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+    }
+
+    .step-title {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .step-desc {
+      display: block;
+      margin-top: 5px;
+      color: var(--ink-mute);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .section {
+      margin-top: 22px;
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .gbp-card {
+      border: 1px solid var(--rule-soft);
+      border-radius: 10px;
+      background: var(--cream-light);
+      padding: 14px;
+    }
+
+    .gbp-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--sage);
+      color: var(--cream-light);
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .gbp-name {
+      margin-top: 10px;
+      font-family: "Instrument Serif", serif;
+      font-size: 34px;
+      line-height: 1.08;
+      color: var(--ink);
+    }
+
+    .gbp-grid {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px 12px;
+    }
+
+    .gbp-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      font-weight: 700;
+      padding-top: 3px;
+    }
+
+    .gbp-value {
+      font-size: 18px;
+      line-height: 1.35;
+      font-family: "Instrument Serif", serif;
+      color: var(--ink);
+    }
+
+    .gbp-match {
+      margin-left: 8px;
+      color: var(--sage);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-mute);
+      font-weight: 700;
+    }
+
+    .section-title .step {
+      color: var(--ink);
+    }
+
+    .confidence-pill {
+      border: 1px solid #e1c89f;
+      color: var(--warning);
+      background: var(--warning-soft);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .evidence-card {
+      border: 1px solid var(--rule-soft);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--cream-light);
+    }
+
+    .evidence-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+
+    .evidence-value {
+      margin-top: 6px;
+      font-size: 24px;
+      line-height: 1.12;
+      font-family: "Instrument Serif", serif;
+      color: var(--ink);
+      text-transform: lowercase;
+    }
+
+    .evidence-note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .rs-panel {
+      border: 1px solid var(--sage);
+      background: var(--sage-soft);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .rs-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--sage);
+    }
+
+    .rs-desc {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--ink-soft);
+    }
+
+    .rs-input {
+      width: 100%;
+      margin-top: 10px;
+      border: 1px solid var(--rule);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px 12px;
+      font-size: 20px;
+      font-family: "Instrument Serif", serif;
+      text-transform: lowercase;
+      color: var(--ink);
+    }
+
+    .moderate-note {
+      margin-top: 10px;
+      border: 1px solid #e1c89f;
+      background: var(--warning-soft);
+      border-radius: 8px;
+      padding: 10px 11px;
+      color: var(--warning);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .language-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .lang-card {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: var(--cream-light);
+      padding: 11px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .lang-card.active {
+      border-color: var(--ink);
+      background: #fff;
+    }
+
+    .lang-card input {
+      margin-top: 2px;
+    }
+
+    .lang-main {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .lang-sub {
+      margin-top: 2px;
+      color: var(--ink-mute);
+      font-size: 12px;
+    }
+
+    .confirm-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .confirm-box {
+      border: 1px solid var(--rule-soft);
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+
+    .check-row + .check-row {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--rule-soft);
+    }
+
+    .cta-panel {
+      border: 1px solid var(--rule-soft);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--cream-light);
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .cta-info {
+      font-size: 13px;
+      color: var(--ink-soft);
+    }
+
+    .cta-button {
+      appearance: none;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--cream-light);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .cta-button:hover {
+      background: #2a2822;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--ink-mute);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 21, 24, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal {
+      width: min(520px, 100%);
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--rule);
+      padding: 16px;
+      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal h3 {
+      font-size: 20px;
+      font-family: "Instrument Serif", serif;
+      line-height: 1.2;
+    }
+
+    .modal p {
+      margin-top: 8px;
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .modal ul {
+      margin: 10px 0 0 18px;
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .modal-actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--cream-light);
+    }
+
+    @media (max-width: 860px) {
+      .flow {
+        grid-template-columns: 1fr 1fr;
+      }
+      .language-grid,
+      .evidence-grid,
+      .confirm-grid {
+        grid-template-columns: 1fr;
+      }
+      .gbp-name {
+        font-size: 28px;
+      }
+      .gbp-grid {
+        grid-template-columns: 1fr;
+      }
+      .gbp-label {
+        padding-top: 8px;
+      }
+      .title {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="eyebrow">Audit intake · service confirmation layout v2</div>
+    <h1 class="title">Make the business service as accurate as possible</h1>
+    <p class="subtitle">
+      This layout clearly shows <b>Google Service</b> and <b>BAAM-generated Service</b> as
+      evidence, then lets users edit and confirm the <b>Recommended Service</b>
+      before generating the audit.
+    </p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-step-head">
+          <span class="step-num">1</span>
+          <span class="step-title">Match GBP profile</span>
+        </div>
+        <p class="step-desc">Confirm Name, Address, Website, and Rating from Google.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-head">
+          <span class="step-num">2</span>
+          <span class="step-title">Choose report language</span>
+        </div>
+        <p class="step-desc">Select output language for this audit report.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-head">
+          <span class="step-num">3</span>
+          <span class="step-title">Set final service</span>
+        </div>
+        <p class="step-desc">Use Google and BAAM evidence, then finalize the Recommended Service.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-head">
+          <span class="step-num">4</span>
+          <span class="step-title">Confirm and generate</span>
+        </div>
+        <p class="step-desc">Check confirmation, then generate the audit.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title"><span class="step">Step 1</span> · GBP matched profile</h2>
+      </div>
+      <article class="gbp-card">
+        <span class="gbp-status">✓ Found · Match confirmed</span>
+        <h3 class="gbp-name">Wedding Atelier Flagship Bridal Boutique</h3>
+        <div class="gbp-grid">
+          <div class="gbp-label">Name on Google</div>
+          <div class="gbp-value">
+            Wedding Atelier Flagship Bridal Boutique
+            <span class="gbp-match">✓ matched</span>
+          </div>
+          <div class="gbp-label">Address on Google</div>
+          <div class="gbp-value">
+            72 Madison Ave 4th floor, New York, NY 10016, USA
+            <span class="gbp-match">✓ matched</span>
+          </div>
+          <div class="gbp-label">Website</div>
+          <div class="gbp-value">https://weddingatelier.com/</div>
+          <div class="gbp-label">Google rating</div>
+          <div class="gbp-value">★ 4.4 · 687 reviews</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title"><span class="step">Step 2</span> · Report language</h2>
+      </div>
+      <div class="language-grid">
+        <label class="lang-card active">
+          <input type="radio" name="lang" checked />
+          <div>
+            <div class="lang-main">Auto (recommended)</div>
+            <div class="lang-sub">English only</div>
+          </div>
+        </label>
+        <label class="lang-card">
+          <input type="radio" name="lang" />
+          <div>
+            <div class="lang-main">English only</div>
+            <div class="lang-sub">EN PDF + HTML</div>
+          </div>
+        </label>
+        <label class="lang-card">
+          <input type="radio" name="lang" />
+          <div>
+            <div class="lang-main">中文 only</div>
+            <div class="lang-sub">ZH PDF + HTML</div>
+          </div>
+        </label>
+        <label class="lang-card">
+          <input type="radio" name="lang" />
+          <div>
+            <div class="lang-main">Both English and 中文</div>
+            <div class="lang-sub">Bilingual: EN + ZH</div>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title"><span class="step">Step 3</span> · Service evidence and recommended service</h2>
+        <span class="confidence-pill">Confidence 64% · Moderate</span>
+      </div>
+      <div class="evidence-grid">
+        <article class="evidence-card">
+          <div class="evidence-label">Google Service</div>
+          <div class="evidence-value" id="gsValue">clothing store</div>
+          <p class="evidence-note">From Google Business Profile category signals.</p>
+        </article>
+        <article class="evidence-card">
+          <div class="evidence-label">BAAM-generated Service</div>
+          <div class="evidence-value" id="bsValue">bridal boutique</div>
+          <p class="evidence-note">From BAAM vertical + keyword inference rules.</p>
+        </article>
+      </div>
+
+      <div class="rs-panel">
+        <div class="rs-title">Recommended Service (final audit input)</div>
+        <p class="rs-desc">
+          Edit the Recommended Service if needed. This exact value is used for competitor query and
+          final audit generation.
+        </p>
+        <input
+          id="rsInput"
+          class="rs-input"
+          type="text"
+          value="bridal boutique"
+          placeholder="Enter the final service"
+        />
+        <div class="moderate-note">
+          Confidence is moderate. You can refine the Recommended Service to improve
+          service accuracy. Confirm it before generating the audit.
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title"><span class="step">Step 4</span> · Confirmation gate</h2>
+      </div>
+      <div class="confirm-grid">
+        <div class="confirm-box">
+          <label class="check-row">
+            <input id="checkedConfirm" type="checkbox" />
+            <span
+              >I confirm the Recommended Service as the final service for this audit and accept this
+              will be used to generate the report.</span
+            >
+          </label>
+        </div>
+        <div class="cta-panel">
+          <div class="cta-info">
+            Final service used now:
+            <b id="rsPreview">bridal boutique</b>
+          </div>
+          <button class="cta-button" type="button" onclick="tryGenerate()">
+            Generate audit →
+          </button>
+          <div class="footer-note">
+            If confirmation is missing, a modal reminder appears.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="confirmModal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3>Please confirm before generating</h3>
+      <p>
+        The audit is blocked until the Recommended Service is confirmed. Complete these checks first:
+      </p>
+      <ul>
+        <li>Review Google Service and BAAM-generated Service.</li>
+        <li>Set the Recommended Service to the final service you want.</li>
+        <li>Check the confirmation box.</li>
+      </ul>
+      <div class="modal-actions">
+        <button class="btn" type="button" onclick="closeModal()">Got it</button>
+        <button class="btn primary" type="button" onclick="focusConfirm()">
+          Go to confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const rsInput = document.getElementById("rsInput");
+    const rsPreview = document.getElementById("rsPreview");
+    const checkedConfirm = document.getElementById("checkedConfirm");
+    const confirmModal = document.getElementById("confirmModal");
+    const languageCards = Array.from(document.querySelectorAll(".lang-card"));
+
+    function syncPreview() {
+      rsPreview.textContent = (rsInput.value || "").trim() || "—";
+    }
+    rsInput.addEventListener("input", syncPreview);
+    syncPreview();
+
+    languageCards.forEach((card) => {
+      const radio = card.querySelector('input[type="radio"]');
+      if (!radio) return;
+      radio.addEventListener("change", () => {
+        languageCards.forEach((other) => other.classList.remove("active"));
+        if (radio.checked) card.classList.add("active");
+      });
+    });
+
+    function tryGenerate() {
+      const rs = (rsInput.value || "").trim();
+      if (!rs || !checkedConfirm.checked) {
+        confirmModal.style.display = "flex";
+        return;
+      }
+      window.alert(`Demo success: Generate audit with Recommended Service = "${rs}"`);
+    }
+
+    function closeModal() {
+      confirmModal.style.display = "none";
+    }
+
+    function focusConfirm() {
+      closeModal();
+      checkedConfirm.focus();
+      checkedConfirm.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    confirmModal.addEventListener("click", (event) => {
+      if (event.target === confirmModal) closeModal();
+    });
+  </script>
+</body>
+</html>

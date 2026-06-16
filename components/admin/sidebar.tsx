@@ -139,14 +139,19 @@ const staffAccessItem: WorkspaceItem = {
   label: "Staff access",
   icon: ShieldCheck,
 };
+const serviceLearningItem: WorkspaceItem = {
+  href: "/app/admin/service-learning",
+  label: "Service learning QA",
+  icon: BarChart3,
+};
 
 function operationsItemsForRole(
   role: OpsRole | null | undefined,
 ): WorkspaceItem[] {
   if (role === "admin")
-    return [customersItem, onboardingItem, staffAccessItem];
-  if (role === "sales") return [customersItem, onboardingItem];
-  if (role === "account_manager") return [customersItem];
+    return [customersItem, onboardingItem, serviceLearningItem, staffAccessItem];
+  if (role === "sales") return [customersItem, onboardingItem, serviceLearningItem];
+  if (role === "account_manager") return [customersItem, serviceLearningItem];
   return [];
 }
 

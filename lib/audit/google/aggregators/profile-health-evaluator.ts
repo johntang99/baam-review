@@ -3,6 +3,7 @@ export interface RawPlaceForHealth {
   url?: string;
   formatted_phone_number?: string;
   website?: string;
+  description?: string;
   opening_hours?: { periods?: unknown[] };
   types?: string[];
   photos?: unknown[];
@@ -25,6 +26,7 @@ export function evaluateProfileHealth(raw: RawPlaceForHealth): ProfileHealth {
   const has_hours = !!raw.opening_hours?.periods?.length;
   const has_phone = !!raw.formatted_phone_number;
   const has_website = !!raw.website;
+  const has_description = !!raw.description && raw.description.trim().length > 0;
   const has_categories = !!raw.types && raw.types.length > 1;
   const photos_count = raw.photos?.length ?? 0;
 
@@ -33,6 +35,7 @@ export function evaluateProfileHealth(raw: RawPlaceForHealth): ProfileHealth {
     has_hours,
     has_phone,
     has_website,
+    has_description,
     has_categories,
   ];
   const profile_completeness =
@@ -45,7 +48,7 @@ export function evaluateProfileHealth(raw: RawPlaceForHealth): ProfileHealth {
     has_phone,
     has_website,
     has_categories,
-    has_description: false,
+    has_description,
     photos_count,
     profile_completeness,
   };

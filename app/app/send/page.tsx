@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { isTwilioConfigured } from "@/lib/messaging/twilio";
 import { getSelectedLocationId } from "@/lib/selected-location";
 import { PageHeader } from "@/components/admin/page-header";
@@ -24,7 +25,11 @@ export default async function SendPage() {
   const internal = await getInternalContext(supabase, user.id);
   const visibleIds = await getVisibleLocationIds(supabase, internal);
 
-  let locationsQuery = supabase
+  // Internal staff read across accounts via the service client (gated by
+  // visibleIds); customers stay on the RLS-bound user client.
+  const db = internal ? createServiceClient() : supabase;
+
+  let locationsQuery = db
     .from("locations")
     .select(
       "id, slug, display_name, default_language, supported_languages, gmail_sender_email, connected_via_google_email, address",

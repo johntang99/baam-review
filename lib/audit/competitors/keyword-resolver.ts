@@ -1,4 +1,12 @@
 import type { AuditGoogleData, VerticalKey } from "../google/types";
+import {
+  hasManufacturerSignalText,
+  inferDetailedManufacturerService,
+} from "../manufacturer-detail-rules";
+import {
+  hasVisionSignalText,
+  inferDetailedVisionService,
+} from "../vision-detail-rules";
 
 const KEYWORD_BY_VERTICAL: Record<VerticalKey, string> = {
   tcm_clinic: "acupuncture",
@@ -51,10 +59,13 @@ const TYPE_REFINEMENTS: Array<{ type: string; keyword: string }> = [
   { type: "orthodontist", keyword: "orthodontist" },
   { type: "pediatric_dentist", keyword: "pediatric dentist" },
   { type: "endodontist", keyword: "endodontist" },
-  { type: "ophthalmologist", keyword: "eye doctor" },
+  { type: "optometrist", keyword: "optometry clinic" },
+  { type: "optician", keyword: "optician" },
+  { type: "sunglasses_store", keyword: "eyewear store" },
+  { type: "ophthalmologist", keyword: "ophthalmology clinic" },
   { type: "dermatologist", keyword: "dermatologist" },
   // Contractor / home-improvement refinements
-  { type: "cabinet_maker", keyword: "cabinet maker" },
+  { type: "cabinet_maker", keyword: "kitchen cabinet manufacturer" },
   { type: "kitchen_remodeler", keyword: "kitchen remodeler" },
   { type: "countertop_store", keyword: "countertop store" },
   { type: "countertop_contractor", keyword: "countertop contractor" },
@@ -90,6 +101,10 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
   // Medical sub-types
   { pattern: /\b(orthodontic|braces|invisalign)\b/i, keyword: "orthodontist" },
   { pattern: /\b(pediatric)\b/i, keyword: "pediatric dentist" },
+  { pattern: /\b(ophthalmolog|retina|cataract|lasik)\b/i, keyword: "ophthalmology clinic" },
+  { pattern: /\b(optometr|eye exam|vision care|vision center)\b/i, keyword: "optometry clinic" },
+  { pattern: /\b(optician|contact lenses?)\b/i, keyword: "optician" },
+  { pattern: /\b(eyewear|eyeglasses?|glasses|spectacles|frames|sunglasses)\b/i, keyword: "eyewear store" },
   { pattern: /\b(dermatolog|skin clinic)\b/i, keyword: "dermatologist" },
   { pattern: /\b(chiropract)\b/i, keyword: "chiropractor" },
   { pattern: /\b(physical therap|physiotherap)\b/i, keyword: "physical therapy" },
@@ -100,8 +115,8 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
   { pattern: /\b(dealer(ship)?)\b/i, keyword: "car dealer" },
 
   // Contractor / home-improvement sub-types
-  { pattern: /\b(cabinet|cabinetry)\b/i, keyword: "cabinet maker" },
-  { pattern: /\b(countertop|granite|quartz)\b/i, keyword: "countertop contractor" },
+  { pattern: /\b(kitchen cabinets?|cabinets?|cabinetry|millwork|joinery)\b/i, keyword: "kitchen cabinet manufacturer" },
+  { pattern: /\b(countertops?|granite|quartz)\b/i, keyword: "countertop contractor" },
   { pattern: /\b(remodel|renovation|kitchen\s*&\s*bath|kitchen and bath)\b/i, keyword: "kitchen remodeler" },
 
   // Food sub-types (when vertical is restaurant but cuisine wasn't tagged)
@@ -143,6 +158,10 @@ export function resolveServiceKeyword(primary: AuditGoogleData): string {
   const vertical = primary.vertical.inferred_vertical;
   const types = primary.vertical.google_categories ?? [];
   const name = primary.business.name;
+  const visionKeyword = resolveDetailedVisionKeyword(primary);
+  if (visionKeyword) return visionKeyword;
+  const detailKeyword = resolveDetailedManufacturerKeyword(primary);
+  if (detailKeyword) return detailKeyword;
 
   const typeMatch = TYPE_REFINEMENTS.find((r) => types.includes(r.type));
   if (typeMatch) return typeMatch.keyword;
@@ -161,6 +180,45 @@ export function resolveServiceKeyword(primary: AuditGoogleData): string {
   // Last resort: Google's raw primary category (e.g. "medical_clinic").
   // Humanize it so it reads as a search term, not a snake_case type.
   return (primary.vertical.primary_category || "business").replace(/_/g, " ");
+}
+
+function resolveDetailedManufacturerKeyword(primary: AuditGoogleData): string {
+  const types = primary.vertical.google_categories ?? [];
+  const hasManufacturerType = types.includes("manufacturer");
+  const textBlob = [
+    primary.business.name,
+    primary.business.description ?? "",
+    primary.vertical.primary_category_display ?? "",
+    primary.vertical.primary_category ?? "",
+    ...types,
+  ]
+    .join(" ")
+    .toLowerCase();
+  const hasManufacturingSignal = hasManufacturerSignalText(
+    textBlob,
+    hasManufacturerType,
+  );
+  return inferDetailedManufacturerService({
+    text: textBlob,
+    hasManufacturerSignal: hasManufacturingSignal,
+  });
+}
+
+function resolveDetailedVisionKeyword(primary: AuditGoogleData): string {
+  const types = primary.vertical.google_categories ?? [];
+  const textBlob = [
+    primary.business.name,
+    primary.business.description ?? "",
+    primary.vertical.primary_category_display ?? "",
+    primary.vertical.primary_category ?? "",
+    ...types,
+  ]
+    .join(" ")
+    .toLowerCase();
+  return inferDetailedVisionService({
+    text: textBlob,
+    hasVisionSignal: hasVisionSignalText(textBlob),
+  });
 }
 
 export function resolvePrimaryKeyword(
@@ -216,6 +274,10 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
   "orthodontist": ["orthodontist", "braces", "invisalign provider"],
   "endodontist": ["endodontist", "root canal specialist"],
   "eye doctor": ["eye doctor", "optometrist"],
+  "optometry clinic": ["optometry clinic", "optometrist", "eye exam center"],
+  optician: ["optician", "optical store", "contact lens center"],
+  "eyewear store": ["eyewear store", "eyeglasses store", "glasses shop"],
+  "ophthalmology clinic": ["ophthalmology clinic", "ophthalmologist", "eye surgeon"],
   "dermatologist": ["dermatologist", "skin clinic"],
   "chiropractor": ["chiropractor", "back pain clinic"],
   "physical therapy": ["physical therapy", "physiotherapist", "sports rehab"],
@@ -256,6 +318,57 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
   "real estate agent": ["real estate agent", "realtor", "real estate broker"],
   "insurance agent": ["insurance agent", "insurance broker"],
   "contractor": ["contractor", "general contractor", "home builder"],
+  "kitchen cabinet manufacturer": [
+    "kitchen cabinet manufacturer",
+    "cabinet manufacturer",
+    "custom kitchen cabinets",
+  ],
+  "countertop manufacturer": [
+    "countertop manufacturer",
+    "stone countertop manufacturer",
+    "granite quartz countertops",
+  ],
+  "sign manufacturer": ["sign manufacturer", "signage manufacturer", "light box manufacturer"],
+  "metal fabrication manufacturer": [
+    "metal fabrication manufacturer",
+    "sheet metal manufacturer",
+    "steel fabrication",
+  ],
+  "electronics manufacturer": [
+    "electronics manufacturer",
+    "electronic components manufacturer",
+    "pcb manufacturer",
+  ],
+  "furniture manufacturer": [
+    "furniture manufacturer",
+    "custom furniture manufacturer",
+    "furniture factory",
+  ],
+  "food manufacturer": [
+    "food manufacturer",
+    "snack manufacturer",
+    "beverage manufacturer",
+  ],
+  "packaging manufacturer": [
+    "packaging manufacturer",
+    "carton manufacturer",
+    "label manufacturer",
+  ],
+  "textile manufacturer": [
+    "textile manufacturer",
+    "garment manufacturer",
+    "fabric manufacturer",
+  ],
+  "plastic manufacturer": [
+    "plastic manufacturer",
+    "injection molding manufacturer",
+    "polymer products manufacturer",
+  ],
+  "automotive parts manufacturer": [
+    "automotive parts manufacturer",
+    "auto parts manufacturer",
+    "aftermarket parts manufacturer",
+  ],
 
   // ── Hospitality / lifestyle ──────────────────────────────────────
   "hotel": ["hotel", "boutique hotel"],

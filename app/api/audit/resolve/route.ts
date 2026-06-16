@@ -7,6 +7,7 @@ import {
 } from "@/lib/audit/google";
 import { resolveServiceKeyword } from "@/lib/audit/competitors/keyword-resolver";
 import { reconcileServiceDecision } from "@/lib/audit/service-reconciler";
+import { fetchWebsiteServiceSignalText } from "@/lib/audit/service-signal-web";
 import { VERTICAL_KEYS } from "@/lib/audit/google/types";
 import type { VerticalKey } from "@/lib/audit/google/types";
 
@@ -49,9 +50,14 @@ export async function POST(request: Request) {
     const google = await getGoogleBusinessData({ textQuery }, "free");
     const detectedVertical: VerticalKey = google.vertical.inferred_vertical;
     const detectedService = resolveServiceKeyword(google);
+    const websiteSignal = await fetchWebsiteServiceSignalText(
+      google.business.website ?? body.website,
+    );
     const serviceDecision = reconcileServiceDecision({
       google,
       bsService: detectedService,
+      gbpDescription: google.business.description ?? null,
+      websiteSignalText: websiteSignal?.text ?? null,
     });
     const websiteMatch = matchWebsite(body.website, google.business.website);
 

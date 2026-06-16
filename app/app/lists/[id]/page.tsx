@@ -10,6 +10,8 @@ import {
   Zap,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
+import { getInternalContext, getVisibleLocationIds } from "@/lib/auth/staff";
 import { relativeTime } from "@/lib/analytics/aggregate";
 import { markListComplete } from "../actions";
 import { DetailTable, type DetailCustomer } from "./detail-table";
@@ -115,7 +117,13 @@ export default async function ListDetailPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/app/lists/${id}`);
 
-  const { data: list } = await supabase
+  // Internal staff read across accounts via the service client (gated below);
+  // customers stay on the RLS-bound user client (own account only).
+  const internal = await getInternalContext(supabase, user.id);
+  const visibleIds = await getVisibleLocationIds(supabase, internal);
+  const db = internal ? createServiceClient() : supabase;
+
+  const { data: list } = await db
     .from("lists")
     .select(
       "id, name, status, customer_count, sent_at, completed_at, max_touches, location_id",
@@ -123,22 +131,24 @@ export default async function ListDetailPage({
     .eq("id", id)
     .maybeSingle();
   if (!list) notFound();
+  // Internal non-admins (sales/account_manager) may only open their locations.
+  if (internal && visibleIds && !visibleIds.includes(list.location_id)) notFound();
 
   const [{ data: location }, { data: customers }, { data: events }] =
     await Promise.all([
-      supabase
+      db
         .from("locations")
         .select("display_name")
         .eq("id", list.location_id)
         .maybeSingle(),
-      supabase
+      db
         .from("list_customers")
         .select(
           "id, name, email, phone, language, channel, status, notes, touches, selected, excluded_reason, created_at",
         )
         .eq("list_id", id)
         .order("created_at", { ascending: true }),
-      supabase
+      db
         .from("list_events")
         .select("list_customer_id, event_type, occurred_at")
         .eq("list_id", id)

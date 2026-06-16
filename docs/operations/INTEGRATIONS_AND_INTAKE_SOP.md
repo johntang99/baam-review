@@ -297,6 +297,62 @@ Same pattern in **Make** (HTTP module) or **n8n** (HTTP Request node). This is t
 
 > A branded "BAAM Review" Zapier/Make app (so clients pick it from the directory instead of the generic HTTP module) is a later productization step — build it once the generic‑HTTP path shows real demand. The endpoints above are already everything such an app would wrap.
 
+#### Walkthrough — set up Zapier for a business, end to end
+A full, repeatable walkthrough for staff onboarding a client whose booking/POS/CRM we **cannot** modify (no website-code access needed — Zapier connects to their tool through the tool's own login).
+
+**Mental model — a Zap has two ends:**
+```
+Client's app (booking/POS/CRM)  ──►   Zapier (the Zap)   ──►   BAAM Review
+        TRIGGER  (input)                                       ACTION (output)
+   reads each new transaction                            POSTs the contact to the queue
+```
+- The **TRIGGER** connects Zapier **to the business** (Part 1).
+- The **ACTION** connects Zapier **to BAAM Review** (Part 2).
+- **The API key = which business.** A key is bound to one location, so the request body never names the business — get the key from that location's **Location Setup → Integrations · API keys**.
+
+**Before you start, confirm:**
+1. **Which tool** captures their customers (Calendly / Acuity / Square / Shopify / Jobber / a CRM / etc.) — that's the trigger app.
+2. **Access to connect it in Zapier** — either the client builds it in *their* Zapier, adds you as a collaborator, or authorizes the tool for you. (You need the *tool's* login/OAuth, never their website code.)
+3. **The location's API key** is generated and copied.
+
+**Part 1 — Connect Zapier → the business (Trigger)**
+1. zapier.com → **Create → Zap**.
+2. **Trigger** step → search the client's tool → pick the "new transaction" event (e.g. Calendly **Invitee Created**, Acuity **New Appointment**, Square **New Booking/Order**, Shopify **Order Fulfilled**, Jobber **Job Closed**). Prefer the **fulfillment / visit-complete** event over payment-auth.
+3. **Connect account** → sign in / authorize the tool (OAuth). 
+4. **Test trigger** → Zapier pulls a recent real record as sample data — confirms the connection and gives you fields to map.
+
+**Part 2 — Connect Zapier → BAAM Review (Action)**
+1. **Action** step → **Webhooks by Zapier → Custom Request** (or POST).
+2. **Method:** `POST` · **URL:** `https://baamreview.com/api/integrations/review-request`
+3. **Headers:** `Authorization: Bearer <LOCATION_API_KEY>` (and `Content-Type: application/json` if using JSON).
+4. **Data** — map the trigger's fields (don't type values; pick them from the dropdown so each booking fills its own data):
+
+   | Our field | Map from the trigger |
+   |---|---|
+   | `name` | customer name (combine First+Last if split) |
+   | `email` | customer email |
+   | `phone` | customer phone (often a custom field) |
+   | `service` | service / appointment type / first line item |
+   | `transacted_at` | appointment or fulfillment time |
+   | `external_id` | the record's **unique id** (makes retries idempotent) |
+
+5. *(Optional)* To request **after the visit**: add a **Delay by Zapier → Delay Until** the appointment end time before the webhook. (Otherwise it queues now; staff send one-by-one later anyway.)
+
+**Test it (three levels):**
+- **BAAM side only, before the Zap exists:** `GET …/ping` with the key (or POST a sample) via curl / ReqBin / Hoppscotch → expect the location name / `201`.
+- **In Zapier:** click **Test action** → Zapier sends the sample record → expect `201` / `{"status":"queued"}`.
+- **End-to-end:** make a real test booking with a fresh `+alias` email → confirm it lands.
+- Verify in **Bulk Review Requests → (filter to the location) → "Incoming · week of …"**.
+
+**Go live:** **Publish** and toggle the Zap **ON**. Every future transaction now auto-queues a contact — no website code, hands-off.
+
+**Gotchas:**
+- **Key = business.** Use the *correct* location's key, or contacts land under the wrong business.
+- **`external_id`** must be the record's unique id → prevents duplicates on Zapier retries.
+- **60-day dedupe:** when testing, use a new `+alias` email each time (a repeat returns `200 skipped`).
+- **Form vs JSON:** Zapier "Webhooks → POST" defaults to form-encoded; our endpoint accepts both, so either is fine.
+- **Managed option:** if the client can't self-serve, we build the Zap *for* them (Phase 5) — same steps in their account or ours.
+
 ### Door 6 — Native connector (Phase 4)
 Two flavors:
 

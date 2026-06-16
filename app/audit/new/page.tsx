@@ -47,7 +47,7 @@ export default async function NewAuditPage(props: {
       <AuditTopNav active="audit-new" />
 
       <div className="intake-page">
-        <div className="intake-inner">
+        <div className="intake-inner" style={{ maxWidth: 1120 }}>
           <div className="intake-header">
             <div className="intake-header-left">
               <div className="intake-eyebrow">Start a new audit</div>
