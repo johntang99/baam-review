@@ -92,8 +92,33 @@ const SERVICE_TAXONOMY: readonly ServiceTaxonomyEntry[] = [
     specificity: 4,
   },
   {
+    canonical: "lighting manufacturer",
+    aliases: ["led lighting manufacturer", "lighting factory"],
+    specificity: 4,
+  },
+  {
+    canonical: "oriental rug store",
+    aliases: [
+      "rug store",
+      "carpet store",
+      "oriental carpet store",
+      "persian rug store",
+    ],
+    specificity: 4,
+  },
+  {
+    canonical: "carpet cleaning service",
+    aliases: ["rug cleaning service", "carpet cleaning", "rug cleaning"],
+    specificity: 4,
+  },
+  {
+    canonical: "carpet repair service",
+    aliases: ["rug repair service", "carpet repair", "rug repair"],
+    specificity: 4,
+  },
+  {
     canonical: "optometry clinic",
-    aliases: ["optometrist", "eye doctor", "vision clinic", "eye exam clinic"],
+    aliases: ["optometry", "optometrist", "eye doctor", "vision clinic", "eye exam clinic"],
     specificity: 4,
   },
   {
@@ -194,6 +219,7 @@ const SERVICE_BOOST_BY_VERTICAL: Partial<Record<VerticalKey, Record<string, numb
     "textile manufacturer": 0.12,
     "plastic manufacturer": 0.14,
     "automotive parts manufacturer": 0.14,
+    "lighting manufacturer": 0.14,
     "kitchen remodeler": 0.16,
     "cabinet maker": 0.14,
     manufacturer: -0.18,
@@ -210,6 +236,10 @@ const SERVICE_BOOST_BY_VERTICAL: Partial<Record<VerticalKey, Record<string, numb
     "textile manufacturer": 0.17,
     "plastic manufacturer": 0.18,
     "automotive parts manufacturer": 0.18,
+    "lighting manufacturer": 0.16,
+    "oriental rug store": 0.2,
+    "carpet cleaning service": 0.16,
+    "carpet repair service": 0.16,
     "optometry clinic": 0.24,
     optician: 0.22,
     "eyewear store": 0.22,
@@ -228,7 +258,12 @@ const SERVICE_ALIAS_TO_CANONICAL = buildAliasIndex();
 
 export function normalizeServiceText(input: string | null | undefined) {
   if (!input) return "";
-  return input.trim().toLowerCase().replace(/\s+/g, " ");
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[_/]+/g, " ")
+    .replace(/-/g, " ")
+    .replace(/\s+/g, " ");
 }
 
 export function canonicalizeService(input: string | null | undefined) {
@@ -272,6 +307,12 @@ export function getServiceBoostForVertical(
   const canonical = canonicalizeService(service);
   if (!canonical) return 0;
   return SERVICE_BOOST_BY_VERTICAL[vertical]?.[canonical] ?? 0;
+}
+
+export function isKnownService(input: string | null | undefined) {
+  const canonical = canonicalizeService(input);
+  if (!canonical) return false;
+  return SERVICE_ALIAS_TO_CANONICAL.has(canonical);
 }
 
 function buildAliasIndex() {

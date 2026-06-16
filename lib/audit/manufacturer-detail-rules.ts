@@ -6,53 +6,60 @@ type ManufacturerDetailRule = {
 const MANUFACTURER_DETAIL_RULES: readonly ManufacturerDetailRule[] = [
   {
     service: "kitchen cabinet manufacturer",
-    pattern: /\b(kitchen cabinets?|cabinets?|cabinetry|millwork|joinery)\b/i,
+    pattern:
+      /(kitchen\s*cabinets?|cabinets?|cabinetry|cabinet\s*doors?|millwork|joinery|wood\s*cabinetry)/i,
   },
   {
     service: "countertop manufacturer",
-    pattern: /\b(countertops?|stone tops?|granite|quartz|solid surface)\b/i,
+    pattern:
+      /(countertops?|stone\s*tops?|granite|quartz|solid\s*surface|engineered\s*stone|kitchen\s*tops?)/i,
   },
   {
     service: "sign manufacturer",
     pattern:
-      /\b(signs?|signage|channel letters?|light boxes?|led signs?|wayfinding)\b/i,
+      /(signs?|signage|channel\s*letters?|light\s*boxes?|led\s*signs?|wayfinding)/i,
   },
   {
     service: "metal fabrication manufacturer",
     pattern:
-      /\b(metalworks?|metal fabrication|sheet metal|steel fabrication|aluminum fabrication|cnc machining)\b/i,
+      /(metalworks?|metal\s*fabrication|sheet\s*metal|steel\s*fabrication|aluminum\s*fabrication|cnc\s*machining)/i,
   },
   {
     service: "electronics manufacturer",
     pattern:
-      /\b(electronics?|electronic components?|pcb|circuit boards?|semiconductor|ems)\b/i,
+      /(electronics?|electronic\s*components?|pcb|circuit\s*boards?|semiconductor|ems)/i,
   },
   {
     service: "furniture manufacturer",
-    pattern: /\b(furniture|sofas?|chairs?|tables?|bedroom sets?)\b/i,
+    pattern: /(furniture|sofas?|chairs?|tables?|bedroom\s*sets?)/i,
   },
   {
     service: "food manufacturer",
     pattern:
-      /\b(foods?|snacks?|beverages?|frozen foods?|nutrition products?|confectionery)\b/i,
+      /(foods?|snacks?|beverages?|frozen\s*foods?|nutrition\s*products?|confectionery)/i,
   },
   {
     service: "packaging manufacturer",
-    pattern: /\b(packaging|cartons?|boxes?|labels?|containers?|bottles?)\b/i,
+    pattern: /(packaging|cartons?|boxes?|labels?|containers?|bottles?)/i,
   },
   {
     service: "textile manufacturer",
-    pattern: /\b(textiles?|garments?|apparel|fabrics?|knitwear)\b/i,
+    pattern: /(textiles?|garments?|apparel|fabrics?|knitwear)/i,
   },
   {
     service: "plastic manufacturer",
     pattern:
-      /\b(plastics?|polymer|injection molding|blow molding|resin products?)\b/i,
+      /(plastics?|polymer|injection\s*molding|blow\s*molding|resin\s*products?)/i,
   },
   {
     service: "automotive parts manufacturer",
     pattern:
-      /\b(auto parts?|automotive parts?|aftermarket parts?|brake pads?|engine parts?)\b/i,
+      /(auto\s*parts?|automotive\s*parts?|aftermarket\s*parts?|brake\s*pads?|engine\s*parts?|headlights?|tail\s*lights?|taillights?|fog\s*lights?|car\s*lights?|truck\s*lights?)/i,
+  },
+  {
+    service: "lighting manufacturer",
+    pattern:
+      /(led\s*lighting|lighting\s*fixtures?|luminaires?|lamp\s*manufacturing|light\s*factory)/i,
   },
 ];
 

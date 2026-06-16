@@ -8,11 +8,30 @@ import {
 import { resolveServiceKeyword } from "@/lib/audit/competitors/keyword-resolver";
 import { reconcileServiceDecision } from "@/lib/audit/service-reconciler";
 import { fetchWebsiteServiceSignalText } from "@/lib/audit/service-signal-web";
-import { VERTICAL_KEYS } from "@/lib/audit/google/types";
 import type { VerticalKey } from "@/lib/audit/google/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
+
+// UI industry options can include aliases that map to existing backend verticals.
+const INDUSTRY_OPTIONS: string[] = [
+  "tcm_clinic",
+  "dental",
+  "legal_immigration",
+  "restaurant",
+  "real_estate",
+  "hotel",
+  "auto",
+  "contractor",
+  "manufacturer_industrial",
+  "salon_spa",
+  "cafe",
+  "apparel",
+  "health_food",
+  "insurance",
+  "optometry_vision",
+  "general_smb",
+];
 
 interface ResolveRequest {
   name?: string;
@@ -89,7 +108,7 @@ export async function POST(request: Request) {
         google.vertical.google_categories,
         google.vertical.primary_category,
       ),
-      vertical_options: VERTICAL_KEYS,
+      vertical_options: INDUSTRY_OPTIONS,
       website_match: websiteMatch,
     });
   } catch (err) {

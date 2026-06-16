@@ -16,6 +16,10 @@ import {
   hasVisionSignalText,
   inferDetailedVisionService,
 } from "@/lib/audit/vision-detail-rules";
+import {
+  hasRetailSignalText,
+  inferDetailedRetailService,
+} from "@/lib/audit/retail-detail-rules";
 
 export interface ServiceReconciliationResult {
   gs_service: string;
@@ -156,6 +160,23 @@ const TEXT_SIGNAL_PATTERNS: Array<{
     pattern: /\b(hotel|inn|lodging)\b/i,
     service: "hotel",
     verticals: ["hotel"],
+  },
+  {
+    pattern: /\b(oriental|persian)\s*(rugs?|carpets?)\b/i,
+    service: "oriental rug store",
+  },
+  {
+    pattern:
+      /\b(area\s*rugs?|rugs?|carpets?)\s*(store|shop|gallery|showroom|boutique)\b/i,
+    service: "oriental rug store",
+  },
+  {
+    pattern: /\b(rug|carpet)\s*clean(ing|er|ers)?\b/i,
+    service: "carpet cleaning service",
+  },
+  {
+    pattern: /\b(rug|carpet)\s*repair(s|ing)?\b/i,
+    service: "carpet repair service",
   },
 ];
 
@@ -343,15 +364,26 @@ function inferDetailedIndustryCandidate({
   gsService: string;
   bsService: string;
 }) {
-  const textBlob = normalizeService(
+  const categoriesText = (google.vertical.google_categories ?? [])
+    .map((category) => category.replace(/_/g, " "))
+    .join(" ");
+  const websiteKeywordSignal = extractWebsiteKeywordSignal(google.business.website);
+  const reviewSignalText = (google.reviews ?? [])
+    .slice(0, 8)
+    .map((review) => review.text ?? "")
+    .join(" ")
+    .slice(0, 1500);
+  const textBlob = normalizeEvidenceText(
     [
       google.business.name,
       google.business.description ?? "",
       google.vertical.primary_category_display ?? "",
       google.vertical.primary_category ?? "",
-      ...(google.vertical.google_categories ?? []),
+      categoriesText,
       gbpDescription ?? "",
       websiteSignalText ?? "",
+      websiteKeywordSignal,
+      reviewSignalText,
       gsService,
       bsService,
     ].join(" "),
@@ -365,12 +397,23 @@ function inferDetailedIndustryCandidate({
     return canonicalizeService(visionCandidate);
   }
 
+  const hasManufacturerType =
+    google.vertical.primary_category === "manufacturer" ||
+    (google.vertical.google_categories ?? []).includes("manufacturer");
   const manufacturerCandidate = inferDetailedManufacturerService({
     text: textBlob,
-    hasManufacturerSignal: hasManufacturerSignalText(textBlob),
+    hasManufacturerSignal: hasManufacturerSignalText(textBlob, hasManufacturerType),
   });
   if (manufacturerCandidate) {
     return canonicalizeService(manufacturerCandidate);
+  }
+
+  const retailCandidate = inferDetailedRetailService({
+    text: textBlob,
+    hasRetailSignal: hasRetailSignalText(textBlob),
+  });
+  if (retailCandidate) {
+    return canonicalizeService(retailCandidate);
   }
 
   const hasCabinetSignal =
@@ -404,13 +447,18 @@ function inferServiceFromTextSignals(
   text: string | null | undefined,
   vertical: VerticalKey,
 ) {
-  const normalized = normalizeService(text);
+  const normalized = normalizeEvidenceText(text);
   if (!normalized || normalized.length < 12) return "";
   const visionCandidate = inferDetailedVisionService({
     text: normalized,
     hasVisionSignal: hasVisionSignalText(normalized),
   });
   if (visionCandidate) return canonicalizeService(visionCandidate);
+  const retailCandidate = inferDetailedRetailService({
+    text: normalized,
+    hasRetailSignal: hasRetailSignalText(normalized),
+  });
+  if (retailCandidate) return canonicalizeService(retailCandidate);
   for (const pattern of TEXT_SIGNAL_PATTERNS) {
     if (pattern.verticals && !pattern.verticals.includes(vertical)) continue;
     if (pattern.pattern.test(normalized)) return canonicalizeService(pattern.service);
@@ -538,4 +586,30 @@ function computeWeightedConfidence(score: number, votes: number, specificity: nu
   if (votes >= 3) confidence += 0.03;
   confidence += Math.min(0.05, specificity * 0.01);
   return Number(Math.min(0.95, confidence).toFixed(2));
+}
+
+function normalizeEvidenceText(input: string | null | undefined) {
+  return normalizeService(input).replace(/[_/]+/g, " ").replace(/-/g, " ");
+}
+
+function extractWebsiteKeywordSignal(inputUrl: string | null | undefined) {
+  const raw = (inputUrl ?? "").trim();
+  if (!raw) return "";
+  const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    const parsed = new URL(candidate);
+    const host = parsed.hostname
+      .replace(/^www\./i, "")
+      .split(".")
+      .slice(0, -1)
+      .join(" ");
+    const path = parsed.pathname.replace(/[\/._-]+/g, " ");
+    const query = decodeURIComponent(parsed.search.replace(/^[?]/, "")).replace(
+      /[=&._-]+/g,
+      " ",
+    );
+    return normalizeEvidenceText([host, path, query].join(" "));
+  } catch {
+    return normalizeEvidenceText(raw.replace(/[\/._-]+/g, " "));
+  }
 }

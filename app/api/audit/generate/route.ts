@@ -15,6 +15,11 @@ export const runtime = "nodejs";
 // sync-reviews cron) gives the pipeline room to finish.
 export const maxDuration = 300;
 
+const INDUSTRY_ALIAS_TO_VERTICAL: Record<string, VerticalKey> = {
+  manufacturer_industrial: "contractor",
+  optometry_vision: "general_smb",
+};
+
 interface GenerateRequest {
   /** Free-form business identifier (URL, text query, place_id). Used
    *  when the user skipped the confirm step (legacy path). */
@@ -147,8 +152,12 @@ function buildBusinessRef(
 
 function parseVerticalOverride(input: string | undefined): VerticalKey | undefined {
   if (!input) return undefined;
-  const trimmed = input.trim() as VerticalKey;
-  return (VERTICAL_KEYS as readonly string[]).includes(trimmed) ? trimmed : undefined;
+  const trimmed = input.trim();
+  const aliased = INDUSTRY_ALIAS_TO_VERTICAL[trimmed] ?? trimmed;
+  const normalized = aliased as VerticalKey;
+  return (VERTICAL_KEYS as readonly string[]).includes(normalized)
+    ? normalized
+    : undefined;
 }
 
 function extractTextFromMapsUrl(input: string): string | null {

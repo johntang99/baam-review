@@ -7,6 +7,10 @@ import {
   hasVisionSignalText,
   inferDetailedVisionService,
 } from "../vision-detail-rules";
+import {
+  hasRetailSignalText,
+  inferDetailedRetailService,
+} from "../retail-detail-rules";
 
 const KEYWORD_BY_VERTICAL: Record<VerticalKey, string> = {
   tcm_clinic: "acupuncture",
@@ -42,6 +46,7 @@ const TYPE_REFINEMENTS: Array<{ type: string; keyword: string }> = [
   { type: "shoe_store", keyword: "shoe store" },
   { type: "sporting_goods_store", keyword: "sporting goods store" },
   { type: "book_store", keyword: "bookstore" },
+  { type: "carpet_store", keyword: "oriental rug store" },
   { type: "florist", keyword: "florist" },
   { type: "hair_salon", keyword: "hair salon" },
   { type: "nail_salon", keyword: "nail salon" },
@@ -85,6 +90,13 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
   { pattern: /\b(vintage|consignment|thrift)\b/i, keyword: "vintage clothing store" },
   { pattern: /\b(maternity)\b/i, keyword: "maternity clothing" },
   { pattern: /\b(children|kids|baby)\b/i, keyword: "children's clothing" },
+  { pattern: /\b(rug|carpet)\s*clean(ing|er|ers)?\b/i, keyword: "carpet cleaning service" },
+  { pattern: /\b(rug|carpet)\s*repair(s|ing)?\b/i, keyword: "carpet repair service" },
+  {
+    pattern:
+      /\b(oriental|persian)\s*(rug|rugs|carpet|carpets)\b|\b(rug|rugs|carpet|carpets)\s*(store|shop|gallery|showroom|boutique)\b/i,
+    keyword: "oriental rug store",
+  },
 
   // Salon / spa sub-types
   // "spa" runs FIRST inside this block: a business named "X Salon and
@@ -162,6 +174,8 @@ export function resolveServiceKeyword(primary: AuditGoogleData): string {
   if (visionKeyword) return visionKeyword;
   const detailKeyword = resolveDetailedManufacturerKeyword(primary);
   if (detailKeyword) return detailKeyword;
+  const retailKeyword = resolveDetailedRetailKeyword(primary);
+  if (retailKeyword) return retailKeyword;
 
   const typeMatch = TYPE_REFINEMENTS.find((r) => types.includes(r.type));
   if (typeMatch) return typeMatch.keyword;
@@ -184,16 +198,9 @@ export function resolveServiceKeyword(primary: AuditGoogleData): string {
 
 function resolveDetailedManufacturerKeyword(primary: AuditGoogleData): string {
   const types = primary.vertical.google_categories ?? [];
-  const hasManufacturerType = types.includes("manufacturer");
-  const textBlob = [
-    primary.business.name,
-    primary.business.description ?? "",
-    primary.vertical.primary_category_display ?? "",
-    primary.vertical.primary_category ?? "",
-    ...types,
-  ]
-    .join(" ")
-    .toLowerCase();
+  const hasManufacturerType =
+    types.includes("manufacturer") || primary.vertical.primary_category === "manufacturer";
+  const textBlob = buildIndustryEvidenceText(primary);
   const hasManufacturingSignal = hasManufacturerSignalText(
     textBlob,
     hasManufacturerType,
@@ -205,19 +212,18 @@ function resolveDetailedManufacturerKeyword(primary: AuditGoogleData): string {
 }
 
 function resolveDetailedVisionKeyword(primary: AuditGoogleData): string {
-  const types = primary.vertical.google_categories ?? [];
-  const textBlob = [
-    primary.business.name,
-    primary.business.description ?? "",
-    primary.vertical.primary_category_display ?? "",
-    primary.vertical.primary_category ?? "",
-    ...types,
-  ]
-    .join(" ")
-    .toLowerCase();
+  const textBlob = buildIndustryEvidenceText(primary);
   return inferDetailedVisionService({
     text: textBlob,
     hasVisionSignal: hasVisionSignalText(textBlob),
+  });
+}
+
+function resolveDetailedRetailKeyword(primary: AuditGoogleData): string {
+  const textBlob = buildIndustryEvidenceText(primary);
+  return inferDetailedRetailService({
+    text: textBlob,
+    hasRetailSignal: hasRetailSignalText(textBlob),
   });
 }
 
@@ -257,6 +263,13 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
   "florist": ["florist", "flower shop"],
   "pet store": ["pet store", "pet supplies"],
   "sporting goods store": ["sporting goods store", "sports equipment"],
+  "oriental rug store": ["oriental rug store", "persian rug store", "carpet store"],
+  "carpet cleaning service": [
+    "carpet cleaning service",
+    "rug cleaning service",
+    "carpet cleaner",
+  ],
+  "carpet repair service": ["carpet repair service", "rug repair service", "rug restoration"],
 
   // ── Beauty / personal care ───────────────────────────────────────
   "hair salon": ["hair salon", "hair stylist", "beauty salon"],
@@ -369,6 +382,11 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
     "auto parts manufacturer",
     "aftermarket parts manufacturer",
   ],
+  "lighting manufacturer": [
+    "lighting manufacturer",
+    "led lighting manufacturer",
+    "lighting factory",
+  ],
 
   // ── Hospitality / lifestyle ──────────────────────────────────────
   "hotel": ["hotel", "boutique hotel"],
@@ -387,4 +405,58 @@ export function resolvePrimaryKeywords(
   const variants = KEYWORD_SYNONYM_VARIANTS[baseKeyword] ?? [baseKeyword];
   const city = primary.business.city;
   return variants.map((v) => (city ? `${v} ${city}` : v));
+}
+
+function buildIndustryEvidenceText(primary: AuditGoogleData) {
+  const categories = (primary.vertical.google_categories ?? [])
+    .map((type) => type.replace(/_/g, " "))
+    .join(" ");
+  const websiteSignal = extractWebsiteKeywordSignal(primary.business.website);
+  const reviewSignal = (primary.reviews ?? [])
+    .slice(0, 8)
+    .map((review) => review.text ?? "")
+    .join(" ")
+    .slice(0, 1200);
+  return normalizeEvidenceText(
+    [
+      primary.business.name,
+      primary.business.description ?? "",
+      primary.vertical.primary_category_display ?? "",
+      primary.vertical.primary_category ?? "",
+      categories,
+      websiteSignal,
+      reviewSignal,
+    ].join(" "),
+  );
+}
+
+function normalizeEvidenceText(input: string | null | undefined) {
+  return (input ?? "")
+    .toLowerCase()
+    .replace(/[_/]+/g, " ")
+    .replace(/-/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractWebsiteKeywordSignal(inputUrl: string | null | undefined) {
+  const raw = (inputUrl ?? "").trim();
+  if (!raw) return "";
+  const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    const parsed = new URL(candidate);
+    const host = parsed.hostname
+      .replace(/^www\./i, "")
+      .split(".")
+      .slice(0, -1)
+      .join(" ");
+    const path = parsed.pathname.replace(/[\/._-]+/g, " ");
+    const query = decodeURIComponent(parsed.search.replace(/^\?/, "")).replace(
+      /[=&._-]+/g,
+      " ",
+    );
+    return normalizeEvidenceText([host, path, query].join(" "));
+  } catch {
+    return normalizeEvidenceText(raw.replace(/[\/._-]+/g, " "));
+  }
 }

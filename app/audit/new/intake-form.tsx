@@ -30,11 +30,13 @@ const VERTICAL_LABELS: Record<string, string> = {
   hotel: "Hotel / lodging",
   auto: "Auto services / repair",
   contractor: "Contractor / home services",
+  manufacturer_industrial: "Manufacturer / industrial",
   salon_spa: "Salon / spa",
   cafe: "Café / coffee shop",
   apparel: "Apparel / retail",
   health_food: "Health food / supplements",
   insurance: "Insurance agency",
+  optometry_vision: "Optometry / vision services",
   general_smb: "Other local business",
 };
 
