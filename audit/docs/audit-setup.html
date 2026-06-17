@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Search Audit Setup — Baam Audits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Palette — lifted from the Checkout page */
+    --cream:#f7f4ec;        /* page background */
+    --paper:#ffffff;        /* card surface */
+    --ink:#1c2532;          /* primary text / dark fills */
+    --ink-soft:#3a4453;     /* secondary text */
+    --muted:#6c7585;        /* tertiary / hints */
+    --line:#e4e0d4;         /* hairline dividers */
+    --line-soft:#ece8dd;    /* faint lines */
+    --rust:#b4471f;         /* accent (editorial highlight) */
+    --sand:#efe7d6;         /* warm fill (info panel) */
+    --sand-line:#e2d6bd;
+    --sel:#eef1f6;          /* selected/active soft slate */
+    --sel-line:#c9d3e2;
+    --field:#fcfbf7;        /* input fill */
+    --field-line:#dcd7c9;
+    --radius:14px;
+    --radius-sm:10px;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Onest',system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    background:linear-gradient(180deg,#fbf8f1,#f7f4ec);
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:20;
+  }
+  .topbar-inner{
+    max-width:1180px; margin:0 auto;
+    padding:18px 32px;
+    display:flex; align-items:center; gap:32px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none;}
+  .brand .mark{
+    width:11px; height:11px; background:var(--ink);
+    transform:rotate(45deg); border-radius:2px;
+    box-shadow:0 0 0 3px rgba(28,37,50,.08);
+  }
+  .brand .name{
+    font-family:'Fraunces',serif; font-weight:600; font-size:22px;
+    color:var(--ink); letter-spacing:-.01em;
+  }
+  .brand .sub{
+    font-family:'Fraunces',serif; font-style:italic; font-weight:400;
+    font-size:16px; color:var(--muted); margin-left:2px;
+  }
+  .nav{display:flex; gap:30px; margin-left:8px;}
+  .nav a{
+    text-decoration:none; color:var(--ink-soft);
+    font-weight:500; font-size:15px; letter-spacing:-.005em;
+    padding-bottom:2px; border-bottom:2px solid transparent;
+    transition:color .15s, border-color .15s;
+  }
+  .nav a:hover{color:var(--ink);}
+  .nav a.active{color:var(--ink); border-color:var(--rust);}
+  .account{
+    margin-left:auto; display:flex; align-items:center; gap:12px;
+    background:var(--paper); border:1px solid var(--line);
+    border-radius:999px; padding:5px 5px 5px 6px;
+    box-shadow:0 1px 2px rgba(28,37,50,.04);
+  }
+  .avatar{
+    width:30px; height:30px; border-radius:50%;
+    background:var(--ink); color:#fff;
+    display:grid; place-items:center;
+    font-size:12px; font-weight:600; letter-spacing:.02em;
+  }
+  .account .email{font-size:14px; color:var(--ink-soft);}
+  .signout{
+    border:0; background:transparent; cursor:pointer;
+    font-family:'Onest',sans-serif; font-size:14px; color:var(--muted);
+    padding:6px 14px; border-left:1px solid var(--line);
+    border-radius:0 999px 999px 0;
+  }
+  .signout:hover{color:var(--ink);}
+
+  /* ---------- Page frame ---------- */
+  .wrap{max-width:1180px; margin:0 auto; padding:56px 32px 96px;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:500;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--rust);
+    margin:0 0 14px;
+  }
+  h1.page-title{
+    font-family:'Fraunces',serif; font-weight:600;
+    font-size:clamp(38px,5vw,52px); line-height:1.02;
+    letter-spacing:-.02em; color:var(--ink); margin:0 0 14px;
+  }
+  h1.page-title em{font-style:italic; color:var(--rust); font-weight:500;}
+  .audit-id{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    color:var(--muted); margin:0 0 4px;
+  }
+  .audit-id .lbl{font-family:'Onest',sans-serif; color:var(--ink-soft); font-weight:500;}
+  .lead{
+    font-size:16px; color:var(--ink-soft); max-width:560px;
+    margin:18px 0 0; line-height:1.6;
+  }
+
+  .rule{height:1px; background:var(--line); border:0; margin:40px 0;}
+
+  /* ---------- Stepper ---------- */
+  .stepper{
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:14px; margin:36px 0 0;
+  }
+  .step{
+    position:relative; text-align:left;
+    background:var(--paper); border:1px solid var(--line);
+    border-radius:var(--radius); padding:16px 18px;
+    cursor:pointer; font-family:'Onest',sans-serif;
+    transition:transform .15s, box-shadow .15s, border-color .15s, background .15s;
+    box-shadow:0 1px 2px rgba(28,37,50,.03);
+  }
+  .step:hover{transform:translateY(-1px); box-shadow:0 6px 18px rgba(28,37,50,.07);}
+  .step .num{
+    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:500;
+    color:var(--muted); letter-spacing:.04em; display:block; margin-bottom:6px;
+  }
+  .step .lab{font-weight:600; font-size:15.5px; color:var(--ink); letter-spacing:-.01em;}
+  .step .tick{
+    position:absolute; top:14px; right:14px; width:18px; height:18px;
+    border-radius:50%; display:none; place-items:center;
+    background:var(--rust); color:#fff; font-size:11px;
+  }
+  /* done */
+  .step.done{background:var(--sel); border-color:var(--sel-line);}
+  .step.done .tick{display:grid;}
+  /* active */
+  .step.active{background:var(--ink); border-color:var(--ink);}
+  .step.active .num{color:rgba(255,255,255,.55);}
+  .step.active .lab{color:#fff;}
+  .step.active:hover{box-shadow:0 8px 22px rgba(28,37,50,.22);}
+
+  /* ---------- Panel card ---------- */
+  .panel{
+    background:var(--paper); border:1px solid var(--line);
+    border-radius:18px; padding:40px 44px;
+    margin-top:22px;
+    box-shadow:0 1px 2px rgba(28,37,50,.04), 0 18px 40px -28px rgba(28,37,50,.18);
+  }
+  .panel-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;}
+  .panel-step{
+    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:500;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--rust);
+  }
+  .panel h2{
+    font-family:'Fraunces',serif; font-weight:600; font-size:28px;
+    letter-spacing:-.015em; color:var(--ink); margin:6px 0 0;
+  }
+  .panel-desc{color:var(--muted); font-size:15.5px; margin:10px 0 30px; max-width:640px;}
+
+  /* ---------- Form ---------- */
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:22px 28px;}
+  .field{display:flex; flex-direction:column; gap:8px;}
+  .field.full{grid-column:1/-1;}
+  label{
+    font-size:13px; font-weight:600; color:var(--ink-soft);
+    letter-spacing:.01em;
+  }
+  label .opt{color:var(--muted); font-weight:400; font-size:12px; margin-left:6px;}
+  .input{
+    font-family:'Onest',sans-serif; font-size:15.5px; color:var(--ink);
+    background:var(--field); border:1px solid var(--field-line);
+    border-radius:var(--radius-sm); padding:13px 15px;
+    transition:border-color .15s, box-shadow .15s, background .15s;
+    width:100%;
+  }
+  .input::placeholder{color:#a7a294;}
+  .input:focus{
+    outline:none; background:#fff; border-color:var(--ink);
+    box-shadow:0 0 0 3px rgba(28,37,50,.08);
+  }
+  .input.mono{font-family:'JetBrains Mono',monospace; font-size:14px;}
+
+  /* chips */
+  .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:2px;}
+  .chip{
+    font-family:'Onest',sans-serif; font-size:14px; color:var(--ink-soft);
+    background:var(--field); border:1px solid var(--field-line);
+    border-radius:999px; padding:8px 16px; cursor:pointer;
+    transition:all .15s;
+  }
+  .chip:hover{border-color:var(--ink); color:var(--ink);}
+  .chip.on{background:var(--ink); border-color:var(--ink); color:#fff;}
+
+  /* competitor cards */
+  .comp-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .comp{
+    display:flex; gap:14px; align-items:flex-start;
+    background:var(--sel); border:1px solid var(--sel-line);
+    border-radius:var(--radius); padding:18px 20px;
+    cursor:pointer; transition:box-shadow .15s, transform .15s;
+  }
+  .comp:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(28,37,50,.08);}
+  .comp.off{background:var(--field); border-color:var(--field-line);}
+  .cbox{
+    flex:none; width:20px; height:20px; border-radius:6px;
+    border:1px solid var(--sel-line); background:#fff;
+    display:grid; place-items:center; margin-top:2px;
+    color:#fff; font-size:12px; transition:all .15s;
+  }
+  .comp:not(.off) .cbox{background:var(--ink); border-color:var(--ink);}
+  .comp-body{min-width:0;}
+  .comp-name{font-weight:600; font-size:16px; color:var(--ink); letter-spacing:-.01em;}
+  .comp-addr{font-size:13.5px; color:var(--muted); margin-top:4px; line-height:1.45;}
+  .comp-meta{
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft);
+    margin-top:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  }
+  .comp-meta .dot{width:3px; height:3px; border-radius:50%; background:var(--muted);}
+  .comp-meta b{color:var(--rust); font-weight:500;}
+
+  /* summary lines (step 4) */
+  .summary{display:flex; flex-direction:column; gap:0; margin:4px 0 30px;
+    border-top:1px solid var(--line-soft);}
+  .summary .row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 2px; border-bottom:1px solid var(--line-soft);
+  }
+  .summary .k{font-size:14px; color:var(--ink-soft); font-weight:500;}
+  .summary .v{font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--ink);}
+  .summary .v .pill{
+    background:var(--sand); border:1px solid var(--sand-line);
+    color:var(--ink); padding:3px 12px; border-radius:999px;
+    font-family:'Onest',sans-serif; font-weight:600; font-size:13px;
+  }
+  .summary .v .pill.lock{background:#dfeae0; border-color:#bcd4be; color:#2c5233;}
+
+  /* actions */
+  .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:32px;
+    padding-top:28px; border-top:1px solid var(--line-soft);}
+  .btn{
+    font-family:'Onest',sans-serif; font-weight:600; font-size:15px;
+    border-radius:var(--radius-sm); padding:13px 26px; cursor:pointer;
+    border:1px solid var(--ink); background:transparent; color:var(--ink);
+    transition:all .15s; letter-spacing:-.005em;
+  }
+  .btn:hover{background:var(--ink); color:#fff;}
+  .btn.ghost{border-color:var(--field-line); color:var(--ink-soft);}
+  .btn.ghost:hover{background:var(--sel); color:var(--ink); border-color:var(--sel-line);}
+  .btn.primary{
+    background:var(--ink); color:#fff; border-color:var(--ink);
+    display:inline-flex; align-items:center; gap:10px;
+    box-shadow:0 8px 20px -10px rgba(28,37,50,.5);
+  }
+  .btn.primary:hover{background:#10182333; background:#0f1620;}
+  .btn.primary .arr{transition:transform .15s;}
+  .btn.primary:hover .arr{transform:translateX(3px);}
+  .btn:focus-visible, .step:focus-visible, .chip:focus-visible, .comp:focus-visible{
+    outline:2px solid var(--rust); outline-offset:2px;
+  }
+
+  /* info note inside step 4 */
+  .note{
+    display:flex; gap:12px; background:var(--sand);
+    border:1px solid var(--sand-line); border-radius:var(--radius);
+    padding:16px 18px; margin-bottom:26px; font-size:14px; color:var(--ink-soft);
+  }
+  .note .ico{color:var(--rust); font-weight:600; font-family:'JetBrains Mono',monospace;}
+
+  /* hide non-active screens */
+  .screen{display:none;}
+  .screen.show{display:block; animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  @media (max-width:860px){
+    .topbar-inner{padding:14px 18px; gap:14px; flex-wrap:wrap;}
+    .nav{order:3; width:100%; gap:20px; margin-left:0;}
+    .account .email{display:none;}
+    .wrap{padding:36px 18px 70px;}
+    .stepper{grid-template-columns:1fr 1fr;}
+    .panel{padding:28px 22px;}
+    .grid2,.comp-grid{grid-template-columns:1fr;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important; transition:none!important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#">
+      <span class="mark"></span>
+      <span class="name">Baam</span>
+      <span class="sub">Audits</span>
+    </a>
+    <nav class="nav">
+      <a href="#">Audits hub</a>
+      <a href="#">Checkout</a>
+      <a href="#">Free score</a>
+      <a href="#" class="active">Dashboard</a>
+    </nav>
+    <div class="account">
+      <span class="avatar">JT</span>
+      <span class="email">john.tang2025@gmail.com</span>
+      <button class="signout">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Setup · 4 steps</p>
+  <h1 class="page-title">AI Search <em>Audit</em> Setup</h1>
+  <p class="audit-id"><span class="lbl">Audit ID</span> 09233b9b-ac31-4d1c-8aa7-619e21ae5e49</p>
+  <p class="lead">Lock each layer in order — identity, service, competitors, generation. Each confirmed step feeds the next, so the final report matches exactly what you set here.</p>
+
+  <hr class="rule">
+
+  <!-- Stepper -->
+  <div class="stepper" id="stepper">
+    <button class="step active" data-step="1">
+      <span class="num">01</span><span class="lab">Identity Lock</span>
+      <span class="tick">✓</span>
+    </button>
+    <button class="step" data-step="2">
+      <span class="num">02</span><span class="lab">Service Lock</span>
+      <span class="tick">✓</span>
+    </button>
+    <button class="step" data-step="3">
+      <span class="num">03</span><span class="lab">Competitor Lock</span>
+      <span class="tick">✓</span>
+    </button>
+    <button class="step" data-step="4">
+      <span class="num">04</span><span class="lab">Generation Lock</span>
+      <span class="tick">✓</span>
+    </button>
+  </div>
+
+  <!-- ============ STEP 1 ============ -->
+  <section class="screen show" id="s1">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-step">Step 01</span>
+      </div>
+      <h2>Identity Lock</h2>
+      <p class="panel-desc">Resolve the Google Business Profile identity first, then confirm before moving on. Everything downstream is matched against this.</p>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Business name</label>
+          <input class="input" value="The Oriental Carpet">
+        </div>
+        <div class="field">
+          <label>Website URL</label>
+          <input class="input" value="https://www.theorientalcarpet.com/">
+        </div>
+        <div class="field">
+          <label>Primary city</label>
+          <input class="input" value="Menlo Park">
+        </div>
+        <div class="field">
+          <label>Street address</label>
+          <input class="input" value="773 Santa Cruz Avenue, Menlo Park, CA 94025">
+        </div>
+        <div class="field full">
+          <label>GBP URL or Place ID <span class="opt">optional</span></label>
+          <input class="input mono" placeholder="ChIJ… or maps.google.com/…">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost">Resolve identity</button>
+        <button class="btn primary" data-next="2">Confirm step 1 <span class="arr">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2 ============ -->
+  <section class="screen" id="s2">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-step">Step 02</span></div>
+      <h2>Service Lock</h2>
+      <p class="panel-desc">Pick the confirmed service. Step 3 competitor generation uses this exact wording — so make it the term customers actually search.</p>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Industry</label>
+          <input class="input mono" value="home_services">
+        </div>
+        <div class="field">
+          <label>Final service</label>
+          <input class="input" value="rug store">
+        </div>
+      </div>
+
+      <div class="field full" style="margin-top:22px;">
+        <label>Candidate services</label>
+        <div class="chips">
+          <button class="chip">home services</button>
+          <button class="chip">contractor</button>
+          <button class="chip">handyman</button>
+          <button class="chip">home repair</button>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:22px;">
+        <div class="field">
+          <label>Languages <span class="opt">comma-separated</span></label>
+          <input class="input mono" value="en">
+        </div>
+        <div class="field">
+          <label>Nearby cities <span class="opt">comma-separated</span></label>
+          <input class="input" value="Menlo Park">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost">Refresh recommendations</button>
+        <button class="btn primary" data-next="3">Confirm step 2 <span class="arr">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3 ============ -->
+  <section class="screen" id="s3">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-step">Step 03</span></div>
+      <h2>Competitor Lock</h2>
+      <p class="panel-desc">Generate candidates for the current service version, then keep the businesses you actually compete with. Go back to Step 2 to change the service.</p>
+
+      <div class="comp-grid" id="compGrid">
+        <div class="comp" tabindex="0">
+          <span class="cbox">✓</span>
+          <div class="comp-body">
+            <div class="comp-name">Istanbul Rug Menlo Park</div>
+            <div class="comp-addr">719 Santa Cruz Ave, Menlo Park, CA 94025, USA</div>
+            <div class="comp-meta">istanbulrug.com<span class="dot"></span>places<span class="dot"></span>reviews <b>53</b></div>
+          </div>
+        </div>
+        <div class="comp" tabindex="0">
+          <span class="cbox">✓</span>
+          <div class="comp-body">
+            <div class="comp-name">Medallion Rug Gallery</div>
+            <div class="comp-addr">370 Convention Way, Redwood City, CA 94063, USA</div>
+            <div class="comp-meta">medallionrug.com<span class="dot"></span>places<span class="dot"></span>reviews <b>42</b></div>
+          </div>
+        </div>
+        <div class="comp" tabindex="0">
+          <span class="cbox">✓</span>
+          <div class="comp-body">
+            <div class="comp-name">ARTSY RUGS</div>
+            <div class="comp-addr">300 University Ave, Palo Alto, CA 94301, USA</div>
+            <div class="comp-meta">artsyrugs.com<span class="dot"></span>places<span class="dot"></span>reviews <b>34</b></div>
+          </div>
+        </div>
+        <div class="comp" tabindex="0">
+          <span class="cbox">✓</span>
+          <div class="comp-body">
+            <div class="comp-name">Rug Center</div>
+            <div class="comp-addr">1347 W El Camino Real, Mountain View, CA 94040, USA</div>
+            <div class="comp-meta">rugcenter.com<span class="dot"></span>places<span class="dot"></span>reviews <b>25</b></div>
+          </div>
+        </div>
+        <div class="comp" tabindex="0">
+          <span class="cbox">✓</span>
+          <div class="comp-body">
+            <div class="comp-name">Menlo Flooring &amp; Design</div>
+            <div class="comp-addr">807 Santa Cruz Ave, Menlo Park, CA 94025, USA</div>
+            <div class="comp-meta">menloflooring.com<span class="dot"></span>places<span class="dot"></span>reviews <b>20</b></div>
+          </div>
+        </div>
+        <div class="comp" tabindex="0">
+          <span class="cbox">✓</span>
+          <div class="comp-body">
+            <div class="comp-name">Persian Rugs Clinic</div>
+            <div class="comp-addr">1162 University Dr, Menlo Park, CA 94025, USA</div>
+            <div class="comp-meta">persianrugsclinic.com<span class="dot"></span>places<span class="dot"></span>reviews <b>11</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:26px;">
+        <div class="field">
+          <label>Manual competitor name <span class="opt">optional</span></label>
+          <input class="input" placeholder="Add a business we missed">
+        </div>
+        <div class="field">
+          <label>Manual competitor domain <span class="opt">optional</span></label>
+          <input class="input mono" placeholder="example.com">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost">Generate competitors</button>
+        <button class="btn ghost" data-next="2">← Back to step 2</button>
+        <button class="btn primary" data-next="4">Confirm step 3 <span class="arr">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 4 ============ -->
+  <section class="screen" id="s4">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-step">Step 04</span></div>
+      <h2>Generation Lock</h2>
+      <p class="panel-desc">Lock the confirmed setup inputs. With the dispatch flag enabled, this also starts report generation immediately.</p>
+
+      <div class="note">
+        <span class="ico">!</span>
+        <span>Locking freezes identity, service, and competitors. To change anything after this, you'll start a new audit run.</span>
+      </div>
+
+      <div class="summary">
+        <div class="row"><span class="k">Setup status</span><span class="v"><span class="pill lock">Locked</span></span></div>
+        <div class="row"><span class="k">Service version</span><span class="v">v6</span></div>
+        <div class="row"><span class="k">Confirmed competitors</span><span class="v">6</span></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary">Lock and generate <span class="arr">→</span></button>
+        <button class="btn ghost" data-next="3">← Back to step 3</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const steps = document.querySelectorAll('.step');
+  const screens = {1:'s1',2:'s2',3:'s3',4:'s4'};
+  let current = 1;
+
+  function go(n){
+    n = Number(n);
+    // mark prior steps done, set active
+    steps.forEach(s=>{
+      const k = Number(s.dataset.step);
+      s.classList.toggle('active', k===n);
+      s.classList.toggle('done', k<n);
+    });
+    Object.entries(screens).forEach(([k,id])=>{
+      document.getElementById(id).classList.toggle('show', Number(k)===n);
+    });
+    current = n;
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  steps.forEach(s=> s.addEventListener('click', ()=> go(s.dataset.step)));
+  document.querySelectorAll('[data-next]').forEach(b=>
+    b.addEventListener('click', ()=> go(b.dataset.next)));
+
+  // competitor toggle
+  document.querySelectorAll('.comp').forEach(c=>{
+    const toggle=()=>{
+      c.classList.toggle('off');
+      c.querySelector('.cbox').textContent = c.classList.contains('off') ? '' : '✓';
+    };
+    c.addEventListener('click', toggle);
+    c.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){e.preventDefault(); toggle();}});
+  });
+
+  // chip toggle
+  document.querySelectorAll('.chip').forEach(ch=>
+    ch.addEventListener('click', ()=> ch.classList.toggle('on')));
+</script>
+</body>
+</html>

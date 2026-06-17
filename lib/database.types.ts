@@ -266,6 +266,7 @@ export interface Database {
           customer_record_id: string | null;
           connected_by_user_id: string | null;
           connected_via_google_email: string | null;
+          inbound_email_token: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -273,6 +274,7 @@ export interface Database {
           id?: string;
           account_id: string;
           slug: string;
+          inbound_email_token?: string | null;
           google_place_id?: string | null;
           google_review_url?: string | null;
           display_name: string;

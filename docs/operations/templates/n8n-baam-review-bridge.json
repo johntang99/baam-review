@@ -1,0 +1,57 @@
+{
+  "name": "BAAM Review — bridge template",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1111111-1111-4111-8111-111111111111",
+      "name": "Trigger (replace with client's app)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [260, 300],
+      "notes": "Replace this with the client's real trigger: 'New booking' (Calendly/Acuity), 'Order paid' (Stripe/Square/Shopify), 'Job completed' (Jobber), 'Deal won' (a CRM), etc. Or a Schedule node + their API."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://baamreview.com/api/integrations/review-request",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $json.name }}\",\n  \"email\": \"{{ $json.email }}\",\n  \"phone\": \"{{ $json.phone }}\",\n  \"service\": \"{{ $json.service }}\",\n  \"transacted_at\": \"{{ $json.transacted_at }}\",\n  \"external_id\": \"{{ $json.id }}\"\n}",
+        "options": {}
+      },
+      "id": "b2222222-2222-4222-8222-222222222222",
+      "name": "POST to BAAM Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [560, 300],
+      "notes": "Map the {{ $json.* }} placeholders to the trigger's real fields. Set the Header Auth credential to this location's BAAM key (Authorization: Bearer brk_...). 201 = queued, 200 = skipped (dup/opt-out), 401 = bad key.",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "BAAM <Client> (Header Auth: Authorization Bearer brk_...)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Trigger (replace with client's app)": {
+      "main": [
+        [
+          {
+            "node": "POST to BAAM Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "pinData": {},
+  "meta": {
+    "templateDescription": "One client = one copy. Replace the trigger with the client's app, set the Header Auth credential to that location's BAAM Review API key, map the fields. See N8N_BRIDGE_RUNBOOK.md."
+  }
+}

@@ -239,6 +239,35 @@ Use the **go‑live checklist (§9)** to confirm nothing's missed. After this, c
 2. Generate variations → send in Gmail one‑by‑one / auto‑SMS.
 3. For recurring: client exports weekly from their system → upload (or automate the export via Zapier in Door 4).
 
+**Google Sheets auto‑push (free, no Zapier).** If the client keeps customers in a Google Sheet
+(columns `name, email, phone, service`), paste this **Apps Script** (Extensions → Apps Script) so each
+new row auto‑POSTs to us. Set their location key once. Then add an **installable trigger** on
+`onFormSubmit`/`onEdit` or run hourly.
+```javascript
+const BAAM_KEY = 'brk_xxxxxxxxxxxxxxxx';                 // this location's key
+const BAAM_URL = 'https://baamreview.com/api/integrations/review-request';
+function pushNewRows() {
+  const sh = SpreadsheetApp.getActiveSheet();
+  const rows = sh.getDataRange().getValues();
+  const header = rows.shift().map(h => String(h).toLowerCase());
+  const sentCol = header.indexOf('sent');          // add a "sent" column to track
+  rows.forEach((r, i) => {
+    if (sentCol > -1 && r[sentCol]) return;        // skip already-sent
+    const get = n => r[header.indexOf(n)] || '';
+    if (!get('email') && !get('phone')) return;
+    UrlFetchApp.fetch(BAAM_URL, {
+      method: 'post', contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + BAAM_KEY },
+      payload: JSON.stringify({
+        name: get('name'), email: get('email'), phone: get('phone'),
+        service: get('service'), external_id: 'sheet-row-' + (i + 2)
+      }), muteHttpExceptions: true
+    });
+    if (sentCol > -1) sh.getRange(i + 2, sentCol + 1).setValue(new Date());
+  });
+}
+```
+
 ### Endpoints reference (Phase 2/3)
 Two endpoints, authenticated by a per‑location key (`Authorization: Bearer <key>` or `x-api-key: <key>`):
 
@@ -358,7 +387,7 @@ Two flavors:
 
 **(a) Direct webhook adapters — shipped, no OAuth.** For vendors whose webhook already carries the customer's contact, the client points that vendor's *own* webhook straight at us (no Zapier). We translate the payload with a per-provider adapter.
 - URL: `POST https://baamreview.com/api/integrations/<provider>?key=<LOCATION_KEY>`
-- Live providers: **`shopify`** (subscribe `orders/fulfilled`), **`calendly`** (subscribe `invitee.created`).
+- Live providers: **`shopify`** (`orders/fulfilled`), **`calendly`** (`invitee.created`), **`stripe`** (`checkout.session.completed` / `charge.succeeded`), **`woocommerce`** (Order created/updated), **`calcom`** (`BOOKING_CREATED`), **`typeform`** (form response). Each: point the vendor's webhook at `…/api/integrations/<id>?key=<key>`.
 - Setup: generate a key (Location Setup → Integrations · API keys) → in the vendor's webhook settings, add the URL above with `?key=…` → send a test → it lands in this week's queue. Auth + rate‑limit + dedupe are identical to the generic endpoint.
 - Adding a provider = one adapter file in `lib/integrations/providers/` (id, label, `map(payload)→contact`). Tested by `scripts/test-providers.mts`.
 
@@ -366,7 +395,26 @@ Two flavors:
 - **Acuity — ✅ shipped (API-key mode, no OAuth app needed).** Location Setup → **Native connectors → Acuity**: client pastes their **User ID + API Key** (Acuity → Account → Integrations → API). Then in Acuity → Integrations → **Webhooks**, add `POST https://baamreview.com/api/integrations/acuity?key=<location key>` for *Appointment Scheduled*. We fetch the appointment via Acuity's API and enqueue. (`lib/integrations/providers/acuity.ts`; tested in `test-providers.mts`.)
 - **Square / Clover — OAuth, not built.** These need a vendor developer app + OAuth (their tokens, not a simple API key). Use the **Zapier recipe** above today; build native only when a client's volume justifies it.
 
-### Door 7 — Managed onboarding (Full Service)
+### Door 7 — Email-in (forward confirmation emails) — *no integration on the client's side*
+The cheapest, most universal door: a business that has **no connectable tool at all** just
+**auto-forwards its order/booking confirmation emails** to a per-location address, and we parse the
+customer out and queue them. (See `docs/operations/INTEGRATION_BRIDGES_PLAN.md`.)
+
+**How it works:**
+1. Each location has a forward-to address shown in **Location Setup → Integrations · API keys → Email-in**: `r-<token>@<INBOUND_EMAIL_DOMAIN>`.
+2. The client adds an **auto-forward rule** (Gmail/Outlook) for their "new order / new booking / appointment confirmed" emails → that address.
+3. The inbound provider posts the email to `POST /api/integrations/inbound-email`; we resolve the location by the address token, extract the **customer's** name/email/phone (Claude Haiku, with a regex fallback — it ignores the business's own/support/no-reply addresses), and enqueue. Idempotent per message.
+
+**One-time infra (ops):**
+- Pick an inbound-email provider for `<INBOUND_EMAIL_DOMAIN>`:
+  - **Cloudflare Email Routing (free):** catch-all on the domain → an **Email Worker** that POSTs `{ to, from, subject, text }` (JSON) to `https://baamreview.com/api/integrations/inbound-email` with header `x-inbound-secret: <INBOUND_EMAIL_SECRET>`.
+  - or **Resend / Mailgun / SendGrid inbound** → same POST shape + secret.
+- Env: `INBOUND_EMAIL_DOMAIN`, `INBOUND_EMAIL_SECRET` (shared with the worker), `ANTHROPIC_API_KEY` (already set; used for extraction).
+- DB: migration `0059` adds `locations.inbound_email_token`.
+
+**Test:** forward (or POST) a sample "new order" email to a location's address → it appears in that location's "Incoming · week of …" queue. Endpoint returns `201` queued · `200` skipped (no_contact/duplicate/no_location) · `401` bad secret.
+
+### Door 8 — Managed onboarding (Full Service)
 1. Run §5 discovery → pick door.
 2. We do the setup (key + Zapier/n8n flow, or native connect, or scheduled CSV).
 3. Test, confirm queue populates, confirm sends land in Primary, hand over.

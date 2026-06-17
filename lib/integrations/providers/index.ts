@@ -2,6 +2,10 @@ import "server-only";
 import { shopifyAdapter } from "./shopify";
 import { calendlyAdapter } from "./calendly";
 import { acuityAdapter } from "./acuity";
+import { stripeAdapter } from "./stripe";
+import { woocommerceAdapter } from "./woocommerce";
+import { calcomAdapter } from "./calcom";
+import { typeformAdapter } from "./typeform";
 
 /**
  * Native connector adapters (Phase 4). Each adapter translates ONE vendor's
@@ -56,6 +60,10 @@ const ADAPTERS: Record<string, ProviderAdapter> = {
   [shopifyAdapter.id]: shopifyAdapter,
   [calendlyAdapter.id]: calendlyAdapter,
   [acuityAdapter.id]: acuityAdapter,
+  [stripeAdapter.id]: stripeAdapter,
+  [woocommerceAdapter.id]: woocommerceAdapter,
+  [calcomAdapter.id]: calcomAdapter,
+  [typeformAdapter.id]: typeformAdapter,
 };
 
 export function getProviderAdapter(id: string): ProviderAdapter | null {

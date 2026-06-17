@@ -25,6 +25,8 @@ interface Props {
   locationId: string;
   appUrl: string;
   initialKeys: ApiKeyRow[];
+  /** Email-in forward-to address for this location (Item 1). */
+  inboundAddress: string;
 }
 
 /**
@@ -32,12 +34,12 @@ interface Props {
  * API keys for the universal intake endpoint, plus a copy-paste usage snippet.
  * The plaintext key is shown exactly once, right after creation.
  */
-export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
+export function ApiKeysManager({ locationId, appUrl, initialKeys, inboundAddress }: Props) {
   const [keys, setKeys] = useState<ApiKeyRow[]>(initialKeys);
   const [justCreated, setJustCreated] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState<"key" | "curl" | null>(null);
+  const [copied, setCopied] = useState<"key" | "curl" | "inbound" | null>(null);
   // Per-row reveal: keyId → decrypted plaintext (fetched on demand).
   const [revealed, setRevealed] = useState<Record<string, string>>({});
   const [copiedRow, setCopiedRow] = useState<string | null>(null);
@@ -111,7 +113,7 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
     });
   }
 
-  async function copy(text: string, which: "key" | "curl") {
+  async function copy(text: string, which: "key" | "curl" | "inbound") {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(which);
@@ -194,6 +196,30 @@ export function ApiKeysManager({ locationId, appUrl, initialKeys }: Props) {
           Endpoint
         </div>
         <code className="text-[12.5px] text-ink break-all">POST {endpoint}</code>
+      </div>
+
+      {/* Email-in bridge (no integration needed on the business's side) */}
+      <div className="rounded-lg border border-border-soft bg-cream-deep/30 px-3 py-2.5 space-y-1.5">
+        <div className="text-[11px] uppercase tracking-[0.1em] text-text-muted">
+          Email-in · forward order/booking confirmations here
+        </div>
+        <div className="flex items-center gap-2">
+          <code className="flex-1 rounded-md border border-border-base bg-paper px-2.5 py-1.5 text-[12.5px] text-ink break-all">
+            {inboundAddress}
+          </code>
+          <button
+            type="button"
+            onClick={() => copy(inboundAddress, "inbound")}
+            className="inline-flex items-center gap-1 rounded-md border border-border-base bg-paper px-2.5 py-1.5 text-[12px] text-text-soft hover:text-ink hover:border-ink"
+          >
+            {copied === "inbound" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied === "inbound" ? "Copied" : "Copy"}
+          </button>
+        </div>
+        <p className="text-[12px] text-text-soft">
+          Have the business auto-forward its &ldquo;new order/booking&rdquo; emails to this address.
+          We parse the customer and queue a review request — no API or Zapier needed.
+        </p>
       </div>
 
       {/* Reveal-once banner */}
