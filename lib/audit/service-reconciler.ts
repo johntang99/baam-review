@@ -8,6 +8,7 @@ import {
   isGenericServiceValue,
   normalizeServiceText,
 } from "@/lib/audit/service-taxonomy";
+import { isBroadServiceTerm } from "@/lib/audit/broad-service-terms";
 import {
   hasManufacturerSignalText,
   inferDetailedManufacturerService,
@@ -20,6 +21,7 @@ import {
   hasRetailSignalText,
   inferDetailedRetailService,
 } from "@/lib/audit/retail-detail-rules";
+import { inferWindowTreatmentService } from "@/lib/audit/window-treatment-detail-rules";
 import {
   generateServiceCandidates,
   pickTopComprehensiveService,
@@ -42,6 +44,9 @@ const GOOGLE_TYPE_TO_SERVICE: Array<{ types: readonly string[]; service: string 
   { types: ["optician"], service: "optician" },
   { types: ["sunglasses_store"], service: "eyewear store" },
   { types: ["ophthalmologist"], service: "ophthalmology clinic" },
+  { types: ["hvac_contractor"], service: "hvac contractor" },
+  { types: ["air_conditioning_contractor"], service: "hvac contractor" },
+  { types: ["heating_contractor"], service: "hvac contractor" },
   { types: ["lawyer", "attorney"], service: "lawyer" },
   { types: ["immigration_lawyer"], service: "immigration lawyer" },
   { types: ["real_estate_agency"], service: "real estate agent" },
@@ -81,6 +86,101 @@ const TEXT_SIGNAL_PATTERNS: Array<{
   verticals?: readonly VerticalKey[];
 }> = [
   {
+    pattern: /\b(dermatolog(y|ist)|skin specialist|skin clinic)\b/i,
+    service: "dermatology clinic",
+  },
+  {
+    pattern: /\b(jewelers?|jewellery|jewelry|diamonds?|watch(es)?)\b/i,
+    service: "jewelry store",
+  },
+  {
+    pattern:
+      /\b(phone|cell phone|iphone|android|mobile)\b.*\b(repair|fix|screen)\b|\b(repair|fix)\b.*\b(phone|cell phone|iphone|android|mobile)\b/i,
+    service: "phone repair service",
+  },
+  {
+    pattern:
+      /\b(computer|laptop|pc|macbook)\b.*\b(repair|fix)\b|\b(repair|fix)\b.*\b(computer|laptop|pc|macbook)\b/i,
+    service: "computer repair service",
+  },
+  {
+    pattern: /\b(laundromat|laundry|dry clean(ing)?|dry cleaner)\b/i,
+    service: "laundry service",
+  },
+  {
+    pattern:
+      /\b(house cleaning|home cleaning|commercial cleaning|office cleaning|janitorial|maid service|deep cleaning|cleaning (service|services|company|crew|chief))\b/i,
+    service: "cleaning service",
+  },
+  {
+    pattern: /\b(photo(graphy)?|portrait studio|photo studio|videography|self-portrait)\b/i,
+    service: "photography studio",
+  },
+  {
+    pattern: /\b(print(ing)?|print shop|commercial printer|copy shop|copy center|offset print)\b/i,
+    service: "print shop",
+  },
+  {
+    pattern: /\b(piano(s)?|grand piano|upright piano|piano dealer|piano showroom|piano shop)\b/i,
+    service: "piano store",
+  },
+  {
+    pattern: /\b(tailor(ing)?|alterations?|seamstress)\b/i,
+    service: "tailor shop",
+  },
+  {
+    pattern: /\b(arcade|claw machine|anime claw)\b/i,
+    service: "arcade",
+  },
+  {
+    pattern: /\b(ups store|shipping|mailing|postal|courier|parcel)\b/i,
+    service: "shipping and mailing service",
+  },
+  {
+    pattern: /\b(zoo)\b/i,
+    service: "zoo",
+  },
+  {
+    pattern: /\b(park)\b/i,
+    service: "park",
+  },
+  {
+    pattern: /\b(church|cathedral|basilica)\b/i,
+    service: "church",
+  },
+  {
+    pattern: /\b(buddhist temple|monastery)\b/i,
+    service: "buddhist temple",
+  },
+  {
+    pattern: /\b(hindu temple)\b/i,
+    service: "hindu temple",
+  },
+  {
+    pattern: /\b(landmark|observation deck)\b/i,
+    service: "historical landmark",
+  },
+  {
+    pattern: /\b(petco|pet store)\b/i,
+    service: "pet store",
+  },
+  {
+    pattern: /\b(animal rescue|pet rescue)\b/i,
+    service: "pet care",
+  },
+  {
+    pattern: /\b(pet adoption|pet adoption center|animal adoption)\b/i,
+    service: "pet care",
+  },
+  {
+    pattern: /\b(digital marketing|seo|web design|marketing agency)\b/i,
+    service: "marketing consultant",
+  },
+  {
+    pattern: /\b(travel agency|travel services?|tour operator)\b/i,
+    service: "travel agency",
+  },
+  {
     pattern: /\b(bridal|wedding gown|wedding dress)\b/i,
     service: "bridal boutique",
   },
@@ -115,6 +215,84 @@ const TEXT_SIGNAL_PATTERNS: Array<{
   {
     pattern: /\b(eyewear|eyeglasses?|glasses|spectacles|sunglasses)\b/i,
     service: "eyewear store",
+  },
+  {
+    pattern:
+      /\b(business coach|business coaching|executive coach|growth coach|business consultant|business consulting)\b/i,
+    service: "business coach",
+  },
+  {
+    pattern: /\b(management consultant|management consulting|strategy consultant)\b/i,
+    service: "management consultant",
+  },
+  {
+    pattern: /\b(marketing consultant|marketing consulting|marketing advisor)\b/i,
+    service: "marketing consultant",
+  },
+  {
+    pattern:
+      /\b(mortgage broker|home loan|mortgage lender|loan agency|lending company|loan company|loan service)\b/i,
+    service: "loan agency",
+  },
+  {
+    pattern: /\b(financial advisor|financial planner|wealth advisor|wealth management)\b/i,
+    service: "financial planner",
+  },
+  {
+    pattern:
+      /\b(tutor|tutoring|training school|learning center|learning centre|education center|education centre)\b/i,
+    service: "tutoring service",
+  },
+  {
+    pattern: /\b(test prep|prep school|sat prep|esl|after school)\b/i,
+    service: "tutoring service",
+  },
+  {
+    pattern:
+      /\b(driving school|auto school|driver training|driving lessons?|driving academy)\b/i,
+    service: "driving school",
+  },
+  {
+    pattern: /\b(translation|translator|interpretation|immigrant services?)\b/i,
+    service: "translation service",
+  },
+  {
+    pattern: /\b(property management|property manager)\b/i,
+    service: "property management service",
+  },
+  {
+    pattern: /\b(tailor(ing)?|alterations?|seamstress)\b/i,
+    service: "tailor shop",
+  },
+  {
+    pattern: /\b(plumb(er|ing)|sewer|drain cleaning)\b/i,
+    service: "plumbing service",
+    verticals: ["contractor", "general_smb"],
+  },
+  {
+    pattern: /\b(car dealership|car dealer|auto sales|used car|new car)\b/i,
+    service: "car dealer",
+    verticals: ["auto"],
+  },
+  {
+    pattern:
+      /\b(personal injury|car accident|accident lawyer|injury lawyer|slip and fall)\b/i,
+    service: "personal injury lawyer",
+    verticals: ["legal_immigration"],
+  },
+  {
+    pattern: /\b(vocational school|trade school|skills training|career training)\b/i,
+    service: "vocational training center",
+  },
+  {
+    pattern: /\b(language school|esl school|english school|language academy)\b/i,
+    service: "language school",
+  },
+  {
+    pattern:
+      /\b(hvac|air conditioning|a\/c|heating\s*(and|&)\s*cooling|cooling\s*(and|&)\s*heating|furnace|heat pump|duct(work)?|ventilation)\b/i,
+    service: "hvac contractor",
+    verticals: ["contractor"],
   },
   {
     pattern: /\b(kitchen remodel|renovation|kitchen & bath|kitchen and bath)\b/i,
@@ -253,37 +431,20 @@ export function reconcileServiceDecision({
     reasonCodes.push("prefer_comprehensive_candidate");
   }
   let recommended = bsServiceNormalized;
-  let confidence = 0.72;
+  let confidence = Math.max(0.74, comprehensiveTop?.confidence ?? 0.74);
+  reasonCodes.push("prefer_bs_primary_signal");
 
   if (gsService === bsServiceNormalized) {
     reasonCodes.push("gs_bs_match");
-    recommended = bsServiceNormalized;
-    confidence = 0.95;
+    confidence = Math.max(confidence, 0.9);
   } else if (isGenericService(gsService) && !isGenericService(bsServiceNormalized)) {
     reasonCodes.push("prefer_bs_non_generic");
-    recommended = bsServiceNormalized;
-    confidence = 0.82;
-  } else if (gsScore > bsScore) {
-    reasonCodes.push("prefer_gs_more_specific");
-    recommended = gsService;
-    confidence = gsScore - bsScore >= 2 ? 0.88 : 0.78;
+    confidence = Math.max(confidence, 0.82);
   } else if (bsScore > gsScore) {
     reasonCodes.push("prefer_bs_more_specific");
-    recommended = bsServiceNormalized;
-    confidence = bsScore - gsScore >= 2 ? 0.88 : 0.78;
+    confidence = Math.max(confidence, bsScore - gsScore >= 2 ? 0.88 : 0.8);
   } else {
-    reasonCodes.push("gs_bs_conflict_manual_confirmation");
-    recommended = bsServiceNormalized;
-    confidence = 0.64;
-  }
-
-  if (
-    google.vertical.inferred_vertical === "contractor" &&
-    /(manufacturer|cabinet|countertop|remodel)/.test(gsService)
-  ) {
-    reasonCodes.push("contractor_signal_from_google");
-    recommended = gsService;
-    confidence = Math.max(confidence, 0.86);
+    reasonCodes.push("gs_used_as_weak_hint");
   }
 
   const gbpDescriptionSignal = inferServiceFromTextSignals(
@@ -294,6 +455,13 @@ export function reconcileServiceDecision({
     websiteSignalText,
     google.vertical.inferred_vertical,
   );
+  const businessNameSignal = inferServiceFromTextSignals(
+    google.business.name,
+    google.vertical.inferred_vertical,
+  );
+  if (businessNameSignal) {
+    reasonCodes.push("business_name_signal");
+  }
   if (gbpDescriptionSignal) {
     reasonCodes.push("gbp_description_signal");
   }
@@ -302,6 +470,7 @@ export function reconcileServiceDecision({
   }
 
   const externalCandidate = pickExternalCandidate([
+    businessNameSignal,
     gbpDescriptionSignal,
     websiteSignal,
   ]);
@@ -312,9 +481,17 @@ export function reconcileServiceDecision({
       recommended = externalCandidate.service;
       confidence = Math.max(confidence, 0.87);
     } else if (externalCandidate.service === gsService && gsService !== bsServiceNormalized) {
-      reasonCodes.push("external_supports_gs");
-      recommended = gsService;
-      confidence = Math.max(confidence, 0.81);
+      if (
+        isBroadService(recommended, google.vertical.inferred_vertical) &&
+        !isBroadService(gsService, google.vertical.inferred_vertical) &&
+        candidateScore >= 3
+      ) {
+        reasonCodes.push("external_supports_specific_gs");
+        recommended = gsService;
+        confidence = Math.max(confidence, 0.81);
+      } else {
+        reasonCodes.push("external_signal_observed");
+      }
     } else if (externalCandidate.service === bsServiceNormalized && gsService !== bsServiceNormalized) {
       reasonCodes.push("external_supports_bs");
       recommended = bsServiceNormalized;
@@ -350,6 +527,7 @@ export function reconcileServiceDecision({
     bsService: bsServiceNormalized,
     gbpService: gbpDescriptionSignal,
     websiteService: websiteSignal,
+    nameService: businessNameSignal,
     detailService: detailedIndustryCandidate,
     generatedCandidates,
   });
@@ -362,10 +540,53 @@ export function reconcileServiceDecision({
     confidence = Math.max(confidence, weightedCandidate.confidence);
   }
 
+  const guardrailedRecommendation = applyVerticalGuardrail({
+    vertical: google.vertical.inferred_vertical,
+    recommended,
+    gsService,
+    bsService: bsServiceNormalized,
+    businessName: google.business.name,
+    textBlob: normalizeEvidenceText(
+      [
+        google.business.name,
+        google.business.description ?? "",
+        gbpDescription ?? "",
+        websiteSignalText ?? "",
+      ].join(" "),
+    ),
+  });
+  if (guardrailedRecommendation !== recommended) {
+    reasonCodes.push("vertical_guardrail_applied");
+    recommended = guardrailedRecommendation;
+    confidence = Math.max(confidence, 0.87);
+  }
+
   if (comprehensiveTop && canonicalizeService(recommended) === comprehensiveTop.service) {
     if (comprehensiveTop.confidence > confidence) {
       reasonCodes.push("comprehensive_confidence_support");
       confidence = Math.max(confidence, comprehensiveTop.confidence);
+    }
+  }
+
+  // Global policy: block broad output whenever we can recover a specific candidate.
+  if (isBroadService(recommended, google.vertical.inferred_vertical)) {
+    const specificGenerated = generatedCandidates.find(
+      (candidate) =>
+        !isBroadService(candidate.service, google.vertical.inferred_vertical) &&
+        isServiceCompatibleWithVertical(
+          candidate.service,
+          google.vertical.inferred_vertical,
+        ) &&
+        candidate.specificity >= 3 &&
+        candidate.confidence >= 0.68,
+    );
+    if (specificGenerated) {
+      reasonCodes.push("broad_service_blocked_specific_promoted");
+      recommended = canonicalizeService(specificGenerated.service);
+      confidence = Math.max(confidence, specificGenerated.confidence);
+    } else {
+      reasonCodes.push("broad_service_needs_user_selection");
+      confidence = Math.min(confidence, 0.61);
     }
   }
 
@@ -420,6 +641,14 @@ function inferDetailedIndustryCandidate({
   });
   if (visionCandidate) {
     return canonicalizeService(visionCandidate);
+  }
+
+  const windowTreatmentCandidate = inferWindowTreatmentService({
+    text: textBlob,
+    vertical: google.vertical.inferred_vertical,
+  });
+  if (windowTreatmentCandidate) {
+    return canonicalizeService(windowTreatmentCandidate);
   }
 
   const hasManufacturerType =
@@ -479,6 +708,11 @@ function inferServiceFromTextSignals(
     hasVisionSignal: hasVisionSignalText(normalized),
   });
   if (visionCandidate) return canonicalizeService(visionCandidate);
+  const windowTreatmentCandidate = inferWindowTreatmentService({
+    text: normalized,
+    vertical,
+  });
+  if (windowTreatmentCandidate) return canonicalizeService(windowTreatmentCandidate);
   const retailCandidate = inferDetailedRetailService({
     text: normalized,
     hasRetailSignal: hasRetailSignalText(normalized),
@@ -518,6 +752,7 @@ function pickWeightedCandidate({
   bsService,
   gbpService,
   websiteService,
+  nameService,
   detailService,
   generatedCandidates,
 }: {
@@ -526,6 +761,7 @@ function pickWeightedCandidate({
   bsService: string;
   gbpService: string;
   websiteService: string;
+  nameService: string;
   detailService: string;
   generatedCandidates: Array<{
     service: string;
@@ -556,8 +792,10 @@ function pickWeightedCandidate({
     candidateMap.set(normalized, current);
   };
 
-  add(gsService, weights.google, "google");
+  // Keep Google signal weak; use as a tie-break hint only.
+  add(gsService, weights.google * 0.15, "google");
   add(bsService, weights.baam, "baam");
+  add(nameService, weights.gbp * 1.1, "name_signal");
   add(gbpService, weights.gbp, "gbp");
   add(websiteService, weights.website, "website");
   add(detailService, weights.detailRule, "detail_rule");
@@ -634,12 +872,344 @@ function shouldPreferWeightedCandidate(
   return candidate.confidence >= 0.9 && candidate.score >= 1.18;
 }
 
+function applyVerticalGuardrail({
+  vertical,
+  recommended,
+  gsService,
+  bsService,
+  businessName,
+  textBlob,
+}: {
+  vertical: VerticalKey;
+  recommended: string;
+  gsService: string;
+  bsService: string;
+  businessName: string;
+  textBlob: string;
+}) {
+  const next = canonicalizeService(recommended);
+  const gs = canonicalizeService(gsService);
+  const bs = canonicalizeService(bsService);
+
+  if (vertical === "legal_immigration") {
+    if (!isLegalService(next)) {
+      if (isLegalService(bs) && !isBroadService(bs, vertical)) return bs;
+      if (isLegalService(gs) && !isBroadService(gs, vertical)) return gs;
+      if (/\b(law|lawyer|attorney|legal|immigration)\b/i.test(textBlob)) {
+        if (/\b(personal injury|car accident|injury lawyer)\b/i.test(textBlob)) {
+          return canonicalizeService("personal injury lawyer");
+        }
+        return canonicalizeService("immigration lawyer");
+      }
+      return canonicalizeService("immigration lawyer");
+    }
+  }
+
+  if (vertical === "auto") {
+    if (isManufacturerLike(next) && /\b(dealer(ship)?|auto sales|used car|new car|mercedes|audi|bmw|lexus)\b/i.test(textBlob)) {
+      return canonicalizeService("car dealer");
+    }
+  }
+
+  if (vertical === "contractor") {
+    const hasHvacSignal =
+      /\b(hvac|air conditioning|heating\s*(and|&)\s*cooling|cooling\s*(and|&)\s*heating|furnace|heat pump|duct(work)?|ventilation)\b/i.test(
+        textBlob,
+      );
+    const hasPlumbingSignal = /\b(plumb(er|ing)|sewer|drain)\b/i.test(textBlob);
+    const hasPlumbingNameSignal = /\bplumb(er|ing)\b/i.test(businessName);
+    const hasHvacNameSignal = /\bhvac|heating|cooling\b/i.test(businessName);
+    const hasWindowTreatmentSignal =
+      /\b(curtains?|blinds?|shutters?|drapery|window treatments?|window coverings?)\b/i.test(
+        textBlob,
+      );
+    const hasShippingSignal = /\b(ups|shipping|mailing|postal|courier|parcel)\b/i.test(textBlob);
+    const hasJewelrySignal = /\b(jewelers?|jewellery|jewelry|diamond|watch)\b/i.test(textBlob);
+    const hasCleaningSignal =
+      /\b(house cleaning|home cleaning|commercial cleaning|office cleaning|janitorial|maid service|deep cleaning|cleaning (service|services|company|crew|chief))\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasPianoSignal =
+      /\b(piano(s)?|grand piano|upright piano|piano dealer|piano showroom|piano shop)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasPrintSignal =
+      /\b(print(ing)?|print shop|commercial printer|copy shop|copy center|offset print)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasDigitalNameSignal = /\bdigital\b/i.test(businessName);
+    const hasManufacturerSignal = /\b(manufacturer|manufacturing|factory|industrial|wholesale)\b/i.test(
+      `${businessName} ${textBlob}`,
+    );
+    const hasPhoneRepairSignal =
+      /\b(phone|cell phone|iphone|android|mobile|computer|laptop|pc)\b.*\b(repair|fix|screen)\b|\b(repair|fix)\b.*\b(phone|cell phone|iphone|android|mobile|computer|laptop|pc)\b/i.test(
+        textBlob,
+      );
+
+    if (hasHvacSignal && next === "window treatment store") {
+      return canonicalizeService("hvac contractor");
+    }
+    if (hasPlumbingSignal && !hasHvacSignal && next === "hvac contractor") {
+      return canonicalizeService("plumbing service");
+    }
+    if (
+      (hasPlumbingNameSignal || /\bplumb(er|ing)\b/i.test(textBlob)) &&
+      !hasHvacNameSignal &&
+      next === "hvac contractor"
+    ) {
+      return canonicalizeService("plumbing service");
+    }
+    if (hasPlumbingSignal && isBroadService(next, vertical)) {
+      return canonicalizeService("plumbing service");
+    }
+    if (hasWindowTreatmentSignal && next === "sign manufacturer") {
+      return canonicalizeService("window treatment store");
+    }
+    if (hasCleaningSignal) {
+      return canonicalizeService("cleaning service");
+    }
+    if (hasPianoSignal) {
+      return canonicalizeService("piano store");
+    }
+    if (hasPrintSignal) {
+      return canonicalizeService("print shop");
+    }
+    if (
+      hasDigitalNameSignal &&
+      !hasPhoneRepairSignal &&
+      !hasManufacturerSignal &&
+      !hasHvacSignal &&
+      !hasPlumbingSignal &&
+      !hasWindowTreatmentSignal
+    ) {
+      return canonicalizeService("marketing consultant");
+    }
+    if (hasJewelrySignal) {
+      return canonicalizeService("jewelry store");
+    }
+    if (hasShippingSignal) {
+      return canonicalizeService("shipping and mailing service");
+    }
+    if (hasPhoneRepairSignal) {
+      if (/\b(computer|laptop|pc)\b/i.test(textBlob)) {
+        return canonicalizeService("computer repair service");
+      }
+      return canonicalizeService("phone repair service");
+    }
+  }
+
+  if (vertical === "general_smb") {
+    const hasPhoneRepairSignal =
+      /\b(phone|cell phone|iphone|android|mobile)\b.*\b(repair|fix|screen)\b|\b(repair|fix)\b.*\b(phone|cell phone|iphone|android|mobile)\b/i.test(
+        textBlob,
+      );
+    const hasComputerRepairSignal =
+      /\b(computer|laptop|pc|macbook)\b.*\b(repair|fix)\b|\b(repair|fix)\b.*\b(computer|laptop|pc|macbook)\b/i.test(
+        textBlob,
+      );
+    const hasPetStoreSignal = /\b(pet store|petco|aquarium|aquatic)\b/i.test(
+      `${businessName} ${textBlob}`,
+    );
+    const hasPetCareSignal =
+      /\b(pet care|veterinary|veterinarian|vet clinic|animal hospital|animal clinic|pet hospital|pet doctor)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasCleaningSignal =
+      /\b(house cleaning|home cleaning|commercial cleaning|office cleaning|janitorial|maid service|deep cleaning|cleaning (service|services|company|crew|chief))\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasPianoSignal =
+      /\b(piano(s)?|grand piano|upright piano|piano dealer|piano showroom|piano shop)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasPrintSignal =
+      /\b(print(ing)?|print shop|commercial printer|copy shop|copy center|offset print)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasDigitalNameSignal = /\bdigital\b/i.test(businessName);
+    const hasManufacturerSignal = /\b(manufacturer|manufacturing|factory|industrial|wholesale)\b/i.test(
+      `${businessName} ${textBlob}`,
+    );
+    const hasShippingNameSignal =
+      /\b(dhl|fedex|ups|usps|shipping|mailing|courier|express service point)\b/i.test(
+        businessName,
+      );
+    const hasStrongShippingTextSignal =
+      /\b(ups store|fedex office|dhl express|shipping service|mailing service|courier service|parcel shipping|postal service)\b/i.test(
+        textBlob,
+      );
+
+    if (/\b(church|cathedral|basilica)\b/i.test(businessName)) {
+      return canonicalizeService("church");
+    }
+    if (/\b(buddhist temple|monastery)\b/i.test(businessName)) {
+      return canonicalizeService("buddhist temple");
+    }
+    if (/\b(hindu temple)\b/i.test(businessName)) {
+      return canonicalizeService("hindu temple");
+    }
+    if (/\b(animal rescue|pet rescue|pet adoption)\b/i.test(businessName)) {
+      return canonicalizeService("pet care");
+    }
+    if (hasCleaningSignal) {
+      return canonicalizeService("cleaning service");
+    }
+    if (hasPianoSignal) {
+      return canonicalizeService("piano store");
+    }
+    if (hasPrintSignal) {
+      return canonicalizeService("print shop");
+    }
+    if (/\b(digital marketing|marketing agency|seo|web design|branding|advertising)\b/i.test(businessName)) {
+      return canonicalizeService("marketing consultant");
+    }
+    if (
+      hasDigitalNameSignal &&
+      !hasPhoneRepairSignal &&
+      !hasComputerRepairSignal &&
+      !hasManufacturerSignal &&
+      !hasPrintSignal
+    ) {
+      return canonicalizeService("marketing consultant");
+    }
+    if (/\bzoo\b/i.test(businessName)) {
+      if (/\b(pet store|pet shop|aquarium)\b/i.test(businessName)) {
+        return canonicalizeService("pet store");
+      }
+      return canonicalizeService("zoo");
+    }
+    if (/\b(dermatolog(y|ist)|skin specialist|skin clinic)\b/i.test(textBlob)) {
+      return canonicalizeService("dermatology clinic");
+    }
+    if (/\bproperty management\b/i.test(textBlob)) {
+      return canonicalizeService("property management service");
+    }
+    if (/\b(translation|translator|interpretation)\b/i.test(textBlob)) {
+      return canonicalizeService("translation service");
+    }
+    if (/\b(driving school|auto school|driving lessons?|driver training)\b/i.test(textBlob)) {
+      return canonicalizeService("driving school");
+    }
+    if (hasPhoneRepairSignal) {
+      return canonicalizeService("phone repair service");
+    }
+    if (hasComputerRepairSignal) {
+      return canonicalizeService("computer repair service");
+    }
+    if (/\b(arcade|claw machine|anime claw)\b/i.test(textBlob)) {
+      return canonicalizeService("arcade");
+    }
+    if (
+      hasShippingNameSignal ||
+      (hasStrongShippingTextSignal &&
+        !hasPetStoreSignal &&
+        !hasPetCareSignal &&
+        !hasPhoneRepairSignal &&
+        !hasComputerRepairSignal)
+    ) {
+      return canonicalizeService("shipping and mailing service");
+    }
+    if (/\b(church|cathedral|basilica)\b/i.test(textBlob)) return canonicalizeService("church");
+    if (/\b(buddhist temple|monastery)\b/i.test(textBlob)) {
+      return canonicalizeService("buddhist temple");
+    }
+    if (/\b(hindu temple)\b/i.test(textBlob)) return canonicalizeService("hindu temple");
+    if (/\b(animal rescue|pet rescue|pet adoption)\b/i.test(textBlob)) {
+      return canonicalizeService("pet care");
+    }
+    if (/\b(laundromat|laundry|dry clean(ing)?|dry cleaner)\b/i.test(textBlob)) {
+      return canonicalizeService("laundry service");
+    }
+    if (hasCleaningSignal) {
+      return canonicalizeService("cleaning service");
+    }
+    if (hasPianoSignal) {
+      return canonicalizeService("piano store");
+    }
+    if (hasPrintSignal) {
+      return canonicalizeService("print shop");
+    }
+    if (/\b(digital marketing|seo|web design|marketing agency)\b/i.test(textBlob)) {
+      return canonicalizeService("marketing consultant");
+    }
+    if (/\b(photo(graphy)?|portrait studio|photo studio|videography|self-portrait)\b/i.test(textBlob)) {
+      return canonicalizeService("photography studio");
+    }
+    if (/\b(jewelers?|jewellery|jewelry|diamond|watch)\b/i.test(textBlob)) {
+      return canonicalizeService("jewelry store");
+    }
+    if (/\b(petco|pet store)\b/i.test(textBlob) || hasPetStoreSignal) return canonicalizeService("pet store");
+    if (/\b(animal rescue|pet rescue|pet adoption)\b/i.test(textBlob)) return canonicalizeService("pet care");
+    if (hasPetCareSignal) return canonicalizeService("veterinary care");
+    if (/\b(zoo)\b/i.test(textBlob) && !/\b(pet store|pet shop|aquarium|aquatic)\b/i.test(textBlob)) {
+      return canonicalizeService("zoo");
+    }
+    if (
+      /\b(park)\b/i.test(textBlob) &&
+      /\b(national|state|city|public|recreation|playground|nyc parks|meadows)\b/i.test(textBlob)
+    ) {
+      return canonicalizeService("park");
+    }
+    if (/\b(landmark|observation deck)\b/i.test(textBlob)) {
+      return canonicalizeService("historical landmark");
+    }
+    if (/\b(tailor(ing)?|alterations?|seamstress)\b/i.test(textBlob)) {
+      return canonicalizeService("tailor shop");
+    }
+    if (/\b(travel agency|travel services?|tour operator)\b/i.test(textBlob)) {
+      return canonicalizeService("travel agency");
+    }
+    if (
+      /\b(plumb(er|ing)|sewer|drain)\b/i.test(textBlob) &&
+      (next === "plumber" || isBroadService(next, vertical))
+    ) {
+      return canonicalizeService("plumbing service");
+    }
+  }
+
+  return next;
+}
+
+function isLegalService(input: string) {
+  if (!input) return false;
+  return /\b(law|lawyer|attorney|legal|immigration)\b/i.test(input);
+}
+
+function isManufacturerLike(input: string) {
+  if (!input) return false;
+  return /\bmanufacturer|manufacturing|factory\b/i.test(input);
+}
+
+function isServiceCompatibleWithVertical(service: string, vertical: VerticalKey) {
+  const normalized = canonicalizeService(service);
+  if (!normalized) return false;
+  if (vertical === "legal_immigration") {
+    return isLegalService(normalized);
+  }
+  if (vertical === "auto") {
+    return /\b(auto|car|dealer|repair|body|tire|automotive)\b/i.test(normalized);
+  }
+  if (vertical === "contractor") {
+    if (/\b(law|lawyer|attorney|immigration|finance|mortgage|bank)\b/i.test(normalized)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function computeWeightedConfidence(score: number, votes: number, specificity: number) {
   let confidence = 0.72 + Math.min(0.16, score * 0.1);
   if (votes >= 2) confidence += 0.04;
   if (votes >= 3) confidence += 0.03;
   confidence += Math.min(0.05, specificity * 0.01);
   return Number(Math.min(0.95, confidence).toFixed(2));
+}
+
+function isBroadService(service: string, vertical?: string) {
+  const canonical = canonicalizeService(service);
+  if (!canonical) return true;
+  if (isBroadServiceTerm(canonical, { vertical })) return true;
+  return specificityScore(canonical) <= 2;
 }
 
 function normalizeEvidenceText(input: string | null | undefined) {

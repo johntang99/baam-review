@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { canonicalizeService, isKnownService } from "@/lib/audit/service-taxonomy";
+import { isBroadServiceTerm } from "@/lib/audit/broad-service-terms";
 import type { Database } from "@/lib/database.types";
 import type { AuditGoogleData } from "@/lib/audit/google/types";
 
@@ -34,22 +35,6 @@ type GapCase = {
   confidence: number;
   changed: boolean;
 };
-
-const BROAD_SERVICE_TERMS = new Set([
-  "manufacturer",
-  "contractor",
-  "store",
-  "service",
-  "business",
-  "local business",
-  "health",
-  "medical clinic",
-  "consultant",
-  "finance",
-  "restaurant",
-  "home goods store",
-  "building materials store",
-]);
 
 async function main() {
   loadEnvFile(".env.local");
@@ -91,10 +76,10 @@ async function main() {
 
   const overrideCases = gapCases.filter((row) => row.changed && row.userFinal);
   const broadRecommendationCases = gapCases.filter((row) =>
-    isBroadService(row.recommended),
+    isBroadService(row.recommended, row.vertical),
   );
   const broadAndOverridden = overrideCases.filter((row) =>
-    isBroadService(row.recommended),
+    isBroadService(row.recommended, row.vertical),
   );
 
   console.log("=== Service Coverage Expansion Loop ===");
@@ -286,9 +271,9 @@ function normalizeService(value: string | null | undefined) {
   return canonicalizeService(value).trim();
 }
 
-function isBroadService(service: string) {
+function isBroadService(service: string, vertical?: string) {
   if (!service) return true;
-  if (BROAD_SERVICE_TERMS.has(service)) return true;
+  if (isBroadServiceTerm(service, { vertical })) return true;
   if (service.split(" ").length <= 1 && !isKnownService(service)) return true;
   return false;
 }

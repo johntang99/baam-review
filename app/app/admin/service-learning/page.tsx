@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getInternalContext } from "@/lib/auth/staff";
+import { isBroadServiceTerm } from "@/lib/audit/broad-service-terms";
 import { PageHeader } from "@/components/admin/page-header";
+import { markPromotionAdded, promoteUnknownService } from "./actions";
 
 export const metadata = { title: "Service learning QA — BAAM Review" };
 export const dynamic = "force-dynamic";
@@ -30,6 +32,28 @@ interface ServiceShadowRow {
   agrees_with_system: boolean | null;
   matches_user_final_system: boolean | null;
   matches_user_final_analyst: boolean | null;
+  created_at: string;
+}
+
+interface UnknownServiceRow {
+  id: string;
+  business_place_id: string | null;
+  business_name: string | null;
+  inferred_vertical: string | null;
+  candidate_service: string;
+  source_tag: string;
+  confidence: number | null;
+  reviewed: boolean;
+  review_note: string | null;
+  created_at: string;
+}
+
+interface TaxonomyPromotionRow {
+  id: string;
+  unknown_candidate_id: string | null;
+  canonical_service: string;
+  suggested_vertical: string | null;
+  status: string;
   created_at: string;
 }
 
@@ -97,6 +121,60 @@ export default async function ServiceLearningPage() {
   const shadowRows = shadowData ?? [];
   const shadowTableMissing = shadowError?.code === "42P01";
 
+  const {
+    data: unknownData,
+    error: unknownError,
+  } = await (service as unknown as {
+    from: (table: string) => {
+      select: (query: string) => {
+        order: (
+          column: string,
+          options: { ascending: boolean },
+        ) => {
+          limit: (value: number) => Promise<{
+            data: UnknownServiceRow[] | null;
+            error: { code?: string; message: string } | null;
+          }>;
+        };
+      };
+    };
+  })
+    .from("audit_service_unknown_candidates")
+    .select(
+      "id, business_place_id, business_name, inferred_vertical, candidate_service, source_tag, confidence, reviewed, review_note, created_at",
+    )
+    .order("created_at", { ascending: false })
+    .limit(500);
+
+  const unknownRows = unknownData ?? [];
+  const unknownTableMissing = unknownError?.code === "42P01";
+
+  const {
+    data: promotionData,
+    error: promotionError,
+  } = await (service as unknown as {
+    from: (table: string) => {
+      select: (query: string) => {
+        order: (
+          column: string,
+          options: { ascending: boolean },
+        ) => {
+          limit: (value: number) => Promise<{
+            data: TaxonomyPromotionRow[] | null;
+            error: { code?: string; message: string } | null;
+          }>;
+        };
+      };
+    };
+  })
+    .from("audit_service_taxonomy_promotions")
+    .select("id, unknown_candidate_id, canonical_service, suggested_vertical, status, created_at")
+    .order("created_at", { ascending: false })
+    .limit(300);
+
+  const promotionRows = promotionData ?? [];
+  const promotionTableMissing = promotionError?.code === "42P01";
+
   const total = rows.length;
   const changedRows = rows.filter((row) => row.changed_from_recommended);
   const changedCount = changedRows.length;
@@ -146,6 +224,15 @@ export default async function ServiceLearningPage() {
   const topReasons = Array.from(reasonCounts.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
+  const broadSelectionGateCount = rows.filter((row) =>
+    (row.cs_reason_codes ?? []).includes("broad_service_needs_user_selection"),
+  ).length;
+  const lowConfidenceCount = rows.filter(
+    (row) => typeof row.cs_confidence === "number" && row.cs_confidence <= 0.65,
+  ).length;
+  const highRiskVerticals = verticalRows.filter(
+    (row) => row.total >= 3 && row.changedRate >= 25,
+  );
 
   const shadowTotal = shadowRows.length;
   const shadowCompared = shadowRows.filter(
@@ -166,6 +253,25 @@ export default async function ServiceLearningPage() {
   const disagreements = shadowRows.filter((row) => row.agrees_with_system === false);
   const analystWinRate =
     shadowCompared.length > 0 ? (analystWins.length / shadowCompared.length) * 100 : 0;
+  const policyComparable = shadowCompared.filter((row) => {
+    const finalService = row.user_final_service?.trim() ?? "";
+    if (!finalService) return false;
+    return !isBroadServiceTerm(finalService, { vertical: row.user_final_vertical });
+  });
+  const policyAnalystHits = policyComparable.filter(
+    (row) => row.matches_user_final_analyst === true,
+  ).length;
+  const policySystemHits = policyComparable.filter(
+    (row) => row.matches_user_final_system === true,
+  ).length;
+  const policyAnalystHitRate =
+    policyComparable.length > 0
+      ? (policyAnalystHits / policyComparable.length) * 100
+      : 0;
+  const policySystemHitRate =
+    policyComparable.length > 0
+      ? (policySystemHits / policyComparable.length) * 100
+      : 0;
 
   return (
     <main className="px-10 py-10 space-y-6">
@@ -201,6 +307,34 @@ export default async function ServiceLearningPage() {
       {!shadowTableMissing && shadowError ? (
         <section className="rounded-2xl border border-red-300 bg-red-50 p-4 text-[13px] text-red-700">
           Shadow query failed: {shadowError.message}
+        </section>
+      ) : null}
+      {unknownTableMissing ? (
+        <section className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-[13px] text-amber-800">
+          Unknown-service queue table not found. Run migration{" "}
+          <code className="rounded bg-amber-100 px-1.5 py-0.5">
+            supabase/migrations/0061_audit_service_unknown_candidates.sql
+          </code>{" "}
+          first.
+        </section>
+      ) : null}
+      {!unknownTableMissing && unknownError ? (
+        <section className="rounded-2xl border border-red-300 bg-red-50 p-4 text-[13px] text-red-700">
+          Unknown queue query failed: {unknownError.message}
+        </section>
+      ) : null}
+      {promotionTableMissing ? (
+        <section className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-[13px] text-amber-800">
+          Taxonomy promotion table not found. Run migration{" "}
+          <code className="rounded bg-amber-100 px-1.5 py-0.5">
+            supabase/migrations/0062_audit_service_taxonomy_promotions.sql
+          </code>{" "}
+          first.
+        </section>
+      ) : null}
+      {!promotionTableMissing && promotionError ? (
+        <section className="rounded-2xl border border-red-300 bg-red-50 p-4 text-[13px] text-red-700">
+          Taxonomy promotion query failed: {promotionError.message}
         </section>
       ) : null}
 
@@ -239,6 +373,50 @@ export default async function ServiceLearningPage() {
             value={String(ties.length)}
             hint="Both system and analyst match user final."
           />
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <MiniStatCard
+            label="Policy comparable rows"
+            value={String(policyComparable.length)}
+            hint="Excludes broad user-final values for stricter quality scoring."
+          />
+          <MiniStatCard
+            label="Policy analyst hit rate"
+            value={`${policyAnalystHitRate.toFixed(1)}%`}
+            hint={`Analyst hit rows: ${policyAnalystHits}`}
+          />
+          <MiniStatCard
+            label="Policy system hit rate"
+            value={`${policySystemHitRate.toFixed(1)}%`}
+            hint={`System hit rows: ${policySystemHits}`}
+          />
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-border-base bg-paper p-5 space-y-4">
+        <div>
+          <h2 className="font-display text-[18px] text-ink">Risk alerts</h2>
+          <p className="mt-1 text-[12px] text-text-muted">
+            Quick health checks for paid-quality service decision flow.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-4">
+          <StatCard label="Broad-selection gate hits" value={String(broadSelectionGateCount)} />
+          <StatCard label="Low-confidence (65% or below)" value={String(lowConfidenceCount)} />
+          <StatCard label="Unknown service candidates" value={String(unknownRows.length)} />
+          <StatCard label="Promotion queue (pending)" value={String(promotionRows.filter((row) => row.status === "pending").length)} />
+        </div>
+        <div className="rounded-xl border border-border-soft bg-cream-light px-4 py-3 text-[12px] text-text">
+          {highRiskVerticals.length > 0 ? (
+            <span>
+              Watchlist:{" "}
+              {highRiskVerticals
+                .map((row) => `${row.vertical} (${row.changedRate.toFixed(1)}%)`)
+                .join(", ")}
+            </span>
+          ) : (
+            <span>No high-risk verticals by current threshold (min 3 samples and 25%+ override).</span>
+          )}
         </div>
       </section>
 
@@ -346,6 +524,142 @@ export default async function ServiceLearningPage() {
                 <tr>
                   <td colSpan={7} className="py-6 text-center text-[13px] text-text-muted">
                     No overrides yet. Run a few audits and confirm/edit CS to start learning.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-border-base bg-paper p-5">
+        <h2 className="font-display text-[18px] text-ink">Unknown service candidate queue</h2>
+        <p className="mt-1 text-[12px] text-text-muted">
+          Analyst-first suggestions not currently in taxonomy. Review and promote to taxonomy queue.
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-left text-[12.5px]">
+            <thead className="text-[11px] uppercase tracking-[0.08em] text-text-muted">
+              <tr>
+                <th className="pb-2">Time</th>
+                <th className="pb-2">Business</th>
+                <th className="pb-2">Vertical</th>
+                <th className="pb-2">Candidate service</th>
+                <th className="pb-2">Source</th>
+                <th className="pb-2">Confidence</th>
+                <th className="pb-2">Reviewed</th>
+                <th className="pb-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {unknownRows.slice(0, 25).map((row) => (
+                <tr key={row.id} className="border-t border-border-soft">
+                  <td className="py-2 text-text-muted">
+                    {new Date(row.created_at).toLocaleString("en-US", {
+                      month: "short",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </td>
+                  <td className="py-2 text-text">{row.business_name ?? row.business_place_id ?? "—"}</td>
+                  <td className="py-2 text-text">{row.inferred_vertical ?? "unknown"}</td>
+                  <td className="py-2 font-medium text-ink">{row.candidate_service}</td>
+                  <td className="py-2 text-text">{row.source_tag}</td>
+                  <td className="py-2 text-text">
+                    {typeof row.confidence === "number"
+                      ? `${(row.confidence * 100).toFixed(0)}%`
+                      : "—"}
+                  </td>
+                  <td className="py-2 text-text">{row.reviewed ? "Yes" : "No"}</td>
+                  <td className="py-2">
+                    {row.reviewed ? (
+                      <span className="text-[12px] text-text-muted">
+                        {row.review_note ?? "Reviewed"}
+                      </span>
+                    ) : (
+                      <form action={promoteUnknownService} className="flex items-center gap-2">
+                        <input type="hidden" name="unknown_id" value={row.id} />
+                        <input
+                          type="text"
+                          name="canonical_service"
+                          defaultValue={row.candidate_service}
+                          className="h-8 w-44 rounded-md border border-border-base bg-white px-2 text-[12px] text-ink"
+                        />
+                        <button
+                          type="submit"
+                          className="h-8 rounded-md border border-border-base bg-cream-light px-2 text-[12px] font-medium text-ink hover:bg-cream"
+                        >
+                          Promote
+                        </button>
+                      </form>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {unknownRows.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-6 text-center text-[13px] text-text-muted">
+                    No unknown candidates logged yet.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-border-base bg-paper p-5">
+        <h2 className="font-display text-[18px] text-ink">Taxonomy promotion queue</h2>
+        <p className="mt-1 text-[12px] text-text-muted">
+          Pending candidates to add to `service-taxonomy.ts` as canonical services/aliases.
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-left text-[12.5px]">
+            <thead className="text-[11px] uppercase tracking-[0.08em] text-text-muted">
+              <tr>
+                <th className="pb-2">Time</th>
+                <th className="pb-2">Canonical service</th>
+                <th className="pb-2">Vertical</th>
+                <th className="pb-2">Status</th>
+                <th className="pb-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {promotionRows.slice(0, 25).map((row) => (
+                <tr key={row.id} className="border-t border-border-soft">
+                  <td className="py-2 text-text-muted">
+                    {new Date(row.created_at).toLocaleString("en-US", {
+                      month: "short",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </td>
+                  <td className="py-2 font-medium text-ink">{row.canonical_service}</td>
+                  <td className="py-2 text-text">{row.suggested_vertical ?? "unknown"}</td>
+                  <td className="py-2 text-text">{row.status}</td>
+                  <td className="py-2">
+                    {row.status === "pending" ? (
+                      <form action={markPromotionAdded}>
+                        <input type="hidden" name="promotion_id" value={row.id} />
+                        <button
+                          type="submit"
+                          className="h-8 rounded-md border border-border-base bg-cream-light px-2 text-[12px] font-medium text-ink hover:bg-cream"
+                        >
+                          Mark as added
+                        </button>
+                      </form>
+                    ) : (
+                      <span className="text-[12px] text-text-muted">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {promotionRows.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-6 text-center text-[13px] text-text-muted">
+                    No taxonomy promotions yet.
                   </td>
                 </tr>
               ) : null}

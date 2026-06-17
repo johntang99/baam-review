@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { isBroadServiceTerm } from "@/lib/audit/broad-service-terms";
 
 interface IntakeFormProps {
   initialError?: string;
@@ -19,6 +20,10 @@ const ERROR_LABELS: Record<string, string> = {
     "Please confirm (or adjust) Industry and RS (Recommended service) before generating the audit.",
   email_not_verified:
     "Please verify your email first — check your inbox for the verification link, then refresh this page.",
+  specific_service_required:
+    "Please choose a specific service before generating the audit.",
+  specific_service_selection_required:
+    "Please pick one service from the suggested specific service options.",
 };
 
 const VERTICAL_LABELS: Record<string, string> = {
@@ -91,6 +96,8 @@ interface ResolvedBusiness {
   cs_confidence: number;
   cs_reason_codes: string[];
   service_candidates?: ServiceCandidateDebug[];
+  service_options?: string[];
+  needs_service_selection?: boolean;
   service_shadow?: ServiceShadowDebug;
   google_category: string | null;
   google_categories: string[];
@@ -171,7 +178,11 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
       }
       setResolved(data);
       setVertical(data.detected_vertical);
-      setService(data.cs_recommended_service || data.detected_service);
+      setService(
+        data.needs_service_selection
+          ? ""
+          : data.cs_recommended_service || data.detected_service,
+      );
       setServiceConfirmed(false);
       setStep("confirm");
     } catch (err) {
@@ -187,6 +198,12 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
     if (!resolved) return;
     if (!serviceConfirmed) {
       setShowConfirmReminder(true);
+      return;
+    }
+    if (isBroadServiceInput(service.trim(), vertical)) {
+      setLocalError(
+        "Please select a specific service. Broad labels are blocked for audit generation.",
+      );
       return;
     }
     setLocalError(null);
@@ -205,6 +222,8 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           cs_recommended_service: resolved.cs_recommended_service,
           cs_confidence: resolved.cs_confidence,
           cs_reason_codes: resolved.cs_reason_codes,
+          needs_service_selection: resolved.needs_service_selection,
+          service_options: resolved.service_options ?? [],
           service_shadow: resolved.service_shadow,
           service_confirmed: serviceConfirmed,
         }),
@@ -266,6 +285,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
     const isModerateConfidence = resolved.cs_confidence < 0.75;
     const finalService = service.trim() || "—";
     const topServiceCandidates = resolved.service_candidates ?? [];
+    const serviceOptions = resolved.service_options ?? [];
     const serviceValueDisplayStyle = {
       fontSize: 24,
       lineHeight: 1.12,
@@ -1045,6 +1065,74 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 </div>
               </div>
 
+              {serviceOptions.length > 0 ? (
+                <div
+                  style={{
+                    marginTop: 12,
+                    border: "1px solid var(--rule-soft)",
+                    borderRadius: 8,
+                    background: "#fff",
+                    padding: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 11,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: "var(--ink-mute)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Specific service choices
+                  </div>
+                  <p style={{ marginTop: 6, fontSize: 12, color: "var(--ink-soft)" }}>
+                    {resolved.needs_service_selection
+                      ? "System cannot trust a broad label. Please pick one specific service below."
+                      : "Optional quick-pick specific services based on title/description/website signals."}
+                  </p>
+                  <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+                    {serviceOptions.map((option) => (
+                      <label
+                        key={option}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          border: "1px solid var(--rule-soft)",
+                          borderRadius: 8,
+                          padding: "7px 9px",
+                          cursor: "pointer",
+                          background: service === option ? "var(--cream-light)" : "#fff",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={service === option}
+                          onChange={() => {
+                            setService(option);
+                            setServiceConfirmed(false);
+                            setShowConfirmReminder(false);
+                          }}
+                          disabled={isPending}
+                        />
+                        <span
+                          style={{
+                            fontFamily: "'Instrument Serif', serif",
+                            fontSize: 22,
+                            lineHeight: 1.1,
+                            color: "var(--ink)",
+                            textTransform: "lowercase",
+                          }}
+                        >
+                          {option}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
               {isModerateConfidence ? (
                 <div
                   style={{
@@ -1408,4 +1496,11 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
       </div>
     </form>
   );
+}
+
+function isBroadServiceInput(value: string, vertical?: string) {
+  const normalized = value.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!normalized) return true;
+  if (isBroadServiceTerm(normalized, { vertical })) return true;
+  return normalized.split(" ").length <= 1;
 }

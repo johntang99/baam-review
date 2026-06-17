@@ -17,7 +17,7 @@ const MANUFACTURER_DETAIL_RULES: readonly ManufacturerDetailRule[] = [
   {
     service: "sign manufacturer",
     pattern:
-      /(signs?|signage|channel\s*letters?|light\s*boxes?|led\s*signs?|wayfinding)/i,
+      /\b(signage|channel\s*letters?|light\s*boxes?|led\s*signs?|wayfinding|storefront\s*signs?)\b/i,
   },
   {
     service: "metal fabrication manufacturer",

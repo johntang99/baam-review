@@ -2,6 +2,17 @@ import { readFileSync } from "node:fs";
 import { resolveServiceKeyword } from "@/lib/audit/competitors/keyword-resolver";
 import { mapVertical } from "@/lib/audit/google/aggregators/vertical-mapper";
 import { reconcileServiceDecision } from "@/lib/audit/service-reconciler";
+import {
+  generateServiceCandidates,
+  pickTopComprehensiveService,
+} from "@/lib/audit/service-candidate-generator";
+import { analyzeServiceWithAnalyst } from "@/lib/audit/service-analyst";
+import {
+  canonicalizeService,
+  getServiceSpecificity,
+} from "@/lib/audit/service-taxonomy";
+import { isBroadServiceTerm } from "@/lib/audit/broad-service-terms";
+import type { AuditGoogleData } from "@/lib/audit/google/types";
 
 interface InputBusiness {
   name: string;
@@ -82,6 +93,8 @@ async function main() {
   if (!apiKey) {
     throw new Error("GOOGLE_PLACES_API_KEY is required in environment.");
   }
+  const primaryAnalystEnabled = process.env.SERVICE_ANALYST_PRIMARY === "1";
+  const primaryAnalystUseLlm = process.env.SERVICE_ANALYST_PRIMARY_USE_LLM === "1";
 
   const input = await loadInputBusinesses(process.argv[2]);
   const rows: Array<Record<string, string>> = [];
@@ -101,28 +114,77 @@ async function main() {
 
       const details = await fetchPlaceDetails(match.id, apiKey);
       const googleData = buildGoogleLikeData(details);
-      const bsService = resolveServiceKeyword(googleData as any);
+      const fallbackDetectedService = resolveServiceKeyword(googleData);
       const websiteSignalText = await fetchWebsiteServiceSignalText(
         googleData.business.website ?? business.website ?? null,
       );
+      const comprehensiveTop = pickTopComprehensiveService({
+        google: googleData,
+        gbpDescription: googleData.business.description ?? null,
+        websiteSignalText,
+        seedService: fallbackDetectedService,
+      });
+      const generatedCandidates = generateServiceCandidates({
+        google: googleData,
+        gbpDescription: googleData.business.description ?? null,
+        websiteSignalText,
+        seedService: fallbackDetectedService,
+      });
+      const baseDetectedService = comprehensiveTop?.service || fallbackDetectedService;
+      const primaryAnalyst = primaryAnalystEnabled
+        ? await analyzeServiceWithAnalyst({
+            google: googleData,
+            googleService:
+              googleData.vertical.primary_category_display ||
+              googleData.vertical.primary_category ||
+              "",
+            fallbackService: baseDetectedService,
+            gbpDescription: googleData.business.description ?? null,
+            websiteSignalText,
+            useLlm: primaryAnalystUseLlm,
+          }).catch((err) => {
+            console.error("[batch-check] primary analyst failed:", err);
+            return null;
+          })
+        : null;
+      const detectedService =
+        primaryAnalyst?.recommended_service || baseDetectedService;
       const decision = reconcileServiceDecision({
-        google: googleData as any,
-        bsService,
+        google: googleData,
+        bsService: detectedService,
         gbpDescription: googleData.business.description ?? null,
         websiteSignalText,
       });
+      const recommendedService = canonicalizeService(
+        decision.cs_recommended_service,
+      );
+      const needsSelection =
+        isBroadService(
+          recommendedService,
+          googleData.vertical.inferred_vertical,
+        ) ||
+        decision.cs_reason_codes.includes("broad_service_needs_user_selection");
 
       rows.push({
         Input: business.name,
         "Google Matched Name": googleData.business.name,
+        Vertical: googleData.vertical.inferred_vertical,
         "Google Service": decision.gs_service,
+        "Comprehensive Top Service": comprehensiveTop?.service || "",
+        "Primary Analyst Service": primaryAnalyst?.recommended_service || "",
+        "Analyst Mode": primaryAnalyst?.mode || "disabled",
         "BAAM-generated Service": decision.bs_service,
-        "Recommended Service": decision.cs_recommended_service,
+        "Recommended Service": recommendedService,
         Confidence: `${Math.round(decision.cs_confidence * 100)}%`,
+        "Needs Selection": needsSelection ? "Yes" : "No",
         "Reason Codes": decision.cs_reason_codes.join(", "),
         "Website Signal": decision.cs_reason_codes.includes("website_signal")
           ? "Yes"
           : "No",
+        "Top Candidates": generatedCandidates
+          .slice(0, 3)
+          .map((candidate) => candidate.service)
+          .join(", "),
       });
     } catch (err) {
       failures.push({
@@ -228,24 +290,92 @@ async function fetchPlaceDetails(placeId: string, apiKey: string): Promise<Place
   return (await response.json()) as PlaceDetails;
 }
 
-function buildGoogleLikeData(details: PlaceDetails) {
+function buildGoogleLikeData(details: PlaceDetails): AuditGoogleData {
   const name = details.displayName?.text ?? "(unknown)";
   const types = details.types ?? [];
   const verticalMatch = mapVertical(types, name);
+  const formattedAddress = details.formattedAddress ?? "";
+  const city = deriveCity(details);
+  const state = deriveState(details);
+  const zip = deriveZip(details);
+  const country = deriveCountry(details);
+  const street = deriveStreet(details);
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   return {
     business: {
       name,
+      name_secondary: undefined,
+      formatted_address: formattedAddress,
+      address_lines: formattedAddress
+        ? formattedAddress.split(",").map((part) => part.trim()).filter(Boolean)
+        : [],
+      street,
+      state,
+      zip,
+      country,
       place_id: details.id,
+      business_url: "",
       website: details.websiteUri ?? undefined,
       description: details.editorialSummary?.text?.trim() || undefined,
-      city: deriveCity(details),
+      city,
+      phone: undefined,
+      lat: null,
+      lng: null,
     },
     vertical: {
       google_categories: types,
-      primary_category: details.primaryType ?? verticalMatch.primary_category,
+      primary_category:
+        details.primaryType ?? verticalMatch.primary_category ?? "local business",
       primary_category_display: details.primaryTypeDisplayName?.text ?? null,
       inferred_vertical: verticalMatch.inferred_vertical,
       confidence: verticalMatch.confidence,
+    },
+    language: {
+      primary_language: "en",
+      is_bilingual: false,
+      is_chinese_business: false,
+      detection_signals: {
+        name_has_cjk: false,
+        gbp_locale: "en",
+        review_language_distribution: {},
+      },
+    },
+    profile_health: {
+      is_claimed: false,
+      is_verified: false,
+      has_hours: false,
+      has_phone: false,
+      has_website: Boolean(details.websiteUri),
+      has_categories: types.length > 0,
+      has_description: Boolean(details.editorialSummary?.text),
+      photos_count: 0,
+      profile_completeness: 0,
+    },
+    reviews_aggregate: {
+      total_count: details.userRatingCount ?? 0,
+      rating: details.rating ?? 0,
+      last_review_date: null,
+      last_review_days_ago: null,
+      reviews_30d: null,
+      reviews_90d: null,
+      reviews_180d: null,
+      reviews_365d: null,
+      velocity_30d_per_month: null,
+      velocity_180d_per_month: null,
+      velocity_365d_per_month: null,
+      response_rate: null,
+      response_time_median_hours: null,
+      unanswered_count: null,
+      photo_review_count: null,
+    },
+    reviews: [],
+    meta: {
+      fetched_at: now.toISOString(),
+      expires_at: expiresAt.toISOString(),
+      data_source: "place_details",
+      tier: "free",
+      cache_hit: false,
     },
   };
 }
@@ -260,6 +390,51 @@ function deriveCity(details: PlaceDetails): string {
   const formatted = (details.formattedAddress ?? "").trim();
   const parts = formatted.split(",").map((value) => value.trim());
   return parts[1] ?? "";
+}
+
+function deriveState(details: PlaceDetails): string {
+  for (const component of details.addressComponents ?? []) {
+    const types = component.types ?? [];
+    if (types.includes("administrative_area_level_1")) {
+      return (component.shortText ?? component.longText ?? "").trim();
+    }
+  }
+  return "";
+}
+
+function deriveZip(details: PlaceDetails): string {
+  for (const component of details.addressComponents ?? []) {
+    const types = component.types ?? [];
+    if (types.includes("postal_code")) {
+      return (component.longText ?? component.shortText ?? "").trim();
+    }
+  }
+  return "";
+}
+
+function deriveCountry(details: PlaceDetails): string {
+  for (const component of details.addressComponents ?? []) {
+    const types = component.types ?? [];
+    if (types.includes("country")) {
+      return (component.shortText ?? component.longText ?? "").trim() || "US";
+    }
+  }
+  return "US";
+}
+
+function deriveStreet(details: PlaceDetails): string {
+  let streetNumber = "";
+  let route = "";
+  for (const component of details.addressComponents ?? []) {
+    const types = component.types ?? [];
+    if (types.includes("street_number")) {
+      streetNumber = (component.longText ?? component.shortText ?? "").trim();
+    }
+    if (types.includes("route")) {
+      route = (component.longText ?? component.shortText ?? "").trim();
+    }
+  }
+  return [streetNumber, route].filter(Boolean).join(" ").trim();
 }
 
 async function fetchWebsiteServiceSignalText(
@@ -380,6 +555,13 @@ function loadEnvFile(path: string) {
   } catch {
     // ignore
   }
+}
+
+function isBroadService(input: string, vertical?: string) {
+  const canonical = canonicalizeService(input);
+  if (!canonical) return true;
+  if (isBroadServiceTerm(canonical, { vertical })) return true;
+  return getServiceSpecificity(canonical) <= 2;
 }
 
 main().catch((err) => {

@@ -17,6 +17,7 @@ interface ServiceResolutionLearningInput {
 
 const TABLE = "audit_service_resolutions";
 const SHADOW_TABLE = "audit_service_shadow_logs";
+const UNKNOWN_TABLE = "audit_service_unknown_candidates";
 
 interface ServiceAnalystShadowInput {
   audit_id: string;
@@ -30,6 +31,18 @@ interface ServiceAnalystShadowInput {
   analyst_mode?: "distilled" | "llm";
   analyst_recommended_service?: string;
   analyst_confidence?: number;
+}
+
+interface UnknownServiceCandidateInput {
+  user_id: string;
+  business_place_id?: string;
+  business_name?: string;
+  inferred_vertical?: string;
+  candidate_service: string;
+  source_tag: string;
+  confidence?: number;
+  rationale?: string;
+  evidence_excerpt?: string;
 }
 
 export async function logServiceResolutionLearning(
@@ -144,4 +157,50 @@ export async function logServiceAnalystShadow(input: ServiceAnalystShadowInput) 
     return;
   }
   console.warn("[service-analyst-shadow] insert failed:", error.message);
+}
+
+export async function logUnknownServiceCandidate(input: UnknownServiceCandidateInput) {
+  const candidateService = normalize(input.candidate_service);
+  const sourceTag = normalize(input.source_tag);
+  if (!candidateService || !sourceTag) return;
+
+  const supabase = createServiceClient();
+  const row = {
+    user_id: input.user_id,
+    business_place_id: input.business_place_id ?? null,
+    business_name: input.business_name?.trim() || null,
+    inferred_vertical: input.inferred_vertical?.trim() || null,
+    candidate_service: candidateService,
+    source_tag: sourceTag,
+    confidence:
+      typeof input.confidence === "number"
+        ? Number(input.confidence.toFixed(2))
+        : null,
+    rationale: input.rationale?.trim() || null,
+    evidence_excerpt: input.evidence_excerpt?.trim().slice(0, 1200) || null,
+    reviewed: false,
+    created_at: new Date().toISOString(),
+  };
+
+  const { error } = await (supabase as unknown as {
+    from: (table: string) => {
+      upsert: (
+        payload: Record<string, unknown>,
+        options: { onConflict: string; ignoreDuplicates: boolean },
+      ) => Promise<{
+        error: { code?: string; message: string } | null;
+      }>;
+    };
+  })
+    .from(UNKNOWN_TABLE)
+    .upsert(row, {
+      onConflict: "user_id,business_place_id,candidate_service,source_tag",
+      ignoreDuplicates: true,
+    });
+
+  if (!error) return;
+  if (error.code === "42P01" || error.message.includes(UNKNOWN_TABLE)) {
+    return;
+  }
+  console.warn("[service-unknown-candidate] upsert failed:", error.message);
 }

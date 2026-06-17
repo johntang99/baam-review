@@ -70,12 +70,36 @@ const TYPE_REFINEMENTS: Array<{ type: string; keyword: string }> = [
   { type: "optician", keyword: "optician" },
   { type: "sunglasses_store", keyword: "eyewear store" },
   { type: "ophthalmologist", keyword: "ophthalmology clinic" },
+  { type: "hvac_contractor", keyword: "hvac contractor" },
+  { type: "air_conditioning_contractor", keyword: "hvac contractor" },
+  { type: "heating_contractor", keyword: "hvac contractor" },
   { type: "dermatologist", keyword: "dermatologist" },
   // Contractor / home-improvement refinements
   { type: "cabinet_maker", keyword: "kitchen cabinet manufacturer" },
   { type: "kitchen_remodeler", keyword: "kitchen remodeler" },
   { type: "countertop_store", keyword: "countertop store" },
   { type: "countertop_contractor", keyword: "countertop contractor" },
+  { type: "window_treatment_store", keyword: "window treatment store" },
+  { type: "blinds_shop", keyword: "window treatment store" },
+  { type: "curtain_store", keyword: "window treatment store" },
+  { type: "tailor", keyword: "tailor shop" },
+  { type: "tailor_shop", keyword: "tailor shop" },
+  { type: "photo_studio", keyword: "photography studio" },
+  { type: "photographer", keyword: "photography studio" },
+  { type: "print_shop", keyword: "print shop" },
+  { type: "copy_shop", keyword: "print shop" },
+  { type: "commercial_printer", keyword: "print shop" },
+  { type: "cleaning_service", keyword: "cleaning service" },
+  { type: "house_cleaning_service", keyword: "cleaning service" },
+  { type: "janitorial_service", keyword: "cleaning service" },
+  { type: "piano_store", keyword: "piano store" },
+  { type: "musical_instrument_store", keyword: "piano store" },
+  { type: "shipping_and_mailing_service", keyword: "shipping and mailing service" },
+  { type: "courier_service", keyword: "shipping and mailing service" },
+  { type: "mobile_phone_repair_shop", keyword: "phone repair service" },
+  { type: "computer_repair_service", keyword: "computer repair service" },
+  { type: "zoo", keyword: "zoo" },
+  { type: "park", keyword: "park" },
   { type: "manufacturer", keyword: "manufacturer" },
 ];
 
@@ -122,13 +146,99 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
   { pattern: /\b(dermatolog|skin clinic)\b/i, keyword: "dermatologist" },
   { pattern: /\b(chiropract)\b/i, keyword: "chiropractor" },
   { pattern: /\b(physical therap|physiotherap)\b/i, keyword: "physical therapy" },
+  {
+    pattern:
+      /\b(business coach|business coaching|executive coach|growth coach|business consultant|business consulting)\b/i,
+    keyword: "business coach",
+  },
+  {
+    pattern: /\b(management consultant|management consulting|strategy consultant)\b/i,
+    keyword: "management consultant",
+  },
+  {
+    pattern: /\b(marketing consultant|marketing consulting|marketing advisor)\b/i,
+    keyword: "marketing consultant",
+  },
+  {
+    pattern: /^(?!.*\b(phone|iphone|android|computer|laptop|repair|fix|screen)\b).*?\bdigital\b/i,
+    keyword: "marketing consultant",
+  },
+  {
+    pattern:
+      /\b(mortgage broker|home loan|mortgage lender|loan agency|lending company|loan company|loan service)\b/i,
+    keyword: "loan agency",
+  },
+  {
+    pattern: /\b(financial advisor|financial planner|wealth advisor|wealth management)\b/i,
+    keyword: "financial planner",
+  },
+  {
+    pattern:
+      /\b(tutor|tutoring|training school|learning center|learning centre|education center|education centre)\b/i,
+    keyword: "tutoring service",
+  },
+  {
+    pattern: /\b(vocational school|trade school|skills training|career training)\b/i,
+    keyword: "vocational training center",
+  },
+  {
+    pattern: /\b(language school|esl school|english school|language academy)\b/i,
+    keyword: "language school",
+  },
 
   // Auto sub-types
   { pattern: /\b(body shop|collision)\b/i, keyword: "auto body shop" },
   { pattern: /\b(tire)\b/i, keyword: "tire shop" },
   { pattern: /\b(dealer(ship)?)\b/i, keyword: "car dealer" },
+  { pattern: /\b(tailor(ing)?|alterations?|seamstress)\b/i, keyword: "tailor shop" },
+  {
+    pattern:
+      /\b(phone|cell phone|iphone|android|mobile)\b.*\b(repair|fix|screen)\b|\b(repair|fix)\b.*\b(phone|cell phone|iphone|android|mobile)\b/i,
+    keyword: "phone repair service",
+  },
+  {
+    pattern:
+      /\b(computer|laptop|pc|macbook)\b.*\b(repair|fix)\b|\b(repair|fix)\b.*\b(computer|laptop|pc|macbook)\b/i,
+    keyword: "computer repair service",
+  },
+  {
+    pattern: /\b(photo(graphy)?|portrait studio|photo studio|videography|self-portrait)\b/i,
+    keyword: "photography studio",
+  },
+  {
+    pattern: /\b(print(ing)?|print shop|commercial printer|copy shop|copy center|offset print)\b/i,
+    keyword: "print shop",
+  },
+  {
+    pattern:
+      /\b(house cleaning|home cleaning|commercial cleaning|office cleaning|janitorial|maid service|deep cleaning|cleaning (service|services|company|crew|chief))\b/i,
+    keyword: "cleaning service",
+  },
+  {
+    pattern: /\b(piano(s)?|grand piano|upright piano|piano dealer|piano showroom|piano shop)\b/i,
+    keyword: "piano store",
+  },
+  { pattern: /\b(ups|shipping|mailing|postal|courier|parcel)\b/i, keyword: "shipping and mailing service" },
+  { pattern: /\b(arcade|claw machine|anime claw)\b/i, keyword: "arcade" },
+  { pattern: /\b(zoo)\b/i, keyword: "zoo" },
+  { pattern: /\b(park)\b/i, keyword: "park" },
+  { pattern: /\b(church|cathedral|basilica)\b/i, keyword: "church" },
+  { pattern: /\b(buddhist temple|monastery)\b/i, keyword: "buddhist temple" },
+  { pattern: /\b(hindu temple)\b/i, keyword: "hindu temple" },
+  { pattern: /\b(landmark|observation deck)\b/i, keyword: "historical landmark" },
+  { pattern: /\b(petco|pet store)\b/i, keyword: "pet store" },
+  { pattern: /\b(animal rescue|pet rescue|pet adoption)\b/i, keyword: "pet care" },
+  { pattern: /\b(laundromat|laundry|dry clean(ing)?|dry cleaner)\b/i, keyword: "laundry service" },
+  { pattern: /\b(digital marketing|seo|web design|marketing agency)\b/i, keyword: "marketing consultant" },
+  { pattern: /\b(travel agency|travel services?|tour operator)\b/i, keyword: "travel agency" },
 
   // Contractor / home-improvement sub-types
+  { pattern: /\b(curtains?|blinds?|shutters?|drapery|window treatments?)\b/i, keyword: "window treatment store" },
+  {
+    pattern:
+      /\b(hvac|air conditioning|a\/c|heating\s*(and|&)\s*cooling|cooling\s*(and|&)\s*heating|furnace|heat pump|duct(work)?|ventilation)\b/i,
+    keyword: "hvac contractor",
+  },
   { pattern: /\b(kitchen cabinets?|cabinets?|cabinetry|millwork|joinery)\b/i, keyword: "kitchen cabinet manufacturer" },
   { pattern: /\b(countertops?|granite|quartz)\b/i, keyword: "countertop contractor" },
   { pattern: /\b(remodel|renovation|kitchen\s*&\s*bath|kitchen and bath)\b/i, keyword: "kitchen remodeler" },
@@ -343,6 +453,40 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
   "real estate agent": ["real estate agent", "realtor", "real estate broker"],
   "insurance agent": ["insurance agent", "insurance broker"],
   "contractor": ["contractor", "general contractor", "home builder"],
+  "hvac contractor": [
+    "hvac contractor",
+    "heating and cooling contractor",
+    "air conditioning contractor",
+  ],
+  "window treatment store": [
+    "window treatment store",
+    "curtain store",
+    "blinds store",
+  ],
+  "business coach": ["business coach", "business consultant", "executive coach"],
+  "management consultant": [
+    "management consultant",
+    "strategy consultant",
+    "management consulting",
+  ],
+  "marketing consultant": [
+    "marketing consultant",
+    "marketing advisor",
+    "marketing consulting",
+  ],
+  "print shop": ["print shop", "printing service", "commercial printer"],
+  "cleaning service": ["cleaning service", "house cleaning service", "janitorial service"],
+  "piano store": ["piano store", "piano dealer", "piano showroom"],
+  "loan agency": ["loan agency", "lending company", "mortgage broker"],
+  "mortgage broker": ["mortgage broker", "home loan broker", "mortgage lender"],
+  "financial planner": ["financial planner", "financial advisor", "wealth advisor"],
+  "tutoring service": ["tutoring service", "tutoring center", "private tutor"],
+  "vocational training center": [
+    "vocational training center",
+    "trade school",
+    "vocational school",
+  ],
+  "language school": ["language school", "esl school", "english school"],
   "kitchen cabinet manufacturer": [
     "kitchen cabinet manufacturer",
     "cabinet manufacturer",

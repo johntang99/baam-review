@@ -6,6 +6,7 @@ import {
   isGenericServiceValue,
   normalizeServiceText,
 } from "@/lib/audit/service-taxonomy";
+import { isBroadServiceTerm } from "@/lib/audit/broad-service-terms";
 import {
   hasManufacturerSignalText,
   inferDetailedManufacturerService,
@@ -18,6 +19,7 @@ import {
   hasRetailSignalText,
   inferDetailedRetailService,
 } from "@/lib/audit/retail-detail-rules";
+import { inferWindowTreatmentService } from "@/lib/audit/window-treatment-detail-rules";
 
 export type GeneratedServiceCandidate = {
   service: string;
@@ -43,22 +45,6 @@ const DEFAULT_SERVICE_BY_VERTICAL: Record<string, string> = {
   insurance: "insurance agent",
   general_smb: "local business",
 };
-
-const BROAD_SERVICE_TERMS = new Set([
-  "manufacturer",
-  "contractor",
-  "restaurant",
-  "store",
-  "service",
-  "business",
-  "local business",
-  "health",
-  "finance",
-  "consultant",
-  "home goods store",
-  "building materials store",
-  "educational institution",
-]);
 
 export function generateServiceCandidates({
   google,
@@ -111,14 +97,28 @@ export function generateServiceCandidates({
 
   add(seedService, 0.64, "seed");
   add(DEFAULT_SERVICE_BY_VERTICAL[google.vertical.inferred_vertical] ?? "", 0.56, "vertical_prior");
-  add(google.vertical.primary_category_display, 0.48, "google_category_display");
-  add(google.vertical.primary_category?.replace(/_/g, " "), 0.48, "google_primary_type");
+  // Google categories are often broad/inaccurate in practice, so keep them as weak hints.
+  add(google.vertical.primary_category_display, 0.16, "google_category_display");
+  add(google.vertical.primary_category?.replace(/_/g, " "), 0.16, "google_primary_type");
 
   const detailVision = inferDetailedVisionService({
     text: fullEvidence,
     hasVisionSignal: hasVisionSignalText(fullEvidence),
   });
   add(detailVision, 0.98, "detail_vision");
+
+  const detailWindowTreatment = inferWindowTreatmentService({
+    text: fullEvidence,
+    vertical: google.vertical.inferred_vertical,
+  });
+  const hasHvacSignal =
+    /\b(hvac|air conditioning|heating\s*(and|&)\s*cooling|cooling\s*(and|&)\s*heating|furnace|heat pump|duct(work)?|ventilation)\b/i.test(
+      fullEvidence,
+    );
+  const hasPlumbingSignal = /\b(plumb(er|ing)|sewer|drain)\b/i.test(fullEvidence);
+  const windowTreatmentWeight =
+    detailWindowTreatment && !hasHvacSignal && !hasPlumbingSignal ? 1.06 : 0.28;
+  add(detailWindowTreatment, windowTreatmentWeight, "detail_window_treatment");
 
   const hasManufacturerType =
     google.vertical.primary_category === "manufacturer" ||
@@ -127,7 +127,21 @@ export function generateServiceCandidates({
     text: fullEvidence,
     hasManufacturerSignal: hasManufacturerSignalText(fullEvidence, hasManufacturerType),
   });
-  add(detailManufacturer, 0.98, "detail_manufacturer");
+  const explicitManufacturerSignal = hasManufacturerSignalText(fullEvidence, false);
+  const hasOtherServiceSignals =
+    /\b(jewelers?|jewellery|jewelry|diamond|watch|ups|shipping|mailing|postal|courier|phone repair|computer repair|tailor|alterations?)\b/i.test(
+      fullEvidence,
+    );
+  // Curtain/blinds businesses are frequently mis-read as sign manufacturing
+  // from noisy website snippets. Keep sign-manufacturer as a weak hint when
+  // strong window-treatment evidence exists.
+  const manufacturerWeight =
+    detailManufacturer === "sign manufacturer" &&
+    ((detailWindowTreatment && !hasHvacSignal && !hasPlumbingSignal) ||
+      (!explicitManufacturerSignal && hasOtherServiceSignals))
+      ? 0.12
+      : 0.98;
+  add(detailManufacturer, manufacturerWeight, "detail_manufacturer");
 
   const detailRetail = inferDetailedRetailService({
     text: fullEvidence,
@@ -146,7 +160,7 @@ export function generateServiceCandidates({
 
   return Array.from(candidateMap.entries())
     .map(([service, value]) => {
-      const broadPenalty = isBroadService(service) ? 0.55 : 0;
+      const broadPenalty = isBroadService(service, google.vertical.inferred_vertical) ? 0.55 : 0;
       const score = Number((value.score + value.specificity * 0.05 - broadPenalty).toFixed(3));
       return {
         service,
@@ -189,10 +203,17 @@ export function pickTopComprehensiveService({
       candidate.confidence >= 0.78 &&
       candidate.score >= top.score - 0.72,
   );
-  if ((isBroadService(top.service) || top.specificity <= 2) && specificAlternative) {
+  if (
+    (isBroadService(top.service, google.vertical.inferred_vertical) || top.specificity <= 2) &&
+    specificAlternative
+  ) {
     return specificAlternative;
   }
-  if ((isBroadService(top.service) || isGenericServiceValue(top.service)) && top.confidence < 0.9) {
+  if (
+    (isBroadService(top.service, google.vertical.inferred_vertical) ||
+      isGenericServiceValue(top.service)) &&
+    top.confidence < 0.9
+  ) {
     return null;
   }
   if (top.confidence < 0.76 && top.specificity <= 2) return null;
@@ -233,10 +254,10 @@ function computeCandidateConfidence(score: number, sourceCount: number, specific
   return Number(Math.min(0.95, confidence).toFixed(2));
 }
 
-function isBroadService(service: string) {
+function isBroadService(service: string, vertical?: string) {
   const canonical = canonicalizeService(service);
   if (!canonical) return true;
-  return BROAD_SERVICE_TERMS.has(canonical);
+  return isBroadServiceTerm(canonical, { vertical });
 }
 
 function normalizeEvidenceText(input: string | null | undefined) {

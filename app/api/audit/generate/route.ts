@@ -6,6 +6,8 @@ import {
 } from "@/lib/audit/delivery/start-audit";
 import { canUserAudit, incrementAuditCount } from "@/lib/audit/quotas";
 import { VERTICAL_KEYS, type VerticalKey } from "@/lib/audit/google/types";
+import { isBroadServiceTerm } from "@/lib/audit/broad-service-terms";
+import { canonicalizeService, getServiceSpecificity } from "@/lib/audit/service-taxonomy";
 import {
   logServiceAnalystShadow,
   logServiceResolutionLearning,
@@ -44,6 +46,8 @@ interface GenerateRequest {
   cs_recommended_service?: string;
   cs_confidence?: number;
   cs_reason_codes?: string[];
+  needs_service_selection?: boolean;
+  service_options?: string[];
   service_shadow?: {
     enabled?: boolean;
     mode?: "distilled" | "llm";
@@ -80,12 +84,42 @@ export async function POST(request: Request) {
   }
 
   const verticalOverride = parseVerticalOverride(body.vertical_override);
-  const serviceOverride = (body.service_override ?? "").trim() || undefined;
+  const serviceOverrideRaw = (body.service_override ?? "").trim();
+  const serviceOverride = serviceOverrideRaw || undefined;
   const serviceConfirmed = body.service_confirmed === true;
 
   if (!serviceConfirmed) {
     return NextResponse.json(
       { error: "service_confirmation_required" },
+      { status: 400 },
+    );
+  }
+  if (!serviceOverride) {
+    return NextResponse.json(
+      { error: "specific_service_required" },
+      { status: 400 },
+    );
+  }
+
+  const canonicalServiceOverride = canonicalizeService(serviceOverride);
+  if (isBroadServiceSelection(canonicalServiceOverride, verticalOverride)) {
+    return NextResponse.json(
+      { error: "specific_service_required" },
+      { status: 400 },
+    );
+  }
+
+  const needsServiceSelection = body.needs_service_selection === true;
+  const allowedServiceOptions = (Array.isArray(body.service_options) ? body.service_options : [])
+    .map((item) => (typeof item === "string" ? canonicalizeService(item) : ""))
+    .filter(Boolean);
+  if (
+    needsServiceSelection &&
+    allowedServiceOptions.length > 0 &&
+    !allowedServiceOptions.includes(canonicalServiceOverride)
+  ) {
+    return NextResponse.json(
+      { error: "specific_service_selection_required" },
       { status: 400 },
     );
   }
@@ -112,7 +146,7 @@ export async function POST(request: Request) {
     email: auth.user.email ?? "",
     name: profile?.full_name ?? undefined,
     vertical_override: verticalOverride,
-    service_override: serviceOverride,
+    service_override: canonicalServiceOverride,
     language_choice: body.language_choice,
   };
 
@@ -134,7 +168,7 @@ export async function POST(request: Request) {
             typeof item === "string" && item.trim().length > 0,
         )
       : [],
-    user_final_service: serviceOverride,
+    user_final_service: canonicalServiceOverride,
     user_final_vertical: verticalOverride,
   });
   await logServiceAnalystShadow({
@@ -142,7 +176,7 @@ export async function POST(request: Request) {
     user_id: auth.user.id,
     business_place_id: body.place_id?.trim() || undefined,
     user_final_vertical: verticalOverride,
-    user_final_service: serviceOverride,
+    user_final_service: canonicalServiceOverride,
     system_recommended_service:
       (body.cs_recommended_service ?? "").trim() || undefined,
     system_confidence:
@@ -173,6 +207,12 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({ audit_id: result.audit_id });
+}
+
+function isBroadServiceSelection(service: string, vertical?: VerticalKey) {
+  if (!service) return true;
+  if (isBroadServiceTerm(service, { vertical })) return true;
+  return getServiceSpecificity(service) <= 2;
 }
 
 function buildBusinessRef(
