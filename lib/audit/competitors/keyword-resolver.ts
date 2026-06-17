@@ -11,6 +11,8 @@ import {
   hasRetailSignalText,
   inferDetailedRetailService,
 } from "../retail-detail-rules";
+import { pickTopComprehensiveService } from "../service-candidate-generator";
+import { isGenericServiceValue } from "../service-taxonomy";
 
 const KEYWORD_BY_VERTICAL: Record<VerticalKey, string> = {
   tcm_clinic: "acupuncture",
@@ -116,7 +118,7 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
   { pattern: /\b(ophthalmolog|retina|cataract|lasik)\b/i, keyword: "ophthalmology clinic" },
   { pattern: /\b(optometr|eye exam|vision care|vision center)\b/i, keyword: "optometry clinic" },
   { pattern: /\b(optician|contact lenses?)\b/i, keyword: "optician" },
-  { pattern: /\b(eyewear|eyeglasses?|glasses|spectacles|frames|sunglasses)\b/i, keyword: "eyewear store" },
+  { pattern: /\b(eyewear|eyeglasses?|glasses|spectacles|sunglasses)\b/i, keyword: "eyewear store" },
   { pattern: /\b(dermatolog|skin clinic)\b/i, keyword: "dermatologist" },
   { pattern: /\b(chiropract)\b/i, keyword: "chiropractor" },
   { pattern: /\b(physical therap|physiotherap)\b/i, keyword: "physical therapy" },
@@ -167,6 +169,16 @@ const CUISINE_HINTS: Array<{ type: string; word: string }> = [
  *  name pattern → vertical default → last-resort raw primary_category.
  */
 export function resolveServiceKeyword(primary: AuditGoogleData): string {
+  const comprehensiveTop = pickTopComprehensiveService({
+    google: primary,
+    gbpDescription: primary.business.description ?? null,
+    websiteSignalText: null,
+    seedService: "",
+  });
+  if (comprehensiveTop && !isGenericServiceValue(comprehensiveTop.service)) {
+    return comprehensiveTop.service;
+  }
+
   const vertical = primary.vertical.inferred_vertical;
   const types = primary.vertical.google_categories ?? [];
   const name = primary.business.name;

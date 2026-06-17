@@ -22,7 +22,7 @@ const VISION_DETAIL_RULES: readonly VisionDetailRule[] = [
   {
     service: "eyewear store",
     pattern:
-      /\b(eyewear|eyeglasses?|glasses|spectacles|frames|sunglasses)\b/i,
+      /\b(eyewear|eyeglasses?|glasses|spectacles|sunglasses)\b/i,
   },
 ];
 

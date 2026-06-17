@@ -20,6 +20,19 @@ interface ServiceResolutionRow {
   created_at: string;
 }
 
+interface ServiceShadowRow {
+  audit_id: string;
+  user_final_vertical: string | null;
+  user_final_service: string | null;
+  system_recommended_service: string | null;
+  analyst_mode: string | null;
+  analyst_recommended_service: string | null;
+  agrees_with_system: boolean | null;
+  matches_user_final_system: boolean | null;
+  matches_user_final_analyst: boolean | null;
+  created_at: string;
+}
+
 export default async function ServiceLearningPage() {
   const supabase = await createClient();
   const {
@@ -55,6 +68,34 @@ export default async function ServiceLearningPage() {
 
   const rows = data ?? [];
   const tableMissing = error?.code === "42P01";
+
+  const {
+    data: shadowData,
+    error: shadowError,
+  } = await (service as unknown as {
+    from: (table: string) => {
+      select: (query: string) => {
+        order: (
+          column: string,
+          options: { ascending: boolean },
+        ) => {
+          limit: (value: number) => Promise<{
+            data: ServiceShadowRow[] | null;
+            error: { code?: string; message: string } | null;
+          }>;
+        };
+      };
+    };
+  })
+    .from("audit_service_shadow_logs")
+    .select(
+      "audit_id, user_final_vertical, user_final_service, system_recommended_service, analyst_mode, analyst_recommended_service, agrees_with_system, matches_user_final_system, matches_user_final_analyst, created_at",
+    )
+    .order("created_at", { ascending: false })
+    .limit(1000);
+
+  const shadowRows = shadowData ?? [];
+  const shadowTableMissing = shadowError?.code === "42P01";
 
   const total = rows.length;
   const changedRows = rows.filter((row) => row.changed_from_recommended);
@@ -106,6 +147,26 @@ export default async function ServiceLearningPage() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
 
+  const shadowTotal = shadowRows.length;
+  const shadowCompared = shadowRows.filter(
+    (row) => Boolean(row.user_final_service?.trim()) && Boolean(row.analyst_recommended_service?.trim()),
+  );
+  const analystWins = shadowCompared.filter(
+    (row) =>
+      row.matches_user_final_analyst === true && row.matches_user_final_system !== true,
+  );
+  const systemWins = shadowCompared.filter(
+    (row) =>
+      row.matches_user_final_system === true && row.matches_user_final_analyst !== true,
+  );
+  const ties = shadowCompared.filter(
+    (row) =>
+      row.matches_user_final_system === true && row.matches_user_final_analyst === true,
+  );
+  const disagreements = shadowRows.filter((row) => row.agrees_with_system === false);
+  const analystWinRate =
+    shadowCompared.length > 0 ? (analystWins.length / shadowCompared.length) * 100 : 0;
+
   return (
     <main className="px-10 py-10 space-y-6">
       <PageHeader
@@ -128,11 +189,57 @@ export default async function ServiceLearningPage() {
           Query failed: {error.message}
         </section>
       ) : null}
+      {shadowTableMissing ? (
+        <section className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-[13px] text-amber-800">
+          Shadow table not found. Run migration{" "}
+          <code className="rounded bg-amber-100 px-1.5 py-0.5">
+            supabase/migrations/0060_audit_service_shadow_logs.sql
+          </code>{" "}
+          first.
+        </section>
+      ) : null}
+      {!shadowTableMissing && shadowError ? (
+        <section className="rounded-2xl border border-red-300 bg-red-50 p-4 text-[13px] text-red-700">
+          Shadow query failed: {shadowError.message}
+        </section>
+      ) : null}
 
       <section className="grid gap-4 md:grid-cols-3">
         <StatCard label="Samples tracked" value={String(total)} />
         <StatCard label="CS overridden" value={String(changedCount)} />
         <StatCard label="Override rate" value={`${changedRate.toFixed(1)}%`} />
+      </section>
+
+      <section className="rounded-2xl border border-border-base bg-paper p-5 space-y-4">
+        <div>
+          <h2 className="font-display text-[18px] text-ink">Phase 2 shadow: system vs analyst</h2>
+          <p className="mt-1 text-[12px] text-text-muted">
+            Compares current RS decision and analyst recommendation against user final service.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-4">
+          <StatCard label="Shadow rows" value={String(shadowTotal)} />
+          <StatCard label="Comparable rows" value={String(shadowCompared.length)} />
+          <StatCard label="Analyst win rate" value={`${analystWinRate.toFixed(1)}%`} />
+          <StatCard label="System/analyst disagree" value={String(disagreements.length)} />
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <MiniStatCard
+            label="Analyst wins"
+            value={String(analystWins.length)}
+            hint="Analyst matches user final while system misses."
+          />
+          <MiniStatCard
+            label="System wins"
+            value={String(systemWins.length)}
+            hint="System matches user final while analyst misses."
+          />
+          <MiniStatCard
+            label="Both correct"
+            value={String(ties.length)}
+            hint="Both system and analyst match user final."
+          />
+        </div>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
@@ -246,6 +353,68 @@ export default async function ServiceLearningPage() {
           </table>
         </div>
       </section>
+
+      <section className="rounded-2xl border border-border-base bg-paper p-5">
+        <h2 className="font-display text-[18px] text-ink">Recent shadow disagreements</h2>
+        <p className="mt-1 text-[12px] text-text-muted">
+          Cases where analyst recommendation differs from current system recommendation.
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-left text-[12.5px]">
+            <thead className="text-[11px] uppercase tracking-[0.08em] text-text-muted">
+              <tr>
+                <th className="pb-2">Time</th>
+                <th className="pb-2">Industry</th>
+                <th className="pb-2">User final</th>
+                <th className="pb-2">System RS</th>
+                <th className="pb-2">Analyst RS</th>
+                <th className="pb-2">Mode</th>
+                <th className="pb-2">Winner</th>
+              </tr>
+            </thead>
+            <tbody>
+              {disagreements.slice(0, 25).map((row) => {
+                const winner =
+                  row.matches_user_final_analyst === true &&
+                  row.matches_user_final_system !== true
+                    ? "Analyst"
+                    : row.matches_user_final_system === true &&
+                        row.matches_user_final_analyst !== true
+                      ? "System"
+                      : row.matches_user_final_system === true &&
+                          row.matches_user_final_analyst === true
+                        ? "Both"
+                        : "Neither";
+                return (
+                  <tr key={`${row.audit_id}-${row.created_at}`} className="border-t border-border-soft">
+                    <td className="py-2 text-text-muted">
+                      {new Date(row.created_at).toLocaleString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
+                    <td className="py-2 text-text">{row.user_final_vertical ?? "unknown"}</td>
+                    <td className="py-2 font-medium text-ink">{row.user_final_service ?? "—"}</td>
+                    <td className="py-2 text-text">{row.system_recommended_service ?? "—"}</td>
+                    <td className="py-2 text-text">{row.analyst_recommended_service ?? "—"}</td>
+                    <td className="py-2 text-text">{row.analyst_mode ?? "—"}</td>
+                    <td className="py-2 text-text">{winner}</td>
+                  </tr>
+                );
+              })}
+              {disagreements.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-6 text-center text-[13px] text-text-muted">
+                    No disagreements logged yet. Enable shadow and generate audits to collect data.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
   );
 }
@@ -255,6 +424,24 @@ function StatCard({ label, value }: { label: string; value: string }) {
     <article className="rounded-2xl border border-border-base bg-paper p-5">
       <p className="text-[11px] uppercase tracking-[0.12em] text-text-muted">{label}</p>
       <p className="mt-1 font-display text-[30px] leading-tight text-ink">{value}</p>
+    </article>
+  );
+}
+
+function MiniStatCard({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+}) {
+  return (
+    <article className="rounded-xl border border-border-soft bg-paper p-4">
+      <p className="text-[11px] uppercase tracking-[0.12em] text-text-muted">{label}</p>
+      <p className="mt-1 font-display text-[26px] leading-tight text-ink">{value}</p>
+      <p className="mt-1 text-[12px] text-text-muted">{hint}</p>
     </article>
   );
 }

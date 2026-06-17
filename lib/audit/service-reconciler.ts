@@ -20,6 +20,10 @@ import {
   hasRetailSignalText,
   inferDetailedRetailService,
 } from "@/lib/audit/retail-detail-rules";
+import {
+  generateServiceCandidates,
+  pickTopComprehensiveService,
+} from "@/lib/audit/service-candidate-generator";
 
 export interface ServiceReconciliationResult {
   gs_service: string;
@@ -109,7 +113,7 @@ const TEXT_SIGNAL_PATTERNS: Array<{
     service: "optician",
   },
   {
-    pattern: /\b(eyewear|eyeglasses?|glasses|spectacles|frames|sunglasses)\b/i,
+    pattern: /\b(eyewear|eyeglasses?|glasses|spectacles|sunglasses)\b/i,
     service: "eyewear store",
   },
   {
@@ -221,14 +225,33 @@ export function reconcileServiceDecision({
 }): ServiceReconciliationResult {
   const gsServiceRaw = deriveGsService(google);
   const gsService = canonicalizeService(gsServiceRaw);
-  const bsServiceNormalized =
+  const seedBsService =
     canonicalizeService(bsService) ||
     canonicalizeService(DEFAULT_SERVICE_BY_VERTICAL[google.vertical.inferred_vertical]);
+  const comprehensiveTop = pickTopComprehensiveService({
+    google,
+    gbpDescription,
+    websiteSignalText,
+    seedService: seedBsService,
+  });
+  const bsServiceNormalized =
+    comprehensiveTop?.service ||
+    seedBsService ||
+    canonicalizeService(DEFAULT_SERVICE_BY_VERTICAL[google.vertical.inferred_vertical]);
+  const generatedCandidates = generateServiceCandidates({
+    google,
+    gbpDescription,
+    websiteSignalText,
+    seedService: seedBsService,
+  });
 
   const gsScore = specificityScore(gsService);
   const bsScore = specificityScore(bsServiceNormalized);
 
   const reasonCodes: string[] = [];
+  if (comprehensiveTop && comprehensiveTop.service !== seedBsService) {
+    reasonCodes.push("prefer_comprehensive_candidate");
+  }
   let recommended = bsServiceNormalized;
   let confidence = 0.72;
 
@@ -328,6 +351,7 @@ export function reconcileServiceDecision({
     gbpService: gbpDescriptionSignal,
     websiteService: websiteSignal,
     detailService: detailedIndustryCandidate,
+    generatedCandidates,
   });
   if (
     weightedCandidate &&
@@ -336,6 +360,13 @@ export function reconcileServiceDecision({
     reasonCodes.push("prefer_weighted_service_model");
     recommended = weightedCandidate.service;
     confidence = Math.max(confidence, weightedCandidate.confidence);
+  }
+
+  if (comprehensiveTop && canonicalizeService(recommended) === comprehensiveTop.service) {
+    if (comprehensiveTop.confidence > confidence) {
+      reasonCodes.push("comprehensive_confidence_support");
+      confidence = Math.max(confidence, comprehensiveTop.confidence);
+    }
   }
 
   if (!reasonCodes.length) {
@@ -488,6 +519,7 @@ function pickWeightedCandidate({
   gbpService,
   websiteService,
   detailService,
+  generatedCandidates,
 }: {
   vertical: VerticalKey;
   gsService: string;
@@ -495,6 +527,13 @@ function pickWeightedCandidate({
   gbpService: string;
   websiteService: string;
   detailService: string;
+  generatedCandidates: Array<{
+    service: string;
+    score: number;
+    confidence: number;
+    sources: string[];
+    specificity: number;
+  }>;
 }) {
   const weights = getIndustrySourceWeights(vertical);
   const candidateMap = new Map<
@@ -522,6 +561,21 @@ function pickWeightedCandidate({
   add(gbpService, weights.gbp, "gbp");
   add(websiteService, weights.website, "website");
   add(detailService, weights.detailRule, "detail_rule");
+  for (const candidate of generatedCandidates.slice(0, 3)) {
+    const baseDampening =
+      candidate === generatedCandidates[0]
+        ? 1
+        : candidate === generatedCandidates[1]
+          ? 0.72
+          : 0.56;
+    const specificityDampening =
+      isGenericService(candidate.service) || candidate.specificity <= 2 ? 0.25 : 1;
+    add(
+      candidate.service,
+      weights.detailRule * baseDampening * specificityDampening,
+      "generated_candidate",
+    );
+  }
 
   if (candidateMap.size === 0) return null;
 
@@ -570,7 +624,13 @@ function shouldPreferWeightedCandidate(
   const hasMultiSourceSupport = candidate.sources.size >= 2;
   if (isGenericService(current) && candidate.specificity >= currentSpecificity) return true;
   if (candidate.specificity > currentSpecificity && candidate.score >= 1.12) return true;
-  if (hasMultiSourceSupport && candidate.confidence > currentConfidence + 0.03) return true;
+  if (
+    hasMultiSourceSupport &&
+    candidate.specificity >= currentSpecificity &&
+    candidate.confidence > currentConfidence + 0.03
+  ) {
+    return true;
+  }
   return candidate.confidence >= 0.9 && candidate.score >= 1.18;
 }
 

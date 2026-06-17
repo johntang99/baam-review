@@ -6,7 +6,10 @@ import {
 } from "@/lib/audit/delivery/start-audit";
 import { canUserAudit, incrementAuditCount } from "@/lib/audit/quotas";
 import { VERTICAL_KEYS, type VerticalKey } from "@/lib/audit/google/types";
-import { logServiceResolutionLearning } from "@/lib/audit/service-learning";
+import {
+  logServiceAnalystShadow,
+  logServiceResolutionLearning,
+} from "@/lib/audit/service-learning";
 
 export const runtime = "nodejs";
 // Paid (Outscraper) scrapes of the business + ~7 competitors can legitimately
@@ -41,6 +44,13 @@ interface GenerateRequest {
   cs_recommended_service?: string;
   cs_confidence?: number;
   cs_reason_codes?: string[];
+  service_shadow?: {
+    enabled?: boolean;
+    mode?: "distilled" | "llm";
+    recommended_service?: string;
+    confidence?: number;
+    agrees_with_system?: boolean;
+  };
 }
 
 export async function POST(request: Request) {
@@ -126,6 +136,33 @@ export async function POST(request: Request) {
       : [],
     user_final_service: serviceOverride,
     user_final_vertical: verticalOverride,
+  });
+  await logServiceAnalystShadow({
+    audit_id: result.audit_id,
+    user_id: auth.user.id,
+    business_place_id: body.place_id?.trim() || undefined,
+    user_final_vertical: verticalOverride,
+    user_final_service: serviceOverride,
+    system_recommended_service:
+      (body.cs_recommended_service ?? "").trim() || undefined,
+    system_confidence:
+      typeof body.cs_confidence === "number" ? body.cs_confidence : undefined,
+    system_reason_codes: Array.isArray(body.cs_reason_codes)
+      ? body.cs_reason_codes.filter(
+          (item): item is string =>
+            typeof item === "string" && item.trim().length > 0,
+        )
+      : [],
+    analyst_mode:
+      body.service_shadow?.mode === "distilled" || body.service_shadow?.mode === "llm"
+        ? body.service_shadow.mode
+        : undefined,
+    analyst_recommended_service:
+      (body.service_shadow?.recommended_service ?? "").trim() || undefined,
+    analyst_confidence:
+      typeof body.service_shadow?.confidence === "number"
+        ? body.service_shadow.confidence
+        : undefined,
   });
 
   // Run the heavy pipeline AFTER the response is sent. Works in

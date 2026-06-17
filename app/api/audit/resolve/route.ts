@@ -8,6 +8,12 @@ import {
 import { resolveServiceKeyword } from "@/lib/audit/competitors/keyword-resolver";
 import { reconcileServiceDecision } from "@/lib/audit/service-reconciler";
 import { fetchWebsiteServiceSignalText } from "@/lib/audit/service-signal-web";
+import {
+  generateServiceCandidates,
+  pickTopComprehensiveService,
+} from "@/lib/audit/service-candidate-generator";
+import { analyzeServiceWithAnalyst } from "@/lib/audit/service-analyst";
+import { canonicalizeService } from "@/lib/audit/service-taxonomy";
 import type { VerticalKey } from "@/lib/audit/google/types";
 
 export const runtime = "nodejs";
@@ -68,16 +74,59 @@ export async function POST(request: Request) {
   try {
     const google = await getGoogleBusinessData({ textQuery }, "free");
     const detectedVertical: VerticalKey = google.vertical.inferred_vertical;
-    const detectedService = resolveServiceKeyword(google);
     const websiteSignal = await fetchWebsiteServiceSignalText(
       google.business.website ?? body.website,
     );
+    const fallbackDetectedService = resolveServiceKeyword(google);
+    const comprehensiveTop = pickTopComprehensiveService({
+      google,
+      gbpDescription: google.business.description ?? null,
+      websiteSignalText: websiteSignal?.text ?? null,
+      seedService: fallbackDetectedService,
+    });
+    const generatedCandidates = generateServiceCandidates({
+      google,
+      gbpDescription: google.business.description ?? null,
+      websiteSignalText: websiteSignal?.text ?? null,
+      seedService: fallbackDetectedService,
+    });
+    const orderedCandidates = comprehensiveTop
+      ? [
+          comprehensiveTop,
+          ...generatedCandidates.filter(
+            (candidate) => candidate.service !== comprehensiveTop.service,
+          ),
+        ]
+      : generatedCandidates;
+    const comprehensiveCandidates = orderedCandidates.slice(0, 3).map((candidate) => ({
+      service: candidate.service,
+      score: candidate.score,
+      confidence: candidate.confidence,
+      specificity: candidate.specificity,
+      sources: candidate.sources,
+    }));
+    const detectedService = comprehensiveTop?.service || fallbackDetectedService;
     const serviceDecision = reconcileServiceDecision({
       google,
       bsService: detectedService,
       gbpDescription: google.business.description ?? null,
       websiteSignalText: websiteSignal?.text ?? null,
     });
+    const enableShadow = process.env.SERVICE_ANALYST_SHADOW === "1";
+    const useLlmShadow = process.env.SERVICE_ANALYST_SHADOW_USE_LLM === "1";
+    const serviceShadow = enableShadow
+      ? await analyzeServiceWithAnalyst({
+          google,
+          googleService: serviceDecision.gs_service,
+          fallbackService: detectedService,
+          gbpDescription: google.business.description ?? null,
+          websiteSignalText: websiteSignal?.text ?? null,
+          useLlm: useLlmShadow,
+        }).catch((err) => {
+          console.error("[resolve] service shadow failed:", err);
+          return null;
+        })
+      : null;
     const websiteMatch = matchWebsite(body.website, google.business.website);
 
     return NextResponse.json({
@@ -100,6 +149,18 @@ export async function POST(request: Request) {
       cs_recommended_service: serviceDecision.cs_recommended_service,
       cs_confidence: serviceDecision.cs_confidence,
       cs_reason_codes: serviceDecision.cs_reason_codes,
+      service_candidates: comprehensiveCandidates,
+      service_shadow: serviceShadow
+        ? {
+            enabled: true,
+            mode: serviceShadow.mode,
+            recommended_service: serviceShadow.recommended_service,
+            confidence: serviceShadow.confidence,
+            agrees_with_system:
+              canonicalizeService(serviceShadow.recommended_service) ===
+              canonicalizeService(serviceDecision.cs_recommended_service),
+          }
+        : { enabled: false },
       // Actual Google Business Profile categorization (for display/context).
       google_category:
         google.vertical.primary_category_display ||

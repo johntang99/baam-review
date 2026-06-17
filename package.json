@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start -p 4001",
     "lint": "eslint",
-    "service:coverage-loop": "npx tsx scripts/service-coverage-loop.ts"
+    "service:coverage-loop": "npx tsx scripts/service-coverage-loop.ts",
+    "service:shadow-eval": "npx tsx scripts/service-analyst-shadow-eval.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.1",

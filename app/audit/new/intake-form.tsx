@@ -40,6 +40,36 @@ const VERTICAL_LABELS: Record<string, string> = {
   general_smb: "Other local business",
 };
 
+const CANDIDATE_SOURCE_LABELS: Record<string, string> = {
+  seed: "Seed",
+  vertical_prior: "Industry prior",
+  google_category_display: "Google category label",
+  google_primary_type: "Google primary type",
+  detail_vision: "Vision detail rule",
+  detail_manufacturer: "Manufacturer detail rule",
+  detail_retail: "Retail detail rule",
+  name_match: "Name match",
+  description_match: "GBP description match",
+  website_match: "Website signal match",
+  category_match: "Category token match",
+};
+
+interface ServiceCandidateDebug {
+  service: string;
+  score: number;
+  confidence: number;
+  specificity: number;
+  sources: string[];
+}
+
+interface ServiceShadowDebug {
+  enabled: boolean;
+  mode?: "distilled" | "llm";
+  recommended_service?: string;
+  confidence?: number;
+  agrees_with_system?: boolean;
+}
+
 interface ResolvedBusiness {
   place_id: string;
   name: string;
@@ -60,6 +90,8 @@ interface ResolvedBusiness {
   cs_recommended_service: string;
   cs_confidence: number;
   cs_reason_codes: string[];
+  service_candidates?: ServiceCandidateDebug[];
+  service_shadow?: ServiceShadowDebug;
   google_category: string | null;
   google_categories: string[];
   vertical_options: string[];
@@ -173,6 +205,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           cs_recommended_service: resolved.cs_recommended_service,
           cs_confidence: resolved.cs_confidence,
           cs_reason_codes: resolved.cs_reason_codes,
+          service_shadow: resolved.service_shadow,
           service_confirmed: serviceConfirmed,
         }),
       });
@@ -232,6 +265,28 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
     const confidencePct = Math.round(resolved.cs_confidence * 100);
     const isModerateConfidence = resolved.cs_confidence < 0.75;
     const finalService = service.trim() || "—";
+    const topServiceCandidates = resolved.service_candidates ?? [];
+    const serviceValueDisplayStyle = {
+      fontSize: 24,
+      lineHeight: 1.12,
+      fontFamily: "'Instrument Serif', serif",
+      fontWeight: 400,
+      color: "var(--ink)",
+    } as const;
+    const stepCircleStyle = {
+      width: 28,
+      height: 28,
+      borderRadius: 999,
+      background: "var(--ink)",
+      color: "var(--cream-light)",
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: 13,
+      fontWeight: 800,
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0,
+    } as const;
 
     return (
       <form onSubmit={handleGenerate}>
@@ -245,7 +300,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               color: "var(--ink)",
             }}
           >
-            Make the business service as accurate as possible
+            Determine Service and Report Language
           </h3>
           <p
             style={{
@@ -339,9 +394,13 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 letterSpacing: "0.1em",
                 color: "var(--ink-mute)",
                 fontWeight: 700,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
               }}
             >
-              <span style={{ color: "var(--ink)" }}>Step 1</span> · GBP matched profile
+              <span style={stepCircleStyle}>1</span>
+              <span>GBP matched profile</span>
             </h4>
             <div
               style={{
@@ -572,9 +631,13 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 letterSpacing: "0.1em",
                 color: "var(--ink-mute)",
                 fontWeight: 700,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
               }}
             >
-              <span style={{ color: "var(--ink)" }}>Step 2</span> · Report language
+              <span style={stepCircleStyle}>2</span>
+              <span>Report language</span>
             </h4>
             <div
               style={{
@@ -664,9 +727,13 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                   letterSpacing: "0.1em",
                   color: "var(--ink-mute)",
                   fontWeight: 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                <span style={{ color: "var(--ink)" }}>Step 3</span> · Service evidence and recommended service
+                <span style={stepCircleStyle}>3</span>
+                <span>Service evidence and recommended service</span>
               </h4>
               <span
                 style={{
@@ -763,6 +830,107 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               </article>
             </div>
 
+            {topServiceCandidates.length > 0 ? (
+              <div
+                style={{
+                  marginTop: 12,
+                  border: "1px dashed var(--rule)",
+                  borderRadius: 8,
+                  padding: 12,
+                  background: "#faf9f6",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-mute)",
+                    fontWeight: 700,
+                  }}
+                >
+                  Debug · Top candidates (up to 3)
+                </div>
+                <div
+                  style={{
+                    marginTop: 10,
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                    gap: 10,
+                  }}
+                >
+                  {topServiceCandidates.map((candidate, index) => (
+                    <article
+                      key={`${candidate.service}-${index}`}
+                      style={{
+                        border: "1px solid var(--rule-soft)",
+                        borderRadius: 8,
+                        padding: 10,
+                        background: "#fff",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: "var(--ink-mute)",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.08em",
+                          fontWeight: 700,
+                        }}
+                      >
+                        #{index + 1} candidate
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 4,
+                          ...serviceValueDisplayStyle,
+                          textTransform: "lowercase",
+                        }}
+                      >
+                        {candidate.service}
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 6,
+                          fontSize: 12,
+                          color: "var(--ink-soft)",
+                        }}
+                      >
+                        score {candidate.score.toFixed(2)} · confidence{" "}
+                        {Math.round(candidate.confidence * 100)}% · specificity{" "}
+                        {candidate.specificity}
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 8,
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 6,
+                        }}
+                      >
+                        {candidate.sources.map((source) => (
+                          <span
+                            key={source}
+                            style={{
+                              border: "1px solid var(--rule-soft)",
+                              borderRadius: 999,
+                              padding: "2px 8px",
+                              fontSize: 11,
+                              color: "var(--ink-mute)",
+                              background: "var(--cream-light)",
+                            }}
+                          >
+                            {CANDIDATE_SOURCE_LABELS[source] ?? source}
+                          </span>
+                        ))}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
             <div
               style={{
                 marginTop: 12,
@@ -819,12 +987,14 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                     style={{
                       width: "100%",
                       marginTop: 6,
-                      padding: "10px 12px",
+                      padding: "8px 12px",
                       border: "1px solid var(--rule)",
                       borderRadius: 8,
                       background: "#fff",
-                      fontFamily: "inherit",
-                      fontSize: 14,
+                      fontFamily: "'Instrument Serif', serif",
+                      fontSize: 24,
+                      lineHeight: 1.12,
+                      fontWeight: 400,
                       color: "var(--ink)",
                     }}
                   >
@@ -863,9 +1033,11 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       border: "1px solid var(--rule)",
                       background: "#fff",
                       borderRadius: 8,
-                      padding: "11px 12px",
-                      fontSize: 18,
+                      padding: "8px 12px",
+                      fontSize: 24,
+                      lineHeight: 1.12,
                       fontFamily: "'Instrument Serif', serif",
+                      fontWeight: 400,
                       color: "var(--ink)",
                       textTransform: "lowercase",
                     }}
@@ -910,9 +1082,13 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 letterSpacing: "0.1em",
                 color: "var(--ink-mute)",
                 fontWeight: 700,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
               }}
             >
-              <span style={{ color: "var(--ink)" }}>Step 4</span> · Confirmation gate
+              <span style={stepCircleStyle}>4</span>
+              <span>Confirmation gate</span>
             </h4>
 
             <div

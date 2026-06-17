@@ -56,26 +56,41 @@ Normalize the target business identity and collect enough structured data to sup
 ### Purpose
 Produce a **Recommended Service (RS)** that is specific enough for high-quality competitor discovery and final report generation.
 
-### Decision model
-The reconciler combines multiple sources, not only Google and BAAM:
+### Current decision model (production)
+Step 2 now runs a **comprehensive candidate-first** pipeline. `keyword-resolver` is a supporting/fallback signal, not the decision center.
 
-- **Google Service (GS):** inferred from GBP types/category signals
-- **BAAM Service (BS):** system inference from internal rules and taxonomy
-- **GBP description signal:** editorial summary text
-- **Website signal:** lightweight extraction from title/meta/headings/body snippets
-- **Industry detail rules:** vertical-specific logic (for example manufacturer/vision)
+Primary modules:
+
+- `lib/audit/service-candidate-generator.ts`
+- `lib/audit/service-reconciler.ts`
+- `lib/audit/service-taxonomy.ts`
+
+### Candidate sources used
+
+The candidate generator combines:
+
+- **Seed service:** fallback from resolver
+- **Industry prior:** default service by inferred vertical (for example TCM -> acupuncture)
+- **Google category evidence:** primary type + category display + category tokens
+- **GBP description evidence**
+- **Website evidence:** extracted webpage signal + URL/domain/path tokens
+- **Detail rules:** manufacturer / vision / retail rule engines
+- **Taxonomy lexical matches:** name / description / website / category token matches
 
 ### Core logic (high-level)
-1. Canonicalize all service candidates through shared taxonomy.
-2. Score candidates using weighted source contributions.
-3. Apply specificity preference to avoid generic terms when credible specific terms exist.
-4. Apply vertical boosts/detail rules when evidence supports specialization.
-5. Select top candidate as `RS` and emit confidence + explanation signals.
+1. Normalize evidence and map services to canonical taxonomy values.
+2. Generate multiple candidates with source-attributed score/confidence/specificity.
+3. Apply broad-term penalty to generic services (for example `manufacturer`, `service`, `store`, `local business`).
+4. Prefer specific alternatives when top broad candidate is close in score.
+5. Reconcile GS + BS + external text signals + detail candidates through weighted model.
+6. Block specificity downgrade in weighted override (a lower-specificity candidate cannot replace a stronger specific candidate by small confidence deltas).
+7. If final RS equals comprehensive top candidate, align confidence upward via comprehensive confidence support.
 
 ### UI contract
 At confirmation screen:
 - Show **Google Service** (read-only evidence)
 - Show **BAAM-generated Service** (read-only evidence)
+- Show **Debug · Top candidates (up to 3)** with score/confidence/specificity/source tags
 - Show **Recommended Service** as editable input (`RS`)
 - Require explicit user confirmation before generating audit
 
@@ -84,8 +99,9 @@ At confirmation screen:
 - Unconfirmed state blocks "Generate Audit" and shows reminder modal
 
 ### Failure handling
-- If GS and BS conflict heavily and external text is weak, lower confidence and force visible user confirmation.
-- If RS remains too generic, suggest detail candidates before confirmation.
+- If GS and BS conflict heavily and external text is weak, keep confidence conservative and force visible user confirmation.
+- If RS remains broad/generic, prefer specific candidate alternatives when signal support exists.
+- If only 1-2 unique high-quality candidates remain after canonicalization/dedupe, UI shows fewer than 3 candidates by design.
 
 ---
 
@@ -194,6 +210,7 @@ Use override data to improve reconciliation and ranking:
 - `service_recommended_system` (RS system)
 - `service_final_confirmed` (RS final, user-confirmed)
 - `service_confidence`, reason metadata
+- `service_candidates_debug` (top candidates, up to 3, with source tags and score metadata)
 
 ### Step 3 output contract
 - `competitor_candidates` (scored with source tags)

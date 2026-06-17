@@ -15,6 +15,13 @@ type ServiceTaxonomyEntry = {
   generic?: boolean;
 };
 
+export type ServiceLexiconEntry = {
+  canonical: string;
+  terms: string[];
+  specificity: 1 | 2 | 3 | 4;
+  generic: boolean;
+};
+
 const GENERIC_SERVICE_TERMS = new Set([
   "service",
   "services",
@@ -161,7 +168,22 @@ const SERVICE_TAXONOMY: readonly ServiceTaxonomyEntry[] = [
   { canonical: "real estate agent", aliases: ["realtor"], specificity: 3 },
   { canonical: "insurance agent", specificity: 3 },
   { canonical: "hotel", specificity: 2 },
-  { canonical: "acupuncture", specificity: 3 },
+  {
+    canonical: "acupuncture",
+    aliases: [
+      "tcm",
+      "tcm clinic",
+      "traditional chinese medicine",
+      "traditional chinese medicine clinic",
+      "中医",
+      "中醫",
+      "针灸",
+      "針灸",
+      "中医针灸",
+      "中醫針灸",
+    ],
+    specificity: 3,
+  },
   { canonical: "local business", generic: true, specificity: 1 },
 ];
 
@@ -313,6 +335,18 @@ export function isKnownService(input: string | null | undefined) {
   const canonical = canonicalizeService(input);
   if (!canonical) return false;
   return SERVICE_ALIAS_TO_CANONICAL.has(canonical);
+}
+
+export function getServiceLexicon(): ServiceLexiconEntry[] {
+  return SERVICE_TAXONOMY.map((entry) => ({
+    canonical: normalizeServiceText(entry.canonical),
+    terms: [
+      normalizeServiceText(entry.canonical),
+      ...(entry.aliases ?? []).map((alias) => normalizeServiceText(alias)),
+    ],
+    specificity: entry.specificity ?? 2,
+    generic: Boolean(entry.generic),
+  }));
 }
 
 function buildAliasIndex() {
