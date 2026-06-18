@@ -5,42 +5,80 @@ import {
   resolveLocationByInboundAddress,
   extractContactFromEmail,
 } from "@/lib/integrations/inbound-email";
-import { parseWebhookBody, pickField } from "@/lib/integrations/parse-body";
+import { verifyResendSignature } from "@/lib/integrations/svix-verify";
 
 /**
- * Email-in bridge (Item 1). The inbound-email provider (Cloudflare Email
- * Routing → Worker, Resend/Mailgun inbound, etc.) POSTs a forwarded
- * confirmation email here as JSON or form:
- *   { to, from, subject, text, message_id? }
- * Auth = shared INBOUND_EMAIL_SECRET (header x-inbound-secret or ?secret=).
- * The location is resolved from the `to` address (r-<token>@domain); the
- * customer's contact is parsed out and enqueued.
+ * Email-in bridge (Item 1). Accepts a forwarded confirmation email from the
+ * inbound provider and queues the customer.
  *
- * Always 200s on a handled-but-skipped email so the provider doesn't retry.
+ * Auth — either:
+ *   • Resend inbound: Svix signature (svix-* / webhook-* headers) verified with
+ *     RESEND_INBOUND_SIGNING_SECRET, OR
+ *   • Generic providers (SendGrid Inbound Parse, Cloudflare Worker, etc.):
+ *     shared INBOUND_EMAIL_SECRET via `x-inbound-secret` header or `?secret=`.
+ *
+ * Payload — tolerant of both Resend's nested `{ data: { from,to,subject,text } }`
+ * and flat `{ from,to,subject,text }` (SendGrid/Mailgun field names too). The
+ * location is resolved from the `to` address (r-<token>@domain).
+ *
+ * Always 200s on handled-but-skipped so providers don't retry.
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-export const maxDuration = 30; // AI extraction call
+export const maxDuration = 30; // AI extraction
 
 export async function POST(request: NextRequest) {
-  const secret = process.env.INBOUND_EMAIL_SECRET;
-  const presented =
-    request.headers.get("x-inbound-secret") ??
-    request.nextUrl.searchParams.get("secret");
-  if (!secret || presented !== secret) {
+  const raw = await request.text();
+
+  // ── Auth ────────────────────────────────────────────────────────────────
+  const resendSecret = process.env.RESEND_INBOUND_SIGNING_SECRET;
+  const hasSvix =
+    request.headers.get("svix-signature") ??
+    request.headers.get("webhook-signature");
+  let authed = false;
+  if (resendSecret && hasSvix) {
+    authed = verifyResendSignature(raw, request.headers, resendSecret);
+  } else {
+    const shared = process.env.INBOUND_EMAIL_SECRET;
+    const presented =
+      request.headers.get("x-inbound-secret") ??
+      request.nextUrl.searchParams.get("secret");
+    authed = !!shared && presented === shared;
+  }
+  if (!authed) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  const body = await parseWebhookBody(request);
-  const to = pickField(body, "to", "recipient", "envelope_to");
-  const from = pickField(body, "from", "sender");
-  const subject = pickField(body, "subject");
-  const text = pickField(body, "text", "body-plain", "plain", "body");
-  const messageId = pickField(body, "message_id", "message-id", "messageId");
+  // ── Parse body (JSON or form) ────────────────────────────────────────────
+  const ct = (request.headers.get("content-type") || "").toLowerCase();
+  let parsed: Record<string, unknown> = {};
+  if (ct.includes("application/json") || raw.trim().startsWith("{")) {
+    try {
+      parsed = JSON.parse(raw) as Record<string, unknown>;
+    } catch {
+      /* leave empty */
+    }
+  } else {
+    parsed = Object.fromEntries(new URLSearchParams(raw));
+  }
 
+  // Resend nests the email under `data`; generic providers are flat.
+  const d = parsed.data && typeof parsed.data === "object" ? (parsed.data as Record<string, unknown>) : parsed;
+  const pick = (k: string) => d[k] ?? parsed[k];
+
+  const to = addressString(pick("to") ?? pick("recipient") ?? pick("envelope_to"));
+  const from = emailString(pick("from") ?? pick("sender"));
+  const subject = textOf(pick("subject"));
+  const text = textOf(
+    pick("text") ?? pick("html") ?? pick("body-plain") ?? pick("body"),
+  );
+  const messageId =
+    textOf(pick("message_id") ?? pick("message-id")) ??
+    request.headers.get("svix-id");
+
+  // ── Resolve location → extract contact → enqueue ─────────────────────────
   const locationId = await resolveLocationByInboundAddress(to);
   if (!locationId) {
-    // Unknown address — ack so the provider doesn't keep retrying.
     return NextResponse.json({ ok: true, status: "no_location" });
   }
 
@@ -49,8 +87,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, status: "no_contact" });
   }
 
-  // Idempotency: prefer the provider's message id; else hash the email's
-  // identifying parts so a re-forward of the same email doesn't double-queue.
   const externalId =
     "email-" +
     createHash("sha256")
@@ -74,4 +110,21 @@ export async function POST(request: NextRequest) {
     );
   }
   return NextResponse.json({ ok: true, status: "skipped", reason: result.reason });
+}
+
+// ── helpers: tolerate string | {email|address|name} | array shapes ──────────
+function addressString(v: unknown): string | null {
+  if (typeof v === "string") return v;
+  if (Array.isArray(v)) return v.map(addressString).filter(Boolean).join(",") || null;
+  if (v && typeof v === "object") {
+    const o = v as Record<string, unknown>;
+    return (typeof o.email === "string" && o.email) || (typeof o.address === "string" && o.address) || null;
+  }
+  return null;
+}
+function emailString(v: unknown): string | null {
+  return addressString(v);
+}
+function textOf(v: unknown): string | null {
+  return typeof v === "string" && v.trim() ? v : null;
 }

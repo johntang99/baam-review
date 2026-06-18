@@ -1385,6 +1385,15 @@ function isManufacturerLike(input: string) {
 function isServiceCompatibleWithVertical(service: string, vertical: VerticalKey) {
   const normalized = canonicalizeService(service);
   if (!normalized) return false;
+  // Keep non-commercial location labels from leaking into strict business verticals.
+  if (
+    vertical !== "general_smb" &&
+    /\b(park|zoo|historical landmark|church|buddhist temple|hindu temple)\b/i.test(
+      normalized,
+    )
+  ) {
+    return false;
+  }
   if (vertical === "legal_immigration") {
     return isLegalService(normalized);
   }

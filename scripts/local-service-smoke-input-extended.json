@@ -1,0 +1,83 @@
+[
+  {
+    "name": "The Oriental Carpet",
+    "address": "773 Santa Cruz Ave, Menlo Park, CA 94025",
+    "website": "theorientalcarpet.com"
+  },
+  {
+    "name": "The UPS Store",
+    "address": "325 Sharon Park Dr, Menlo Park, CA 94025"
+  },
+  {
+    "name": "Natural Life Acupuncture, PC",
+    "address": "143-26 41st Ave, Flushing, NY 11354",
+    "website": "acupunctureflushing.com"
+  },
+  {
+    "name": "ACA Acupuncture & Wellness - Washington Heights",
+    "address": "613 W 169th St, New York, NY 10032",
+    "website": "acaacupuncture.com"
+  },
+  {
+    "name": "Wedding Atelier Flagship Bridal Boutique",
+    "address": "72 Madison Ave 4th floor, New York, NY 10016",
+    "website": "weddingatelier.com"
+  },
+  {
+    "name": "Mayell Real Estate",
+    "address": "345 E 18th St Front A, New York, NY 10003",
+    "website": "mayellre.com"
+  },
+  {
+    "name": "Ranshaw Plumbing & Heating",
+    "address": "151-01 14th Ave, Whitestone, NY 11357",
+    "website": "ranshaw.com"
+  },
+  {
+    "name": "WORLD SPA",
+    "address": "1571 McDonald Ave, Brooklyn, NY 11230",
+    "website": "worldspa.com"
+  },
+  {
+    "name": "Haidilao Hotpot",
+    "address": "138-23 39th Ave, Flushing, NY 11354",
+    "website": "superhiinternational.com"
+  },
+  {
+    "name": "Blue Steel Auto School",
+    "address": "197 Utica Ave, Brooklyn, NY 11213",
+    "website": "bluesteelautoschool.com"
+  },
+  {
+    "name": "Apple Fifth Avenue",
+    "address": "767 5th Ave, New York, NY 10153"
+  },
+  {
+    "name": "Bank of America Financial Center",
+    "address": "555 California St, San Francisco, CA 94104"
+  },
+  {
+    "name": "Wells Fargo Bank",
+    "address": "420 Montgomery St, San Francisco, CA 94104"
+  },
+  {
+    "name": "Sephora",
+    "address": "5 Times Sq, New York, NY 10036"
+  },
+  {
+    "name": "Sheraton Times Square Hotel",
+    "address": "811 7th Ave, New York, NY 10019"
+  },
+  {
+    "name": "Starbucks",
+    "address": "1 Ferry Building, San Francisco, CA 94111"
+  },
+  {
+    "name": "FedEx Office Print & Ship Center",
+    "address": "1500 Laurel St, San Carlos, CA 94070"
+  },
+  {
+    "name": "US Post Office",
+    "address": "1100 Broadway, Redwood City, CA 94063"
+  }
+]

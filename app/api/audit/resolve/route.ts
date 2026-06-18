@@ -45,19 +45,6 @@ const INDUSTRY_OPTIONS: string[] = [
   "general_smb",
 ];
 
-const FALLBACK_SERVICE_OPTIONS_BY_VERTICAL: Partial<Record<VerticalKey, string[]>> = {
-  contractor: ["hvac contractor", "window treatment store", "kitchen remodeler"],
-  restaurant: ["chinese restaurant", "italian restaurant", "mexican restaurant"],
-  dental: ["pediatric dentist", "orthodontist", "dentist"],
-  legal_immigration: ["immigration lawyer", "divorce lawyer", "personal injury lawyer"],
-  salon_spa: ["day spa", "nail salon", "hair salon"],
-  auto: ["auto repair", "auto body shop", "tire shop"],
-  real_estate: ["real estate agent", "real estate broker", "property management"],
-  apparel: ["bridal boutique", "jewelry store", "shoe store"],
-  insurance: ["insurance agent", "insurance broker", "life insurance agency"],
-  general_smb: ["business coach", "print shop", "loan agency"],
-};
-
 const EVIDENCE_SERVICE_OPTION_RULES: Array<{
   pattern: RegExp;
   options: string[];
@@ -398,6 +385,8 @@ function buildServiceOptions({
   websiteSignalText?: string | null;
 }) {
   const options: string[] = [];
+  const normalizedRecommended = canonicalizeService(recommendedService);
+  const recommendedIsBroad = isBroadService(normalizedRecommended, vertical);
   const push = (value: string) => {
     const normalized = canonicalizeService(value);
     if (!normalized) return;
@@ -407,9 +396,22 @@ function buildServiceOptions({
   };
 
   push(recommendedService);
-  for (const candidate of generatedCandidates) {
+  const rankedGenerated = [...generatedCandidates].sort((a, b) => {
+    if (b.confidence !== a.confidence) return b.confidence - a.confidence;
+    if (b.specificity !== a.specificity) return b.specificity - a.specificity;
+    return b.score - a.score;
+  });
+
+  for (const candidate of rankedGenerated) {
     if (candidate.specificity < 3) continue;
-    if (candidate.confidence < 0.62) continue;
+    if (candidate.confidence < 0.45) continue;
+    if (
+      !recommendedIsBroad &&
+      normalizedRecommended &&
+      !isSemanticallyRelatedService(candidate.service, normalizedRecommended)
+    ) {
+      continue;
+    }
     push(candidate.service);
     if (options.length >= 3) break;
   }
@@ -431,15 +433,33 @@ function buildServiceOptions({
       .toLowerCase();
 
     for (const suggestion of inferEvidenceServiceOptions(evidenceText, vertical)) {
+      if (
+        !recommendedIsBroad &&
+        normalizedRecommended &&
+        !isSemanticallyRelatedService(suggestion, normalizedRecommended)
+      ) {
+        continue;
+      }
       push(suggestion);
       if (options.length >= 3) break;
     }
   }
 
-  if (options.length < 3) {
-    for (const fallback of FALLBACK_SERVICE_OPTIONS_BY_VERTICAL[vertical] ?? []) {
-      push(fallback);
+  if (options.length < 3 && normalizedRecommended) {
+    for (const suggestion of inferRelatedKeywordOptions(normalizedRecommended, vertical)) {
+      push(suggestion);
       if (options.length >= 3) break;
+    }
+  }
+
+  // Last resort: if options are still too sparse, use remaining specific generated
+  // candidates only (no static vertical fallback).
+  if (options.length < 2) {
+    for (const candidate of rankedGenerated) {
+      if (candidate.specificity < 3) continue;
+      if (candidate.confidence < 0.38) continue;
+      push(candidate.service);
+      if (options.length >= 2) break;
     }
   }
 
@@ -451,6 +471,125 @@ function inferEvidenceServiceOptions(text: string, vertical: VerticalKey) {
   for (const rule of EVIDENCE_SERVICE_OPTION_RULES) {
     if (rule.verticals && !rule.verticals.includes(vertical)) continue;
     if (!rule.pattern.test(text)) continue;
+    for (const option of rule.options) {
+      if (!output.includes(option)) output.push(option);
+    }
+  }
+  return output;
+}
+
+const SERVICE_TOKEN_STOPWORDS = new Set([
+  "service",
+  "services",
+  "store",
+  "shop",
+  "agency",
+  "center",
+  "centre",
+  "clinic",
+  "company",
+  "office",
+  "group",
+  "business",
+  "local",
+  "professional",
+  "solutions",
+  "specialist",
+  "specialists",
+]);
+
+const SERVICE_KEYWORD_FAMILIES: string[][] = [
+  ["rug", "rugs", "carpet", "carpets"],
+  ["shipping", "mailing", "postal", "courier", "parcel", "packaging"],
+  ["hvac", "heating", "cooling", "air", "duct", "furnace", "ventilation"],
+  ["dentist", "dental", "orthodontist", "orthodontic"],
+  ["lawyer", "attorney", "legal", "immigration", "visa", "asylum"],
+  ["translation", "translator", "interpretation", "interpreter", "localization"],
+  ["marketing", "seo", "branding", "advertising", "digital", "web"],
+  ["plumber", "plumbing", "drain", "sewer"],
+  ["repair", "cleaning", "restoration", "maintenance"],
+];
+
+function isSemanticallyRelatedService(inputA: string, inputB: string) {
+  const a = canonicalizeService(inputA);
+  const b = canonicalizeService(inputB);
+  if (!a || !b) return false;
+  if (a === b) return true;
+
+  const aTokens = tokenizeService(a);
+  const bTokens = tokenizeService(b);
+  if (aTokens.length === 0 || bTokens.length === 0) return false;
+
+  if (aTokens.some((token) => bTokens.includes(token))) return true;
+  if (hasSharedKeywordFamily(aTokens, bTokens)) return true;
+  return false;
+}
+
+function tokenizeService(value: string) {
+  return canonicalizeService(value)
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length > 1)
+    .filter((token) => !SERVICE_TOKEN_STOPWORDS.has(token));
+}
+
+function hasSharedKeywordFamily(tokensA: string[], tokensB: string[]) {
+  for (const family of SERVICE_KEYWORD_FAMILIES) {
+    const hasA = tokensA.some((token) => family.includes(token));
+    if (!hasA) continue;
+    const hasB = tokensB.some((token) => family.includes(token));
+    if (hasB) return true;
+  }
+  return false;
+}
+
+const RELATED_KEYWORD_OPTION_RULES: Array<{
+  pattern: RegExp;
+  options: string[];
+  verticals?: VerticalKey[];
+}> = [
+  {
+    pattern: /\b(rug|carpet)\b/i,
+    options: ["carpet cleaning service", "carpet repair service", "rug store"],
+    verticals: ["contractor", "general_smb"],
+  },
+  {
+    pattern: /\b(shipping|mailing|postal|courier)\b/i,
+    options: ["print shop", "mailbox rental service", "shipping and mailing service"],
+  },
+  {
+    pattern: /\b(hvac|heating|cooling|air duct|furnace)\b/i,
+    options: ["heating contractor", "air duct cleaning service", "hvac contractor"],
+    verticals: ["contractor", "general_smb"],
+  },
+  {
+    pattern: /\b(dentist|dental|orthodont)\b/i,
+    options: ["pediatric dentist", "orthodontist", "dentist"],
+    verticals: ["dental"],
+  },
+  {
+    pattern: /\b(acupuncture|tcm|traditional chinese medicine)\b/i,
+    options: ["acupuncture", "massage therapist", "wellness center"],
+    verticals: ["tcm_clinic", "general_smb"],
+  },
+  {
+    pattern: /\b(marketing|seo|web design|branding|advertising)\b/i,
+    options: ["marketing consultant", "management consultant", "business coach"],
+  },
+  {
+    pattern: /\b(immigration|visa|asylum|attorney|lawyer)\b/i,
+    options: ["immigration lawyer", "personal injury lawyer", "divorce lawyer"],
+    verticals: ["legal_immigration"],
+  },
+];
+
+function inferRelatedKeywordOptions(service: string, vertical: VerticalKey) {
+  const normalized = canonicalizeService(service);
+  if (!normalized) return [];
+  const output: string[] = [];
+  for (const rule of RELATED_KEYWORD_OPTION_RULES) {
+    if (rule.verticals && !rule.verticals.includes(vertical)) continue;
+    if (!rule.pattern.test(normalized)) continue;
     for (const option of rule.options) {
       if (!output.includes(option)) output.push(option);
     }

@@ -1,0 +1,31 @@
+[
+  {
+    "name": "The Oriental Carpet",
+    "address": "773 Santa Cruz Ave, Menlo Park, CA 94025",
+    "website": "theorientalcarpet.com"
+  },
+  {
+    "name": "The UPS Store",
+    "address": "325 Sharon Park Dr, Menlo Park, CA 94025"
+  },
+  {
+    "name": "Natural Life Acupuncture, PC",
+    "address": "143-26 41st Ave, Flushing, NY 11354",
+    "website": "acupunctureflushing.com"
+  },
+  {
+    "name": "Wedding Atelier Flagship Bridal Boutique",
+    "address": "72 Madison Ave 4th floor, New York, NY 10016",
+    "website": "weddingatelier.com"
+  },
+  {
+    "name": "Blue Steel Auto School",
+    "address": "197 Utica Ave, Brooklyn, NY 11213",
+    "website": "bluesteelautoschool.com"
+  },
+  {
+    "name": "Ranshaw Plumbing & Heating",
+    "address": "151-01 14th Ave, Whitestone, NY 11357",
+    "website": "ranshaw.com"
+  }
+]

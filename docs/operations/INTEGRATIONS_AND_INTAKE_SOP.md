@@ -405,12 +405,20 @@ customer out and queue them. (See `docs/operations/INTEGRATION_BRIDGES_PLAN.md`.
 2. The client adds an **auto-forward rule** (Gmail/Outlook) for their "new order / new booking / appointment confirmed" emails → that address.
 3. The inbound provider posts the email to `POST /api/integrations/inbound-email`; we resolve the location by the address token, extract the **customer's** name/email/phone (Claude Haiku, with a regex fallback — it ignores the business's own/support/no-reply addresses), and enqueue. Idempotent per message.
 
-**One-time infra (ops):**
-- Pick an inbound-email provider for `<INBOUND_EMAIL_DOMAIN>`:
-  - **Cloudflare Email Routing (free):** catch-all on the domain → an **Email Worker** that POSTs `{ to, from, subject, text }` (JSON) to `https://baamreview.com/api/integrations/inbound-email` with header `x-inbound-secret: <INBOUND_EMAIL_SECRET>`.
-  - or **Resend / Mailgun / SendGrid inbound** → same POST shape + secret.
-- Env: `INBOUND_EMAIL_DOMAIN`, `INBOUND_EMAIL_SECRET` (shared with the worker), `ANTHROPIC_API_KEY` (already set; used for extraction).
-- DB: migration `0059` adds `locations.inbound_email_token`.
+**One-time infra (ops)** — pick ONE inbound provider for `<INBOUND_EMAIL_DOMAIN>` (use a **subdomain**
+like `inbound.baamplatform.com`; never the root if it has Google Workspace MX):
+- **Resend Inbound (all-Resend, keeps GoDaddy)** — Resend receives on the subdomain and sends a
+  **signed webhook** to `/api/integrations/inbound-email`; we verify it with
+  `RESEND_INBOUND_SIGNING_SECRET`. Full steps: `EMAIL_IN_RESEND_SETUP.md`.
+- **SendGrid Inbound Parse / Mailgun (keeps GoDaddy, zero code)** — add an MX at GoDaddy → their MX;
+  set their POST URL to `…/inbound-email?secret=<INBOUND_EMAIL_SECRET>`. The endpoint already accepts
+  their field names (`to`/`recipient`, `from`/`sender`, `subject`, `text`/`body-plain`).
+- **Cloudflare Email Routing (free, needs DNS on Cloudflare)** — Email Worker posts
+  `{to,from,subject,text}` + `x-inbound-secret`. Worker provided at
+  `infra/cloudflare-inbound-email-worker/`. Steps: `EMAIL_IN_CLOUDFLARE_SETUP.md`.
+- **Env:** `INBOUND_EMAIL_DOMAIN`; then `RESEND_INBOUND_SIGNING_SECRET` (Resend path) **or**
+  `INBOUND_EMAIL_SECRET` (SendGrid/Mailgun/Cloudflare path); `ANTHROPIC_API_KEY` (already set).
+- **DB:** migration `0059` adds `locations.inbound_email_token`.
 
 **Test:** forward (or POST) a sample "new order" email to a location's address → it appears in that location's "Incoming · week of …" queue. Endpoint returns `201` queued · `200` skipped (no_contact/duplicate/no_location) · `401` bad secret.
 

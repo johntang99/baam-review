@@ -1,0 +1,9 @@
+name = "baam-inbound-email"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Public (non-secret) var. The secret is set separately:
+#   npx wrangler secret put INBOUND_EMAIL_SECRET
+[vars]
+BAAM_INBOUND_URL = "https://baamreview.com/api/integrations/inbound-email"
