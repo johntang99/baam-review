@@ -67,8 +67,28 @@ export interface ExtractedContact {
 
 const EMAIL_RE = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi;
 const PHONE_RE = /(\+?\d[\d\s().-]{7,}\d)/g;
-// Addresses that are never the customer.
-const NON_CUSTOMER = /no-?reply|do-?not-?reply|notification|mailer|postmaster|support|store\+|@.*shopifyemail|@.*squareup|@.*calendly/i;
+// Role/business addresses that are never the customer.
+const NON_CUSTOMER =
+  /no-?reply|do-?not-?reply|notification|mailer|postmaster|support@|service@|billing@|admin@|hello@|info@|team@|accounts?@|store\+|@.*shopifyemail|@.*squareup|@.*calendly|@baamplatform\.com|@baamreview\.com|baamplatform@|baamreview@/i;
+
+/** Pull the bare address out of "Name <email>" / "<email>" / "email". */
+function bareAddr(v: string | null | undefined): string | null {
+  if (!v) return null;
+  const m = v.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+  return m ? m[0].toLowerCase() : null;
+}
+
+/** An email we must NOT treat as the customer: a role/business address, our own
+ *  infra, or the FORWARDER/sender (a business forwarding its own confirmation —
+ *  the customer is in the body, never the From). */
+function isBusinessLike(email: string | null, from: string | null | undefined): boolean {
+  if (!email) return true;
+  const e = email.toLowerCase();
+  if (NON_CUSTOMER.test(e)) return true;
+  const fromAddr = bareAddr(from);
+  if (fromAddr && e === fromAddr) return true; // the forwarder/sender
+  return false;
+}
 
 /**
  * Pull the CUSTOMER's contact out of a forwarded confirmation email. Tries
@@ -81,7 +101,13 @@ export async function extractContactFromEmail(input: {
   text?: string | null;
 }): Promise<ExtractedContact> {
   const ai = await extractWithAI(input).catch(() => null);
-  if (ai && (ai.email || ai.phone)) return ai;
+  if (ai) {
+    // AI ran — trust its judgment (it returns nulls for non-customer emails).
+    // Never accept the forwarder/business as the "customer".
+    if (isBusinessLike(ai.email, input.from)) ai.email = null;
+    return ai;
+  }
+  // Only when AI is unavailable (no key) / errored: best-effort regex.
   return extractWithRegex(input);
 }
 
@@ -97,11 +123,14 @@ async function extractWithAI(input: {
     model: EXTRACT_MODEL,
     max_tokens: 300,
     system:
-      "You extract the CUSTOMER's contact details from a forwarded order/booking " +
-      "confirmation email. The customer is the buyer/patient — NOT the business, " +
-      "store, support, or no-reply address. Return ONLY minified JSON: " +
+      "Extract a CUSTOMER's contact ONLY from a genuine order/booking/appointment/" +
+      "purchase confirmation. The customer is the buyer/patient/recipient — NEVER " +
+      "the business, store, sender/forwarder, support, no-reply, or an internal/" +
+      "onboarding/marketing/notification email. If this is NOT a customer " +
+      "transaction confirmation, or you cannot clearly identify the customer, " +
+      "return ALL null. Return ONLY minified JSON: " +
       '{"name":string|null,"email":string|null,"phone":string|null,"service":string|null}. ' +
-      "service = the product/appointment name if present. Use null when unsure.",
+      "service = the product/appointment name if present.",
     messages: [
       {
         role: "user",
@@ -135,9 +164,10 @@ function extractWithRegex(input: {
 }): ExtractedContact {
   const hay = `${input.subject ?? ""}\n${input.text ?? ""}`;
   const emails = (hay.match(EMAIL_RE) ?? []).map((e) => e.toLowerCase());
-  // Prefer an email that isn't an obvious business/no-reply address.
-  const email =
-    emails.find((e) => !NON_CUSTOMER.test(e)) ?? emails[0] ?? null;
+  // First address that is NOT a business/role/forwarder address. If all of them
+  // are business-like (e.g. a non-customer notification), return none — do NOT
+  // fall back to the sender.
+  const email = emails.find((e) => !isBusinessLike(e, input.from)) ?? null;
   const phoneRaw = hay.match(PHONE_RE)?.[0] ?? null;
   const phone = phoneRaw && phoneRaw.replace(/\D/g, "").length >= 10 ? phoneRaw : null;
   return { name: null, email, phone, service: input.subject?.trim() || null };

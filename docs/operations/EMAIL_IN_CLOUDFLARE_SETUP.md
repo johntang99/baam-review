@@ -1,4 +1,8 @@
-# Email-in via Cloudflare Email Routing — setup
+# Email-in via Cloudflare Email Routing — setup (ALTERNATIVE)
+
+> **The live path is SendGrid Inbound Parse** ([EMAIL_IN_SENDGRID_SETUP.md](EMAIL_IN_SENDGRID_SETUP.md)),
+> chosen because it keeps DNS at GoDaddy. Use this Cloudflare guide only if you move the domain's DNS
+> to Cloudflare. Functionally equivalent — receives mail → Worker → our endpoint.
 
 Receives a business's forwarded confirmation emails and feeds them into BAAM Review (Door 7 /
 INTEGRATION_BRIDGES_PLAN Item 1). Cloudflare receives the mail → an Email Worker POSTs it to

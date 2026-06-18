@@ -48,3 +48,11 @@ Redeploy. (The `RESEND_INBOUND_SIGNING_SECRET` can stay; the SendGrid path uses 
 - One Inbound Parse host (`inbound.baamplatform.com`) serves **all** locations; the `r-<token>`
   routes each email to the right business.
 - Resend keeps doing **sending**; only the inbound **MX** moved to SendGrid.
+- **Forward CUSTOMER confirmation emails** (order/booking) — they carry the customer's contact in the
+  body. The parser **only** queues a real customer: it returns `no_contact` for internal/marketing/
+  notification emails and **never** uses the forwarder/sender or business/role addresses (`support@`,
+  `service@`, `no-reply`, `@baamplatform.com`, …). HTML-only emails are handled.
+- The Inbound Parse URL's `?secret=` **must exactly equal** Vercel's `INBOUND_EMAIL_SECRET`, or the
+  endpoint returns `401`.
+- `INBOUND_EMAIL_SECRET` (shared) is what this path uses; `RESEND_INBOUND_SIGNING_SECRET` is only for
+  the (currently unused) Resend Svix path and can be left set or removed.

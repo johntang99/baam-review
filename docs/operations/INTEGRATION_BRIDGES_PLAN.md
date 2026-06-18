@@ -53,11 +53,11 @@ Walk-in / no-contact businesses: QR poster + link. No integration, no contact ca
 
 ## Implementation roadmap (tick off one by one)
 
-- [x] **1. Email-in parser** — ✅ built. Endpoint `POST /api/integrations/inbound-email`, per-location
-      token (migration `0059`), AI+regex extractor (verified — picks the customer, ignores
-      business/no-reply), address shown in Location Setup. **Remaining (ops):** apply `0059`, set
-      `INBOUND_EMAIL_DOMAIN`/`INBOUND_EMAIL_SECRET`, and wire an inbound provider (Cloudflare Email
-      Routing / Resend). Docs: SOP Door 7.
+- [x] **1. Email-in parser** — ✅ built & **live**. Endpoint `POST /api/integrations/inbound-email`,
+      per-location token (migration `0059`), AI extractor that ignores the forwarder/business and
+      no-ops on non-customer emails, handles HTML-only + multipart. **Receiving = SendGrid Inbound
+      Parse** (Resend inbound is metadata-only — see below); **sending stays Resend**. On GoDaddy DNS.
+      Docs: `EMAIL_IN_SENDGRID_SETUP.md`, SOP Door 7.
 - [x] **2. n8n self-hosting runbook + reusable workflow template** — ✅ [N8N_BRIDGE_RUNBOOK.md](N8N_BRIDGE_RUNBOOK.md) + importable [templates/n8n-baam-review-bridge.json](templates/n8n-baam-review-bridge.json) (validated). *Ops: stand up the VPS when first needed.*
 - [x] **3. Native adapter expansion** — ✅ added & tested: **Stripe, WooCommerce, Cal.com, Typeform**
       (`lib/integrations/providers/`). *(Jotform deferred — fully form-defined payload; use email-in or n8n.)*
@@ -69,15 +69,31 @@ Walk-in / no-contact businesses: QR poster + link. No integration, no contact ca
 
 ---
 
-## Item 1 — Email-in parser (design)
+## Item 1 — Email-in parser (as built)
 - **Address:** `r-<token>@<INBOUND_EMAIL_DOMAIN>` — `token` is a per-location random string
-  (`locations.inbound_email_token`). The business forwards their "new order/booking" emails there.
-- **Transport:** the inbound provider (Cloudflare Email Routing → Worker, or Resend inbound webhook)
-  POSTs the parsed email to `POST /api/integrations/inbound-email` as
-  `{ to, from, subject, text }`, authenticated by a shared `INBOUND_EMAIL_SECRET`.
+  (`locations.inbound_email_token`). The business forwards its **customer order/booking confirmation**
+  emails there.
+- **Receiver = SendGrid Inbound Parse** → POSTs the email as **`multipart/form-data`** (to/from/
+  subject/text/html) to `POST /api/integrations/inbound-email`, auth via shared `INBOUND_EMAIL_SECRET`
+  in the URL (`?secret=`). The endpoint also accepts JSON + Resend's Svix-signed payload.
 - **Resolve location:** extract `<token>` from the `to` address → look up the location.
-- **Extract contact:** Claude Haiku (cheap) pulls `{name,email,phone,service}` from
-  subject+from+body; regex fallback for email/phone if AI is unavailable. Never the business's own
-  address (filter known sender domains / no-reply).
+- **Extract contact:** Claude Haiku (cheap). The AI is **trusted** — it returns nulls for non-customer
+  emails, so we do **not** fall back to a dumb regex when AI runs. Regex is only used if AI is
+  unavailable. We **never** use the **forwarder/sender** or business/role addresses (`support@`,
+  `service@`, `no-reply`, `@baamplatform.com`, …) as the customer.
 - **Enqueue:** `enqueueReviewRequest` with `externalId` = a stable hash of the message → idempotent.
-- **Surface:** show the location's inbound address in Location Setup → Integrations (copy button).
+- **Surface:** the location's inbound address shows in Location Setup → Integrations · API keys (copy).
+
+### Lessons learned (don't repeat)
+- **Resend Inbound is metadata-only** — `email.received` has no body and there's no fetch API
+  (`/emails/{id}` → 404). Can't feed the parser. Use SendGrid for receiving; Resend for sending.
+- **Many confirmation emails are HTML-only** — read `html` when `text` is empty (a bare `??` keeps
+  `""`, so apply emptiness checks per field).
+- **A business forwards its own confirmations** — the `from` is the *forwarder*, never the customer;
+  the customer is in the body. Filter the sender + business/role addresses.
+- **SendGrid posts `multipart/form-data`**, not JSON/urlencoded — the endpoint must parse it.
+
+### Alternatives (not the live path)
+- **Mailgun Routes** — same shape as SendGrid (form fields + `?secret`).
+- **Cloudflare Email Routing** — free, but needs DNS on Cloudflare; worker at
+  `infra/cloudflare-inbound-email-worker/` (`EMAIL_IN_CLOUDFLARE_SETUP.md`).

@@ -402,25 +402,29 @@ customer out and queue them. (See `docs/operations/INTEGRATION_BRIDGES_PLAN.md`.
 
 **How it works:**
 1. Each location has a forward-to address shown in **Location Setup → Integrations · API keys → Email-in**: `r-<token>@<INBOUND_EMAIL_DOMAIN>`.
-2. The client adds an **auto-forward rule** (Gmail/Outlook) for their "new order / new booking / appointment confirmed" emails → that address.
-3. The inbound provider posts the email to `POST /api/integrations/inbound-email`; we resolve the location by the address token, extract the **customer's** name/email/phone (Claude Haiku, with a regex fallback — it ignores the business's own/support/no-reply addresses), and enqueue. Idempotent per message.
+2. The client adds an **auto-forward rule** (Gmail/Outlook) for their **customer order/booking confirmation** emails → that address. *(Forward emails that carry the customer's contact in the body — not internal/marketing/notification emails.)*
+3. The inbound provider posts the email to `POST /api/integrations/inbound-email`; we resolve the location by the address token, extract the **customer's** name/email/phone (Claude Haiku; AI is trusted and returns nothing for non-customer emails), and enqueue. Idempotent per message.
 
-**One-time infra (ops)** — pick ONE inbound provider for `<INBOUND_EMAIL_DOMAIN>` (use a **subdomain**
-like `inbound.baamplatform.com`; never the root if it has Google Workspace MX):
-- **Resend Inbound (all-Resend, keeps GoDaddy)** — Resend receives on the subdomain and sends a
-  **signed webhook** to `/api/integrations/inbound-email`; we verify it with
-  `RESEND_INBOUND_SIGNING_SECRET`. Full steps: `EMAIL_IN_RESEND_SETUP.md`.
-- **SendGrid Inbound Parse / Mailgun (keeps GoDaddy, zero code)** — add an MX at GoDaddy → their MX;
-  set their POST URL to `…/inbound-email?secret=<INBOUND_EMAIL_SECRET>`. The endpoint already accepts
-  their field names (`to`/`recipient`, `from`/`sender`, `subject`, `text`/`body-plain`).
-- **Cloudflare Email Routing (free, needs DNS on Cloudflare)** — Email Worker posts
-  `{to,from,subject,text}` + `x-inbound-secret`. Worker provided at
-  `infra/cloudflare-inbound-email-worker/`. Steps: `EMAIL_IN_CLOUDFLARE_SETUP.md`.
-- **Env:** `INBOUND_EMAIL_DOMAIN`; then `RESEND_INBOUND_SIGNING_SECRET` (Resend path) **or**
-  `INBOUND_EMAIL_SECRET` (SendGrid/Mailgun/Cloudflare path); `ANTHROPIC_API_KEY` (already set).
-- **DB:** migration `0059` adds `locations.inbound_email_token`.
+**Parser behavior (important):** the extractor **only** queues a genuine customer. It returns
+`no_contact` for non-transaction emails and **never** uses the **forwarder/sender** or business/role
+addresses (`support@`, `service@`, `no-reply`, `@baamplatform.com`, etc.). Handles HTML-only emails.
 
-**Test:** forward (or POST) a sample "new order" email to a location's address → it appears in that location's "Incoming · week of …" queue. Endpoint returns `201` queued · `200` skipped (no_contact/duplicate/no_location) · `401` bad secret.
+**Live setup — SendGrid Inbound Parse (receiving) + Resend (sending), on GoDaddy DNS.**
+Full steps: **`EMAIL_IN_SENDGRID_SETUP.md`**. Summary:
+- Subdomain `inbound.baamplatform.com` (never the root — it has Google Workspace MX).
+- SendGrid: authenticate the domain (3 CNAMEs in GoDaddy), then **Inbound Parse → Add Host & URL**:
+  host `inbound`, domain `baamplatform.com`, URL `…/api/integrations/inbound-email?secret=<INBOUND_EMAIL_SECRET>`, **"POST raw MIME" UNCHECKED**.
+- GoDaddy: `inbound` **MX → `mx.sendgrid.net`** (priority 10).
+- **Env:** `INBOUND_EMAIL_DOMAIN=inbound.baamplatform.com`, `INBOUND_EMAIL_SECRET=<same as URL>`, `ANTHROPIC_API_KEY` (set). **DB:** migration `0059` (`locations.inbound_email_token`).
+
+> ⚠️ **Resend Inbound does NOT work for receiving** — its `email.received` webhook is metadata-only
+> (no body) and there's no body-fetch API. Use it only for *sending*. See `EMAIL_IN_RESEND_SETUP.md`.
+> The endpoint still accepts Resend's Svix-signed JSON (`RESEND_INBOUND_SIGNING_SECRET`) if Resend
+> ships full-body inbound later. **Alternatives:** Mailgun Routes, or Cloudflare Email Routing
+> (free, needs DNS on Cloudflare; worker at `infra/cloudflare-inbound-email-worker/`, see
+> `EMAIL_IN_CLOUDFLARE_SETUP.md`).
+
+**Test:** forward a real **customer confirmation** email to a location's address → it appears in that location's "Incoming · week of …" queue. Endpoint returns `201` queued · `200` skipped (no_contact/duplicate/no_location) · `401` bad secret/signature.
 
 ### Door 8 — Managed onboarding (Full Service)
 1. Run §5 discovery → pick door.

@@ -1,0 +1,4 @@
+# Caddy auto-provisions a Let's Encrypt cert for this host and proxies to n8n.
+{$N8N_HOST} {
+	reverse_proxy n8n:5678
+}
