@@ -142,7 +142,7 @@ const TEXT_SIGNAL_PATTERNS: Array<{
     service: "zoo",
   },
   {
-    pattern: /\b(park)\b/i,
+    pattern: /\b(national park|state park|city park|public park|recreation park|park district|playground)\b/i,
     service: "park",
   },
   {
@@ -158,7 +158,7 @@ const TEXT_SIGNAL_PATTERNS: Array<{
     service: "hindu temple",
   },
   {
-    pattern: /\b(landmark|observation deck)\b/i,
+    pattern: /\b(historical landmark|historic landmark|observation deck|tourist attraction|monument)\b/i,
     service: "historical landmark",
   },
   {
@@ -174,11 +174,12 @@ const TEXT_SIGNAL_PATTERNS: Array<{
     service: "pet care",
   },
   {
-    pattern: /\b(digital marketing|seo|web design|marketing agency)\b/i,
+    pattern:
+      /\b(digital marketing|marketing agency|seo (agency|services?|consult(ant|ing))|web design (agency|studio|services?)|branding agency|advertising agency)\b/i,
     service: "marketing consultant",
   },
   {
-    pattern: /\b(travel agency|travel services?|tour operator)\b/i,
+    pattern: /\b(travel agency|tour operator|travel advisor|flight booking|vacation packages?)\b/i,
     service: "travel agency",
   },
   {
@@ -190,7 +191,8 @@ const TEXT_SIGNAL_PATTERNS: Array<{
     service: "acupuncture",
   },
   {
-    pattern: /\b(immigration|visa|asylum)\b/i,
+    pattern:
+      /\b(immigration (law|lawyer|attorney|services?)|immigration lawyer|visa (lawyer|attorney|consultant|services?)|asylum (lawyer|attorney|services?))\b/i,
     service: "immigration lawyer",
   },
   {
@@ -254,7 +256,7 @@ const TEXT_SIGNAL_PATTERNS: Array<{
     service: "driving school",
   },
   {
-    pattern: /\b(translation|translator|interpretation|immigrant services?)\b/i,
+    pattern: /\b(translation|translator|interpretation|localization services?)\b/i,
     service: "translation service",
   },
   {
@@ -335,7 +337,7 @@ const TEXT_SIGNAL_PATTERNS: Array<{
     verticals: ["real_estate"],
   },
   {
-    pattern: /\b(insurance)\b/i,
+    pattern: /\b(insurance (agency|agent|broker|company|office|services?)|independent insurance)\b/i,
     service: "insurance agent",
     verticals: ["insurance"],
   },
@@ -423,6 +425,23 @@ export function reconcileServiceDecision({
     websiteSignalText,
     seedService: seedBsService,
   });
+  const topGeneratedCandidate = generatedCandidates[0];
+  const topGeneratedService = canonicalizeService(topGeneratedCandidate?.service);
+  const secondGeneratedService = canonicalizeService(generatedCandidates[1]?.service);
+  const strongTopLockActive = isStrongTopCandidate(
+    topGeneratedCandidate,
+    google.vertical.inferred_vertical,
+  );
+  const strongTopAllowlist = new Set<string>();
+  if (strongTopLockActive && topGeneratedService) {
+    strongTopAllowlist.add(topGeneratedService);
+    if (
+      secondGeneratedService &&
+      isStrongTopSecondaryCandidate(generatedCandidates[1], google.vertical.inferred_vertical)
+    ) {
+      strongTopAllowlist.add(secondGeneratedService);
+    }
+  }
 
   const gsScore = specificityScore(gsService);
   const bsScore = specificityScore(bsServiceNormalized);
@@ -460,6 +479,17 @@ export function reconcileServiceDecision({
     google.business.name,
     google.vertical.inferred_vertical,
   );
+  const signalServices = [businessNameSignal, gbpDescriptionSignal, websiteSignal];
+  const canOverrideTo = (
+    targetService: string,
+    weightedSources?: Set<string>,
+  ) =>
+    hasMultiSourceOverrideEvidence({
+      targetService,
+      signalServices,
+      generatedCandidates,
+      weightedSources,
+    });
   if (businessNameSignal) {
     reasonCodes.push("business_name_signal");
   }
@@ -478,14 +508,19 @@ export function reconcileServiceDecision({
   if (externalCandidate) {
     const candidateScore = specificityScore(externalCandidate.service);
     if (externalCandidate.count >= 2) {
-      reasonCodes.push("prefer_external_consensus");
-      recommended = externalCandidate.service;
-      confidence = Math.max(confidence, 0.87);
+      if (canOverrideTo(externalCandidate.service)) {
+        reasonCodes.push("prefer_external_consensus");
+        recommended = externalCandidate.service;
+        confidence = Math.max(confidence, 0.87);
+      } else {
+        reasonCodes.push("external_consensus_insufficient_evidence");
+      }
     } else if (externalCandidate.service === gsService && gsService !== bsServiceNormalized) {
       if (
         isBroadService(recommended, google.vertical.inferred_vertical) &&
         !isBroadService(gsService, google.vertical.inferred_vertical) &&
-        candidateScore >= 3
+        candidateScore >= 3 &&
+        canOverrideTo(gsService)
       ) {
         reasonCodes.push("external_supports_specific_gs");
         recommended = gsService;
@@ -497,7 +532,11 @@ export function reconcileServiceDecision({
       reasonCodes.push("external_supports_bs");
       recommended = bsServiceNormalized;
       confidence = Math.max(confidence, 0.81);
-    } else if (candidateScore >= 3 && confidence <= 0.82) {
+    } else if (
+      candidateScore >= 3 &&
+      confidence <= 0.82 &&
+      canOverrideTo(externalCandidate.service)
+    ) {
       reasonCodes.push("prefer_external_specific_signal");
       recommended = externalCandidate.service;
       confidence = Math.max(confidence, 0.76);
@@ -515,11 +554,17 @@ export function reconcileServiceDecision({
   });
   if (
     detailedIndustryCandidate &&
-    shouldPreferDetailedIndustry(detailedIndustryCandidate, recommended)
+    shouldPreferDetailedIndustry(detailedIndustryCandidate, recommended) &&
+    canOverrideTo(detailedIndustryCandidate)
   ) {
     reasonCodes.push("prefer_detailed_industry");
     recommended = detailedIndustryCandidate;
     confidence = Math.max(confidence, 0.89);
+  } else if (
+    detailedIndustryCandidate &&
+    shouldPreferDetailedIndustry(detailedIndustryCandidate, recommended)
+  ) {
+    reasonCodes.push("detailed_industry_insufficient_evidence");
   }
 
   const weightedCandidate = pickWeightedCandidate({
@@ -534,11 +579,17 @@ export function reconcileServiceDecision({
   });
   if (
     weightedCandidate &&
-    shouldPreferWeightedCandidate(weightedCandidate, recommended, confidence)
+    shouldPreferWeightedCandidate(weightedCandidate, recommended, confidence) &&
+    canOverrideTo(weightedCandidate.service, weightedCandidate.sources)
   ) {
     reasonCodes.push("prefer_weighted_service_model");
     recommended = weightedCandidate.service;
     confidence = Math.max(confidence, weightedCandidate.confidence);
+  } else if (
+    weightedCandidate &&
+    shouldPreferWeightedCandidate(weightedCandidate, recommended, confidence)
+  ) {
+    reasonCodes.push("weighted_override_insufficient_evidence");
   }
 
   const guardrailedRecommendation = applyVerticalGuardrail({
@@ -557,9 +608,13 @@ export function reconcileServiceDecision({
     ),
   });
   if (guardrailedRecommendation !== recommended) {
-    reasonCodes.push("vertical_guardrail_applied");
-    recommended = guardrailedRecommendation;
-    confidence = Math.max(confidence, 0.87);
+    if (canOverrideTo(guardrailedRecommendation)) {
+      reasonCodes.push("vertical_guardrail_applied");
+      recommended = guardrailedRecommendation;
+      confidence = Math.max(confidence, 0.87);
+    } else {
+      reasonCodes.push("guardrail_override_insufficient_evidence");
+    }
   }
 
   if (comprehensiveTop && canonicalizeService(recommended) === comprehensiveTop.service) {
@@ -588,6 +643,24 @@ export function reconcileServiceDecision({
     } else {
       reasonCodes.push("broad_service_needs_user_selection");
       confidence = Math.min(confidence, 0.61);
+    }
+  }
+
+  if (strongTopLockActive && topGeneratedService) {
+    const finalService = canonicalizeService(recommended);
+    const hasStrongOverrideEvidence = hasHighConfidenceOverrideEvidence({
+      targetService: finalService,
+      signalServices,
+      generatedCandidates,
+    });
+    if (
+      finalService &&
+      !strongTopAllowlist.has(finalService) &&
+      !hasStrongOverrideEvidence
+    ) {
+      reasonCodes.push("strong_top_candidate_lock_applied");
+      recommended = topGeneratedService;
+      confidence = Math.max(confidence, topGeneratedCandidate?.confidence ?? 0.84);
     }
   }
 
@@ -745,6 +818,119 @@ function pickExternalCandidate(services: string[]) {
   return Array.from(counts.entries())
     .map(([service, count]) => ({ service, count, score: specificityScore(service) }))
     .sort((a, b) => b.count - a.count || b.score - a.score || b.service.length - a.service.length)[0];
+}
+
+function isStrongTopCandidate(
+  candidate:
+    | {
+        service: string;
+        confidence: number;
+        specificity: number;
+      }
+    | undefined,
+  vertical: VerticalKey,
+) {
+  if (!candidate) return false;
+  const canonical = canonicalizeService(candidate.service);
+  if (!canonical) return false;
+  if (isBroadService(canonical, vertical)) return false;
+  if (!isServiceCompatibleWithVertical(canonical, vertical)) return false;
+  return candidate.specificity >= 4 && candidate.confidence >= 0.82;
+}
+
+function isStrongTopSecondaryCandidate(
+  candidate:
+    | {
+        service: string;
+        confidence: number;
+        specificity: number;
+      }
+    | undefined,
+  vertical: VerticalKey,
+) {
+  if (!candidate) return false;
+  const canonical = canonicalizeService(candidate.service);
+  if (!canonical) return false;
+  if (isBroadService(canonical, vertical)) return false;
+  if (!isServiceCompatibleWithVertical(canonical, vertical)) return false;
+  return candidate.specificity >= 3 && candidate.confidence >= 0.74;
+}
+
+function countMatchingSignalServices(targetService: string, signalServices: string[]) {
+  const canonicalTarget = canonicalizeService(targetService);
+  if (!canonicalTarget) return 0;
+  return signalServices.reduce((count, signalService) => {
+    return canonicalizeService(signalService) === canonicalTarget ? count + 1 : count;
+  }, 0);
+}
+
+function getGeneratedSupportSourceCount(
+  targetService: string,
+  generatedCandidates: Array<{
+    service: string;
+    sources: string[];
+  }>,
+) {
+  const canonicalTarget = canonicalizeService(targetService);
+  if (!canonicalTarget) return 0;
+  const matched = generatedCandidates.find(
+    (candidate) => canonicalizeService(candidate.service) === canonicalTarget,
+  );
+  if (!matched) return 0;
+  return new Set((matched.sources || []).filter(Boolean)).size;
+}
+
+function hasMultiSourceOverrideEvidence({
+  targetService,
+  signalServices,
+  generatedCandidates,
+  weightedSources,
+}: {
+  targetService: string;
+  signalServices: string[];
+  generatedCandidates: Array<{
+    service: string;
+    sources: string[];
+  }>;
+  weightedSources?: Set<string>;
+}) {
+  const canonicalTarget = canonicalizeService(targetService);
+  if (!canonicalTarget) return false;
+  const signalMatches = countMatchingSignalServices(canonicalTarget, signalServices);
+  const generatedSourceCount = getGeneratedSupportSourceCount(
+    canonicalTarget,
+    generatedCandidates,
+  );
+  const weightedSourceCount = (weightedSources?.size ?? 0) || 0;
+
+  if (signalMatches >= 2) return true;
+  if (signalMatches >= 1 && generatedSourceCount >= 2) return true;
+  if (signalMatches >= 1 && weightedSourceCount >= 2) return true;
+  if (generatedSourceCount >= 3) return true;
+  if (weightedSourceCount >= 3) return true;
+  return false;
+}
+
+function hasHighConfidenceOverrideEvidence({
+  targetService,
+  signalServices,
+  generatedCandidates,
+}: {
+  targetService: string;
+  signalServices: string[];
+  generatedCandidates: Array<{
+    service: string;
+    sources: string[];
+  }>;
+}) {
+  const canonicalTarget = canonicalizeService(targetService);
+  if (!canonicalTarget) return false;
+  const signalMatches = countMatchingSignalServices(canonicalTarget, signalServices);
+  const generatedSourceCount = getGeneratedSupportSourceCount(
+    canonicalTarget,
+    generatedCandidates,
+  );
+  return signalMatches >= 2 && (generatedSourceCount >= 2 || signalMatches >= 3);
 }
 
 function pickWeightedCandidate({
@@ -1068,7 +1254,11 @@ function applyVerticalGuardrail({
     if (hasPrintSignal) {
       return canonicalizeService("print shop");
     }
-    if (/\b(digital marketing|marketing agency|seo|web design|branding|advertising)\b/i.test(businessName)) {
+    if (
+      /\b(digital marketing|marketing agency|seo (agency|services?|consult(ant|ing))|web design (agency|studio|services?)|branding agency|advertising agency)\b/i.test(
+        businessName,
+      )
+    ) {
       return canonicalizeService("marketing consultant");
     }
     if (
@@ -1137,7 +1327,11 @@ function applyVerticalGuardrail({
     if (hasPrintSignal) {
       return canonicalizeService("print shop");
     }
-    if (/\b(digital marketing|seo|web design|marketing agency)\b/i.test(textBlob)) {
+    if (
+      /\b(digital marketing|marketing agency|seo (agency|services?|consult(ant|ing))|web design (agency|studio|services?)|branding agency|advertising agency)\b/i.test(
+        textBlob,
+      )
+    ) {
       return canonicalizeService("marketing consultant");
     }
     if (/\b(photo(graphy)?|portrait studio|photo studio|videography|self-portrait)\b/i.test(textBlob)) {
@@ -1158,13 +1352,13 @@ function applyVerticalGuardrail({
     ) {
       return canonicalizeService("park");
     }
-    if (/\b(landmark|observation deck)\b/i.test(textBlob)) {
+    if (/\b(historical landmark|historic landmark|observation deck|tourist attraction|monument)\b/i.test(textBlob)) {
       return canonicalizeService("historical landmark");
     }
     if (/\b(tailor(ing)?|alterations?|seamstress)\b/i.test(textBlob)) {
       return canonicalizeService("tailor shop");
     }
-    if (/\b(travel agency|travel services?|tour operator)\b/i.test(textBlob)) {
+    if (/\b(travel agency|tour operator|travel advisor|flight booking|vacation packages?)\b/i.test(textBlob)) {
       return canonicalizeService("travel agency");
     }
     if (
