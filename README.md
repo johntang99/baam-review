@@ -37,7 +37,7 @@ baamplatform
 
 
 
-Standalone review collection SaaS, built on the BAAM Studio stack. Served from `baamreview.com`. Good to go
+Standalone review collection SaaS, built on the BAAM Studio stack. Served from `baamreview.com`.
 
 The full vision and roadmap live in [`docs/BAAM_REVIEW_MASTER_PLAN.md`](docs/BAAM_REVIEW_MASTER_PLAN.md). This README is the operator's guide.
 
