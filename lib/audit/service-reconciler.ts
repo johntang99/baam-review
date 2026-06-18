@@ -133,7 +133,8 @@ const TEXT_SIGNAL_PATTERNS: Array<{
     service: "arcade",
   },
   {
-    pattern: /\b(ups store|shipping|mailing|postal|courier|parcel)\b/i,
+    pattern:
+      /\b(ups store|mailboxes?|shipping (center|store|service)|mailing (service|center)|postal (service|office)|courier (service|company)|pack(?:ing)? and ship|fedex|usps|dhl)\b/i,
     service: "shipping and mailing service",
   },
   {
@@ -923,7 +924,14 @@ function applyVerticalGuardrail({
       /\b(curtains?|blinds?|shutters?|drapery|window treatments?|window coverings?)\b/i.test(
         textBlob,
       );
-    const hasShippingSignal = /\b(ups|shipping|mailing|postal|courier|parcel)\b/i.test(textBlob);
+    const hasShippingBusinessSignal =
+      /\b(ups store|mailboxes?|shipping (center|store|service)|mailing (service|center)|postal (service|office)|courier (service|company)|pack(?:ing)? and ship|fedex|usps|dhl)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasRugRetailSignal =
+      /\b(oriental|persian)\s*(rugs?|carpets?)\b|\b(area\s*rugs?|rugs?|carpets?)\s*(store|shop|gallery|showroom|boutique)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
     const hasJewelrySignal = /\b(jewelers?|jewellery|jewelry|diamond|watch)\b/i.test(textBlob);
     const hasCleaningSignal =
       /\b(house cleaning|home cleaning|commercial cleaning|office cleaning|janitorial|maid service|deep cleaning|cleaning (service|services|company|crew|chief))\b/i.test(
@@ -987,7 +995,7 @@ function applyVerticalGuardrail({
     if (hasJewelrySignal) {
       return canonicalizeService("jewelry store");
     }
-    if (hasShippingSignal) {
+    if (hasShippingBusinessSignal && !hasRugRetailSignal) {
       return canonicalizeService("shipping and mailing service");
     }
     if (hasPhoneRepairSignal) {
