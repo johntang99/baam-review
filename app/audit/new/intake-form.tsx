@@ -1501,6 +1501,5 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
 function isBroadServiceInput(value: string, vertical?: string) {
   const normalized = value.trim().toLowerCase().replace(/\s+/g, " ");
   if (!normalized) return true;
-  if (isBroadServiceTerm(normalized, { vertical })) return true;
-  return normalized.split(" ").length <= 1;
+  return isBroadServiceTerm(normalized, { vertical });
 }
