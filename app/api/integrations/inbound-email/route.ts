@@ -8,35 +8,54 @@ import {
 import { verifyResendSignature } from "@/lib/integrations/svix-verify";
 
 /**
- * Email-in bridge (Item 1). Accepts a forwarded confirmation email from the
- * inbound provider and queues the customer.
+ * Email-in bridge. Accepts a forwarded confirmation email from the inbound
+ * provider and queues the customer. Supports:
+ *   • SendGrid Inbound Parse — multipart/form-data (to/from/subject/text/html);
+ *     auth via shared INBOUND_EMAIL_SECRET (`?secret=` or x-inbound-secret).
+ *   • Mailgun / Cloudflare worker — form or JSON + shared secret.
+ *   • Resend inbound — JSON, Svix-signed (RESEND_INBOUND_SIGNING_SECRET).
+ *     NOTE: Resend's email.received webhook is metadata-only (no body), so it
+ *     can't feed the parser — use SendGrid for receiving.
  *
- * Auth — either:
- *   • Resend inbound: Svix signature (svix-* / webhook-* headers) verified with
- *     RESEND_INBOUND_SIGNING_SECRET, OR
- *   • Generic providers (SendGrid Inbound Parse, Cloudflare Worker, etc.):
- *     shared INBOUND_EMAIL_SECRET via `x-inbound-secret` header or `?secret=`.
- *
- * Payload — tolerant of both Resend's nested `{ data: { from,to,subject,text } }`
- * and flat `{ from,to,subject,text }` (SendGrid/Mailgun field names too). The
- * location is resolved from the `to` address (r-<token>@domain).
- *
- * Always 200s on handled-but-skipped so providers don't retry.
+ * Location is resolved from the `to` address (r-<token>@domain). Always 200s on
+ * a handled-but-skipped email so providers don't retry.
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 30; // AI extraction
 
 export async function POST(request: NextRequest) {
-  const raw = await request.text();
+  const ct = (request.headers.get("content-type") || "").toLowerCase();
+  const isMultipart = ct.includes("multipart/form-data");
 
-  // ── Auth ────────────────────────────────────────────────────────────────
+  // ── Read + parse the body (SendGrid = multipart; others = JSON/urlencoded) ─
+  let raw = "";
+  let parsed: Record<string, unknown> = {};
+  if (isMultipart) {
+    const fd = await request.formData();
+    parsed = Object.fromEntries(
+      [...fd.entries()].map(([k, v]) => [k, typeof v === "string" ? v : ""]),
+    );
+  } else {
+    raw = await request.text();
+    if (ct.includes("application/json") || raw.trim().startsWith("{")) {
+      try {
+        parsed = JSON.parse(raw) as Record<string, unknown>;
+      } catch {
+        /* leave empty */
+      }
+    } else {
+      parsed = Object.fromEntries(new URLSearchParams(raw));
+    }
+  }
+
+  // ── Auth: Resend signs (Svix) JSON; everyone else uses the shared secret ──
   const resendSecret = process.env.RESEND_INBOUND_SIGNING_SECRET;
   const hasSvix =
     request.headers.get("svix-signature") ??
     request.headers.get("webhook-signature");
   let authed = false;
-  if (resendSecret && hasSvix) {
+  if (!isMultipart && resendSecret && hasSvix) {
     authed = verifyResendSignature(raw, request.headers, resendSecret);
   } else {
     const shared = process.env.INBOUND_EMAIL_SECRET;
@@ -49,28 +68,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  // ── Parse body (JSON or form) ────────────────────────────────────────────
-  const ct = (request.headers.get("content-type") || "").toLowerCase();
-  let parsed: Record<string, unknown> = {};
-  if (ct.includes("application/json") || raw.trim().startsWith("{")) {
-    try {
-      parsed = JSON.parse(raw) as Record<string, unknown>;
-    } catch {
-      /* leave empty */
-    }
-  } else {
-    parsed = Object.fromEntries(new URLSearchParams(raw));
-  }
-
-  // Resend nests the email under `data`; generic providers are flat.
-  const d = parsed.data && typeof parsed.data === "object" ? (parsed.data as Record<string, unknown>) : parsed;
+  // ── Extract fields (tolerant of Resend's nested `data` + flat providers) ──
+  const d =
+    parsed.data && typeof parsed.data === "object"
+      ? (parsed.data as Record<string, unknown>)
+      : parsed;
   const pick = (k: string) => d[k] ?? parsed[k];
 
   const to = addressString(pick("to") ?? pick("recipient") ?? pick("envelope_to"));
   const from = emailString(pick("from") ?? pick("sender"));
   const subject = textOf(pick("subject"));
-  // Apply textOf to EACH candidate so an EMPTY string (e.g. an HTML-only Gmail
-  // forward has text="") falls through to html, instead of `??` keeping "".
+  // textOf each candidate so an empty "" falls through (HTML-only emails).
   const text =
     textOf(pick("text")) ??
     textOf(pick("html")) ??
@@ -80,7 +88,6 @@ export async function POST(request: NextRequest) {
     textOf(pick("message_id") ?? pick("message-id")) ??
     request.headers.get("svix-id");
 
-  // ── Resolve location → extract contact → enqueue ─────────────────────────
   const locationId = await resolveLocationByInboundAddress(to);
   if (!locationId) {
     return NextResponse.json({ ok: true, status: "no_location" });
