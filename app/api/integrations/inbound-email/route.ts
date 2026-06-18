@@ -69,9 +69,13 @@ export async function POST(request: NextRequest) {
   const to = addressString(pick("to") ?? pick("recipient") ?? pick("envelope_to"));
   const from = emailString(pick("from") ?? pick("sender"));
   const subject = textOf(pick("subject"));
-  const text = textOf(
-    pick("text") ?? pick("html") ?? pick("body-plain") ?? pick("body"),
-  );
+  // Apply textOf to EACH candidate so an EMPTY string (e.g. an HTML-only Gmail
+  // forward has text="") falls through to html, instead of `??` keeping "".
+  const text =
+    textOf(pick("text")) ??
+    textOf(pick("html")) ??
+    textOf(pick("body-plain")) ??
+    textOf(pick("body"));
   const messageId =
     textOf(pick("message_id") ?? pick("message-id")) ??
     request.headers.get("svix-id");
