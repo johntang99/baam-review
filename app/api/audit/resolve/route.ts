@@ -86,7 +86,17 @@ const EVIDENCE_SERVICE_OPTION_RULES: Array<{
   {
     pattern:
       /\b(school|academy|after school|prep school|test prep|education academy|learning academy)\b/i,
-    options: ["tutoring service", "language school", "vocational training center"],
+    options: ["tutoring service", "after school program", "language school"],
+  },
+  {
+    pattern:
+      /\b(kitchen\s*(and|&)\s*bath|bath(room)? fixtures?|plumbing showroom|walk[\s-]?in tubs?|tub showroom|tubz)\b/i,
+    options: [
+      "kitchen & bath plumbing showroom",
+      "kitchen remodeler",
+      "plumbing service",
+    ],
+    verticals: ["contractor", "general_smb"],
   },
   {
     pattern: /\b(print(ing)?|print shop|commercial printer|copy shop|copy center|offset print)\b/i,
@@ -114,8 +124,19 @@ interface ResolveRequest {
   website?: string;
 }
 
-const PRIMARY_ANALYST_ENABLED = process.env.SERVICE_ANALYST_PRIMARY === "1";
-const PRIMARY_ANALYST_USE_LLM = process.env.SERVICE_ANALYST_PRIMARY_USE_LLM === "1";
+const PRIMARY_ANALYST_ENABLED =
+  process.env.SERVICE_ANALYST_PRIMARY === "1" ||
+  (process.env.SERVICE_ANALYST_PRIMARY !== "0" && !!process.env.ANTHROPIC_API_KEY);
+const PRIMARY_ANALYST_USE_LLM =
+  process.env.SERVICE_ANALYST_PRIMARY_USE_LLM === "1" ||
+  (process.env.SERVICE_ANALYST_PRIMARY_USE_LLM !== "0" && !!process.env.ANTHROPIC_API_KEY);
+const SHADOW_ANALYST_ENABLED =
+  process.env.SERVICE_ANALYST_SHADOW === "1" ||
+  (process.env.SERVICE_ANALYST_SHADOW !== "0" && !!process.env.ANTHROPIC_API_KEY);
+const SHADOW_ANALYST_USE_LLM =
+  process.env.SERVICE_ANALYST_SHADOW_USE_LLM === "1" ||
+  (process.env.SERVICE_ANALYST_SHADOW_USE_LLM !== "0" && !!process.env.ANTHROPIC_API_KEY);
+const MAX_SERVICE_OPTIONS = 4;
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -170,13 +191,6 @@ export async function POST(request: Request) {
           ),
         ]
       : generatedCandidates;
-    const comprehensiveCandidates = orderedCandidates.slice(0, 3).map((candidate) => ({
-      service: candidate.service,
-      score: candidate.score,
-      confidence: candidate.confidence,
-      specificity: candidate.specificity,
-      sources: candidate.sources,
-    }));
     const baseDetectedService = comprehensiveTop?.service || fallbackDetectedService;
     const primaryAnalyst = PRIMARY_ANALYST_ENABLED
       ? await analyzeServiceWithAnalyst({
@@ -216,39 +230,60 @@ export async function POST(request: Request) {
           .trim(),
       });
     }
-    const detectedService = primaryAnalyst?.recommended_service || baseDetectedService;
+    const detectedService = selectPrimaryDetectedService({
+      baseDetectedService,
+      primaryAnalyst,
+      orderedCandidates,
+      vertical: detectedVertical,
+    });
     const serviceDecision = reconcileServiceDecision({
       google,
       bsService: detectedService,
       gbpDescription: google.business.description ?? null,
       websiteSignalText: websiteSignal?.text ?? null,
     });
+    const serviceShadow = SHADOW_ANALYST_ENABLED
+      ? await analyzeServiceWithAnalyst({
+          google,
+          googleService: serviceDecision.gs_service,
+          fallbackService: detectedService,
+          gbpDescription: google.business.description ?? null,
+          websiteSignalText: websiteSignal?.text ?? null,
+          useLlm: SHADOW_ANALYST_USE_LLM,
+        }).catch((err) => {
+          console.error("[resolve] service shadow failed:", err);
+          return null;
+        })
+      : null;
+    const llmCandidates = collectLlmSuggestedServices({
+      primaryAnalyst,
+      serviceShadow,
+    });
+    const llmServicePhrases = collectLlmSuggestedPhrases({
+      primaryAnalyst,
+      serviceShadow,
+    });
     const serviceOptions = buildServiceOptions({
       vertical: detectedVertical,
       generatedCandidates: orderedCandidates,
       recommendedService: serviceDecision.cs_recommended_service,
+      llmSuggestedServices: llmCandidates,
       google,
       websiteSignalText: websiteSignal?.text ?? null,
     });
     const needsServiceSelection =
       isBroadService(serviceDecision.cs_recommended_service, detectedVertical) ||
       serviceDecision.cs_reason_codes.includes("broad_service_needs_user_selection");
-    const enableShadow = process.env.SERVICE_ANALYST_SHADOW === "1";
-    const useLlmShadow = process.env.SERVICE_ANALYST_SHADOW_USE_LLM === "1";
-    const serviceShadow = enableShadow
-      ? primaryAnalyst ??
-        (await analyzeServiceWithAnalyst({
-          google,
-          googleService: serviceDecision.gs_service,
-          fallbackService: detectedService,
-          gbpDescription: google.business.description ?? null,
-          websiteSignalText: websiteSignal?.text ?? null,
-          useLlm: useLlmShadow,
-        }).catch((err) => {
-          console.error("[resolve] service shadow failed:", err);
-          return null;
-        }))
-      : null;
+    const serviceCandidates = buildDisplayServiceCandidates({
+      generatedCandidates: orderedCandidates,
+      llmCandidates,
+      llmConfidence:
+        primaryAnalyst?.mode === "llm"
+          ? primaryAnalyst.confidence
+          : serviceShadow?.mode === "llm"
+            ? serviceShadow.confidence
+            : null,
+    });
     const websiteMatch = matchWebsite(body.website, google.business.website);
 
     return NextResponse.json({
@@ -271,16 +306,21 @@ export async function POST(request: Request) {
       cs_recommended_service: serviceDecision.cs_recommended_service,
       cs_confidence: serviceDecision.cs_confidence,
       cs_reason_codes: serviceDecision.cs_reason_codes,
-      service_candidates: comprehensiveCandidates,
+      service_candidates: serviceCandidates,
       service_options: serviceOptions,
       needs_service_selection: needsServiceSelection,
+      llm_service_candidates: llmCandidates,
+      llm_service_phrases: llmServicePhrases,
       primary_analyst: primaryAnalyst
         ? {
             enabled: true,
             mode: primaryAnalyst.mode,
             recommended_service: primaryAnalyst.recommended_service,
+            llm_service_phrase: primaryAnalyst.llm_service_phrase ?? "",
+            llm_phrase_candidates: primaryAnalyst.llm_phrase_candidates ?? [],
             confidence: primaryAnalyst.confidence,
             rationale: primaryAnalyst.rationale,
+            llm_suggested_services: primaryAnalyst.llm_suggested_services ?? [],
           }
         : { enabled: false },
       service_shadow: serviceShadow
@@ -288,7 +328,10 @@ export async function POST(request: Request) {
             enabled: true,
             mode: serviceShadow.mode,
             recommended_service: serviceShadow.recommended_service,
+            llm_service_phrase: serviceShadow.llm_service_phrase ?? "",
+            llm_phrase_candidates: serviceShadow.llm_phrase_candidates ?? [],
             confidence: serviceShadow.confidence,
+            llm_suggested_services: serviceShadow.llm_suggested_services ?? [],
             agrees_with_system:
               canonicalizeService(serviceShadow.recommended_service) ===
               canonicalizeService(serviceDecision.cs_recommended_service),
@@ -367,6 +410,7 @@ function buildServiceOptions({
   vertical,
   generatedCandidates,
   recommendedService,
+  llmSuggestedServices,
   google,
   websiteSignalText,
 }: {
@@ -379,6 +423,7 @@ function buildServiceOptions({
     specificity: number;
   }>;
   recommendedService: string;
+  llmSuggestedServices?: string[];
   google: {
     business: { name: string; description?: string | null };
     vertical: {
@@ -397,6 +442,15 @@ function buildServiceOptions({
     if (!normalized) return;
     if (options.includes(normalized)) return;
     if (isBroadService(normalized, vertical)) return;
+    options.push(normalized);
+  };
+  const pushLlmChoice = (value: string) => {
+    const normalized = canonicalizeService(value);
+    if (!normalized) return;
+    if (options.includes(normalized)) return;
+    if (options.length >= MAX_SERVICE_OPTIONS) {
+      options.pop();
+    }
     options.push(normalized);
   };
 
@@ -418,10 +472,10 @@ function buildServiceOptions({
       continue;
     }
     push(candidate.service);
-    if (options.length >= 3) break;
+    if (options.length >= MAX_SERVICE_OPTIONS) break;
   }
 
-  if (options.length < 3) {
+  if (options.length < MAX_SERVICE_OPTIONS) {
     const categoriesText = (google.vertical.google_categories ?? [])
       .map((category) => category.replace(/_/g, " "))
       .join(" ");
@@ -446,14 +500,14 @@ function buildServiceOptions({
         continue;
       }
       push(suggestion);
-      if (options.length >= 3) break;
+      if (options.length >= MAX_SERVICE_OPTIONS) break;
     }
   }
 
-  if (options.length < 3 && normalizedRecommended) {
+  if (options.length < MAX_SERVICE_OPTIONS && normalizedRecommended) {
     for (const suggestion of inferRelatedKeywordOptions(normalizedRecommended, vertical)) {
       push(suggestion);
-      if (options.length >= 3) break;
+      if (options.length >= MAX_SERVICE_OPTIONS) break;
     }
   }
 
@@ -468,7 +522,169 @@ function buildServiceOptions({
     }
   }
 
-  return options.slice(0, 3);
+  for (const llmChoice of llmSuggestedServices || []) {
+    pushLlmChoice(llmChoice);
+  }
+
+  return options.slice(0, MAX_SERVICE_OPTIONS);
+}
+
+function collectLlmSuggestedServices(
+  args: {
+    primaryAnalyst: {
+      mode: "distilled" | "llm";
+      recommended_service: string;
+      llm_service_phrase?: string;
+      llm_phrase_candidates?: string[];
+      llm_suggested_services?: string[];
+    } | null;
+    serviceShadow: {
+      mode: "distilled" | "llm";
+      recommended_service: string;
+      llm_service_phrase?: string;
+      llm_phrase_candidates?: string[];
+      llm_suggested_services?: string[];
+    } | null;
+  },
+) {
+  const output: string[] = [];
+  const push = (value: string | null | undefined) => {
+    const phrase = String(value ?? "");
+    if (!phrase.trim()) return;
+    if (output.some((item) => item.trim().toLowerCase() === phrase.trim().toLowerCase())) return;
+    output.push(phrase);
+  };
+  for (const suggestion of args.primaryAnalyst?.llm_suggested_services ?? []) {
+    push(suggestion);
+  }
+  for (const suggestion of args.serviceShadow?.llm_suggested_services ?? []) {
+    push(suggestion);
+  }
+  if (args.primaryAnalyst?.mode === "llm") {
+    push(args.primaryAnalyst.recommended_service);
+  }
+  if (args.serviceShadow?.mode === "llm") {
+    push(args.serviceShadow.recommended_service);
+  }
+  return output;
+}
+
+function collectLlmSuggestedPhrases(
+  args: {
+    primaryAnalyst: {
+      mode: "distilled" | "llm";
+      llm_service_phrase?: string;
+      llm_phrase_candidates?: string[];
+      recommended_service: string;
+    } | null;
+    serviceShadow: {
+      mode: "distilled" | "llm";
+      llm_service_phrase?: string;
+      llm_phrase_candidates?: string[];
+      recommended_service: string;
+    } | null;
+  },
+) {
+  const output: string[] = [];
+  const push = (value: string | null | undefined) => {
+    const phrase = String(value ?? "");
+    if (!phrase.trim()) return;
+    if (output.some((item) => item.trim().toLowerCase() === phrase.trim().toLowerCase())) return;
+    output.push(phrase);
+  };
+  push(args.primaryAnalyst?.llm_service_phrase);
+  for (const phrase of args.primaryAnalyst?.llm_phrase_candidates ?? []) {
+    push(phrase);
+  }
+  push(args.serviceShadow?.llm_service_phrase);
+  for (const phrase of args.serviceShadow?.llm_phrase_candidates ?? []) {
+    push(phrase);
+  }
+  if (args.primaryAnalyst?.mode === "llm") {
+    push(args.primaryAnalyst.recommended_service);
+  }
+  if (args.serviceShadow?.mode === "llm") {
+    push(args.serviceShadow.recommended_service);
+  }
+  return output;
+}
+
+function buildDisplayServiceCandidates(args: {
+  generatedCandidates: Array<{
+    service: string;
+    score: number;
+    confidence: number;
+    sources: string[];
+    specificity: number;
+  }>;
+  llmCandidates: string[];
+  llmConfidence: number | null;
+}) {
+  const output = args.generatedCandidates.slice(0, 3).map((candidate) => ({
+    service: candidate.service,
+    score: candidate.score,
+    confidence: candidate.confidence,
+    specificity: candidate.specificity,
+    sources: candidate.sources,
+  }));
+  for (const llmCandidate of args.llmCandidates) {
+    const exists = output.some(
+      (candidate) => canonicalizeService(candidate.service) === canonicalizeService(llmCandidate),
+    );
+    if (exists) continue;
+    output.push({
+      service: llmCandidate,
+      score: output[0]?.score ?? 0,
+      confidence: args.llmConfidence ?? 0.74,
+      specificity: getServiceSpecificity(llmCandidate),
+      sources: ["llm_analyst"],
+    });
+  }
+  return output.slice(0, 4);
+}
+
+function selectPrimaryDetectedService(args: {
+  baseDetectedService: string;
+  primaryAnalyst:
+    | {
+        recommended_service: string;
+        confidence: number;
+        mode: "distilled" | "llm";
+      }
+    | null;
+  orderedCandidates: Array<{
+    service: string;
+    confidence: number;
+    specificity: number;
+  }>;
+  vertical: VerticalKey;
+}) {
+  if (!args.primaryAnalyst) return args.baseDetectedService;
+  if (args.primaryAnalyst.mode !== "llm") {
+    return args.primaryAnalyst.recommended_service || args.baseDetectedService;
+  }
+
+  const llmService = canonicalizeService(args.primaryAnalyst.recommended_service);
+  if (!llmService) return args.baseDetectedService;
+  if (isBroadService(llmService, args.vertical)) return args.baseDetectedService;
+
+  const topCandidate = args.orderedCandidates[0];
+  const topService = canonicalizeService(topCandidate?.service);
+  if (topService && llmService === topService && (topCandidate?.confidence ?? 0) >= 0.58) {
+    return llmService;
+  }
+
+  const hasStrongCandidateSupport = args.orderedCandidates
+    .slice(0, 3)
+    .some((candidate) => {
+      const candidateService = canonicalizeService(candidate.service);
+      return candidateService === llmService && candidate.confidence >= 0.66 && candidate.specificity >= 3;
+    });
+  if (hasStrongCandidateSupport) {
+    return llmService;
+  }
+
+  return args.baseDetectedService;
 }
 
 function inferEvidenceServiceOptions(text: string, vertical: VerticalKey) {
@@ -588,7 +804,17 @@ const RELATED_KEYWORD_OPTION_RULES: Array<{
   },
   {
     pattern: /\b(school|academy|education|learning center|learning centre|test prep)\b/i,
-    options: ["tutoring service", "language school", "vocational training center"],
+    options: ["tutoring service", "after school program", "language school"],
+  },
+  {
+    pattern:
+      /\b(kitchen\s*(and|&)\s*bath|bath(room)? fixtures?|plumbing showroom|walk[\s-]?in tubs?|tub showroom|tubz)\b/i,
+    options: [
+      "kitchen & bath plumbing showroom",
+      "kitchen remodeler",
+      "plumbing service",
+    ],
+    verticals: ["contractor", "general_smb"],
   },
 ];
 

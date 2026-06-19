@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { resolveServiceKeyword } from "@/lib/audit/competitors/keyword-resolver";
 import { reconcileServiceDecision } from "@/lib/audit/service-reconciler";
+import { fetchWebsiteServiceSignalText as fetchWebsiteServiceSignalTextCore } from "@/lib/audit/service-signal-web-core";
 import type { Database } from "@/lib/database.types";
 import type { AuditGoogleData } from "@/lib/audit/google/types";
 
@@ -103,9 +104,9 @@ async function main() {
         google,
         bsService,
       });
-      const websiteSignal = await fetchWebsiteServiceSignalText(
-        google.business.website ?? null,
-      );
+      const websiteSignal = (
+        await fetchWebsiteServiceSignalTextCore(google.business.website ?? null)
+      )?.text;
       const upgraded = reconcileServiceDecision({
         google,
         bsService,

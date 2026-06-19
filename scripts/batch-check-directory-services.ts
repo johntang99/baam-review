@@ -12,6 +12,7 @@ import {
   getServiceSpecificity,
 } from "@/lib/audit/service-taxonomy";
 import { isBroadServiceTerm } from "@/lib/audit/broad-service-terms";
+import { fetchWebsiteServiceSignalText as fetchWebsiteServiceSignalTextCore } from "@/lib/audit/service-signal-web-core";
 import type { AuditGoogleData } from "@/lib/audit/google/types";
 
 interface InputBusiness {
@@ -115,9 +116,11 @@ async function main() {
       const details = await fetchPlaceDetails(match.id, apiKey);
       const googleData = buildGoogleLikeData(details);
       const fallbackDetectedService = resolveServiceKeyword(googleData);
-      const websiteSignalText = await fetchWebsiteServiceSignalText(
-        googleData.business.website ?? business.website ?? null,
-      );
+      const websiteSignalText = (
+        await fetchWebsiteServiceSignalTextCore(
+          googleData.business.website ?? business.website ?? null,
+        )
+      )?.text;
       const comprehensiveTop = pickTopComprehensiveService({
         google: googleData,
         gbpDescription: googleData.business.description ?? null,

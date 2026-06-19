@@ -57,6 +57,7 @@ const CANDIDATE_SOURCE_LABELS: Record<string, string> = {
   description_match: "GBP description match",
   website_match: "Website signal match",
   category_match: "Category token match",
+  llm_analyst: "LLM analyst",
 };
 
 interface ServiceCandidateDebug {
@@ -71,8 +72,20 @@ interface ServiceShadowDebug {
   enabled: boolean;
   mode?: "distilled" | "llm";
   recommended_service?: string;
+  llm_service_phrase?: string;
+  llm_phrase_candidates?: string[];
   confidence?: number;
   agrees_with_system?: boolean;
+}
+
+interface PrimaryAnalystDebug {
+  enabled: boolean;
+  mode?: "distilled" | "llm";
+  recommended_service?: string;
+  llm_service_phrase?: string;
+  llm_phrase_candidates?: string[];
+  confidence?: number;
+  rationale?: string;
 }
 
 interface ResolvedBusiness {
@@ -98,6 +111,9 @@ interface ResolvedBusiness {
   service_candidates?: ServiceCandidateDebug[];
   service_options?: string[];
   needs_service_selection?: boolean;
+  llm_service_candidates?: string[];
+  llm_service_phrases?: string[];
+  primary_analyst?: PrimaryAnalystDebug;
   service_shadow?: ServiceShadowDebug;
   google_category: string | null;
   google_categories: string[];
@@ -292,6 +308,15 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
     const finalService = service.trim() || "—";
     const topServiceCandidates = resolved.service_candidates ?? [];
     const serviceOptions = resolved.service_options ?? [];
+    const llmServiceCandidates = resolved.llm_service_candidates ?? [];
+    const llmServicePhrases = resolved.llm_service_phrases ?? [];
+    const llmSuggestedServiceOptions = Array.from(
+      new Set(
+        [...llmServicePhrases, ...llmServiceCandidates]
+          .map((candidate) => String(candidate || "").trim())
+          .filter(Boolean),
+      ),
+    );
     const serviceValueDisplayStyle = {
       fontSize: 24,
       lineHeight: 1.12,
@@ -854,6 +879,74 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                   From BAAM vertical and keyword inference rules.
                 </p>
               </article>
+
+              <article
+                style={{
+                  border: "1px solid var(--rule-soft)",
+                  borderRadius: 8,
+                  padding: 12,
+                  background: "var(--cream-light)",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-mute)",
+                  }}
+                >
+                  LLM Analyst Candidate
+                </div>
+                <p style={{ marginTop: 8, fontSize: 12, color: "var(--ink-soft)" }}>
+                  {llmSuggestedServiceOptions.length > 0
+                    ? "All LLM suggestions are shown below as selectable chips."
+                    : "No valid LLM candidate returned this run."}
+                </p>
+                {llmSuggestedServiceOptions.length > 0 ? (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 8,
+                    }}
+                  >
+                    {llmSuggestedServiceOptions.map((candidate) => {
+                      const isSelected = service.trim().toLowerCase() === candidate.toLowerCase();
+                      return (
+                        <button
+                          key={`llm-candidate-card-${candidate}`}
+                          type="button"
+                          onClick={() => {
+                            setService(candidate);
+                            setServiceConfirmed(false);
+                            setShowConfirmReminder(false);
+                          }}
+                          disabled={isPending}
+                          style={{
+                            border: isSelected
+                              ? "1px solid var(--sage-deep)"
+                              : "1px solid var(--rule-soft)",
+                            borderRadius: 999,
+                            padding: "4px 10px",
+                            fontFamily: "'Instrument Serif', serif",
+                            fontSize: 18,
+                            lineHeight: 1.05,
+                            color: isSelected ? "var(--sage-deep)" : "var(--ink)",
+                            background: isSelected ? "#e8f0e8" : "#fff",
+                            cursor: isPending ? "default" : "pointer",
+                            textTransform: "lowercase",
+                          }}
+                        >
+                          {candidate}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </article>
             </div>
 
             {topServiceCandidates.length > 0 ? (
@@ -1135,6 +1228,74 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                         </span>
                       </label>
                     ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {llmSuggestedServiceOptions.length > 0 ? (
+                <div
+                  style={{
+                    marginTop: 12,
+                    border: "1px solid var(--rule-soft)",
+                    borderRadius: 8,
+                    background: "#fff",
+                    padding: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 11,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: "var(--ink-mute)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    LLM suggested services
+                  </div>
+                  <p style={{ marginTop: 6, fontSize: 12, color: "var(--ink-soft)" }}>
+                    Click any chip to use the full multi-word LLM description as your
+                    final Recommended Service.
+                  </p>
+                  <div
+                    style={{
+                      marginTop: 8,
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 8,
+                    }}
+                  >
+                    {llmSuggestedServiceOptions.map((candidate) => {
+                      const isSelected = service.trim().toLowerCase() === candidate.toLowerCase();
+                      return (
+                        <button
+                          key={`llm-candidate-select-${candidate}`}
+                          type="button"
+                          onClick={() => {
+                            setService(candidate);
+                            setServiceConfirmed(false);
+                            setShowConfirmReminder(false);
+                          }}
+                          disabled={isPending}
+                          style={{
+                            border: isSelected
+                              ? "1px solid var(--sage-deep)"
+                              : "1px solid var(--rule-soft)",
+                            borderRadius: 999,
+                            padding: "6px 12px",
+                            fontFamily: "'Instrument Serif', serif",
+                            fontSize: 22,
+                            lineHeight: 1.05,
+                            color: isSelected ? "var(--sage-deep)" : "var(--ink)",
+                            background: isSelected ? "#e8f0e8" : "#fff",
+                            cursor: isPending ? "default" : "pointer",
+                            textTransform: "lowercase",
+                          }}
+                        >
+                          {candidate}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ) : null}

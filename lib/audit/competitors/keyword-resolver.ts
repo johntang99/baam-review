@@ -160,6 +160,11 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
     keyword: "marketing consultant",
   },
   {
+    pattern:
+      /\b(website design|web design|website development|web development|seo agency|digital marketing)\b|网站设计|网页设计|建站服务|网站开发|网页开发|广告公司|广告服务/i,
+    keyword: "website design agency",
+  },
+  {
     pattern: /^(?!.*\b(phone|iphone|android|computer|laptop|repair|fix|screen)\b).*?\bdigital\b/i,
     keyword: "marketing consultant",
   },
@@ -176,6 +181,10 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
     pattern:
       /\b(tutor|tutoring|training school|learning center|learning centre|education center|education centre)\b/i,
     keyword: "tutoring service",
+  },
+  {
+    pattern: /\b(after school|after-school|afterschool|enrichment program)\b/i,
+    keyword: "after school program",
   },
   {
     pattern: /\b(vocational school|trade school|skills training|career training)\b/i,
@@ -241,6 +250,11 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
   },
   { pattern: /\b(kitchen cabinets?|cabinets?|cabinetry|millwork|joinery)\b/i, keyword: "kitchen cabinet manufacturer" },
   { pattern: /\b(countertops?|granite|quartz)\b/i, keyword: "countertop contractor" },
+  {
+    pattern:
+      /\b(kitchen\s*(and|&)\s*bath|bath(room)? fixtures?|plumbing showroom|walk[\s-]?in tubs?|tub showroom|tubz)\b/i,
+    keyword: "kitchen & bath plumbing showroom",
+  },
   { pattern: /\b(remodel|renovation|kitchen\s*&\s*bath|kitchen and bath)\b/i, keyword: "kitchen remodeler" },
 
   // Food sub-types (when vertical is restaurant but cuisine wasn't tagged)
@@ -474,6 +488,11 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
     "marketing advisor",
     "marketing consulting",
   ],
+  "website design agency": [
+    "website design agency",
+    "web design agency",
+    "website development agency",
+  ],
   "print shop": ["print shop", "printing service", "commercial printer"],
   "cleaning service": ["cleaning service", "house cleaning service", "janitorial service"],
   "piano store": ["piano store", "piano dealer", "piano showroom"],
@@ -481,12 +500,23 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
   "mortgage broker": ["mortgage broker", "home loan broker", "mortgage lender"],
   "financial planner": ["financial planner", "financial advisor", "wealth advisor"],
   "tutoring service": ["tutoring service", "tutoring center", "private tutor"],
+  "after school program": [
+    "after school program",
+    "after-school program",
+    "afterschool program",
+  ],
   "vocational training center": [
     "vocational training center",
     "trade school",
     "vocational school",
   ],
   "language school": ["language school", "esl school", "english school"],
+  "kitchen & bath plumbing showroom": [
+    "kitchen and bath showroom",
+    "plumbing showroom",
+    "bath fixture showroom",
+    "walk-in tub showroom",
+  ],
   "kitchen cabinet manufacturer": [
     "kitchen cabinet manufacturer",
     "cabinet manufacturer",

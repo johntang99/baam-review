@@ -234,6 +234,11 @@ const TEXT_SIGNAL_PATTERNS: Array<{
   },
   {
     pattern:
+      /\b(website design|web design|website development|web development|seo agency|digital marketing)\b|网站设计|网页设计|建站服务|网站开发|网页开发|广告公司|广告服务/i,
+    service: "website design agency",
+  },
+  {
+    pattern:
       /\b(mortgage broker|home loan|mortgage lender|loan agency|lending company|loan company|loan service)\b/i,
     service: "loan agency",
   },
@@ -244,6 +249,16 @@ const TEXT_SIGNAL_PATTERNS: Array<{
   {
     pattern:
       /\b(tutor|tutoring|training school|learning center|learning centre|education center|education centre)\b/i,
+    service: "tutoring service",
+  },
+  {
+    pattern:
+      /\b(after school|after-school|afterschool|enrichment program|homework help)\b/i,
+    service: "after school program",
+  },
+  {
+    pattern:
+      /\b(school|academy|learning academy|education academy|learning center|learning centre)\b/i,
     service: "tutoring service",
   },
   {
@@ -296,6 +311,12 @@ const TEXT_SIGNAL_PATTERNS: Array<{
       /\b(hvac|air conditioning|a\/c|heating\s*(and|&)\s*cooling|cooling\s*(and|&)\s*heating|furnace|heat pump|duct(work)?|ventilation)\b/i,
     service: "hvac contractor",
     verticals: ["contractor"],
+  },
+  {
+    pattern:
+      /\b(kitchen\s*(and|&)\s*bath|bath(room)? fixtures?|plumbing showroom|walk[\s-]?in tubs?|tub showroom|tubz)\b/i,
+    service: "kitchen & bath plumbing showroom",
+    verticals: ["contractor", "general_smb"],
   },
   {
     pattern: /\b(kitchen remodel|renovation|kitchen & bath|kitchen and bath)\b/i,
@@ -592,23 +613,29 @@ export function reconcileServiceDecision({
     reasonCodes.push("weighted_override_insufficient_evidence");
   }
 
+  const combinedEvidenceTextBlob = normalizeEvidenceText(
+    [
+      google.business.name,
+      google.business.description ?? "",
+      gbpDescription ?? "",
+      websiteSignalText ?? "",
+    ].join(" "),
+  );
   const guardrailedRecommendation = applyVerticalGuardrail({
     vertical: google.vertical.inferred_vertical,
     recommended,
     gsService,
     bsService: bsServiceNormalized,
     businessName: google.business.name,
-    textBlob: normalizeEvidenceText(
-      [
-        google.business.name,
-        google.business.description ?? "",
-        gbpDescription ?? "",
-        websiteSignalText ?? "",
-      ].join(" "),
-    ),
+    textBlob: combinedEvidenceTextBlob,
   });
   if (guardrailedRecommendation !== recommended) {
-    if (canOverrideTo(guardrailedRecommendation)) {
+    const hasDeterministicEvidence = hasDeterministicGuardrailEvidence({
+      targetService: guardrailedRecommendation,
+      businessName: google.business.name,
+      textBlob: combinedEvidenceTextBlob,
+    });
+    if (canOverrideTo(guardrailedRecommendation) || hasDeterministicEvidence) {
       reasonCodes.push("vertical_guardrail_applied");
       recommended = guardrailedRecommendation;
       confidence = Math.max(confidence, 0.87);
@@ -911,6 +938,40 @@ function hasMultiSourceOverrideEvidence({
   return false;
 }
 
+function hasDeterministicGuardrailEvidence({
+  targetService,
+  businessName,
+  textBlob,
+}: {
+  targetService: string;
+  businessName: string;
+  textBlob: string;
+}) {
+  const target = canonicalizeService(targetService);
+  if (!target) return false;
+  const evidence = `${businessName} ${textBlob}`;
+
+  if (target === "kitchen & bath plumbing showroom") {
+    return /\b(tubz|walk[\s-]?in tubs?|kitchen\s*(and|&)\s*bath|plumbing showroom|bath(room)? fixtures?)\b/i.test(
+      evidence,
+    );
+  }
+  if (target === "after school program") {
+    return /\b(after school|after-school|afterschool|enrichment program|homework help)\b/i.test(
+      evidence,
+    );
+  }
+  if (target === "language school") {
+    return /\b(language school|esl school|english school|language academy)\b/i.test(evidence);
+  }
+  if (target === "tutoring service") {
+    return /\b(academy|school|tutor|tutoring|test prep|sat prep|learning center|learning centre|education center|education centre)\b/i.test(
+      evidence,
+    );
+  }
+  return false;
+}
+
 function hasHighConfidenceOverrideEvidence({
   targetService,
   signalServices,
@@ -1110,6 +1171,10 @@ function applyVerticalGuardrail({
       /\b(curtains?|blinds?|shutters?|drapery|window treatments?|window coverings?)\b/i.test(
         textBlob,
       );
+    const hasKitchenBathShowroomSignal =
+      /\b(kitchen\s*(and|&)\s*bath|bath(room)? fixtures?|plumbing showroom|walk[\s-]?in tubs?|tub showroom|tubz)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
     const hasShippingBusinessSignal =
       /\b(ups store|mailboxes?|shipping (center|store|service)|mailing (service|center)|postal (service|office)|courier (service|company)|pack(?:ing)? and ship|fedex|usps|dhl)\b/i.test(
         `${businessName} ${textBlob}`,
@@ -1158,6 +1223,12 @@ function applyVerticalGuardrail({
     }
     if (hasWindowTreatmentSignal && next === "sign manufacturer") {
       return canonicalizeService("window treatment store");
+    }
+    if (
+      hasKitchenBathShowroomSignal &&
+      (next === "building materials store" || isBroadService(next, vertical) || isManufacturerLike(next))
+    ) {
+      return canonicalizeService("kitchen & bath plumbing showroom");
     }
     if (hasCleaningSignal) {
       return canonicalizeService("cleaning service");
@@ -1232,6 +1303,23 @@ function applyVerticalGuardrail({
       /\b(ups store|fedex office|dhl express|shipping service|mailing service|courier service|parcel shipping|postal service)\b/i.test(
         textBlob,
       );
+    const hasAfterSchoolSignal =
+      /\b(after school|after-school|afterschool|enrichment program|homework help)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasTutoringSignal =
+      /\b(tutor|tutoring|test prep|sat prep|learning center|learning centre|education center|education centre|academic support)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasAcademySchoolSignal = /\b(academy|school)\b/i.test(`${businessName} ${textBlob}`);
+    const hasLanguageSchoolSignal =
+      /\b(language school|esl school|english school|language academy)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
+    const hasKitchenBathShowroomSignal =
+      /\b(kitchen\s*(and|&)\s*bath|bath(room)? fixtures?|plumbing showroom|walk[\s-]?in tubs?|tub showroom|tubz)\b/i.test(
+        `${businessName} ${textBlob}`,
+      );
 
     if (/\b(church|cathedral|basilica)\b/i.test(businessName)) {
       return canonicalizeService("church");
@@ -1285,8 +1373,29 @@ function applyVerticalGuardrail({
     if (/\b(translation|translator|interpretation)\b/i.test(textBlob)) {
       return canonicalizeService("translation service");
     }
+    if (
+      hasKitchenBathShowroomSignal &&
+      (next === "building materials store" || isBroadService(next, vertical) || isManufacturerLike(next))
+    ) {
+      return canonicalizeService("kitchen & bath plumbing showroom");
+    }
     if (/\b(driving school|auto school|driving lessons?|driver training)\b/i.test(textBlob)) {
       return canonicalizeService("driving school");
+    }
+    if (
+      (next === "school" || next === "academy" || next === "educational institution") &&
+      hasLanguageSchoolSignal
+    ) {
+      return canonicalizeService("language school");
+    }
+    if (
+      (next === "school" || next === "academy" || next === "educational institution") &&
+      (hasAfterSchoolSignal || hasTutoringSignal || hasAcademySchoolSignal)
+    ) {
+      if (hasAfterSchoolSignal) {
+        return canonicalizeService("after school program");
+      }
+      return canonicalizeService("tutoring service");
     }
     if (hasPhoneRepairSignal) {
       return canonicalizeService("phone repair service");
