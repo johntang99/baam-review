@@ -37,8 +37,10 @@ export interface AuditViewModel {
   business_name_secondary: string;
   business_address_line_1: string;
   business_address_line_2: string;
+  business_website_line: string;
   vertical_display_name: string;
   vertical_subtype: string;
+  cover_service_display: string;
 
   doc_header_subtitle_left: string;
 
@@ -61,6 +63,14 @@ export interface AuditViewModel {
   projection_ranking_drop_display: string;
   projection_revenue_loss_display: string;
   projection_floor_blurb: string;
+  forecast_google_ranking_display: string;
+  forecast_google_ranking_desc: string;
+  forecast_ai_visibility_display: string;
+  forecast_ai_visibility_desc: string;
+  forecast_referral_retention_display: string;
+  forecast_referral_retention_desc: string;
+  forecast_revenue_display: string;
+  forecast_revenue_desc: string;
 
   // Section 4 — Benchmarks (paid only)
   per_review_value_median_display: string;

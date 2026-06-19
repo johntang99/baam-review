@@ -73,6 +73,16 @@ export async function getGoogleBusinessData(
       outscraperReviews = await client.fetchReviews(placeId, {
         timeoutMs: options.reviewsTimeoutMs,
       });
+      // Some paid calls can succeed transport-wise but still return an empty
+      // reviews array. Treat that as degraded and fall back to Place Details
+      // reviews instead of propagating zero-history aggregates.
+      if (outscraperReviews.length === 0) {
+        outscraperReviews = null;
+        degraded = {
+          outscraper_failed: true,
+          reason: "outscraper returned empty reviews_data",
+        };
+      }
     } catch (err) {
       outscraperReviews = null;
       degraded = {

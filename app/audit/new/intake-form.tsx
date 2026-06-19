@@ -178,10 +178,16 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
       }
       setResolved(data);
       setVertical(data.detected_vertical);
+      const suggestedSpecificService =
+        Array.isArray(data.service_options) && data.service_options.length > 0
+          ? String(data.service_options[0] || "").trim()
+          : "";
+      const fallbackService =
+        String(data.cs_recommended_service || data.detected_service || "").trim();
       setService(
         data.needs_service_selection
-          ? ""
-          : data.cs_recommended_service || data.detected_service,
+          ? suggestedSpecificService || fallbackService
+          : fallbackService,
       );
       setServiceConfirmed(false);
       setStep("confirm");

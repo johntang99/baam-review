@@ -1,8 +1,10 @@
 import type { AuditCompetitor, AuditCompetitorsData } from "../competitors/types";
+import { resolveServiceKeyword } from "../competitors/keyword-resolver";
 import type { AuditGoogleData, VerticalKey } from "../google/types";
 import type { AuditProjection } from "../projection/types";
 import type { AuditScore, ScoreComponent } from "../scoring/types";
 import type { VerticalBenchmarks } from "../benchmarks/types";
+import { canonicalizeService } from "../service-taxonomy";
 import { renderProjectionSvg } from "./chart-svg";
 import { LABELS, STRINGS } from "./labels";
 import type {
@@ -28,6 +30,24 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
   const auditId =
     input.audit_id ?? generateAuditId(google.business.place_id, preparedAt);
   const planSummary = buildActionPlanSummary(google, benchmarks);
+  const competitorRows = buildCompetitorRows(
+    google,
+    competitors,
+    score,
+    benchmarks,
+    language,
+  );
+  const yourRankIndex = competitorRows.findIndex((row) => row.is_you);
+  const yourRank = yourRankIndex >= 0 ? yourRankIndex + 1 : null;
+  const rankingGainDisplay = formatRankingGain(
+    projection.ranking_estimate.do_nothing_six_month_drop,
+  );
+  const forecastOutcome = buildForecastOutcomeCopy({
+    language,
+    currentGrade: score.grade,
+    projectedGrade: projection.twelve_month.with_baam_grade,
+    rankingGainDisplay,
+  });
 
   return {
     language,
@@ -41,8 +61,10 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
       language === "zh"
         ? formatZhAddressLine2(google)
         : `${google.business.city} · ${google.business.state} ${google.business.zip}`.trim(),
+    business_website_line: displayWebsite(google.business.website),
     vertical_display_name: t.verticals[google.vertical.inferred_vertical] ?? t.verticals.general_smb,
     vertical_subtype: formatVerticalSubtype(google, language),
+    cover_service_display: formatCoverServiceDisplay(google, language),
 
     doc_header_subtitle_left: t.doc_header_subtitle,
 
@@ -66,9 +88,17 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
     projection_six_month_score: projection.twelve_month.with_baam_score,
     projection_six_month_grade: projection.twelve_month.with_baam_grade,
     projection_six_month_drop_display: `${score.total} → ${projection.twelve_month.with_baam_score}`,
-    projection_ranking_drop_display: formatRankingGain(projection.ranking_estimate.do_nothing_six_month_drop),
+    projection_ranking_drop_display: rankingGainDisplay,
     projection_revenue_loss_display: `$${projection.revenue_impact.six_month_loss_usd.toLocaleString()}`,
     projection_floor_blurb: buildProjectionFloorBlurb(score, projection, language),
+    forecast_google_ranking_display: forecastOutcome.google_ranking_display,
+    forecast_google_ranking_desc: forecastOutcome.google_ranking_desc,
+    forecast_ai_visibility_display: forecastOutcome.ai_visibility_display,
+    forecast_ai_visibility_desc: forecastOutcome.ai_visibility_desc,
+    forecast_referral_retention_display: forecastOutcome.referral_retention_display,
+    forecast_referral_retention_desc: forecastOutcome.referral_retention_desc,
+    forecast_revenue_display: forecastOutcome.revenue_display,
+    forecast_revenue_desc: forecastOutcome.revenue_desc,
 
     per_review_value_median_display: `$${benchmarks.per_review_value.median_usd.toLocaleString()}`,
     per_review_value_range_display: `$${benchmarks.per_review_value.range_low_usd.toLocaleString()} — $${benchmarks.per_review_value.range_high_usd.toLocaleString()}`,
@@ -86,7 +116,7 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
     ),
     money_on_table_html: buildMoneyOnTableHtml(google, competitors, benchmarks, language),
 
-    competitor_rows: buildCompetitorRows(google, competitors, score, benchmarks, language),
+    competitor_rows: competitorRows,
     competitor_diagnosis_html: buildCompetitorDiagnosis(google, competitors, benchmarks, language),
     competitor_closing_line: buildCompetitorClosingLine(google, competitors, language),
 
@@ -109,6 +139,11 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
       summary_review_asset: `$${planSummary.reviewAssetValue.toLocaleString()}`,
       service_opportunity: buildServiceOpportunity(score.total, score.grade, auditId),
       business_name_display: pickPrimaryName(google.business.name, language),
+      score_total: score.total,
+      competitor_count: competitors.competitors.length,
+      your_rank: yourRank,
+      forecast_grade: projection.twelve_month.with_baam_grade,
+      forecast_score: projection.twelve_month.with_baam_score,
     }),
   };
 }
@@ -127,6 +162,11 @@ function buildTranslatedStrings(
     summary_review_asset: string;
     service_opportunity: ServiceOpportunityVM;
     business_name_display: string;
+    score_total: number;
+    competitor_count: number;
+    your_rank: number | null;
+    forecast_grade: "A" | "B" | "C" | "D" | "F";
+    forecast_score: number;
   },
 ): TranslatedStrings {
   const s = STRINGS[language];
@@ -139,7 +179,7 @@ function buildTranslatedStrings(
     cover_subtitle: s.cover_subtitle,
     cover_meta_labels: s.cover_meta_labels,
     cover_meta_subtitle: s.cover_meta_subtitle,
-    cover_toc: s.cover_toc,
+    cover_toc: buildCoverTocRows(language, s, ctx),
     hook_quote_html: s.hook_quote_html,
     section_titles: s.section_titles as TranslatedStrings["section_titles"],
     section_headlines: s.section_headlines as TranslatedStrings["section_headlines"],
@@ -281,6 +321,84 @@ function buildTranslatedStrings(
   };
 }
 
+function buildCoverTocRows(
+  language: AuditLanguage,
+  s: (typeof STRINGS)[AuditLanguage],
+  ctx: {
+    score_total: number;
+    score_grade: string;
+    competitor_count: number;
+    your_rank: number | null;
+    forecast_grade: "A" | "B" | "C" | "D" | "F";
+    forecast_score: number;
+  },
+): Array<{ num: string; title: string; sub: string }> {
+  const isZh = language === "zh";
+  const base = s.cover_toc;
+  const snapshotSub = isZh
+    ? `分數 ${ctx.score_total} / 100 · ${ctx.score_grade} 級 · ${gradeResultTagZh(ctx.score_grade)}`
+    : `Score ${ctx.score_total} / 100 · Grade ${ctx.score_grade} · ${gradeResultTagEn(ctx.score_grade)}`;
+
+  const competitorSub =
+    ctx.competitor_count > 0 && ctx.your_rank
+      ? isZh
+        ? `競爭差距 · ${ctx.competitor_count} 位對手 · 您 #${ctx.your_rank}`
+        : `Gap · ${ctx.competitor_count} competitors · You #${ctx.your_rank}`
+      : isZh
+        ? "尚無可比競爭對手"
+        : "No comparable competitors yet";
+
+  const serviceSub = isZh ? "升級窗口 · 90–120 天" : "Upgrade window · 90–120 days";
+  const forecastSub = isZh
+    ? `目標結果 · ${ctx.forecast_grade} 級 · ${ctx.forecast_score} 分 · 營收成長`
+    : `Target · Grade ${ctx.forecast_grade} · Score ${ctx.forecast_score} · Revenue increase`;
+  const actionSub = isZh ? "執行計劃 · 5 項優先行動" : "Execution · 5 owner-ready moves";
+
+  return [
+    {
+      num: "02",
+      title: base[0]?.title ?? (isZh ? "您目前的狀況概覽" : "Your current snapshot"),
+      sub: snapshotSub,
+    },
+    {
+      num: "03",
+      title: base[1]?.title ?? (isZh ? "競爭對手比較" : "Competitor comparison"),
+      sub: competitorSub,
+    },
+    {
+      num: "04",
+      title: base[2]?.title ?? (isZh ? "服務機會" : "Service opportunity"),
+      sub: serviceSub,
+    },
+    {
+      num: "05",
+      title: base[3]?.title ?? (isZh ? "12 個月預測" : "The 12-month forecast"),
+      sub: forecastSub,
+    },
+    {
+      num: "06",
+      title: base[4]?.title ?? (isZh ? "您的行動計劃" : "Your action plan"),
+      sub: actionSub,
+    },
+  ];
+}
+
+function gradeResultTagEn(grade: string): string {
+  if (grade === "A") return "Leading";
+  if (grade === "B") return "Strong";
+  if (grade === "C") return "Recoverable";
+  if (grade === "D") return "At risk";
+  return "High risk";
+}
+
+function gradeResultTagZh(grade: string): string {
+  if (grade === "A") return "領先";
+  if (grade === "B") return "穩健";
+  if (grade === "C") return "可恢復";
+  if (grade === "D") return "風險偏高";
+  return "高風險";
+}
+
 function generateAuditId(placeId: string, date: Date): string {
   const yymm = date.toISOString().slice(2, 7).replace("-", "");
   const tail = placeId.slice(-4).toUpperCase();
@@ -345,6 +463,65 @@ function formatVerticalSubtype(
   }
   const bi = google.language.is_bilingual ? " · Bilingual" : "";
   return `${capitalize(cat)}${bi}`;
+}
+
+function displayWebsite(input: string | null | undefined): string {
+  const raw = (input ?? "").trim();
+  if (!raw) return "";
+  try {
+    const url = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+    return new URL(url).hostname.replace(/^www\./i, "");
+  } catch {
+    return raw
+      .replace(/^https?:\/\//i, "")
+      .replace(/^www\./i, "")
+      .replace(/\/+$/, "");
+  }
+}
+
+function formatCoverServiceDisplay(
+  google: AuditGoogleData,
+  language: AuditLanguage,
+): string {
+  const raw = canonicalizeService(resolveServiceKeyword(google));
+  const service = refineBroadEducationService(raw, google);
+  if (language === "zh") {
+    return translateServiceZh(service);
+  }
+  return capitalize(service);
+}
+
+function refineBroadEducationService(service: string, google: AuditGoogleData): string {
+  const normalized = canonicalizeService(service);
+  if (normalized && !["school", "academy", "education", "training center"].includes(normalized)) {
+    return normalized;
+  }
+  const text = [
+    google.business.name,
+    google.business.description ?? "",
+    google.vertical.primary_category_display ?? "",
+    google.vertical.primary_category ?? "",
+    (google.vertical.google_categories ?? []).join(" "),
+  ]
+    .join(" ")
+    .toLowerCase();
+  if (/\b(language school|esl|english school)\b/.test(text)) return "language school";
+  if (/\b(vocational|trade school|career training)\b/.test(text)) {
+    return "vocational training center";
+  }
+  if (/\b(school|academy|after school|tutor|tutoring|learning center|test prep)\b/.test(text)) {
+    return "tutoring service";
+  }
+  return normalized || "local business";
+}
+
+function translateServiceZh(service: string): string {
+  const map: Record<string, string> = {
+    "tutoring service": "課後輔導",
+    "language school": "語言學校",
+    "vocational training center": "職業培訓中心",
+  };
+  return map[service] ?? capitalize(service);
 }
 
 function capitalize(s: string): string {
@@ -529,6 +706,35 @@ function buildScaleTicks(comp: ScoreComponent): ScaleTickVM[] {
 function formatRankingGain(referenceDrop: number): string {
   const abs = Math.max(1, Math.abs(referenceDrop));
   return `+${abs} to +${abs + 1}`;
+}
+
+function buildForecastOutcomeCopy(args: {
+  language: AuditLanguage;
+  currentGrade: "A" | "B" | "C" | "D" | "F";
+  projectedGrade: "A" | "B" | "C" | "D" | "F";
+  rankingGainDisplay: string;
+}) {
+  const isZh = args.language === "zh";
+  return {
+    google_ranking_display: args.rankingGainDisplay,
+    google_ranking_desc: isZh
+      ? "預估本地搜尋包排名提升（6 個月）"
+      : "Estimated Local Pack climb in 6 months",
+    ai_visibility_display: `${args.currentGrade} → ${args.projectedGrade}`,
+    ai_visibility_desc: isZh
+      ? "AI 可見度等級提升（回答中更常被提及）"
+      : "AI visibility grade lift (more likely to be cited in answers)",
+    referral_retention_display: isZh
+      ? "回流與轉介紹循環"
+      : "Customers return & refer",
+    referral_retention_desc: isZh
+      ? "願意留下評論的人，更可能再次消費，並主動推薦他人。"
+      : "People who leave reviews are more likely to come back and refer others.",
+    revenue_display: isZh ? "營收將持續成長" : "Revenue will increase",
+    revenue_desc: isZh
+      ? "當排名提升、AI 可見度增加、轉介紹與留存同步成長，營收將確定上行。"
+      : "With stronger ranking, higher AI visibility, and better referral and retention, revenue is set to rise.",
+  };
 }
 
 function buildProjectionFloorBlurb(

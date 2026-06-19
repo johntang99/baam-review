@@ -56,7 +56,7 @@
       {{#each t.cover_toc}}
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">{{num}}</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">{{title}}</span><span class="cover3-toc-sub"> • {{sub}}</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">{{title}}</span><span class="cover3-toc-sub"> {{sub}}</span></span>
       </div>
       {{/each}}
     </div>
@@ -64,8 +64,8 @@
     <div class="cover3-main-spacer"></div>
 
     <div class="cover3-meta">
-      <div><div class="cover3-meta-k">{{t.cover_meta_labels.location}}</div><div class="cover3-meta-v">{{business_address_line_1}}<small>{{business_address_line_2}}</small></div></div>
-      <div><div class="cover3-meta-k">{{t.cover_meta_labels.vertical}}</div><div class="cover3-meta-v">{{vertical_display_name}}<small>{{vertical_subtype}}</small></div></div>
+      <div><div class="cover3-meta-k">{{t.cover_meta_labels.location}}</div><div class="cover3-meta-v">{{business_address_line_1}}<small>{{business_address_line_2}}</small>{{#if business_website_line}}<small>{{business_website_line}}</small>{{/if}}</div></div>
+      <div><div class="cover3-meta-k">{{t.cover_meta_labels.vertical}}</div><div class="cover3-meta-v">{{vertical_display_name}}{{#if cover_service_display}}<small>{{cover_service_display}}</small>{{/if}}<small>{{vertical_subtype}}</small></div></div>
       <div><div class="cover3-meta-k">{{#if (eq language "zh")}}編製者{{else}}Prepared by{{/if}}</div><div class="cover3-meta-v">Baam Review<small>{{#if (eq language "zh")}}聲譽診斷{{else}}Reputation Diagnostic{{/if}}</small></div></div>
     </div>
   </div>
@@ -352,22 +352,34 @@
       </div>
     </div>
 
-    <div class="projection-impact">
-      <div class="impact-cell">
-        <div class="impact-label">{{t.projection_impact_labels.score}}</div>
-        <div class="impact-value gain">{{projection_six_month_drop_display}}</div>
-        <div class="impact-sub">{{projection_floor_blurb}}</div>
+    <p class="forecast-results-intro">
+      {{#if (eq language "zh")}}評論成長只是手段，真正目標是商業結果與營收改善。{{else}}Review growth is the lever. Business outcomes and income growth are the real goal.{{/if}}
+    </p>
+
+    <div class="forecast-results-grid">
+      <div class="forecast-result-card">
+        <div class="forecast-result-icon">G</div>
+        <div class="forecast-result-title"><strong>{{#if (eq language "zh")}}Google 排名提升{{else}}Google ranking improves{{/if}}</strong></div>
+        <div class="forecast-result-value">{{forecast_google_ranking_display}}</div>
+        <div class="forecast-result-desc">{{forecast_google_ranking_desc}}</div>
       </div>
-      <div class="impact-cell">
-        <div class="impact-label">{{t.projection_impact_labels.ranking}}</div>
-        <div class="impact-value gain">{{projection_ranking_drop_display}}</div>
-        <div class="impact-sub">{{#if (eq language "zh")}}預估本地搜尋包排名提升 · 持續領先在地競爭對手{{else}}Estimated Local Pack climb · pulling ahead of your local set{{/if}}</div>
+      <div class="forecast-result-card">
+        <div class="forecast-result-icon">AI</div>
+        <div class="forecast-result-title"><strong>{{#if (eq language "zh")}}AI 搜尋可見度提升{{else}}AI search visibility improves{{/if}}</strong></div>
+        <div class="forecast-result-value">{{forecast_ai_visibility_display}}</div>
+        <div class="forecast-result-desc">{{forecast_ai_visibility_desc}}</div>
       </div>
-      <div class="impact-cell">
-        <div class="impact-label">{{t.projection_impact_labels.revenue}}</div>
-        <ul class="impact-results">
-          {{#each t.projection_results_items}}<li><span class="impact-check">✓</span> {{{this}}}</li>{{/each}}
-        </ul>
+      <div class="forecast-result-card">
+        <div class="forecast-result-icon">R</div>
+        <div class="forecast-result-title"><strong>{{#if (eq language "zh")}}轉介紹與留存成長{{else}}Referral & retention grow{{/if}}</strong></div>
+        <div class="forecast-result-value forecast-result-value-text">{{forecast_referral_retention_display}}</div>
+        <div class="forecast-result-desc">{{forecast_referral_retention_desc}}</div>
+      </div>
+      <div class="forecast-result-card">
+        <div class="forecast-result-icon">$</div>
+        <div class="forecast-result-title"><strong>{{#if (eq language "zh")}}營收增加{{else}}Revenue increases{{/if}}</strong></div>
+        <div class="forecast-result-value forecast-result-value-text">{{forecast_revenue_display}}</div>
+        <div class="forecast-result-desc">{{forecast_revenue_desc}}</div>
       </div>
     </div>
   </div>

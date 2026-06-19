@@ -84,6 +84,11 @@ const EVIDENCE_SERVICE_OPTION_RULES: Array<{
     options: ["tutoring service", "vocational training center", "language school"],
   },
   {
+    pattern:
+      /\b(school|academy|after school|prep school|test prep|education academy|learning academy)\b/i,
+    options: ["tutoring service", "language school", "vocational training center"],
+  },
+  {
     pattern: /\b(print(ing)?|print shop|commercial printer|copy shop|copy center|offset print)\b/i,
     options: ["print shop", "marketing consultant", "shipping and mailing service"],
   },
@@ -580,6 +585,10 @@ const RELATED_KEYWORD_OPTION_RULES: Array<{
     pattern: /\b(immigration|visa|asylum|attorney|lawyer)\b/i,
     options: ["immigration lawyer", "personal injury lawyer", "divorce lawyer"],
     verticals: ["legal_immigration"],
+  },
+  {
+    pattern: /\b(school|academy|education|learning center|learning centre|test prep)\b/i,
+    options: ["tutoring service", "language school", "vocational training center"],
   },
 ];
 

@@ -210,7 +210,15 @@
   .cover3-toc-title {
     font-size: 16px; font-weight: 700; color: var(--ink);
   }
-  .cover3-toc-sub { font-size: 13px; color: var(--ink-mute); }
+  .cover3-toc-sub {
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--rust-deep);
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
   .cover3-main-spacer { flex: 1; }
   .cover3-meta {
     display: grid; grid-template-columns: 1fr 1fr 1fr;
@@ -849,58 +857,70 @@
   .legend-swatch.amber { background: var(--amber); }
   .legend-item strong { color: var(--ink); font-weight: 600; }
 
-  .projection-impact {
+  .forecast-results-intro {
+    margin-top: 18px;
+    margin-bottom: 12px;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.4;
+    color: var(--ink);
+    max-width: 760px;
+  }
+  .forecast-results-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0;
     border-top: 1px solid var(--ink);
     border-bottom: 1px solid var(--ink);
-    margin-top: 22px;
+    margin-top: 10px;
   }
-  .impact-cell {
-    padding: 14px 24px;
+  .forecast-result-card {
+    padding: 16px 16px 14px;
     border-right: 1px solid var(--rule);
   }
-  .impact-cell:last-child { border-right: none; }
-  .impact-label {
+  .forecast-result-card:last-child { border-right: none; }
+  .forecast-result-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 999px;
+    border: 1px solid var(--rule);
+    background: var(--cream-deep);
+    color: var(--rust-deep);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--ink-mute);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
     margin-bottom: 10px;
   }
-  .impact-value {
+  .forecast-result-title {
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
+    font-size: 21px;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .forecast-result-title strong { font-weight: 700; }
+  .forecast-result-value {
     font-family: 'Instrument Serif', 'Noto Serif TC', serif;
-    font-size: 32px;
-    color: var(--rust-deep);
-    line-height: 1.05;
+    font-size: 36px;
+    line-height: 1;
+    color: var(--sage-darkest);
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
   }
-  .impact-value.neutral { color: var(--ink); }
-  .impact-value.gain { color: var(--sage-deep); }
-  .impact-sub {
+  .forecast-result-value-text {
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .forecast-result-desc {
     font-size: 12px;
+    line-height: 1.45;
     color: var(--ink-soft);
-    margin-top: 6px;
-    line-height: 1.4;
-  }
-  .impact-results {
-    list-style: none;
-    margin: 2px 0 0;
-    padding: 0;
-  }
-  .impact-results li {
-    font-size: 13px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-  }
-  .impact-check {
-    color: var(--sage-deep);
-    font-weight: 600;
-    flex-shrink: 0;
   }
 
   /* ============ SECTION 4 — BENCHMARKS ============ */
@@ -1695,6 +1715,70 @@
 
   /* Mobile */
   @media (max-width: 720px) {
+    .page.cover3 {
+      display: block;
+      min-height: auto;
+      border-left: none;
+      border-right: none;
+    }
+    .cover3-rail {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+      padding: 26px 20px;
+    }
+    .cover3-rail-head { margin-bottom: 16px; }
+    .cover3-ev { margin-bottom: 16px; }
+    .cover3-ev-stat { font-size: 24px; }
+    .cover3-main {
+      padding: 28px 20px 34px;
+    }
+    .cover3-masthead { font-size: 9px; letter-spacing: 0.14em; }
+    .cover3-masthead-brand { letter-spacing: 0.2em; }
+    .cover3-for {
+      font-size: 14px;
+      margin: 24px 0 14px;
+      line-height: 1.35;
+    }
+    .cover3-biz {
+      font-size: 34px;
+      line-height: 0.98;
+      padding-bottom: 14px;
+    }
+    .cover3-statement {
+      font-size: 24px;
+      line-height: 1.15;
+      margin-top: 16px;
+    }
+    .cover3-toc { margin-top: 22px; }
+    .cover3-toc-item {
+      padding: 10px 0;
+      gap: 10px;
+      align-items: baseline;
+    }
+    .cover3-toc-num { width: 30px; font-size: 10px; }
+    .cover3-toc-line {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      line-height: 1.25;
+    }
+    .cover3-toc-title { font-size: 13px; }
+    .cover3-toc-sub {
+      margin-left: 0;
+      font-size: 9px;
+      letter-spacing: 0.02em;
+    }
+    .cover3-main-spacer { display: none; }
+    .cover3-meta {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 26px;
+      padding-top: 12px;
+    }
+    .cover3-meta-v { font-size: 13px; }
+    .cover3-meta-v small { font-size: 9px; }
+
     .page { padding: 40px 28px 60px; }
     .cover-title { font-size: 48px; }
     .cover-subtitle { font-size: 20px; }
@@ -1714,9 +1798,23 @@
     .cta-paths { grid-template-columns: 1fr; }
     .cta-path { border-right: none; border-bottom: 1px solid var(--ink); }
     .cta-path:last-child { border-bottom: none; }
-    .projection-impact { grid-template-columns: 1fr; }
-    .impact-cell { border-right: none; border-bottom: 1px solid var(--rule); }
-    .impact-cell:last-child { border-bottom: none; }
+    .forecast-results-grid { grid-template-columns: 1fr 1fr; }
+    .forecast-result-card:nth-child(2n) { border-right: none; }
+    .forecast-result-card {
+      border-bottom: 1px solid var(--rule-soft);
+      min-height: 132px;
+    }
+    .forecast-result-card:nth-last-child(-n+2) { border-bottom: none; }
+    .forecast-result-icon {
+      width: 38px;
+      height: 38px;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .forecast-result-title { font-size: 15px; }
+    .forecast-result-value { font-size: 28px; }
+    .forecast-result-value-text { font-size: 18px; }
+    .forecast-result-desc { font-size: 11px; }
     .grade-scale-table { font-size: 12px; }
     .grade-scale-table td, .grade-scale-table th { padding: 12px 8px 12px 0; }
     .grade-letter-pill { font-size: 28px; }

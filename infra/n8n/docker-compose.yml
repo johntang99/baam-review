@@ -4,6 +4,10 @@ services:
   caddy:
     image: caddy:2
     restart: unless-stopped
+    # Caddy needs N8N_HOST too — the Caddyfile uses {$N8N_HOST}. Without this,
+    # the var is empty and the Caddyfile fails to parse.
+    environment:
+      - N8N_HOST=${N8N_HOST}
     ports:
       - "80:80"
       - "443:443"

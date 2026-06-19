@@ -508,7 +508,7 @@ export const STRINGS: Record<
     cover_eyebrow: (pages) => `A personalized diagnostic · ${pages} pages · for the owner, not the developer`,
     cover_title_html: "Customers can't choose you <em>if they can't find you</em>",
     cover_subtitle: "Where your business stands today, what it costs you each month, and the five things to do in the next 12 months.",
-    cover_meta_labels: { business: "Business", location: "Location", vertical: "Vertical", audit_id: "Audit ID" },
+    cover_meta_labels: { business: "Business", location: "Location", vertical: "Industry & Service", audit_id: "Audit ID" },
     cover_meta_subtitle: "prepared by BAAM Studio",
     cover_toc: [
       { num: "02", title: "Your current snapshot", sub: "Score, grade, and the full breakdown" },
@@ -672,7 +672,7 @@ export const STRINGS: Record<
     cover_eyebrow: (pages) => `為您量身定制的診斷報告 · 共 ${pages} 頁 · 為老闆而寫，非為工程師`,
     cover_title_html: "客戶找不到您，<em>就無法選擇您</em>",
     cover_subtitle: "您的業務當前狀況、每月損失多少、以及未來 12 個月需要採取的五項行動",
-    cover_meta_labels: { business: "商家", location: "地址", vertical: "行業", audit_id: "審計編號" },
+    cover_meta_labels: { business: "商家", location: "地址", vertical: "行業與服務", audit_id: "審計編號" },
     cover_meta_subtitle: "由 BAAM Studio 編製",
     cover_toc: [
       { num: "02", title: "您目前的狀況概覽", sub: "分數、等級與完整細項" },

@@ -1,5 +1,8 @@
 # BAAM Review
 
+N8N_HOST=n8n.baamplatform.com
+N8N_ENCRYPTION_KEY=6b3491a0b83d0e6624969f0e9f017234b49d28e0641c91a2
+
 
 lsof -ti:4001 | xargs kill -9
 rm -rf .next

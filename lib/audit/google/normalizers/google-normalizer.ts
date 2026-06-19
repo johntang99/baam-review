@@ -29,8 +29,12 @@ export function normalizeGoogleData(input: NormalizeInput): AuditGoogleData {
   const { rawPlace, outscraperReviews, tier, cacheHit, fetchedAt, expiresAt } =
     input;
 
-  const reviews = outscraperReviews
-    ? outscraperReviews.map(mapOutscraperReview)
+  const hasOutscraperHistory =
+    tier === "paid" &&
+    Array.isArray(outscraperReviews) &&
+    outscraperReviews.length > 0;
+  const reviews = hasOutscraperHistory
+    ? (outscraperReviews ?? []).map(mapOutscraperReview)
     : (rawPlace.reviews ?? []).map(mapPlaceDetailsReview);
 
   const address = parseAddress(
@@ -57,8 +61,8 @@ export function normalizeGoogleData(input: NormalizeInput): AuditGoogleData {
 
   const aggregates = aggregateReviews(reviews, fetchedAt);
 
-  const isPaidWithFullHistory = tier === "paid" && outscraperReviews !== null;
-  const data_source = isPaidWithFullHistory
+  const isPaidTier = tier === "paid";
+  const data_source = hasOutscraperHistory
     ? "place_details_plus_outscraper"
     : "place_details";
 
@@ -127,21 +131,21 @@ export function normalizeGoogleData(input: NormalizeInput): AuditGoogleData {
       last_review_date: aggregates.last_review_date,
       last_review_days_ago: aggregates.last_review_days_ago,
       reviews_30d: aggregates.reviews_30d,
-      reviews_90d: isPaidWithFullHistory ? aggregates.reviews_90d : null,
-      reviews_180d: isPaidWithFullHistory ? aggregates.reviews_180d : null,
-      reviews_365d: isPaidWithFullHistory ? aggregates.reviews_365d : null,
+      reviews_90d: isPaidTier ? aggregates.reviews_90d : null,
+      reviews_180d: isPaidTier ? aggregates.reviews_180d : null,
+      reviews_365d: isPaidTier ? aggregates.reviews_365d : null,
       velocity_30d_per_month: aggregates.velocity_30d_per_month,
-      velocity_180d_per_month: isPaidWithFullHistory
+      velocity_180d_per_month: isPaidTier
         ? aggregates.velocity_180d_per_month
         : null,
-      velocity_365d_per_month: isPaidWithFullHistory
+      velocity_365d_per_month: isPaidTier
         ? aggregates.velocity_365d_per_month
         : null,
-      response_rate: isPaidWithFullHistory ? aggregates.response_rate : null,
-      response_time_median_hours: isPaidWithFullHistory
+      response_rate: hasOutscraperHistory ? aggregates.response_rate : null,
+      response_time_median_hours: hasOutscraperHistory
         ? aggregates.response_time_median_hours
         : null,
-      unanswered_count: isPaidWithFullHistory
+      unanswered_count: hasOutscraperHistory
         ? aggregates.unanswered_count
         : null,
       photo_review_count: null,
