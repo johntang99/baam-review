@@ -298,7 +298,8 @@ export const SHORT_REPORT_STYLES = `
     line-height: 1.02;
     color: #842f1b;
     display: block;
-    width: fit-content;
+    width: 100%;
+    text-align: center;
     padding: 0;
   }
   .short-letter-subtitle {
