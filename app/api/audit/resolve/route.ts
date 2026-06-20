@@ -124,18 +124,19 @@ interface ResolveRequest {
   website?: string;
 }
 
+const HAS_LLM_PROVIDER = !!process.env.ANTHROPIC_API_KEY || !!process.env.OPENAI_API_KEY;
 const PRIMARY_ANALYST_ENABLED =
   process.env.SERVICE_ANALYST_PRIMARY === "1" ||
-  (process.env.SERVICE_ANALYST_PRIMARY !== "0" && !!process.env.ANTHROPIC_API_KEY);
+  (process.env.SERVICE_ANALYST_PRIMARY !== "0" && HAS_LLM_PROVIDER);
 const PRIMARY_ANALYST_USE_LLM =
   process.env.SERVICE_ANALYST_PRIMARY_USE_LLM === "1" ||
-  (process.env.SERVICE_ANALYST_PRIMARY_USE_LLM !== "0" && !!process.env.ANTHROPIC_API_KEY);
+  (process.env.SERVICE_ANALYST_PRIMARY_USE_LLM !== "0" && HAS_LLM_PROVIDER);
 const SHADOW_ANALYST_ENABLED =
   process.env.SERVICE_ANALYST_SHADOW === "1" ||
-  (process.env.SERVICE_ANALYST_SHADOW !== "0" && !!process.env.ANTHROPIC_API_KEY);
+  (process.env.SERVICE_ANALYST_SHADOW !== "0" && HAS_LLM_PROVIDER);
 const SHADOW_ANALYST_USE_LLM =
   process.env.SERVICE_ANALYST_SHADOW_USE_LLM === "1" ||
-  (process.env.SERVICE_ANALYST_SHADOW_USE_LLM !== "0" && !!process.env.ANTHROPIC_API_KEY);
+  (process.env.SERVICE_ANALYST_SHADOW_USE_LLM !== "0" && HAS_LLM_PROVIDER);
 const MAX_SERVICE_OPTIONS = 4;
 
 export async function POST(request: Request) {
@@ -233,14 +234,16 @@ export async function POST(request: Request) {
     const detectedService = selectPrimaryDetectedService({
       baseDetectedService,
       primaryAnalyst,
-      orderedCandidates,
-      vertical: detectedVertical,
     });
-    const serviceDecision = reconcileServiceDecision({
+    const reconciledServiceDecision = reconcileServiceDecision({
       google,
       bsService: detectedService,
       gbpDescription: google.business.description ?? null,
       websiteSignalText: websiteSignal?.text ?? null,
+    });
+    const serviceDecision = applyLlmForcedDefault({
+      serviceDecision: reconciledServiceDecision,
+      primaryAnalyst,
     });
     const serviceShadow = SHADOW_ANALYST_ENABLED
       ? await analyzeServiceWithAnalyst({
@@ -315,6 +318,9 @@ export async function POST(request: Request) {
         ? {
             enabled: true,
             mode: primaryAnalyst.mode,
+            llm_provider: primaryAnalyst.llm_provider ?? "",
+            llm_model: primaryAnalyst.llm_model ?? "",
+            llm_fallback_used: primaryAnalyst.llm_fallback_used ?? false,
             recommended_service: primaryAnalyst.recommended_service,
             llm_service_phrase: primaryAnalyst.llm_service_phrase ?? "",
             llm_phrase_candidates: primaryAnalyst.llm_phrase_candidates ?? [],
@@ -327,6 +333,9 @@ export async function POST(request: Request) {
         ? {
             enabled: true,
             mode: serviceShadow.mode,
+            llm_provider: serviceShadow.llm_provider ?? "",
+            llm_model: serviceShadow.llm_model ?? "",
+            llm_fallback_used: serviceShadow.llm_fallback_used ?? false,
             recommended_service: serviceShadow.recommended_service,
             llm_service_phrase: serviceShadow.llm_service_phrase ?? "",
             llm_phrase_candidates: serviceShadow.llm_phrase_candidates ?? [],
@@ -337,6 +346,24 @@ export async function POST(request: Request) {
               canonicalizeService(serviceDecision.cs_recommended_service),
           }
         : { enabled: false },
+      service_model_debug: {
+        primary: primaryAnalyst
+          ? {
+              mode: primaryAnalyst.mode,
+              provider: primaryAnalyst.llm_provider ?? "",
+              model: primaryAnalyst.llm_model ?? "",
+              fallback_used: primaryAnalyst.llm_fallback_used ?? false,
+            }
+          : null,
+        shadow: serviceShadow
+          ? {
+              mode: serviceShadow.mode,
+              provider: serviceShadow.llm_provider ?? "",
+              model: serviceShadow.llm_model ?? "",
+              fallback_used: serviceShadow.llm_fallback_used ?? false,
+            }
+          : null,
+      },
       // Actual Google Business Profile categorization (for display/context).
       google_category:
         google.vertical.primary_category_display ||
@@ -652,39 +679,50 @@ function selectPrimaryDetectedService(args: {
         mode: "distilled" | "llm";
       }
     | null;
-  orderedCandidates: Array<{
-    service: string;
-    confidence: number;
-    specificity: number;
-  }>;
-  vertical: VerticalKey;
 }) {
   if (!args.primaryAnalyst) return args.baseDetectedService;
-  if (args.primaryAnalyst.mode !== "llm") {
-    return args.primaryAnalyst.recommended_service || args.baseDetectedService;
+  const analystService = String(args.primaryAnalyst.recommended_service ?? "").trim();
+  if (!analystService) return args.baseDetectedService;
+  return analystService;
+}
+
+function applyLlmForcedDefault(args: {
+  serviceDecision: {
+    gs_service: string;
+    bs_service: string;
+    cs_recommended_service: string;
+    cs_confidence: number;
+    cs_reason_codes: string[];
+  };
+  primaryAnalyst:
+    | {
+        mode: "distilled" | "llm";
+        recommended_service: string;
+        llm_service_phrase?: string;
+        confidence: number;
+      }
+    | null;
+}) {
+  if (!args.primaryAnalyst || args.primaryAnalyst.mode !== "llm") {
+    return args.serviceDecision;
   }
-
-  const llmService = canonicalizeService(args.primaryAnalyst.recommended_service);
-  if (!llmService) return args.baseDetectedService;
-  if (isBroadService(llmService, args.vertical)) return args.baseDetectedService;
-
-  const topCandidate = args.orderedCandidates[0];
-  const topService = canonicalizeService(topCandidate?.service);
-  if (topService && llmService === topService && (topCandidate?.confidence ?? 0) >= 0.58) {
-    return llmService;
+  const preferredRaw = String(
+    args.primaryAnalyst.llm_service_phrase || args.primaryAnalyst.recommended_service || "",
+  ).trim();
+  if (!preferredRaw) {
+    return args.serviceDecision;
   }
+  const reasonCodes = args.serviceDecision.cs_reason_codes.includes("llm_forced_default")
+    ? args.serviceDecision.cs_reason_codes
+    : [...args.serviceDecision.cs_reason_codes, "llm_forced_default"];
 
-  const hasStrongCandidateSupport = args.orderedCandidates
-    .slice(0, 3)
-    .some((candidate) => {
-      const candidateService = canonicalizeService(candidate.service);
-      return candidateService === llmService && candidate.confidence >= 0.66 && candidate.specificity >= 3;
-    });
-  if (hasStrongCandidateSupport) {
-    return llmService;
-  }
-
-  return args.baseDetectedService;
+  return {
+    ...args.serviceDecision,
+    bs_service: preferredRaw,
+    cs_recommended_service: preferredRaw,
+    cs_confidence: Number(Math.max(args.serviceDecision.cs_confidence, args.primaryAnalyst.confidence).toFixed(2)),
+    cs_reason_codes: reasonCodes,
+  };
 }
 
 function inferEvidenceServiceOptions(text: string, vertical: VerticalKey) {

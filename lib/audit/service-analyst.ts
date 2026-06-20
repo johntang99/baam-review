@@ -23,6 +23,11 @@ const PRIMARY_ANALYST_MODEL =
   process.env.ANTHROPIC_MODEL ||
   "claude-opus-4-8";
 const FALLBACK_ANALYST_MODEL = "claude-sonnet-4-5-20250929";
+const GPT_FALLBACK_MODEL =
+  process.env.SERVICE_ANALYST_GPT_FALLBACK_MODEL ||
+  process.env.OPENAI_MAIN_MODEL ||
+  "gpt-4o-mini";
+const GPT_FALLBACK_MODEL_BACKUP = "gpt-4o-mini";
 const PHRASE_TOKEN_STOPWORDS = new Set([
   "a",
   "an",
@@ -62,6 +67,9 @@ export interface ServiceAnalystResult {
   confidence: number;
   mode: "distilled" | "llm";
   rationale: string;
+  llm_provider?: "anthropic" | "openai";
+  llm_model?: string;
+  llm_fallback_used?: boolean;
   llm_service_phrase?: string;
   llm_phrase_candidates?: string[];
   llm_suggested_services?: string[];
@@ -118,7 +126,7 @@ export async function analyzeServiceWithAnalyst({
     };
   }
 
-  if (!useLlm || !process.env.ANTHROPIC_API_KEY) {
+  if (!useLlm || (!process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY)) {
     return {
       recommended_service: canonicalizeService(distilledTop.service),
       confidence: distilledTop.distilled_confidence,
@@ -248,6 +256,9 @@ export async function analyzeServiceWithAnalyst({
     confidence: bestSupported.confidence,
     mode: "llm",
     rationale,
+    llm_provider: llmResult.provider,
+    llm_model: llmResult.model,
+    llm_fallback_used: llmResult.fallbackUsed,
     llm_service_phrase: llmServicePhrase,
     llm_phrase_candidates: llmPhraseCandidates,
     llm_suggested_services: buildLlmSuggestedServices({
@@ -286,32 +297,90 @@ export function buildServiceEvidencePack({
   };
 }
 
+type ParsedAnalystPayload = {
+  recommended_service: string;
+  service_phrase: string;
+  confidence: number;
+  rationale: string;
+  alternative_phrases: string[];
+};
+
+type LlmAnalysisDebugPayload = ParsedAnalystPayload & {
+  provider: "anthropic" | "openai";
+  model: string;
+  fallbackUsed: boolean;
+};
+
 async function analyzeWithLlm({
   evidence,
   candidates,
 }: {
   evidence: ServiceEvidencePack;
   candidates: GeneratedServiceCandidate[];
-}) {
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const response = await createAnalystMessage(client, evidence, candidates, PRIMARY_ANALYST_MODEL).catch(
-    async () => {
-      if (PRIMARY_ANALYST_MODEL === FALLBACK_ANALYST_MODEL) {
-        throw new Error("primary_analyst_model_failed");
+}): Promise<LlmAnalysisDebugPayload | null> {
+  let hasPriorFailure = false;
+  if (process.env.ANTHROPIC_API_KEY) {
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const primaryResponse = await createAnalystMessage(
+      client,
+      evidence,
+      candidates,
+      PRIMARY_ANALYST_MODEL,
+    ).catch(() => null);
+    const primaryParsed = safeParseAnalystJson(extractAnthropicText(primaryResponse));
+    if (primaryParsed) {
+      return {
+        ...primaryParsed,
+        provider: "anthropic",
+        model: PRIMARY_ANALYST_MODEL,
+        fallbackUsed: hasPriorFailure,
+      };
+    }
+    hasPriorFailure = true;
+
+    if (PRIMARY_ANALYST_MODEL !== FALLBACK_ANALYST_MODEL) {
+      const fallbackResponse = await createAnalystMessage(
+        client,
+        evidence,
+        candidates,
+        FALLBACK_ANALYST_MODEL,
+      ).catch(() => null);
+      const fallbackParsed = safeParseAnalystJson(extractAnthropicText(fallbackResponse));
+      if (fallbackParsed) {
+        return {
+          ...fallbackParsed,
+          provider: "anthropic",
+          model: FALLBACK_ANALYST_MODEL,
+          fallbackUsed: true,
+        };
       }
-      return createAnalystMessage(client, evidence, candidates, FALLBACK_ANALYST_MODEL);
-    },
-  );
+      hasPriorFailure = true;
+    }
+  }
 
-  const text = response.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
-    .join("")
-    .trim();
+  if (process.env.OPENAI_API_KEY) {
+    const openAiModels = getOpenAiFallbackModels();
+    for (let index = 0; index < openAiModels.length; index += 1) {
+      const model = openAiModels[index];
+      const gptText = await createOpenAiAnalystMessage({
+        evidence,
+        candidates,
+        model,
+      }).catch(() => "");
+      const gptParsed = safeParseAnalystJson(gptText);
+      if (gptParsed) {
+        return {
+          ...gptParsed,
+          provider: "openai",
+          model,
+          fallbackUsed: hasPriorFailure || index > 0,
+        };
+      }
+      hasPriorFailure = true;
+    }
+  }
 
-  const parsed = safeParseAnalystJson(text);
-  if (!parsed) return null;
-  return parsed;
+  return null;
 }
 
 async function analyzeWithVerifier({
@@ -325,33 +394,47 @@ async function analyzeWithVerifier({
   initialRecommendation: string;
   initialPhrase: string;
 }) {
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const response = await createVerifierMessage(
-    client,
-    evidence,
-    candidates,
-    initialRecommendation,
-    initialPhrase,
-    PRIMARY_ANALYST_MODEL,
-  ).catch(async () => {
-    if (PRIMARY_ANALYST_MODEL === FALLBACK_ANALYST_MODEL) {
-      throw new Error("verifier_primary_model_failed");
-    }
-    return createVerifierMessage(
+  if (process.env.ANTHROPIC_API_KEY) {
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const primaryResponse = await createVerifierMessage(
       client,
       evidence,
       candidates,
       initialRecommendation,
       initialPhrase,
-      FALLBACK_ANALYST_MODEL,
-    );
-  });
-  const text = response.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
-    .join("")
-    .trim();
-  return safeParseVerifierJson(text);
+      PRIMARY_ANALYST_MODEL,
+    ).catch(() => null);
+    const primaryParsed = safeParseVerifierJson(extractAnthropicText(primaryResponse));
+    if (primaryParsed) return primaryParsed;
+
+    if (PRIMARY_ANALYST_MODEL !== FALLBACK_ANALYST_MODEL) {
+      const fallbackResponse = await createVerifierMessage(
+        client,
+        evidence,
+        candidates,
+        initialRecommendation,
+        initialPhrase,
+        FALLBACK_ANALYST_MODEL,
+      ).catch(() => null);
+      const fallbackParsed = safeParseVerifierJson(extractAnthropicText(fallbackResponse));
+      if (fallbackParsed) return fallbackParsed;
+    }
+  }
+
+  if (process.env.OPENAI_API_KEY) {
+    for (const model of getOpenAiFallbackModels()) {
+      const gptRun = await analyzeWithVerifierWithGpt({
+        evidence,
+        candidates,
+        initialRecommendation,
+        initialPhrase,
+        model,
+      }).catch(() => null);
+      if (gptRun) return gptRun;
+    }
+  }
+
+  return null;
 }
 
 async function analyzeWithVerifierEnsemble(args: {
@@ -387,6 +470,22 @@ async function analyzeWithVerifierEnsemble(args: {
     if (fallbackRun) runs.push(fallbackRun);
   }
 
+  if (process.env.OPENAI_API_KEY) {
+    for (const model of getOpenAiFallbackModels()) {
+      const gptRun = await analyzeWithVerifierWithGpt({
+        evidence: args.evidence,
+        candidates: args.candidates,
+        initialRecommendation: args.initialRecommendation,
+        initialPhrase: args.initialPhrase,
+        model,
+      }).catch(() => null);
+      if (gptRun) {
+        runs.push(gptRun);
+        break;
+      }
+    }
+  }
+
   if (runs.length === 0) return null;
   return pickBestVerifierRun(runs, args.candidates, args.evidence.inferred_vertical);
 }
@@ -418,6 +517,29 @@ async function analyzeWithVerifierWithModel({
     .map((block) => block.text)
     .join("")
     .trim();
+  return safeParseVerifierJson(text);
+}
+
+async function analyzeWithVerifierWithGpt({
+  evidence,
+  candidates,
+  initialRecommendation,
+  initialPhrase,
+  model,
+}: {
+  evidence: ServiceEvidencePack;
+  candidates: GeneratedServiceCandidate[];
+  initialRecommendation: string;
+  initialPhrase: string;
+  model: string;
+}) {
+  const text = await createOpenAiVerifierMessage({
+    evidence,
+    candidates,
+    initialRecommendation,
+    initialPhrase,
+    model,
+  });
   return safeParseVerifierJson(text);
 }
 
@@ -476,6 +598,126 @@ async function createVerifierMessage(
       },
     ],
   });
+}
+
+function extractAnthropicText(response: Anthropic.Message | null | undefined) {
+  if (!response) return "";
+  return response.content
+    .filter((block) => block.type === "text")
+    .map((block) => block.text)
+    .join("")
+    .trim();
+}
+
+async function createOpenAiAnalystMessage({
+  evidence,
+  candidates,
+  model,
+}: {
+  evidence: ServiceEvidencePack;
+  candidates: GeneratedServiceCandidate[];
+  model: string;
+}) {
+  return createOpenAiChatCompletion({
+    model,
+    temperature: 0.1,
+    maxTokens: 700,
+    systemPrompt: buildAnalystSystemPrompt(model),
+    userPrompt: buildAnalystUserPrompt(evidence, candidates),
+  });
+}
+
+async function createOpenAiVerifierMessage({
+  evidence,
+  candidates,
+  initialRecommendation,
+  initialPhrase,
+  model,
+}: {
+  evidence: ServiceEvidencePack;
+  candidates: GeneratedServiceCandidate[];
+  initialRecommendation: string;
+  initialPhrase: string;
+  model: string;
+}) {
+  return createOpenAiChatCompletion({
+    model,
+    temperature: 0,
+    maxTokens: 700,
+    systemPrompt: buildVerifierSystemPrompt(model),
+    userPrompt: buildVerifierUserPrompt(
+      evidence,
+      candidates,
+      initialRecommendation,
+      initialPhrase,
+    ),
+  });
+}
+
+async function createOpenAiChatCompletion({
+  model,
+  systemPrompt,
+  userPrompt,
+  temperature,
+  maxTokens,
+}: {
+  model: string;
+  systemPrompt: string;
+  userPrompt: string;
+  temperature: number;
+  maxTokens: number;
+}) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("openai_api_key_missing");
+  }
+
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      temperature,
+      max_tokens: maxTokens,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => "(no body)");
+    throw new Error(`openai_chat_completion_failed:${response.status}:${body}`);
+  }
+
+  const payload = (await response.json()) as {
+    choices?: Array<{
+      message?: {
+        content?:
+          | string
+          | Array<{
+              type?: string;
+              text?: string;
+            }>;
+      };
+    }>;
+  };
+  const content = payload.choices?.[0]?.message?.content;
+  if (typeof content === "string") {
+    return content.trim();
+  }
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => (part.type === "text" ? String(part.text ?? "") : ""))
+      .join("")
+      .trim();
+  }
+
+  throw new Error("openai_empty_content");
 }
 
 function chooseSupportedRecommendation({
@@ -862,6 +1104,13 @@ function pushUniquePhrase(target: string[], phrase: string | null | undefined) {
 
 function isOpus48Model(model: string) {
   return /claude-opus-4-8/i.test(model);
+}
+
+function getOpenAiFallbackModels() {
+  const candidates = [GPT_FALLBACK_MODEL, GPT_FALLBACK_MODEL_BACKUP]
+    .map((model) => String(model || "").trim())
+    .filter(Boolean);
+  return Array.from(new Set(candidates));
 }
 
 function selectBestEvidenceBackedPhrase(args: {

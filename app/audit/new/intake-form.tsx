@@ -71,6 +71,9 @@ interface ServiceCandidateDebug {
 interface ServiceShadowDebug {
   enabled: boolean;
   mode?: "distilled" | "llm";
+  llm_provider?: string;
+  llm_model?: string;
+  llm_fallback_used?: boolean;
   recommended_service?: string;
   llm_service_phrase?: string;
   llm_phrase_candidates?: string[];
@@ -81,6 +84,9 @@ interface ServiceShadowDebug {
 interface PrimaryAnalystDebug {
   enabled: boolean;
   mode?: "distilled" | "llm";
+  llm_provider?: string;
+  llm_model?: string;
+  llm_fallback_used?: boolean;
   recommended_service?: string;
   llm_service_phrase?: string;
   llm_phrase_candidates?: string[];
@@ -115,6 +121,20 @@ interface ResolvedBusiness {
   llm_service_phrases?: string[];
   primary_analyst?: PrimaryAnalystDebug;
   service_shadow?: ServiceShadowDebug;
+  service_model_debug?: {
+    primary?: {
+      mode?: "distilled" | "llm";
+      provider?: string;
+      model?: string;
+      fallback_used?: boolean;
+    } | null;
+    shadow?: {
+      mode?: "distilled" | "llm";
+      provider?: string;
+      model?: string;
+      fallback_used?: boolean;
+    } | null;
+  };
   google_category: string | null;
   google_categories: string[];
   vertical_options: string[];
@@ -307,6 +327,29 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           .filter(Boolean),
       ),
     ).slice(0, 8);
+    const primaryModelDebug = resolved.service_model_debug?.primary ?? null;
+    const shadowModelDebug = resolved.service_model_debug?.shadow ?? null;
+    const formatModelDebug = (
+      label: string,
+      debug:
+        | {
+            mode?: "distilled" | "llm";
+            provider?: string;
+            model?: string;
+            fallback_used?: boolean;
+          }
+        | null
+        | undefined,
+    ) => {
+      if (!debug) return "";
+      const mode = debug.mode ? String(debug.mode) : "unknown";
+      const provider = debug.provider ? String(debug.provider) : "n/a";
+      const model = debug.model ? String(debug.model) : "n/a";
+      const fallback = debug.fallback_used ? "yes" : "no";
+      return `${label}: mode=${mode}, provider=${provider}, model=${model}, fallback=${fallback}`;
+    };
+    const primaryModelDebugLine = formatModelDebug("Primary", primaryModelDebug);
+    const shadowModelDebugLine = formatModelDebug("Shadow", shadowModelDebug);
     const serviceValueDisplayStyle = {
       fontSize: 16,
       lineHeight: 1.3,
@@ -756,6 +799,20 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 Google: <b style={{ color: "var(--ink)" }}>{resolved.gs_service}</b> · BAAM:{" "}
                 <b style={{ color: "var(--ink)" }}>{resolved.bs_service}</b>
               </p>
+              {primaryModelDebugLine || shadowModelDebugLine ? (
+                <p
+                  style={{
+                    marginTop: 8,
+                    fontSize: 11,
+                    color: "var(--ink-mute)",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {primaryModelDebugLine}
+                  {primaryModelDebugLine && shadowModelDebugLine ? " | " : ""}
+                  {shadowModelDebugLine}
+                </p>
+              ) : null}
             </article>
 
             {topServiceCandidates.length > 0 ? (
