@@ -1,204 +1,203 @@
-# Service Inference Guide (How BAAM Gets Service)
+# Service Generation Guide (Production Flow + Model Conditions)
 
-This document explains how BAAM Review determines service on the New Audit flow, from raw business data to final Recommended Service.
+This guide documents the **actual production path** for how BAAM Review generates service, which model is used under each condition, and how confirmed service is carried into competitor discovery and report rendering.
 
----
+Main production routes/files:
 
-## 1) Terminology used in UI
-
-- `Google Service (GS)`: service inferred from Google profile categories/types.
-- `BAAM-generated Service (BS)`: service selected by BAAM's comprehensive inference engine.
-- `Recommended Service (RS)`: final system recommendation used for competitor query and report generation (editable by user before confirm).
-
----
-
-## 2) End-to-end flow
-
-Main route: `app/api/audit/resolve/route.ts`
-
-When user clicks "Find my business", the system does:
-
-1. Load business profile from Google via `getGoogleBusinessData(...)`.
-2. Fetch website text signal via `fetchWebsiteServiceSignalText(...)`.
-3. Build a fallback service from legacy resolver (`resolveServiceKeyword(...)`).
-4. Run comprehensive candidate selection (`pickTopComprehensiveService(...)`).
-5. Set `detected_service` to comprehensive top candidate when available, otherwise fallback.
-6. Run reconciliation (`reconcileServiceDecision(...)`) to produce final `cs_recommended_service`, confidence, and reason codes.
-7. Return top candidates (up to 3) to UI for debug transparency.
+- Resolve: `app/api/audit/resolve/route.ts`
+- Confirm + generate: `app/api/audit/generate/route.ts`
+- Async pipeline: `lib/audit/delivery/start-audit.ts`
+- Analyst logic + model cascade: `lib/audit/service-analyst.ts`
+- Deterministic reconciliation: `lib/audit/service-reconciler.ts`
+- Report mapper/rendering: `lib/audit/templating/data-mapper.ts`
 
 ---
 
-## 3) Comprehensive candidate generation (V2 core)
+## 1) Terms used in production
 
-Core module: `lib/audit/service-candidate-generator.ts`
+- `GS` (`gs_service`): Google-derived service hint (category/type mapping).
+- `BS` (`bs_service`): BAAM service after inference/reconciliation.
+- `CS` (`cs_recommended_service`): final recommended service returned by resolve API.
+- `Confirmed service`: user-confirmed service from Step 3 and sent as `service_override` to `/api/audit/generate`.
 
-### Inputs used for candidate generation
+---
+
+## 2) Resolve step (service inference before user confirm)
+
+When user clicks “Find my business”, `/api/audit/resolve` does:
+
+1. Load Google business profile (`getGoogleBusinessData(..., "free")`).
+2. Extract website signals from homepage + selected secondary pages (`fetchWebsiteServiceSignalText`).
+3. Build deterministic baseline:
+   - seed service (`resolveServiceKeyword`)
+   - comprehensive top (`pickTopComprehensiveService`)
+   - ranked candidates (`generateServiceCandidates`)
+4. Run primary analyst (`analyzeServiceWithAnalyst`) if enabled.
+5. Reconcile deterministic + evidence (`reconcileServiceDecision`).
+6. Apply forced LLM default (`applyLlmForcedDefault`) when primary analyst mode is `llm`.
+7. Return UI payload:
+   - `gs_service`, `bs_service`, `cs_recommended_service`
+   - candidate list/options
+   - `primary_analyst`, `service_shadow`
+   - `service_model_debug` (provider/model/fallback info)
+
+Key behavior now:
+
+- If LLM returns successfully (`mode: "llm"`), resolve forces BS/CS to LLM phrase/result.
+- This is intentionally opinionated to prioritize LLM business-phrase output.
+
+---
+
+## 3) Candidate generation logic (deterministic layer)
+
+Core: `lib/audit/service-candidate-generator.ts`.
+
+Evidence inputs:
 
 - business name
-- Google primary type/category display
-- Google categories (`google_categories`)
-- GBP editorial description
+- Google primary category display + primary type + additional categories
+- GBP description
 - website extracted text
-- website URL/domain/path/query tokens
-- seed service from fallback resolver
-- industry prior by inferred vertical (for example `tcm_clinic -> acupuncture`)
+- website URL host/path/query tokens
+- vertical prior defaults
+- seed service
+- vertical detail rules (vision/manufacturer/retail/window-treatment)
 
-### Candidate sources
+Candidate scoring:
 
-Each candidate can accumulate score from multiple sources:
+- accumulates per-source weights
+- broad/generic penalties apply
+- emits candidate objects with `score`, `confidence`, `specificity`, `sources`
 
-- `seed`
-- `vertical_prior`
-- `google_category_display`
-- `google_primary_type`
-- `detail_vision`
-- `detail_manufacturer`
-- `detail_retail`
-- `name_match`
-- `description_match`
-- `website_match`
-- `category_match`
+Used in both:
 
-### Candidate ranking behavior
-
-- Candidates are normalized via taxonomy (`canonicalizeService`).
-- Generic/broad services receive a penalty (for example `manufacturer`, `service`, `store`, `local business`).
-- If top candidate is broad and a close, more specific candidate exists, system prefers the specific one.
-- Output includes score, confidence, specificity, and sources.
+- baseline recommendation
+- context for LLM prompts/verifier
 
 ---
 
-## 4) Reconciliation to final RS
+## 4) Model usage and fallback conditions
 
-Core module: `lib/audit/service-reconciler.ts`
+Core: `lib/audit/service-analyst.ts`.
 
-The reconciler merges:
+### 4.1 Enable conditions
 
-- `GS` (Google-derived service)
-- `BS` (comprehensive top candidate or fallback)
-- text signals from GBP/website
-- detail-industry signals
-- weighted model decision
+LLM path is used when:
 
-### Important safeguards
+- `useLlm` is true from caller, and
+- at least one key exists: `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`.
 
-- Broad generated candidates are dampened in weighted model.
-- Weighted override cannot downgrade to lower specificity just because confidence is slightly higher.
-- If final recommended service equals comprehensive top candidate, confidence is lifted by `comprehensive_confidence_support`.
+Otherwise, output is `mode: "distilled"`.
 
-This prevents generic terms (for example `medical clinic`) from pulling a specific result (for example `acupuncture`) backward.
+### 4.2 Model order (primary + fallback)
 
----
+Primary model:
 
-## 5) Taxonomy + detail rules
+1. `SERVICE_ANALYST_CLAUDE_MODEL`
+2. else `ANTHROPIC_MODEL`
+3. else default `claude-opus-4-8`
 
-### Taxonomy
+Fallback order if primary fails/invalid:
 
-File: `lib/audit/service-taxonomy.ts`
+1. Anthropic fallback: `claude-sonnet-4-5-20250929`
+2. OpenAI fallback: `SERVICE_ANALYST_GPT_FALLBACK_MODEL`
+3. else `OPENAI_MAIN_MODEL`
+4. backup fallback: `gpt-4o-mini`
+5. if all LLM attempts fail -> distilled fallback
 
-- canonical services
-- aliases/synonyms (including Chinese aliases where relevant)
-- specificity scores
-- source weights and vertical boosts
+### 4.3 Opus-specific transport rule
 
-### Detail rules
+For `claude-opus-4-8`, `temperature` is omitted from Anthropic request payloads because this model rejects temperature in our endpoint usage.
 
-- Manufacturer: `lib/audit/manufacturer-detail-rules.ts`
-- Vision: `lib/audit/vision-detail-rules.ts`
-- Retail/rug cases: `lib/audit/retail-detail-rules.ts`
+### 4.4 Verifier pass
 
-These rules generate high-precision service candidates when signal text matches strong domain patterns.
+When recommendation/category is broad or ambiguous, verifier pass runs with similar fallback logic and can refine phrase/recommendation.
 
----
+### 4.5 Runtime debug visibility
 
-## 6) UI behavior on confirm step
+Resolve response includes:
 
-File: `app/audit/new/intake-form.tsx`
+- `primary_analyst.llm_provider`, `llm_model`, `llm_fallback_used`
+- `service_shadow.llm_provider`, `llm_model`, `llm_fallback_used`
+- `service_model_debug` summary block
 
-Step 3 shows:
-
-- Google Service
-- BAAM-generated Service
-- Debug block: `Top candidates (up to 3)` with score/confidence/specificity/source tags
-- Recommended Service editable input
-
-Why "up to 3": after normalization and dedupe, some businesses only have 1-2 meaningful unique candidates.
+This is the source of truth to inspect “which model actually answered”.
 
 ---
 
-## 7) Why a service can still be wrong
+## 5) Confirm + generate gate (user is final authority)
 
-Most common reasons:
+`/api/audit/generate` enforces:
 
-1. Very weak text evidence (empty description + weak website content).
-2. Business name is highly generic and categories are broad.
-3. Missing taxonomy alias for a niche term.
-4. Missing detail rule for a vertical-specific phrase.
+- `service_confirmed` must be true
+- `service_override` must be present
+- broad service values are blocked
+- if `needs_service_selection` is true, selected service must be in `service_options`
 
-In these cases user confirmation is the final safety gate.
+Then pipeline input stores:
 
----
-
-## 8) How to improve accuracy continuously
-
-Use loop script:
-
-```bash
-pnpm service:coverage-loop -- --days 30 --limit 1500 --samples 12
-```
-
-Output helps identify:
-
-- broad recommendations overridden by users
-- top model->user transition pairs
-- highest-value next taxonomy/rule targets
-
-For Phase 2 shadow validation, compare current reconciler vs analyst recommendation:
-
-```bash
-pnpm service:shadow-eval -- --days 30 --limit 500 --samples 12
-```
-
-Optional (more costly) LLM analyst run:
-
-```bash
-pnpm service:shadow-eval -- --days 14 --limit 150 --llm
-```
-
-This script reports:
-
-- current hit-rate vs user-confirmed service
-- analyst hit-rate vs user-confirmed service
-- improved and regressed samples
-- recommendation changes requiring manual review
-
-For persistent production tracking (no script required):
-
-- apply migration `supabase/migrations/0060_audit_service_shadow_logs.sql`
-- enable shadow in resolve API with `SERVICE_ANALYST_SHADOW=1`
-- generate audits normally; rows are logged on `/api/audit/generate`
-- review metrics at `/app/admin/service-learning` (internal/staff only)
-
-Phase 3 distilled layer is implemented in `lib/audit/service-distilled-ranker.ts`:
-
-- lightweight ranker (no online LLM required)
-- uses candidate score, confidence, specificity, source diversity
-- applies generic-service penalties and specific multi-source bonus
-- serves as both standalone cheap ranker and LLM fallback
-
-After any service logic change, run:
-
-```bash
-npx tsx scripts/test-service-recommendation-stress.ts
-npx tsx scripts/test-service-recommendation-human-benchmark.ts
-```
-
-Ship only if no critical regressions.
+- `vertical_override`
+- `service_override`
+- language choice
 
 ---
 
-## 9) Practical operator rule
+## 6) How confirmed service is used in production pipeline
 
-- Trust RS when it is specific and supported by multiple sources.
-- If RS is broad and confidence is moderate, refine manually in UI.
-- Always confirm before generate; user-confirmed service is the final source of truth for that audit.
+In async generation (`runAuditPipeline`):
+
+- Google is fetched in paid tier.
+- Competitor discovery uses user-confirmed `service_override`:
+  `getCompetitorsData(..., { service_override })`
+- Competitor keyword variants are derived from that service.
+
+This means confirmed service drives:
+
+- competitor search query
+- competitor set
+- downstream score/projection context
+
+---
+
+## 7) Report rendering consistency with confirmed service
+
+To make display consistent with user-confirmed service:
+
+1. During generation, `score_data.service_context.confirmed_service` is persisted.
+2. In report data-mapper, cover service display resolves in this order:
+   - `score.service_context.confirmed_service` (preferred)
+   - legacy fallback from `competitors.search_metadata.primary_keyword` (city-stripped)
+   - fallback to `resolveServiceKeyword(google)`
+
+So new audits are fully aligned to confirmed service; old audits still get best-effort alignment.
+
+---
+
+## 8) Environment flags that affect behavior
+
+- `SERVICE_ANALYST_PRIMARY` (`1`/`0`)
+- `SERVICE_ANALYST_PRIMARY_USE_LLM` (`1`/`0`)
+- `SERVICE_ANALYST_SHADOW` (`1`/`0`)
+- `SERVICE_ANALYST_SHADOW_USE_LLM` (`1`/`0`)
+- `SERVICE_ANALYST_CLAUDE_MODEL`
+- `ANTHROPIC_MODEL`
+- `SERVICE_ANALYST_GPT_FALLBACK_MODEL`
+- `OPENAI_MAIN_MODEL`
+- `ANTHROPIC_API_KEY`
+- `OPENAI_API_KEY`
+
+---
+
+## 9) Operational checklist
+
+When validating service behavior in production:
+
+1. Check `/api/audit/resolve` response:
+   - `service_model_debug.primary`
+   - `bs_service`, `cs_recommended_service`
+2. Confirm generate request carries `service_override`.
+3. Verify competitor metadata on resulting audit:
+   - `competitors_data.search_metadata.primary_keyword`
+4. Verify report display service:
+   - should match `score_data.service_context.confirmed_service` for new audits.
+

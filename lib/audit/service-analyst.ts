@@ -549,10 +549,15 @@ async function createAnalystMessage(
   candidates: GeneratedServiceCandidate[],
   model: string,
 ) {
-  return client.messages.create({
+  const payload: {
+    model: string;
+    max_tokens: number;
+    temperature?: number;
+    system: Array<{ type: "text"; text: string }>;
+    messages: Array<{ role: "user"; content: string }>;
+  } = {
     model,
     max_tokens: 700,
-    temperature: 0.1,
     system: [
       {
         type: "text",
@@ -565,7 +570,11 @@ async function createAnalystMessage(
         content: buildAnalystUserPrompt(evidence, candidates),
       },
     ],
-  });
+  };
+  if (!isOpus48Model(model)) {
+    payload.temperature = 0.1;
+  }
+  return client.messages.create(payload);
 }
 
 async function createVerifierMessage(
@@ -576,10 +585,15 @@ async function createVerifierMessage(
   initialPhrase: string,
   model: string,
 ) {
-  return client.messages.create({
+  const payload: {
+    model: string;
+    max_tokens: number;
+    temperature?: number;
+    system: Array<{ type: "text"; text: string }>;
+    messages: Array<{ role: "user"; content: string }>;
+  } = {
     model,
     max_tokens: 700,
-    temperature: 0,
     system: [
       {
         type: "text",
@@ -597,7 +611,11 @@ async function createVerifierMessage(
         ),
       },
     ],
-  });
+  };
+  if (!isOpus48Model(model)) {
+    payload.temperature = 0;
+  }
+  return client.messages.create(payload);
 }
 
 function extractAnthropicText(response: Anthropic.Message | null | undefined) {

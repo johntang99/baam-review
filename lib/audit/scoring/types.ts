@@ -43,6 +43,12 @@ export const AuditScoreSchema = z.object({
 
   weakest_component: ComponentKeySchema,
 
+  service_context: z
+    .object({
+      confirmed_service: z.string().nullable().optional(),
+    })
+    .optional(),
+
   benchmark_version: z.string(),
   computed_at: z.string(),
 });

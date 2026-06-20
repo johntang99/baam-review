@@ -9,6 +9,7 @@ import { getBenchmarks, getBenchmarksForBusiness } from "../benchmarks";
 import { computeAuditScore } from "../scoring";
 import { computeProjection } from "../projection";
 import { decrementAuditCount } from "../quotas";
+import { canonicalizeService } from "../service-taxonomy";
 import { renderAndDeliverAudit } from "./index";
 
 export interface StartAuditInput {
@@ -74,7 +75,13 @@ export async function runAuditPipeline(
     const benchmarks = input.vertical_override
       ? await getBenchmarks(input.vertical_override)
       : await getBenchmarksForBusiness(google);
-    const score = computeAuditScore(google, competitors, benchmarks);
+    const scoreBase = computeAuditScore(google, competitors, benchmarks);
+    const score = {
+      ...scoreBase,
+      service_context: {
+        confirmed_service: canonicalizeService(input.service_override) || null,
+      },
+    };
 
     await updateStage(audit_id, 4);
     const projection = computeProjection(google, competitors, score, benchmarks);

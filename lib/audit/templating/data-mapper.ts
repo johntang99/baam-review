@@ -64,7 +64,7 @@ export function buildAuditViewModel(input: RenderAuditInput): AuditViewModel {
     business_website_line: displayWebsite(google.business.website),
     vertical_display_name: t.verticals[google.vertical.inferred_vertical] ?? t.verticals.general_smb,
     vertical_subtype: formatVerticalSubtype(google, language),
-    cover_service_display: formatCoverServiceDisplay(google, language),
+    cover_service_display: formatCoverServiceDisplay(google, competitors, score, language),
 
     doc_header_subtitle_left: t.doc_header_subtitle,
 
@@ -481,14 +481,50 @@ function displayWebsite(input: string | null | undefined): string {
 
 function formatCoverServiceDisplay(
   google: AuditGoogleData,
+  competitors: AuditCompetitorsData,
+  score: AuditScore,
   language: AuditLanguage,
 ): string {
-  const raw = canonicalizeService(resolveServiceKeyword(google));
+  const raw = canonicalizeService(
+    resolveConfirmedService({
+      google,
+      competitors,
+      score,
+    }),
+  );
   const service = refineBroadEducationService(raw, google);
   if (language === "zh") {
     return translateServiceZh(service);
   }
   return capitalize(service);
+}
+
+function resolveConfirmedService(args: {
+  google: AuditGoogleData;
+  competitors: AuditCompetitorsData;
+  score: AuditScore;
+}) {
+  const fromScore = canonicalizeService(args.score.service_context?.confirmed_service);
+  if (fromScore) return fromScore;
+
+  const fromKeyword = parseServiceFromPrimaryKeyword(
+    args.competitors.search_metadata.primary_keyword,
+    args.google.business.city,
+  );
+  if (fromKeyword) return fromKeyword;
+
+  return resolveServiceKeyword(args.google);
+}
+
+function parseServiceFromPrimaryKeyword(keyword: string | null | undefined, city: string | null | undefined) {
+  const raw = String(keyword ?? "").trim();
+  if (!raw) return "";
+  const cityRaw = String(city ?? "").trim();
+  if (!cityRaw) return raw;
+
+  const escapedCity = escapeRegex(cityRaw);
+  const trimmed = raw.replace(new RegExp(`\\s+${escapedCity}\\s*$`, "i"), "").trim();
+  return trimmed || raw;
 }
 
 function refineBroadEducationService(service: string, google: AuditGoogleData): string {
@@ -526,6 +562,10 @@ function translateServiceZh(service: string): string {
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function escapeRegex(input: string): string {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function buildGooglePlatformRow(
