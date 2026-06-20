@@ -36,115 +36,34 @@ interface PlaceDetails {
   rating?: number;
 }
 
-const PAGE_11_BUSINESSES: InputBusiness[] = [
-  {
-    rank: 201,
-    name: "JSPrivateTech Electronics Repair Specialist, MacBook | iPhone | iPads | iMac | Androids Repairs and Data Recovery",
-    address: "31-52 102nd St, East Elmhurst, NY 11369",
-  },
-  {
-    rank: 202,
-    name: "AJ PRINTING & MULTISERVICE CORP.",
-    address: "66-38 Forest Ave, Ridgewood, NY 11385",
-  },
-  {
-    rank: 203,
-    name: "Heart of Chelsea Veterinary Group - Lower East Side",
-    address: "241 Eldridge St, New York, NY 10002",
-  },
-  {
-    rank: 204,
-    name: "Aliento de Vida",
-    address: "103-12 Roosevelt Ave, Corona, NY 11368",
-  },
-  {
-    rank: 205,
-    name: "Dursun Tailoring",
-    address: "63-56 Saunders St, Flushing, NY 11374",
-  },
-  {
-    rank: 206,
-    name: "Manhattan7arts",
-    address: "90-22 Roosevelt Ave, Jackson Heights, NY",
-  },
-  {
-    rank: 207,
-    name: "The UPS Store",
-    address: "35-11B Farrington St, Flushing, NY 11354",
-  },
-  {
-    rank: 208,
-    name: "Same Day printing | Ador Graphics Inc | Retractable Banner | Step and Repeat backdrop Banner | poster & Flyer Printing.",
-    address: "502 McDonald Ave, Brooklyn, NY 11218",
-  },
-  {
-    rank: 209,
-    name: "LaundryBee - Kew Gardens",
-    address: "116-24 Metropolitan Ave, Richmond Hill, NY",
-  },
-  {
-    rank: 210,
-    name: "AJ Translation",
-    address: "1706 Sheepshead Bay Rd, Brooklyn, NY",
-  },
-  {
-    rank: 211,
-    name: "PicVoyage Wedding & Elopement Photos",
-    address: "477 FDR Dr m902, New York, NY 10002",
-  },
-  {
-    rank: 212,
-    name: "Kimi iPhone repair and accessories",
-    address: "259 B Canal St, New York, NY 10013",
-  },
-  {
-    rank: 213,
-    name: "R&K Theme Photography Inc",
-    address: "40-51 College Point Blvd, Flushing, NY",
-  },
-  {
-    rank: 214,
-    name: "Mobile Evolution cellphone repair and accesories",
-    address: "479 56th St, Brooklyn, NY 11220",
-  },
-  {
-    rank: 215,
-    name: "Bit Repair",
-    address: "547 86th St, Brooklyn, NY 11209",
-  },
-  {
-    rank: 216,
-    name: "Petcare Animal Clinic",
-    address: "43-73 156th St, Flushing, NY 11355",
-  },
-  {
-    rank: 217,
-    name: "Flushing Meadows Corona Park Kayak/Canoe Launch",
-    address: "Marina Rd, Corona, NY 11368",
-  },
-  {
-    rank: 218,
-    name: "UPS - FedEx - DHL - CJ택배 / CJ Nationwide / USPS",
-    address: "192-02 Northern Blvd Side, Flushing, NY",
-  },
-  {
-    rank: 219,
-    name: "St. Mark's Church in-the-Bowery",
-    address: "131 E 10th St, New York, NY 10003",
-  },
-  {
-    rank: 220,
-    name: "Kissena Aquarium Inc",
-    address: "46-30 Kissena Blvd, Flushing, NY 11355",
-  },
+const PAGE_14_BUSINESSES: InputBusiness[] = [
+  { rank: 261, name: "美程旅游Atrip", address: "39-10 Main St #203, Flushing, NY 11354" },
+  { rank: 262, name: "Supreme Fast Delivery Laundromat", address: "97-24 Metropolitan Ave, Forest Hills, NY" },
+  { rank: 263, name: "Bath Animal Hospital", address: "2125 Bath Ave, Brooklyn, NY 11214" },
+  { rank: 264, name: "Wellspring Church NYC", address: "10-15 46th Rd, Long Island City, NY 1110" },
+  { rank: 265, name: "Luk Fook Jewelry & Goldsmith", address: "185 Canal St A, New York, NY 10013" },
+  { rank: 266, name: "Queens Public Library at Flushing", address: "41-17 Main St, Flushing, NY 11355" },
+  { rank: 267, name: "Lorilil Jewelers", address: "6 Station Square, Forest Hills, NY 11375" },
+  { rank: 268, name: "Long Island City Veterinary Center", address: "48-18 Vernon Blvd, Long Island City, NY" },
+  { rank: 269, name: "DHL Express Service Point New York", address: "98 Walker St, New York, NY 10013" },
+  { rank: 270, name: "Lafiny Jewelry", address: "70-19 Grand Ave, Maspeth, NY 11378" },
+  { rank: 271, name: "Synod of Bishops Russian Church", address: "75 E 93rd St, New York, NY 10128" },
+  { rank: 272, name: "NEW VISION 纽约摄影公司", address: "144-63 35th Ave, Flushing, NY 11354" },
+  { rank: 273, name: "Bayparkway Aquarium", address: "6310 Bay Pkwy, Brooklyn, NY 11204" },
+  { rank: 274, name: "The One Express 第一速递 回国行李 UPS FEDEX", address: "44-06 Kissena Blvd, Flushing, NY 11355" },
+  { rank: 275, name: "Kazalas Paints Supplies", address: "90-16 37th Ave, Jackson Heights, NY 1137" },
+  { rank: 276, name: "NYC Pet Services", address: "31-21 31st St, Astoria, NY 11106" },
+  { rank: 277, name: "Moloty Bridal Atelier & Master Tailor", address: "37-02 Main St 2nd Floor #209, Queens, NY" },
+  { rank: 278, name: "GS Printing NY Inc.", address: "35-30B Farrington St, Flushing, NY 11354" },
+  { rank: 279, name: "Andrew Laundromat", address: "147-13 45th Ave, Flushing, NY 11355" },
+  { rank: 280, name: "Shipping Center Mini Mart", address: "6916 Bay Pkwy, Brooklyn, NY 11204" },
 ];
 
 async function main() {
   loadEnvFile(".env.local");
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
-  if (!apiKey) {
-    throw new Error("GOOGLE_PLACES_API_KEY is required in environment.");
-  }
+  if (!apiKey) throw new Error("GOOGLE_PLACES_API_KEY is required in environment.");
+
   const llmEnabled =
     process.env.SERVICE_ANALYST_PRIMARY_USE_LLM === "1" ||
     (process.env.SERVICE_ANALYST_PRIMARY_USE_LLM !== "0" && !!process.env.ANTHROPIC_API_KEY);
@@ -164,27 +83,21 @@ async function main() {
   }> = [];
   const failures: Array<{ rank: number; name: string; reason: string }> = [];
 
-  for (const business of PAGE_11_BUSINESSES) {
+  for (const business of PAGE_14_BUSINESSES) {
     try {
       const primaryQuery = [business.name, business.address ?? ""].join(" ").trim();
       const match =
         (await searchBestPlace(primaryQuery, apiKey)) ||
         (await searchBestPlace(business.name, apiKey));
       if (!match) {
-        failures.push({
-          rank: business.rank,
-          name: business.name,
-          reason: "No Google place match found",
-        });
+        failures.push({ rank: business.rank, name: business.name, reason: "No Google place match found" });
         continue;
       }
 
       const details = await fetchPlaceDetails(match.id, apiKey);
       const googleData = buildGoogleLikeData(details);
       const seedService = resolveServiceKeyword(googleData);
-      const websiteSignal = await fetchWebsiteServiceSignalText(
-        googleData.business.website ?? null,
-      );
+      const websiteSignal = await fetchWebsiteServiceSignalText(googleData.business.website ?? null);
       const comprehensiveTop = pickTopComprehensiveService({
         google: googleData,
         gbpDescription: googleData.business.description ?? null,
@@ -202,9 +115,7 @@ async function main() {
       const analyst = await analyzeServiceWithAnalyst({
         google: googleData,
         googleService:
-          googleData.vertical.primary_category_display ||
-          googleData.vertical.primary_category ||
-          "",
+          googleData.vertical.primary_category_display || googleData.vertical.primary_category || "",
         fallbackService: baseDetectedService,
         gbpDescription: googleData.business.description ?? null,
         websiteSignalText: websiteSignal?.text ?? null,
@@ -235,26 +146,19 @@ async function main() {
   rows.sort((a, b) => a.rank - b.rank);
   failures.sort((a, b) => a.rank - b.rank);
 
-  console.log("=== Other Services Page 11 · System vs LLM ===");
-  console.log(`Businesses requested: ${PAGE_11_BUSINESSES.length}`);
+  console.log("=== Other Services Page 14 · System vs LLM ===");
+  console.log(`Businesses requested: ${PAGE_14_BUSINESSES.length}`);
   console.log(`Evaluated: ${rows.length}`);
   console.log(`Failures: ${failures.length}`);
   console.log(`LLM enabled: ${llmEnabled ? "yes" : "no"}`);
   console.log(`Effective model: ${effectiveModel}`);
-  console.log(
-    `Same service: ${rows.filter((row) => row.same).length}/${rows.length}`,
-  );
-  console.log(
-    `Different service: ${rows.filter((row) => !row.same).length}/${rows.length}`,
-  );
+  console.log(`Same service: ${rows.filter((row) => row.same).length}/${rows.length}`);
+  console.log(`Different service: ${rows.filter((row) => !row.same).length}/${rows.length}`);
   console.log("");
   console.log(JSON.stringify({ rows, failures }, null, 2));
 }
 
-async function searchBestPlace(
-  textQuery: string,
-  apiKey: string,
-): Promise<PlaceSearchMatch | null> {
+async function searchBestPlace(textQuery: string, apiKey: string): Promise<PlaceSearchMatch | null> {
   if (!textQuery.trim()) return null;
   const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
     method: "POST",
@@ -270,26 +174,21 @@ async function searchBestPlace(
     }),
   });
   if (!response.ok) return null;
-  const json = (await response.json()) as {
-    places?: Array<{ id?: string }>;
-  };
+  const json = (await response.json()) as { places?: Array<{ id?: string }> };
   const first = json.places?.[0];
   if (!first?.id) return null;
   return { id: first.id };
 }
 
 async function fetchPlaceDetails(placeId: string, apiKey: string): Promise<PlaceDetails> {
-  const response = await fetch(
-    `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`,
-    {
-      method: "GET",
-      headers: {
-        "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask":
-          "id,displayName,formattedAddress,addressComponents,types,primaryType,primaryTypeDisplayName,websiteUri,editorialSummary,userRatingCount,rating",
-      },
+  const response = await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`, {
+    method: "GET",
+    headers: {
+      "X-Goog-Api-Key": apiKey,
+      "X-Goog-FieldMask":
+        "id,displayName,formattedAddress,addressComponents,types,primaryType,primaryTypeDisplayName,websiteUri,editorialSummary,userRatingCount,rating",
     },
-  );
+  });
   if (!response.ok) {
     const body = await response.text().catch(() => "(no body)");
     throw new Error(`Place details failed (${response.status}): ${body}`);
@@ -332,8 +231,7 @@ function buildGoogleLikeData(details: PlaceDetails): AuditGoogleData {
     },
     vertical: {
       google_categories: types,
-      primary_category:
-        details.primaryType ?? verticalMatch.primary_category ?? "local business",
+      primary_category: details.primaryType ?? verticalMatch.primary_category ?? "local business",
       primary_category_display: details.primaryTypeDisplayName?.text ?? null,
       inferred_vertical: verticalMatch.inferred_vertical,
       confidence: verticalMatch.confidence,
@@ -390,9 +288,7 @@ function buildGoogleLikeData(details: PlaceDetails): AuditGoogleData {
 function deriveCity(details: PlaceDetails): string {
   for (const component of details.addressComponents ?? []) {
     const types = component.types ?? [];
-    if (types.includes("locality")) {
-      return (component.longText ?? component.shortText ?? "").trim();
-    }
+    if (types.includes("locality")) return (component.longText ?? component.shortText ?? "").trim();
   }
   const formatted = (details.formattedAddress ?? "").trim();
   const parts = formatted.split(",").map((value) => value.trim());
@@ -412,9 +308,7 @@ function deriveState(details: PlaceDetails): string {
 function deriveZip(details: PlaceDetails): string {
   for (const component of details.addressComponents ?? []) {
     const types = component.types ?? [];
-    if (types.includes("postal_code")) {
-      return (component.longText ?? component.shortText ?? "").trim();
-    }
+    if (types.includes("postal_code")) return (component.longText ?? component.shortText ?? "").trim();
   }
   return "";
 }
@@ -434,12 +328,8 @@ function deriveStreet(details: PlaceDetails): string {
   let route = "";
   for (const component of details.addressComponents ?? []) {
     const types = component.types ?? [];
-    if (types.includes("street_number")) {
-      streetNumber = (component.longText ?? component.shortText ?? "").trim();
-    }
-    if (types.includes("route")) {
-      route = (component.longText ?? component.shortText ?? "").trim();
-    }
+    if (types.includes("street_number")) streetNumber = (component.longText ?? component.shortText ?? "").trim();
+    if (types.includes("route")) route = (component.longText ?? component.shortText ?? "").trim();
   }
   return [streetNumber, route].filter(Boolean).join(" ").trim();
 }
@@ -460,9 +350,7 @@ function loadEnvFile(path: string) {
       ) {
         value = value.slice(1, -1);
       }
-      if (!(key in process.env)) {
-        process.env[key] = value;
-      }
+      if (!(key in process.env)) process.env[key] = value;
     }
   } catch {
     // ignore
@@ -470,6 +358,6 @@ function loadEnvFile(path: string) {
 }
 
 main().catch((err) => {
-  console.error("[compare-other-services-page11] failed:", err);
+  console.error("[compare-other-services-page14] failed:", err);
   process.exitCode = 1;
 });

@@ -3,10 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <title>BAAM Review Audit · 大唐艾灸</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<style>  :root {
+<style>  /* Self-hosted fonts — served from our own domain so PDF rendering never
+     depends on reaching Google Fonts (which can be slow/blocked in some
+     regions and would otherwise stall the render). http://localhost:4001 is
+     replaced at render time with the app origin. */
+  @font-face { font-family: 'Instrument Serif'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/instrument-serif-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Instrument Serif'; font-style: italic; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/instrument-serif-400-italic.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 300; font-display: swap; src: url('http://localhost:4001/fonts/archivo-300.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/archivo-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 500; font-display: swap; src: url('http://localhost:4001/fonts/archivo-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 600; font-display: swap; src: url('http://localhost:4001/fonts/archivo-600.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 700; font-display: swap; src: url('http://localhost:4001/fonts/archivo-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 800; font-display: swap; src: url('http://localhost:4001/fonts/archivo-800.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/jetbrains-mono-400.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('http://localhost:4001/fonts/jetbrains-mono-500.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('http://localhost:4001/fonts/jetbrains-mono-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Serif TC'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/noto-serif-tc-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Serif TC'; font-style: normal; font-weight: 700; font-display: swap; src: url('http://localhost:4001/fonts/noto-serif-tc-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/noto-sans-tc-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 500; font-display: swap; src: url('http://localhost:4001/fonts/noto-sans-tc-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 700; font-display: swap; src: url('http://localhost:4001/fonts/noto-sans-tc-700.woff2') format('woff2'); }
+
+  :root {
     --cream: #F5F0E6;
     --cream-light: #FAF7F0;
     --cream-deep: #EBE3D2;
@@ -197,7 +215,15 @@
   .cover3-toc-title {
     font-size: 16px; font-weight: 700; color: var(--ink);
   }
-  .cover3-toc-sub { font-size: 13px; color: var(--ink-mute); }
+  .cover3-toc-sub {
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--rust-deep);
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
   .cover3-main-spacer { flex: 1; }
   .cover3-meta {
     display: grid; grid-template-columns: 1fr 1fr 1fr;
@@ -836,58 +862,95 @@
   .legend-swatch.amber { background: var(--amber); }
   .legend-item strong { color: var(--ink); font-weight: 600; }
 
-  .projection-impact {
+  .forecast-results-intro {
+    margin-top: 18px;
+    margin-bottom: 12px;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.4;
+    color: var(--ink);
+    max-width: 760px;
+  }
+  .forecast-results-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0;
     border-top: 1px solid var(--ink);
     border-bottom: 1px solid var(--ink);
-    margin-top: 22px;
+    margin-top: 10px;
   }
-  .impact-cell {
-    padding: 14px 24px;
+  .forecast-result-card {
+    padding: 16px 16px 14px;
     border-right: 1px solid var(--rule);
   }
-  .impact-cell:last-child { border-right: none; }
-  .impact-label {
+  .forecast-result-card:last-child { border-right: none; }
+  .forecast-result-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 999px;
+    border: 1px solid var(--rule);
+    background: var(--cream-deep);
+    color: var(--rust-deep);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--ink-mute);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
     margin-bottom: 10px;
   }
-  .impact-value {
+  .forecast-result-title {
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
+    font-size: 21px;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .forecast-result-title strong { font-weight: 700; }
+  .forecast-result-value {
     font-family: 'Instrument Serif', 'Noto Serif TC', serif;
-    font-size: 32px;
-    color: var(--rust-deep);
-    line-height: 1.05;
+    font-size: 36px;
+    line-height: 1;
+    color: var(--sage-darkest);
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
   }
-  .impact-value.neutral { color: var(--ink); }
-  .impact-value.gain { color: var(--sage-deep); }
-  .impact-sub {
+  .forecast-result-value-text {
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .forecast-result-desc {
     font-size: 12px;
+    line-height: 1.45;
     color: var(--ink-soft);
-    margin-top: 6px;
-    line-height: 1.4;
   }
-  .impact-results {
-    list-style: none;
-    margin: 2px 0 0;
-    padding: 0;
+  .forecast-cited-research {
+    margin-top: 0;
+    background: var(--cream);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 10px 16px 12px;
   }
-  .impact-results li {
-    font-size: 13px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-  }
-  .impact-check {
-    color: var(--sage-deep);
+  .forecast-cited-research-kicker {
+    text-align: center;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
     font-weight: 600;
-    flex-shrink: 0;
+    margin-bottom: 8px;
+  }
+  .forecast-cited-research-list {
+    text-align: center;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink);
+    letter-spacing: 0.01em;
   }
 
   /* ============ SECTION 4 — BENCHMARKS ============ */
@@ -1080,6 +1143,10 @@
     border-bottom: 1.5px solid var(--ink);
   }
   .competitor-table th:not(:first-child) { text-align: right; }
+  /* Keep the business (1st) column from collapsing to a 1-char vertical
+     strip when a competitor's name is long (CJK breaks at every char). */
+  .competitor-table th:first-child,
+  .competitor-table td:first-child { min-width: 170px; }
   .competitor-table td {
     padding: 18px 12px;
     border-bottom: 1px solid var(--rule-soft);
@@ -1112,8 +1179,18 @@
   }
   .competitor-name {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 12px;
+  }
+  /* The name + optional secondary line live in one flex item so the line
+     break stacks them vertically (a bare <br> inside the flex row would
+     instead lay name and secondary out side-by-side). min-width:0 lets it
+     wrap within the column instead of forcing it wider. */
+  .competitor-name-text { min-width: 0; line-height: 1.35; }
+  .competitor-name-sec {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 12px;
+    color: var(--ink-mute);
   }
   .competitor-rank {
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
@@ -1168,11 +1245,20 @@
   }
   .action-item {
     display: grid;
-    grid-template-columns: 80px 1fr 200px;
-    gap: 28px;
-    padding: 28px 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    padding: 20px 0;
     border-bottom: 1px solid var(--rule);
+    align-items: center;
+  }
+  .action-main {
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    gap: 18px;
     align-items: start;
+    background: var(--cream);
+    border: 1px solid var(--rule-soft);
+    padding: 14px 18px 14px 0;
   }
   .action-number {
     font-family: 'Instrument Serif', 'Noto Serif TC', serif;
@@ -1180,8 +1266,10 @@
     line-height: 1;
     color: var(--rust-deep);
     font-style: italic;
+    text-align: center;
+    padding-top: 2px;
   }
-  .action-body { padding-top: 2px; }
+  .action-body { padding-top: 0; }
   .action-title {
     font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 17px;
@@ -1196,19 +1284,17 @@
     font-size: 15px;
     line-height: 1.4;
     color: var(--ink-soft);
-    margin-bottom: 12px;
+    margin-bottom: 0;
   }
-  .action-tag-row {
+  .action-result-panel {
+    min-width: 185px;
+    background: var(--cream);
+    border: 1px solid var(--rule-soft);
+    padding: 12px 16px 10px;
     display: flex;
-    align-items: center;
-    gap: 28px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
-  .action-result-block {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
   .action-result-label {
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
@@ -1240,15 +1326,11 @@
     color: var(--amber);
     border-color: var(--ink);
   }
-  .action-value-block .action-owner-pill {
+  .action-result-panel .action-owner-pill {
     display: inline-block;
-    margin-top: 14px;
+    margin-top: 4px;
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
-  }
-  .action-value-block {
-    padding-top: 8px;
-    text-align: right;
   }
   .summary-stat {
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
@@ -1668,6 +1750,70 @@
 
   /* Mobile */
   @media (max-width: 720px) {
+    .page.cover3 {
+      display: block;
+      min-height: auto;
+      border-left: none;
+      border-right: none;
+    }
+    .cover3-rail {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+      padding: 26px 20px;
+    }
+    .cover3-rail-head { margin-bottom: 16px; }
+    .cover3-ev { margin-bottom: 16px; }
+    .cover3-ev-stat { font-size: 24px; }
+    .cover3-main {
+      padding: 28px 20px 34px;
+    }
+    .cover3-masthead { font-size: 9px; letter-spacing: 0.14em; }
+    .cover3-masthead-brand { letter-spacing: 0.2em; }
+    .cover3-for {
+      font-size: 14px;
+      margin: 24px 0 14px;
+      line-height: 1.35;
+    }
+    .cover3-biz {
+      font-size: 34px;
+      line-height: 0.98;
+      padding-bottom: 14px;
+    }
+    .cover3-statement {
+      font-size: 24px;
+      line-height: 1.15;
+      margin-top: 16px;
+    }
+    .cover3-toc { margin-top: 22px; }
+    .cover3-toc-item {
+      padding: 10px 0;
+      gap: 10px;
+      align-items: baseline;
+    }
+    .cover3-toc-num { width: 30px; font-size: 10px; }
+    .cover3-toc-line {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      line-height: 1.25;
+    }
+    .cover3-toc-title { font-size: 13px; }
+    .cover3-toc-sub {
+      margin-left: 0;
+      font-size: 9px;
+      letter-spacing: 0.02em;
+    }
+    .cover3-main-spacer { display: none; }
+    .cover3-meta {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 26px;
+      padding-top: 12px;
+    }
+    .cover3-meta-v { font-size: 13px; }
+    .cover3-meta-v small { font-size: 9px; }
+
     .page { padding: 40px 28px 60px; }
     .cover-title { font-size: 48px; }
     .cover-subtitle { font-size: 20px; }
@@ -1682,14 +1828,30 @@
     .competitor-table { font-size: 12px; }
     .competitor-table td, .competitor-table th { padding: 12px 6px; }
     .action-item { grid-template-columns: 1fr; gap: 12px; }
-    .action-value-block { text-align: left; }
+    .action-main { grid-template-columns: 56px 1fr; padding: 12px 12px 12px 0; }
+    .action-result-panel { width: 100%; }
     .action-value-calc { text-align: left; }
     .cta-paths { grid-template-columns: 1fr; }
     .cta-path { border-right: none; border-bottom: 1px solid var(--ink); }
     .cta-path:last-child { border-bottom: none; }
-    .projection-impact { grid-template-columns: 1fr; }
-    .impact-cell { border-right: none; border-bottom: 1px solid var(--rule); }
-    .impact-cell:last-child { border-bottom: none; }
+    .forecast-results-grid { grid-template-columns: 1fr 1fr; }
+    .forecast-cited-research-list { font-size: 14px; }
+    .forecast-result-card:nth-child(2n) { border-right: none; }
+    .forecast-result-card {
+      border-bottom: 1px solid var(--rule-soft);
+      min-height: 132px;
+    }
+    .forecast-result-card:nth-last-child(-n+2) { border-bottom: none; }
+    .forecast-result-icon {
+      width: 38px;
+      height: 38px;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .forecast-result-title { font-size: 15px; }
+    .forecast-result-value { font-size: 28px; }
+    .forecast-result-value-text { font-size: 18px; }
+    .forecast-result-desc { font-size: 11px; }
     .grade-scale-table { font-size: 12px; }
     .grade-scale-table td, .grade-scale-table th { padding: 12px 8px 12px 0; }
     .grade-letter-pill { font-size: 28px; }
@@ -2088,39 +2250,35 @@
         <div class="cover3-masthead-brand">BAAM REVIEW</div>
         <div class="cover3-masthead-sub">聲譽與營收診斷報告 · v3.0</div>
       </div>
-      <div class="cover3-masthead-right"><b>第 001 號</b>2026 年 6 月 9 日</div>
+      <div class="cover3-masthead-right"><b>第 001 號</b>2026 年 6 月 20 日</div>
     </div>
 
     <div class="cover3-for">評論審計報告 · 為商家而寫</div>
     <div class="cover3-biz">大唐艾灸</div>
 
-    <h1 class="cover3-statement">客戶找不到您，<em>就無法選擇您。</em></h1>
+    <h1 class="cover3-statement">客戶找不到您，<em>就無法選擇您</em></h1>
 
     <div class="cover3-toc">
       <div class="cover3-toc-head">報告目錄</div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">02</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">您目前的狀況概覽</span><span class="cover3-toc-sub"> • 分數、等級與完整細項</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">您目前的狀況概覽</span><span class="cover3-toc-sub"> 分數 80 / 100 · B 級 · 穩健</span></span>
       </div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">03</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">競爭對手比較</span><span class="cover3-toc-sub"> • 客戶比您先看到的名字</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">競爭對手比較</span><span class="cover3-toc-sub"> 競爭差距 · 6 位對手 · 您 #1</span></span>
       </div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">04</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">服務機會</span><span class="cover3-toc-sub"> • 90–120 天內提升一個等級</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">服務機會</span><span class="cover3-toc-sub"> 升級窗口 · 90–120 天</span></span>
       </div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">05</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">12 個月預測</span><span class="cover3-toc-sub"> • 與 BAAM Review 合作的預測分數</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">12 個月預測</span><span class="cover3-toc-sub"> 目標結果 · B 級 · 80 分 · 營收成長</span></span>
       </div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">06</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">您的行動計劃</span><span class="cover3-toc-sub"> • 五項行動，依子分數排序</span></span>
-      </div>
-      <div class="cover3-toc-item">
-        <span class="cover3-toc-num">A</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">附錄 · 參考數據表</span><span class="cover3-toc-sub"> • 完整方法論，兩張表呈現</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">您的行動計劃</span><span class="cover3-toc-sub"> 執行計劃 · 3 項優先行動</span></span>
       </div>
     </div>
 
@@ -2128,7 +2286,7 @@
 
     <div class="cover3-meta">
       <div><div class="cover3-meta-k">地址</div><div class="cover3-meta-v">36-28A Union Street<small>紐約州Flushing · 11354</small></div></div>
-      <div><div class="cover3-meta-k">行業</div><div class="cover3-meta-v">中醫診所<small>Health</small></div></div>
+      <div><div class="cover3-meta-k">行業與服務</div><div class="cover3-meta-v">中醫診所<small>Acupuncture</small><small>Health</small></div></div>
       <div><div class="cover3-meta-k">編製者</div><div class="cover3-meta-v">Baam Review<small>聲譽診斷</small></div></div>
     </div>
   </div>
@@ -2163,9 +2321,9 @@
           </div>
         </td>
         <td><div class="star-rating"><span class="stars">★★★★★</span> <span class="mono">5.0</span></div></td>
-        <td><div class="review-count">77</div></td>
-        <td><div class="last-review stale">3 個月前</div></td>
-        <td><div class="health-dot warn">80%</div></td>
+        <td><div class="review-count">74</div></td>
+        <td><div class="last-review">2 個月前</div></td>
+        <td><div class="health-dot warn">66.66666666666666%</div></td>
       </tr>
       <tr>
         <td colspan="5" style="padding: 24px 0; color: var(--ink-mute); font-style: italic; text-align: center;">
@@ -2176,7 +2334,7 @@
   </table>
 
   <div class="insight-callout">
-    <strong>這代表什麼</strong><br><br>您最近一則 Google 評論在 94 天前 — 搜尋引擎與 AI 都會將沉默解讀為衰退。 總評論數 <strong>77</strong> 則低於您行業的中位數 — 評論總量是最弱項。
+    <strong>這代表什麼</strong><br><br>您最近一則 Google 評論在 47 天前。 總評論數 <strong>74</strong> 則低於您行業的中位數 — 評論總量是最弱項。
   </div>
 
   <!-- §03 score content merged into §02 — snapshot + score read as one
@@ -2229,12 +2387,12 @@
       <div class="subscore-row">
         <div class="subscore-meta">
           <div class="subscore-label">評論總數</div>
-          <div class="subscore-raw"><span class="mono-num">77</span> 則總評論</div>
+          <div class="subscore-raw"><span class="mono-num">74</span> 則總評論</div>
           <div class="subscore-meta-footnote">對比行業中位數</div>
         </div>
         <div class="subscore-bar-area">
           <div class="subscore-bar-track">
-            <div class="subscore-bar-fill " style="width: 61%;"></div>
+            <div class="subscore-bar-fill " style="width: 60%;"></div>
             <div class="subscore-mark" style="left: 50%;"></div><div class="subscore-mark" style="left: 70%;"></div><div class="subscore-mark" style="left: 100%;"></div>
           </div>
           <div class="subscore-scale">
@@ -2252,7 +2410,7 @@
               <span class="subscore-scale-tick anchor-right">300+</span>
           </div>
         </div>
-        <div class="subscore-value">61</div>
+        <div class="subscore-value">60</div>
         <div class="subscore-weight">20%</div>
       </div>
   </div>

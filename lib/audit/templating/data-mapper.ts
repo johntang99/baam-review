@@ -352,7 +352,7 @@ function buildCoverTocRows(
   const forecastSub = isZh
     ? `目標結果 · ${ctx.forecast_grade} 級 · ${ctx.forecast_score} 分 · 營收成長`
     : `Target · Grade ${ctx.forecast_grade} · Score ${ctx.forecast_score} · Revenue increase`;
-  const actionSub = isZh ? "執行計劃 · 5 項優先行動" : "Execution · 5 owner-ready moves";
+  const actionSub = isZh ? "執行計劃 · 3 項優先行動" : "Execution · 3 owner-ready moves";
 
   return [
     {
@@ -958,7 +958,7 @@ function buildCompetitorClosingLine(
 }
 
 // 12-month new-customer gains per action (also summed for the section total).
-const CUSTOMER_GAIN = { respond: 10, profile: 16, recover: 6, widget: 7 } as const;
+const CUSTOMER_GAIN = { respond: 10, recover: 6 } as const;
 
 // Review-quantity target by where the business sits in its vertical's velocity
 // bands (minimum → optimal_low → optimal_high → aggressive). Each position
@@ -999,8 +999,7 @@ function buildActionPlanSummary(
 ): ActionPlanSummary {
   const perReviewValue = benchmarks.per_review_value.median_usd;
   const { annualReviewGain } = reviewVelocityGain(google, benchmarks);
-  const newCustomers =
-    CUSTOMER_GAIN.respond + CUSTOMER_GAIN.profile + CUSTOMER_GAIN.recover + CUSTOMER_GAIN.widget;
+  const newCustomers = CUSTOMER_GAIN.respond + CUSTOMER_GAIN.recover;
   return {
     newReviews: annualReviewGain,
     newCustomers,
@@ -1049,30 +1048,12 @@ function buildActionItems(
       year_result_label: t.actions.result_year_customers,
     },
     {
-      title: t.actions.profile.title,
-      why: t.actions.profile.why,
-      result_value: t.actions.profile.result,
-      owner_label: t.actions.owner_you,
-      owner_is_baam: false,
-      year_result_value: `+${CUSTOMER_GAIN.profile}`,
-      year_result_label: t.actions.result_year_customers,
-    },
-    {
       title: t.actions.recover.title(unanswered),
       why: t.actions.recover.why,
       result_value: t.actions.recover.result,
       owner_label: t.actions.owner_baam,
       owner_is_baam: true,
       year_result_value: `+${CUSTOMER_GAIN.recover}`,
-      year_result_label: t.actions.result_year_customers,
-    },
-    {
-      title: t.actions.widget.title,
-      why: t.actions.widget.why,
-      result_value: t.actions.widget.result,
-      owner_label: t.actions.owner_baam_platform,
-      owner_is_baam: false,
-      year_result_value: `+${CUSTOMER_GAIN.widget}`,
       year_result_label: t.actions.result_year_customers,
     },
   ];

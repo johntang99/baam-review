@@ -125,7 +125,8 @@ export async function GET(
   return new NextResponse(htmlWithHeightReporter, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "private, max-age=600",
+      // Always render the latest copy/template changes for existing audits.
+      "Cache-Control": "private, no-store",
     },
   });
 }

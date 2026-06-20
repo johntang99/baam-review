@@ -239,8 +239,6 @@
     </tbody>
   </table>
 
-  <p class="competitor-diagnosis">{{{competitor_diagnosis_html}}}</p>
-
   <div class="ornament">§</div>
 
   <p style="font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-style: italic; font-size: 20px; line-height: 1.45; color: var(--ink-soft); text-align: center; max-width: 640px; margin: 0 auto;">
@@ -302,7 +300,9 @@
     </div>
 
     <div class="so-tier featured">
+      {{#if t.so_tier_full_recommended}}
       <span class="so-tier-recommended">{{t.so_tier_full_recommended}}</span>
+      {{/if}}
       <div class="so-tier-name-row">
         <div class="so-tier-name">{{{t.so_tier_full_name_html}}}</div>
         <div class="so-tier-price">{{t.so_tier_full_price}}</div>
@@ -382,6 +382,19 @@
         <div class="forecast-result-desc">{{forecast_revenue_desc}}</div>
       </div>
     </div>
+
+    <div class="forecast-cited-research">
+      <div class="forecast-cited-research-kicker">
+        {{#if (eq language "zh")}}引用研究{{else}}CITED RESEARCH{{/if}}
+      </div>
+      <div class="forecast-cited-research-list">
+        {{#if (eq language "zh")}}
+          哈佛商學院 · BrightLocal · Whitespark · Berkeley / Economic Journal · 紐約大學斯特恩商學院 · 美國聯邦貿易委員會 · Google 透明度報告
+        {{else}}
+          Harvard Business School · BrightLocal · Whitespark · Berkeley / Economic Journal · NYU Stern · Federal Trade Commission · Google Transparency Report
+        {{/if}}
+      </div>
+    </div>
   </div>
 
   <div class="doc-footer">
@@ -428,10 +441,6 @@
       {{> action-item}}
     {{/each}}
   </ol>
-
-  <div class="conclusion-block">
-    {{{t.summary_block_html}}}
-  </div>
 
   <div class="cta-block">
     <div class="cta-eyebrow">{{t.cta_eyebrow}}</div>

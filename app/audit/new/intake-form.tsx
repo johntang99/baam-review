@@ -137,6 +137,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
   const [localError, setLocalError] = useState<string | null>(null);
   const [shakeField, setShakeField] = useState<"address" | "website" | null>(null);
   const [showConfirmReminder, setShowConfirmReminder] = useState(false);
+  const [showAllSuggestions, setShowAllSuggestions] = useState(false);
 
   const error = localError ?? initialError ?? null;
 
@@ -205,6 +206,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           ? suggestedSpecificService || fallbackService
           : fallbackService,
       );
+      setShowAllSuggestions(false);
       setServiceConfirmed(false);
       setStep("confirm");
     } catch (err) {
@@ -267,25 +269,6 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
   }
 
   if (step === "confirm" && resolved) {
-    const flowSteps = [
-      {
-        title: "Match GBP profile",
-        desc: "Confirm Name, Address, Website, and Rating from Google.",
-      },
-      {
-        title: "Choose report language",
-        desc: "Select output language for this audit report.",
-      },
-      {
-        title: "Set final service",
-        desc: "Use Google and BAAM evidence, then finalize the Recommended Service.",
-      },
-      {
-        title: "Confirm and generate",
-        desc: "Check confirmation, then generate the audit.",
-      },
-    ] as const;
-
     const languageOptions = [
       {
         value: "auto" as const,
@@ -317,11 +300,18 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           .filter(Boolean),
       ),
     );
+    const suggestedServiceOptions = Array.from(
+      new Set(
+        [...serviceOptions, ...llmSuggestedServiceOptions]
+          .map((option) => String(option || "").trim())
+          .filter(Boolean),
+      ),
+    ).slice(0, 8);
     const serviceValueDisplayStyle = {
-      fontSize: 24,
-      lineHeight: 1.12,
-      fontFamily: "'Instrument Serif', serif",
-      fontWeight: 400,
+      fontSize: 16,
+      lineHeight: 1.3,
+      fontFamily: "inherit",
+      fontWeight: 500,
       color: "var(--ink)",
     } as const;
     const stepCircleStyle = {
@@ -330,9 +320,8 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
       borderRadius: 999,
       background: "var(--ink)",
       color: "var(--cream-light)",
-      fontFamily: "'JetBrains Mono', monospace",
-      fontSize: 13,
-      fontWeight: 800,
+      fontSize: 12,
+      fontWeight: 700,
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
@@ -345,13 +334,14 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           <h3
             style={{
               margin: 0,
-              fontFamily: "'Instrument Serif', serif",
-              fontSize: 42,
-              lineHeight: 1.05,
+              fontFamily: "inherit",
+              fontSize: 32,
+              lineHeight: 1.2,
+              fontWeight: 600,
               color: "var(--ink)",
             }}
           >
-            Determine Service and Report Language
+            Confirm Service and Report Language
           </h3>
           <p
             style={{
@@ -362,71 +352,8 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               color: "var(--ink-soft)",
             }}
           >
-            This page shows Google Service and BAAM-generated Service as evidence,
-            then lets you confirm the Recommended Service before generating the audit.
+            Confirm the final service and report language before generating your audit.
           </p>
-
-          <div
-            style={{
-              marginTop: 18,
-              display: "grid",
-              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-              gap: 10,
-            }}
-          >
-            {flowSteps.map((stepItem, index) => (
-              <div
-                key={stepItem.title}
-                style={{
-                  border: "1px solid var(--rule)",
-                  borderRadius: 8,
-                  background: "var(--cream-light)",
-                  padding: "11px 11px 10px",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: 999,
-                      background: "var(--ink)",
-                      color: "var(--cream-light)",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 13,
-                      fontWeight: 800,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {index + 1}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                      color: "var(--ink)",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {stepItem.title}
-                  </span>
-                </div>
-                <p
-                  style={{
-                    marginTop: 6,
-                    fontSize: 12,
-                    lineHeight: 1.35,
-                    color: "var(--ink-mute)",
-                  }}
-                >
-                  {stepItem.desc}
-                </p>
-              </div>
-            ))}
-          </div>
 
           <section
             style={{
@@ -471,41 +398,18 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                   color: "var(--cream-light)",
                   borderRadius: 999,
                   padding: "3px 9px",
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: 10,
-                  letterSpacing: "0.12em",
+                  fontFamily: "inherit",
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   fontWeight: 700,
                 }}
               >
                 ✓ Found · Match confirmed
               </span>
-              <h5
-                style={{
-                  margin: "10px 0 0",
-                  fontFamily: "'Instrument Serif', serif",
-                  fontSize: 34,
-                  lineHeight: 1.08,
-                  color: "var(--ink)",
-                }}
-              >
-                {resolved.name}
-              </h5>
-              {resolved.name_secondary ? (
-                <div
-                  style={{
-                    marginTop: 4,
-                    fontSize: 16,
-                    color: "var(--ink-mute)",
-                    fontStyle: "italic",
-                  }}
-                >
-                  {resolved.name_secondary}
-                </div>
-              ) : null}
               <div
                 style={{
-                  marginTop: 12,
+                  marginTop: 10,
                   display: "grid",
                   gridTemplateColumns: "140px 1fr",
                   gap: "10px 12px",
@@ -513,9 +417,9 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               >
                 <div
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
-                    letterSpacing: "0.12em",
+                    fontFamily: "inherit",
+                    fontSize: 11,
+                    letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     color: "var(--ink-mute)",
                     fontWeight: 700,
@@ -526,9 +430,10 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 </div>
                 <div
                   style={{
-                    fontSize: 18,
+                    fontSize: 16,
                     lineHeight: 1.35,
-                    fontFamily: "'Instrument Serif', serif",
+                    fontFamily: "inherit",
+                    fontWeight: 500,
                     color: "var(--ink)",
                   }}
                 >
@@ -537,7 +442,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                     style={{
                       marginLeft: 8,
                       color: "var(--sage-deep)",
-                      fontFamily: "'JetBrains Mono', monospace",
+                      fontFamily: "inherit",
                       fontSize: 11,
                       letterSpacing: "0.05em",
                       fontWeight: 700,
@@ -549,9 +454,9 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
 
                 <div
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
-                    letterSpacing: "0.12em",
+                    fontFamily: "inherit",
+                    fontSize: 11,
+                    letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     color: "var(--ink-mute)",
                     fontWeight: 700,
@@ -562,9 +467,10 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 </div>
                 <div
                   style={{
-                    fontSize: 18,
+                    fontSize: 16,
                     lineHeight: 1.35,
-                    fontFamily: "'Instrument Serif', serif",
+                    fontFamily: "inherit",
+                    fontWeight: 500,
                     color: "var(--ink)",
                   }}
                 >
@@ -573,7 +479,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                     style={{
                       marginLeft: 8,
                       color: "var(--sage-deep)",
-                      fontFamily: "'JetBrains Mono', monospace",
+                      fontFamily: "inherit",
                       fontSize: 11,
                       letterSpacing: "0.05em",
                       fontWeight: 700,
@@ -585,9 +491,9 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
 
                 <div
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
-                    letterSpacing: "0.12em",
+                    fontFamily: "inherit",
+                    fontSize: 11,
+                    letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     color: "var(--ink-mute)",
                     fontWeight: 700,
@@ -598,9 +504,10 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 </div>
                 <div
                   style={{
-                    fontSize: 18,
+                    fontSize: 16,
                     lineHeight: 1.35,
-                    fontFamily: "'Instrument Serif', serif",
+                    fontFamily: "inherit",
+                    fontWeight: 500,
                     color:
                       resolved.website_match === "mismatch"
                         ? "var(--rust-deep)"
@@ -613,7 +520,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       style={{
                         marginLeft: 8,
                         color: "var(--sage-deep)",
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "inherit",
                         fontSize: 11,
                         letterSpacing: "0.05em",
                         fontWeight: 700,
@@ -627,7 +534,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       style={{
                         marginLeft: 8,
                         color: "var(--rust-deep)",
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "inherit",
                         fontSize: 11,
                         letterSpacing: "0.05em",
                         fontWeight: 700,
@@ -640,9 +547,9 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
 
                 <div
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
-                    letterSpacing: "0.12em",
+                    fontFamily: "inherit",
+                    fontSize: 11,
+                    letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     color: "var(--ink-mute)",
                     fontWeight: 700,
@@ -653,9 +560,10 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 </div>
                 <div
                   style={{
-                    fontSize: 18,
+                    fontSize: 16,
                     lineHeight: 1.35,
-                    fontFamily: "'Instrument Serif', serif",
+                    fontFamily: "inherit",
+                    fontWeight: 500,
                     color: "var(--ink)",
                   }}
                 >
@@ -664,6 +572,26 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               </div>
             </div>
           </section>
+
+          <button
+            type="button"
+            className="found-action-edit"
+            onClick={() => {
+              setStep("input");
+              setResolved(null);
+              setLocalError(null);
+            }}
+            disabled={isPending}
+            style={{
+              marginTop: 10,
+              background: "none",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+            }}
+          >
+            ← Not the right business? Edit your details
+          </button>
 
           <section
             style={{
@@ -734,16 +662,18 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       >
                         {opt.label}
                       </span>
-                      <span
-                        style={{
-                          marginTop: 2,
-                          display: "block",
-                          fontSize: 12,
-                          color: "var(--ink-mute)",
-                        }}
-                      >
-                        {opt.hint}
-                      </span>
+                      {checked ? (
+                        <span
+                          style={{
+                            marginTop: 2,
+                            display: "block",
+                            fontSize: 12,
+                            color: "var(--ink-mute)",
+                          }}
+                        >
+                          {opt.hint}
+                        </span>
+                      ) : null}
                     </span>
                   </label>
                 );
@@ -784,173 +714,52 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 }}
               >
                 <span style={stepCircleStyle}>3</span>
-                <span>Service evidence and recommended service</span>
+                <span>Final service selection</span>
               </h4>
-              <span
-                style={{
-                  border: "1px solid #e1c89f",
-                  color: "var(--amber-deep)",
-                  background: "#fbf0df",
-                  borderRadius: 999,
-                  padding: "4px 10px",
-                  fontSize: 12,
-                  fontWeight: 600,
-                }}
-              >
-                Confidence {confidencePct}% {isModerateConfidence ? "· Moderate" : ""}
-              </span>
+              {isModerateConfidence ? (
+                <span
+                  style={{
+                    border: "1px solid #e1c89f",
+                    color: "var(--amber-deep)",
+                    background: "#fbf0df",
+                    borderRadius: 999,
+                    padding: "4px 10px",
+                    fontSize: 12,
+                    fontWeight: 600,
+                  }}
+                >
+                  Confidence {confidencePct}% · Needs review
+                </span>
+              ) : null}
             </div>
 
-            <div
+            <article
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-                gap: 12,
+                border: "1px solid var(--rule-soft)",
+                borderRadius: 8,
+                padding: 12,
+                background: "var(--cream-light)",
               }}
             >
-              <article
+              <div
                 style={{
-                  border: "1px solid var(--rule-soft)",
-                  borderRadius: 8,
-                  padding: 12,
-                  background: "var(--cream-light)",
+                  fontFamily: "inherit",
+                  fontSize: 11,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "var(--ink-mute)",
                 }}
               >
-                <div
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "var(--ink-mute)",
-                  }}
-                >
-                  Google Service
-                </div>
-                <div
-                  style={{
-                    marginTop: 6,
-                    fontSize: 24,
-                    lineHeight: 1.12,
-                    fontFamily: "'Instrument Serif', serif",
-                    color: "var(--ink)",
-                    textTransform: "lowercase",
-                  }}
-                >
-                  {resolved.gs_service}
-                </div>
-                <p style={{ marginTop: 8, fontSize: 12, color: "var(--ink-soft)" }}>
-                  From Google Business Profile category signals.
-                </p>
-              </article>
-
-              <article
-                style={{
-                  border: "1px solid var(--rule-soft)",
-                  borderRadius: 8,
-                  padding: 12,
-                  background: "var(--cream-light)",
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "var(--ink-mute)",
-                  }}
-                >
-                  BAAM-generated Service
-                </div>
-                <div
-                  style={{
-                    marginTop: 6,
-                    fontSize: 24,
-                    lineHeight: 1.12,
-                    fontFamily: "'Instrument Serif', serif",
-                    color: "var(--ink)",
-                    textTransform: "lowercase",
-                  }}
-                >
-                  {resolved.bs_service}
-                </div>
-                <p style={{ marginTop: 8, fontSize: 12, color: "var(--ink-soft)" }}>
-                  From BAAM vertical and keyword inference rules.
-                </p>
-              </article>
-
-              <article
-                style={{
-                  border: "1px solid var(--rule-soft)",
-                  borderRadius: 8,
-                  padding: 12,
-                  background: "var(--cream-light)",
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "var(--ink-mute)",
-                  }}
-                >
-                  LLM Analyst Candidate
-                </div>
-                <p style={{ marginTop: 8, fontSize: 12, color: "var(--ink-soft)" }}>
-                  {llmSuggestedServiceOptions.length > 0
-                    ? "All LLM suggestions are shown below as selectable chips."
-                    : "No valid LLM candidate returned this run."}
-                </p>
-                {llmSuggestedServiceOptions.length > 0 ? (
-                  <div
-                    style={{
-                      marginTop: 8,
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 8,
-                    }}
-                  >
-                    {llmSuggestedServiceOptions.map((candidate) => {
-                      const isSelected = service.trim().toLowerCase() === candidate.toLowerCase();
-                      return (
-                        <button
-                          key={`llm-candidate-card-${candidate}`}
-                          type="button"
-                          onClick={() => {
-                            setService(candidate);
-                            setServiceConfirmed(false);
-                            setShowConfirmReminder(false);
-                          }}
-                          disabled={isPending}
-                          style={{
-                            border: isSelected
-                              ? "1px solid var(--sage-deep)"
-                              : "1px solid var(--rule-soft)",
-                            borderRadius: 999,
-                            padding: "4px 10px",
-                            fontFamily: "'Instrument Serif', serif",
-                            fontSize: 18,
-                            lineHeight: 1.05,
-                            color: isSelected ? "var(--sage-deep)" : "var(--ink)",
-                            background: isSelected ? "#e8f0e8" : "#fff",
-                            cursor: isPending ? "default" : "pointer",
-                            textTransform: "lowercase",
-                          }}
-                        >
-                          {candidate}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : null}
-              </article>
-            </div>
+                Model evidence
+              </div>
+              <p style={{ marginTop: 6, fontSize: 13, color: "var(--ink-soft)" }}>
+                Google: <b style={{ color: "var(--ink)" }}>{resolved.gs_service}</b> · BAAM:{" "}
+                <b style={{ color: "var(--ink)" }}>{resolved.bs_service}</b>
+              </p>
+            </article>
 
             {topServiceCandidates.length > 0 ? (
-              <div
+              <details
                 style={{
                   marginTop: 12,
                   border: "1px dashed var(--rule)",
@@ -959,18 +768,19 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                   background: "#faf9f6",
                 }}
               >
-                <div
+                <summary
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    fontSize: 11,
                     letterSpacing: "0.1em",
                     textTransform: "uppercase",
                     color: "var(--ink-mute)",
                     fontWeight: 700,
                   }}
                 >
-                  Debug · Top candidates (up to 3)
-                </div>
+                  Why this service? (advanced)
+                </summary>
                 <div
                   style={{
                     marginTop: 10,
@@ -1047,7 +857,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                     </article>
                   ))}
                 </div>
-              </div>
+              </details>
             ) : null}
 
             <div
@@ -1068,11 +878,10 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                   color: "var(--sage-deep)",
                 }}
               >
-                Recommended Service (final audit input)
+                Final service for this audit
               </div>
               <p style={{ marginTop: 6, fontSize: 13, color: "var(--ink-soft)" }}>
-                Edit if needed. This exact value is used for competitor query and
-                final audit generation.
+                Edit if needed. This exact value is used for competitor query and final audit generation.
               </p>
 
               <div
@@ -1110,9 +919,9 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       border: "1px solid var(--rule)",
                       borderRadius: 8,
                       background: "#fff",
-                      fontFamily: "'Instrument Serif', serif",
-                      fontSize: 24,
-                      lineHeight: 1.12,
+                      fontFamily: "inherit",
+                      fontSize: 16,
+                      lineHeight: 1.3,
                       fontWeight: 400,
                       color: "var(--ink)",
                     }}
@@ -1153,9 +962,9 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       background: "#fff",
                       borderRadius: 8,
                       padding: "8px 12px",
-                      fontSize: 24,
-                      lineHeight: 1.12,
-                      fontFamily: "'Instrument Serif', serif",
+                      fontSize: 16,
+                      lineHeight: 1.3,
+                      fontFamily: "inherit",
                       fontWeight: 400,
                       color: "var(--ink)",
                       textTransform: "lowercase",
@@ -1164,7 +973,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 </div>
               </div>
 
-              {serviceOptions.length > 0 ? (
+              {suggestedServiceOptions.length > 0 ? (
                 <div
                   style={{
                     marginTop: 12,
@@ -1183,79 +992,12 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       fontWeight: 700,
                     }}
                   >
-                    Specific service choices
+                    Suggested services
                   </div>
                   <p style={{ marginTop: 6, fontSize: 12, color: "var(--ink-soft)" }}>
                     {resolved.needs_service_selection
-                      ? "System cannot trust a broad label. Please pick one specific service below."
-                      : "Optional quick-pick specific services based on title/description/website signals."}
-                  </p>
-                  <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
-                    {serviceOptions.map((option) => (
-                      <label
-                        key={option}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          border: "1px solid var(--rule-soft)",
-                          borderRadius: 8,
-                          padding: "7px 9px",
-                          cursor: "pointer",
-                          background: service === option ? "var(--cream-light)" : "#fff",
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={service === option}
-                          onChange={() => {
-                            setService(option);
-                            setServiceConfirmed(false);
-                            setShowConfirmReminder(false);
-                          }}
-                          disabled={isPending}
-                        />
-                        <span
-                          style={{
-                            fontFamily: "'Instrument Serif', serif",
-                            fontSize: 22,
-                            lineHeight: 1.1,
-                            color: "var(--ink)",
-                            textTransform: "lowercase",
-                          }}
-                        >
-                          {option}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {llmSuggestedServiceOptions.length > 0 ? (
-                <div
-                  style={{
-                    marginTop: 12,
-                    border: "1px solid var(--rule-soft)",
-                    borderRadius: 8,
-                    background: "#fff",
-                    padding: 10,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 11,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                      color: "var(--ink-mute)",
-                      fontWeight: 700,
-                    }}
-                  >
-                    LLM suggested services
-                  </div>
-                  <p style={{ marginTop: 6, fontSize: 12, color: "var(--ink-soft)" }}>
-                    Click any chip to use the full multi-word LLM description as your
-                    final Recommended Service.
+                      ? "Current label is too broad. Pick one specific service below."
+                      : "Quick picks from BAAM and LLM signals. Click to use as final service."}
                   </p>
                   <div
                     style={{
@@ -1265,14 +1007,17 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       gap: 8,
                     }}
                   >
-                    {llmSuggestedServiceOptions.map((candidate) => {
-                      const isSelected = service.trim().toLowerCase() === candidate.toLowerCase();
+                    {(showAllSuggestions
+                      ? suggestedServiceOptions
+                      : suggestedServiceOptions.slice(0, 4)
+                    ).map((option) => {
+                      const isSelected = service.trim().toLowerCase() === option.toLowerCase();
                       return (
                         <button
-                          key={`llm-candidate-select-${candidate}`}
+                          key={option}
                           type="button"
                           onClick={() => {
-                            setService(candidate);
+                            setService(option);
                             setServiceConfirmed(false);
                             setShowConfirmReminder(false);
                           }}
@@ -1283,20 +1028,40 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                               : "1px solid var(--rule-soft)",
                             borderRadius: 999,
                             padding: "6px 12px",
-                            fontFamily: "'Instrument Serif', serif",
-                            fontSize: 22,
-                            lineHeight: 1.05,
+                            fontFamily: "inherit",
+                            fontSize: 16,
+                            lineHeight: 1.3,
+                            fontWeight: 400,
                             color: isSelected ? "var(--sage-deep)" : "var(--ink)",
                             background: isSelected ? "#e8f0e8" : "#fff",
                             cursor: isPending ? "default" : "pointer",
                             textTransform: "lowercase",
                           }}
                         >
-                          {candidate}
+                          {option}
                         </button>
                       );
                     })}
                   </div>
+                  {suggestedServiceOptions.length > 4 ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllSuggestions((prev) => !prev)}
+                      disabled={isPending}
+                      style={{
+                        marginTop: 8,
+                        border: "1px solid var(--rule-soft)",
+                        background: "#fff",
+                        borderRadius: 999,
+                        padding: "4px 10px",
+                        fontSize: 12,
+                        color: "var(--ink-soft)",
+                        cursor: isPending ? "default" : "pointer",
+                      }}
+                    >
+                      {showAllSuggestions ? "Show less" : `+ ${suggestedServiceOptions.length - 4} more`}
+                    </button>
+                  ) : null}
                 </div>
               ) : null}
 
@@ -1343,71 +1108,52 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
               }}
             >
               <span style={stepCircleStyle}>4</span>
-              <span>Confirmation gate</span>
+              <span>Confirm and generate</span>
             </h4>
 
             <div
               style={{
                 marginTop: 12,
-                display: "grid",
-                gridTemplateColumns: "1.2fr 1fr",
-                gap: 14,
+                border: "1px solid var(--rule-soft)",
+                background: "var(--cream-light)",
+                borderRadius: 8,
+                padding: 12,
               }}
             >
-              <div
+              <label
                 style={{
-                  border: "1px solid var(--rule-soft)",
-                  background: "#fff",
-                  borderRadius: 8,
-                  padding: 12,
-                }}
-              >
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 10,
-                    fontSize: 14,
-                    color: "var(--ink)",
-                    lineHeight: 1.35,
-                  }}
-                >
-                  <input
-                    id="service-confirm-checkbox"
-                    type="checkbox"
-                    checked={serviceConfirmed}
-                    onChange={(e) => {
-                      setServiceConfirmed(e.target.checked);
-                      if (e.target.checked) setShowConfirmReminder(false);
-                    }}
-                    disabled={isPending}
-                    style={{ marginTop: 2 }}
-                  />
-                  <span>
-                    I confirm the selected <strong>Industry</strong> and{" "}
-                    <strong>Recommended Service</strong> for this audit.
-                  </span>
-                </label>
-              </div>
-
-              <div
-                style={{
-                  border: "1px solid var(--rule-soft)",
-                  borderRadius: 8,
-                  padding: 12,
-                  background: "var(--cream-light)",
                   display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
+                  alignItems: "flex-start",
+                  gap: 10,
+                  fontSize: 14,
+                  color: "var(--ink)",
+                  lineHeight: 1.35,
                 }}
               >
-                <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
-                  Final service used now: <b>{finalService}</b>
+                <input
+                  id="service-confirm-checkbox"
+                  type="checkbox"
+                  checked={serviceConfirmed}
+                  onChange={(e) => {
+                    setServiceConfirmed(e.target.checked);
+                    if (e.target.checked) setShowConfirmReminder(false);
+                  }}
+                  disabled={isPending}
+                  style={{ marginTop: 2 }}
+                />
+                <span>
+                  I confirm the selected <strong>Industry</strong> and{" "}
+                  <strong>Final Service</strong> for this audit.
+                  <span style={{ display: "block", marginTop: 6, color: "var(--ink-soft)" }}>
+                    Final service used now: <b>{finalService}</b>. Generate stays blocked until this is checked.
+                  </span>
+                </span>
+              </label>
+              {!serviceConfirmed ? (
+                <div style={{ marginTop: 10, fontSize: 12, color: "var(--amber-deep)" }}>
+                  Please confirm before generating.
                 </div>
-                <div style={{ fontSize: 12, color: "var(--ink-mute)" }}>
-                  Generate is blocked until confirmation is checked.
-                </div>
-              </div>
+              ) : null}
             </div>
           </section>
 
@@ -1428,20 +1174,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
             </div>
           )}
 
-          <div className="found-action-row">
-            <button
-              type="button"
-              className="found-action-edit"
-              onClick={() => {
-                setStep("input");
-                setResolved(null);
-                setLocalError(null);
-              }}
-              disabled={isPending}
-              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
-            >
-              ← Not the right business? Edit your details
-            </button>
+          <div className="found-action-row" style={{ justifyContent: "flex-end" }}>
             <button
               type="submit"
               className="found-action-generate"

@@ -922,6 +922,31 @@
     line-height: 1.45;
     color: var(--ink-soft);
   }
+  .forecast-cited-research {
+    margin-top: 0;
+    background: var(--cream);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 10px 16px 12px;
+  }
+  .forecast-cited-research-kicker {
+    text-align: center;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .forecast-cited-research-list {
+    text-align: center;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+  }
 
   /* ============ SECTION 4 — BENCHMARKS ============ */
   .benchmark-split {
@@ -1215,11 +1240,20 @@
   }
   .action-item {
     display: grid;
-    grid-template-columns: 80px 1fr 200px;
-    gap: 28px;
-    padding: 28px 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    padding: 20px 0;
     border-bottom: 1px solid var(--rule);
+    align-items: center;
+  }
+  .action-main {
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    gap: 18px;
     align-items: start;
+    background: var(--cream);
+    border: 1px solid var(--rule-soft);
+    padding: 14px 18px 14px 0;
   }
   .action-number {
     font-family: 'Instrument Serif', 'Noto Serif TC', serif;
@@ -1227,8 +1261,10 @@
     line-height: 1;
     color: var(--rust-deep);
     font-style: italic;
+    text-align: center;
+    padding-top: 2px;
   }
-  .action-body { padding-top: 2px; }
+  .action-body { padding-top: 0; }
   .action-title {
     font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 17px;
@@ -1243,19 +1279,17 @@
     font-size: 15px;
     line-height: 1.4;
     color: var(--ink-soft);
-    margin-bottom: 12px;
+    margin-bottom: 0;
   }
-  .action-tag-row {
+  .action-result-panel {
+    min-width: 185px;
+    background: var(--cream);
+    border: 1px solid var(--rule-soft);
+    padding: 12px 16px 10px;
     display: flex;
-    align-items: center;
-    gap: 28px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
-  .action-result-block {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
   .action-result-label {
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
@@ -1287,15 +1321,11 @@
     color: var(--amber);
     border-color: var(--ink);
   }
-  .action-value-block .action-owner-pill {
+  .action-result-panel .action-owner-pill {
     display: inline-block;
-    margin-top: 14px;
+    margin-top: 4px;
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
-  }
-  .action-value-block {
-    padding-top: 8px;
-    text-align: right;
   }
   .summary-stat {
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
@@ -1793,12 +1823,14 @@
     .competitor-table { font-size: 12px; }
     .competitor-table td, .competitor-table th { padding: 12px 6px; }
     .action-item { grid-template-columns: 1fr; gap: 12px; }
-    .action-value-block { text-align: left; }
+    .action-main { grid-template-columns: 56px 1fr; padding: 12px 12px 12px 0; }
+    .action-result-panel { width: 100%; }
     .action-value-calc { text-align: left; }
     .cta-paths { grid-template-columns: 1fr; }
     .cta-path { border-right: none; border-bottom: 1px solid var(--ink); }
     .cta-path:last-child { border-bottom: none; }
     .forecast-results-grid { grid-template-columns: 1fr 1fr; }
+    .forecast-cited-research-list { font-size: 14px; }
     .forecast-result-card:nth-child(2n) { border-right: none; }
     .forecast-result-card {
       border-bottom: 1px solid var(--rule-soft);

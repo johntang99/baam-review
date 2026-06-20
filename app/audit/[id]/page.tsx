@@ -69,6 +69,7 @@ export default async function AuditResultPage(props: {
   }
 
   const business = data.google_data.business;
+  const embedVersion = "20260619-so-copy-v2";
 
   return (
     <main className="min-h-screen bg-cream">
@@ -85,7 +86,7 @@ export default async function AuditResultPage(props: {
         languages_rendered={data.languages_rendered}
         current_language={lang}
       />
-      <AuditEmbed src={`/audit/${id}/embed?lang=${lang}`} />
+      <AuditEmbed src={`/audit/${id}/embed?lang=${lang}&v=${embedVersion}`} />
     </main>
   );
 }

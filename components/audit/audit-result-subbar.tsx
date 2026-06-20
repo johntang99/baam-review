@@ -80,6 +80,12 @@ export function AuditResultSubBar({
           <Download className="h-3 w-3 opacity-60" />
           {langLabel} HTML
         </a>
+        <Link
+          href={`/audit/${audit_id}/short?lang=${current_language}`}
+          className="audit-subbar-pdf-btn"
+        >
+          Short Version
+        </Link>
         <a
           href={downloadHref("pdf", current_language)}
           className="audit-subbar-pdf-btn"

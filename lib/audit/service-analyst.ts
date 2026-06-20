@@ -21,7 +21,7 @@ import {
 const PRIMARY_ANALYST_MODEL =
   process.env.SERVICE_ANALYST_CLAUDE_MODEL ||
   process.env.ANTHROPIC_MODEL ||
-  "claude-opus-4-1-20250805";
+  "claude-opus-4-8";
 const FALLBACK_ANALYST_MODEL = "claude-sonnet-4-5-20250929";
 const PHRASE_TOKEN_STOPWORDS = new Set([
   "a",

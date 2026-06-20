@@ -67,14 +67,6 @@ export default async function NewAuditPage(props: {
           </div>
 
           <div className="input-block">
-            <div className="input-label">Business identification</div>
-            <h2 className="input-headline">
-              Three details. We use them to find your <em>exact business</em> on Google.
-            </h2>
-            <p className="input-sub">
-              Verify each field before submitting — the buttons let you confirm your input is correct in a new tab.
-            </p>
-
             <IntakeForm initialError={error} />
           </div>
         </div>

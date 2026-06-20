@@ -1,18 +1,14 @@
 <li class="action-item">
-  <div class="action-number">{{numeral}}</div>
-  <div class="action-body">
-    <div class="action-title">{{title}}</div>
-    <div class="action-why">{{why}}</div>
-    <div class="action-tag-row">
-      <div class="action-result-block">
-        <span class="action-result-label">{{result_label}}</span>
-        <span class="action-result-value">{{result_value}}</span>
-      </div>
+  <div class="action-main">
+    <div class="action-number">{{numeral}}</div>
+    <div class="action-body">
+      <div class="action-title">{{title}}</div>
+      <div class="action-why">{{why}}</div>
     </div>
   </div>
-  <div class="action-value-block">
-    <div class="action-value-amount">{{year_result_value}}</div>
-    <div class="action-value-label">{{year_result_label}}</div>
+  <div class="action-result-panel">
+    <span class="action-result-label">{{result_label}}</span>
+    <span class="action-result-value">{{result_value}}</span>
     <span class="action-owner-pill{{#if owner_is_baam}} baam{{/if}}">{{owner_label}}</span>
   </div>
 </li>

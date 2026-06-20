@@ -43,7 +43,7 @@ async function main() {
   const effectiveModel =
     process.env.SERVICE_ANALYST_CLAUDE_MODEL ||
     process.env.ANTHROPIC_MODEL ||
-    "claude-opus-4-1-20250805";
+    "claude-opus-4-8";
 
   const sb = supabase as unknown as {
     from: (table: string) => {

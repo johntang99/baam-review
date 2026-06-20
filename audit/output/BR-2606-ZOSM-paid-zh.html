@@ -3,10 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <title>BAAM Review Audit · 大唐艾灸</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<style>  :root {
+<style>  /* Self-hosted fonts — served from our own domain so PDF rendering never
+     depends on reaching Google Fonts (which can be slow/blocked in some
+     regions and would otherwise stall the render). http://localhost:4001 is
+     replaced at render time with the app origin. */
+  @font-face { font-family: 'Instrument Serif'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/instrument-serif-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Instrument Serif'; font-style: italic; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/instrument-serif-400-italic.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 300; font-display: swap; src: url('http://localhost:4001/fonts/archivo-300.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/archivo-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 500; font-display: swap; src: url('http://localhost:4001/fonts/archivo-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 600; font-display: swap; src: url('http://localhost:4001/fonts/archivo-600.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 700; font-display: swap; src: url('http://localhost:4001/fonts/archivo-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 800; font-display: swap; src: url('http://localhost:4001/fonts/archivo-800.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/jetbrains-mono-400.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('http://localhost:4001/fonts/jetbrains-mono-500.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('http://localhost:4001/fonts/jetbrains-mono-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Serif TC'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/noto-serif-tc-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Serif TC'; font-style: normal; font-weight: 700; font-display: swap; src: url('http://localhost:4001/fonts/noto-serif-tc-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 400; font-display: swap; src: url('http://localhost:4001/fonts/noto-sans-tc-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 500; font-display: swap; src: url('http://localhost:4001/fonts/noto-sans-tc-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 700; font-display: swap; src: url('http://localhost:4001/fonts/noto-sans-tc-700.woff2') format('woff2'); }
+
+  :root {
     --cream: #F5F0E6;
     --cream-light: #FAF7F0;
     --cream-deep: #EBE3D2;
@@ -197,7 +215,15 @@
   .cover3-toc-title {
     font-size: 16px; font-weight: 700; color: var(--ink);
   }
-  .cover3-toc-sub { font-size: 13px; color: var(--ink-mute); }
+  .cover3-toc-sub {
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--rust-deep);
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
   .cover3-main-spacer { flex: 1; }
   .cover3-meta {
     display: grid; grid-template-columns: 1fr 1fr 1fr;
@@ -836,58 +862,95 @@
   .legend-swatch.amber { background: var(--amber); }
   .legend-item strong { color: var(--ink); font-weight: 600; }
 
-  .projection-impact {
+  .forecast-results-intro {
+    margin-top: 18px;
+    margin-bottom: 12px;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.4;
+    color: var(--ink);
+    max-width: 760px;
+  }
+  .forecast-results-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0;
     border-top: 1px solid var(--ink);
     border-bottom: 1px solid var(--ink);
-    margin-top: 22px;
+    margin-top: 10px;
   }
-  .impact-cell {
-    padding: 14px 24px;
+  .forecast-result-card {
+    padding: 16px 16px 14px;
     border-right: 1px solid var(--rule);
   }
-  .impact-cell:last-child { border-right: none; }
-  .impact-label {
+  .forecast-result-card:last-child { border-right: none; }
+  .forecast-result-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 999px;
+    border: 1px solid var(--rule);
+    background: var(--cream-deep);
+    color: var(--rust-deep);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--ink-mute);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
     margin-bottom: 10px;
   }
-  .impact-value {
+  .forecast-result-title {
+    font-family: 'Archivo', 'Noto Sans TC', sans-serif;
+    font-size: 21px;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .forecast-result-title strong { font-weight: 700; }
+  .forecast-result-value {
     font-family: 'Instrument Serif', 'Noto Serif TC', serif;
-    font-size: 32px;
-    color: var(--rust-deep);
-    line-height: 1.05;
+    font-size: 36px;
+    line-height: 1;
+    color: var(--sage-darkest);
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
   }
-  .impact-value.neutral { color: var(--ink); }
-  .impact-value.gain { color: var(--sage-deep); }
-  .impact-sub {
+  .forecast-result-value-text {
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .forecast-result-desc {
     font-size: 12px;
+    line-height: 1.45;
     color: var(--ink-soft);
-    margin-top: 6px;
-    line-height: 1.4;
   }
-  .impact-results {
-    list-style: none;
-    margin: 2px 0 0;
-    padding: 0;
+  .forecast-cited-research {
+    margin-top: 0;
+    background: var(--cream);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 10px 16px 12px;
   }
-  .impact-results li {
-    font-size: 13px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-  }
-  .impact-check {
-    color: var(--sage-deep);
+  .forecast-cited-research-kicker {
+    text-align: center;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber-deep);
     font-weight: 600;
-    flex-shrink: 0;
+    margin-bottom: 8px;
+  }
+  .forecast-cited-research-list {
+    text-align: center;
+    font-family: 'Instrument Serif', 'Noto Serif TC', serif;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink);
+    letter-spacing: 0.01em;
   }
 
   /* ============ SECTION 4 — BENCHMARKS ============ */
@@ -1080,6 +1143,10 @@
     border-bottom: 1.5px solid var(--ink);
   }
   .competitor-table th:not(:first-child) { text-align: right; }
+  /* Keep the business (1st) column from collapsing to a 1-char vertical
+     strip when a competitor's name is long (CJK breaks at every char). */
+  .competitor-table th:first-child,
+  .competitor-table td:first-child { min-width: 170px; }
   .competitor-table td {
     padding: 18px 12px;
     border-bottom: 1px solid var(--rule-soft);
@@ -1112,8 +1179,18 @@
   }
   .competitor-name {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 12px;
+  }
+  /* The name + optional secondary line live in one flex item so the line
+     break stacks them vertically (a bare <br> inside the flex row would
+     instead lay name and secondary out side-by-side). min-width:0 lets it
+     wrap within the column instead of forcing it wider. */
+  .competitor-name-text { min-width: 0; line-height: 1.35; }
+  .competitor-name-sec {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 12px;
+    color: var(--ink-mute);
   }
   .competitor-rank {
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
@@ -1168,11 +1245,20 @@
   }
   .action-item {
     display: grid;
-    grid-template-columns: 80px 1fr 200px;
-    gap: 28px;
-    padding: 28px 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    padding: 20px 0;
     border-bottom: 1px solid var(--rule);
+    align-items: center;
+  }
+  .action-main {
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    gap: 18px;
     align-items: start;
+    background: var(--cream);
+    border: 1px solid var(--rule-soft);
+    padding: 14px 18px 14px 0;
   }
   .action-number {
     font-family: 'Instrument Serif', 'Noto Serif TC', serif;
@@ -1180,8 +1266,10 @@
     line-height: 1;
     color: var(--rust-deep);
     font-style: italic;
+    text-align: center;
+    padding-top: 2px;
   }
-  .action-body { padding-top: 2px; }
+  .action-body { padding-top: 0; }
   .action-title {
     font-family: 'Archivo', 'Noto Sans TC', sans-serif;
     font-size: 17px;
@@ -1196,19 +1284,17 @@
     font-size: 15px;
     line-height: 1.4;
     color: var(--ink-soft);
-    margin-bottom: 12px;
+    margin-bottom: 0;
   }
-  .action-tag-row {
+  .action-result-panel {
+    min-width: 185px;
+    background: var(--cream);
+    border: 1px solid var(--rule-soft);
+    padding: 12px 16px 10px;
     display: flex;
-    align-items: center;
-    gap: 28px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
-  .action-result-block {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
   .action-result-label {
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
@@ -1240,15 +1326,11 @@
     color: var(--amber);
     border-color: var(--ink);
   }
-  .action-value-block .action-owner-pill {
+  .action-result-panel .action-owner-pill {
     display: inline-block;
-    margin-top: 14px;
+    margin-top: 4px;
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
     font-size: 11px;
-  }
-  .action-value-block {
-    padding-top: 8px;
-    text-align: right;
   }
   .summary-stat {
     font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
@@ -1668,6 +1750,70 @@
 
   /* Mobile */
   @media (max-width: 720px) {
+    .page.cover3 {
+      display: block;
+      min-height: auto;
+      border-left: none;
+      border-right: none;
+    }
+    .cover3-rail {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+      padding: 26px 20px;
+    }
+    .cover3-rail-head { margin-bottom: 16px; }
+    .cover3-ev { margin-bottom: 16px; }
+    .cover3-ev-stat { font-size: 24px; }
+    .cover3-main {
+      padding: 28px 20px 34px;
+    }
+    .cover3-masthead { font-size: 9px; letter-spacing: 0.14em; }
+    .cover3-masthead-brand { letter-spacing: 0.2em; }
+    .cover3-for {
+      font-size: 14px;
+      margin: 24px 0 14px;
+      line-height: 1.35;
+    }
+    .cover3-biz {
+      font-size: 34px;
+      line-height: 0.98;
+      padding-bottom: 14px;
+    }
+    .cover3-statement {
+      font-size: 24px;
+      line-height: 1.15;
+      margin-top: 16px;
+    }
+    .cover3-toc { margin-top: 22px; }
+    .cover3-toc-item {
+      padding: 10px 0;
+      gap: 10px;
+      align-items: baseline;
+    }
+    .cover3-toc-num { width: 30px; font-size: 10px; }
+    .cover3-toc-line {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      line-height: 1.25;
+    }
+    .cover3-toc-title { font-size: 13px; }
+    .cover3-toc-sub {
+      margin-left: 0;
+      font-size: 9px;
+      letter-spacing: 0.02em;
+    }
+    .cover3-main-spacer { display: none; }
+    .cover3-meta {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 26px;
+      padding-top: 12px;
+    }
+    .cover3-meta-v { font-size: 13px; }
+    .cover3-meta-v small { font-size: 9px; }
+
     .page { padding: 40px 28px 60px; }
     .cover-title { font-size: 48px; }
     .cover-subtitle { font-size: 20px; }
@@ -1682,14 +1828,30 @@
     .competitor-table { font-size: 12px; }
     .competitor-table td, .competitor-table th { padding: 12px 6px; }
     .action-item { grid-template-columns: 1fr; gap: 12px; }
-    .action-value-block { text-align: left; }
+    .action-main { grid-template-columns: 56px 1fr; padding: 12px 12px 12px 0; }
+    .action-result-panel { width: 100%; }
     .action-value-calc { text-align: left; }
     .cta-paths { grid-template-columns: 1fr; }
     .cta-path { border-right: none; border-bottom: 1px solid var(--ink); }
     .cta-path:last-child { border-bottom: none; }
-    .projection-impact { grid-template-columns: 1fr; }
-    .impact-cell { border-right: none; border-bottom: 1px solid var(--rule); }
-    .impact-cell:last-child { border-bottom: none; }
+    .forecast-results-grid { grid-template-columns: 1fr 1fr; }
+    .forecast-cited-research-list { font-size: 14px; }
+    .forecast-result-card:nth-child(2n) { border-right: none; }
+    .forecast-result-card {
+      border-bottom: 1px solid var(--rule-soft);
+      min-height: 132px;
+    }
+    .forecast-result-card:nth-last-child(-n+2) { border-bottom: none; }
+    .forecast-result-icon {
+      width: 38px;
+      height: 38px;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .forecast-result-title { font-size: 15px; }
+    .forecast-result-value { font-size: 28px; }
+    .forecast-result-value-text { font-size: 18px; }
+    .forecast-result-desc { font-size: 11px; }
     .grade-scale-table { font-size: 12px; }
     .grade-scale-table td, .grade-scale-table th { padding: 12px 8px 12px 0; }
     .grade-letter-pill { font-size: 28px; }
@@ -2088,39 +2250,35 @@
         <div class="cover3-masthead-brand">BAAM REVIEW</div>
         <div class="cover3-masthead-sub">聲譽與營收診斷報告 · v3.0</div>
       </div>
-      <div class="cover3-masthead-right"><b>第 001 號</b>2026 年 6 月 9 日</div>
+      <div class="cover3-masthead-right"><b>第 001 號</b>2026 年 6 月 20 日</div>
     </div>
 
     <div class="cover3-for">評論審計報告 · 為商家而寫</div>
     <div class="cover3-biz">大唐艾灸</div>
 
-    <h1 class="cover3-statement">客戶找不到您，<em>就無法選擇您。</em></h1>
+    <h1 class="cover3-statement">客戶找不到您，<em>就無法選擇您</em></h1>
 
     <div class="cover3-toc">
       <div class="cover3-toc-head">報告目錄</div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">02</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">您目前的狀況概覽</span><span class="cover3-toc-sub"> • 分數、等級與完整細項</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">您目前的狀況概覽</span><span class="cover3-toc-sub"> 分數 86 / 100 · B 級 · 穩健</span></span>
       </div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">03</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">競爭對手比較</span><span class="cover3-toc-sub"> • 客戶比您先看到的名字</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">競爭對手比較</span><span class="cover3-toc-sub"> 競爭差距 · 6 位對手 · 您 #1</span></span>
       </div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">04</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">服務機會</span><span class="cover3-toc-sub"> • 90–120 天內提升一個等級</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">服務機會</span><span class="cover3-toc-sub"> 升級窗口 · 90–120 天</span></span>
       </div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">05</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">12 個月預測</span><span class="cover3-toc-sub"> • 與 BAAM Review 合作的預測分數</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">12 個月預測</span><span class="cover3-toc-sub"> 目標結果 · B 級 · 86 分 · 營收成長</span></span>
       </div>
       <div class="cover3-toc-item">
         <span class="cover3-toc-num">06</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">您的行動計劃</span><span class="cover3-toc-sub"> • 五項行動，依子分數排序</span></span>
-      </div>
-      <div class="cover3-toc-item">
-        <span class="cover3-toc-num">A</span>
-        <span class="cover3-toc-line"><span class="cover3-toc-title">附錄 · 參考數據表</span><span class="cover3-toc-sub"> • 完整方法論，兩張表呈現</span></span>
+        <span class="cover3-toc-line"><span class="cover3-toc-title">您的行動計劃</span><span class="cover3-toc-sub"> 執行計劃 · 3 項優先行動</span></span>
       </div>
     </div>
 
@@ -2128,7 +2286,7 @@
 
     <div class="cover3-meta">
       <div><div class="cover3-meta-k">地址</div><div class="cover3-meta-v">36-28A Union Street<small>紐約州Flushing · 11354</small></div></div>
-      <div><div class="cover3-meta-k">行業</div><div class="cover3-meta-v">中醫診所<small>Health · 雙語服務</small></div></div>
+      <div><div class="cover3-meta-k">行業與服務</div><div class="cover3-meta-v">中醫診所<small>Acupuncture</small><small>Health · 雙語服務</small></div></div>
       <div><div class="cover3-meta-k">編製者</div><div class="cover3-meta-v">Baam Review<small>聲譽診斷</small></div></div>
     </div>
   </div>
@@ -2163,15 +2321,15 @@
           </div>
         </td>
         <td><div class="star-rating"><span class="stars">★★★★★</span> <span class="mono">5.0</span></div></td>
-        <td><div class="review-count">77</div></td>
-        <td><div class="last-review">昨天</div></td>
-        <td><div class="health-dot warn">80%</div></td>
+        <td><div class="review-count">74</div></td>
+        <td><div class="last-review">12 天前</div></td>
+        <td><div class="health-dot warn">66.66666666666666%</div></td>
       </tr>
     </tbody>
   </table>
 
   <div class="insight-callout">
-    <strong>這代表什麼</strong><br><br>您最近一則 Google 評論在 1 天前。 總評論數 <strong>77</strong> 則低於您行業的中位數 — 評論總量是最弱項。
+    <strong>這代表什麼</strong><br><br>您最近一則 Google 評論在 12 天前。 總評論數 <strong>74</strong> 則低於您行業的中位數 — 評論總量是最弱項。
   </div>
 
   <!-- §03 score content merged into §02 — snapshot + score read as one
@@ -2181,11 +2339,11 @@
        physical pagination still works because the PDF renderer paginates
        on overflow. -->
   <div class="score-hero" style="margin-top: 40px;">
-    <div class="score-number">90</div>
+    <div class="score-number">86</div>
     <div class="score-grade-block">
-      <div class="score-grade-label">等級 · A 級</div>
-      <div class="score-grade-letter">A</div>
-      <div class="score-grade-diagnosis">您在本地市場處於領先地位 · 評論已成為您的競爭護城河。</div>
+      <div class="score-grade-label">等級 · B 級</div>
+      <div class="score-grade-letter">B</div>
+      <div class="score-grade-diagnosis">表現強勁 · 但每月都在被頂級競爭對手追上。</div>
     </div>
   </div>
 
@@ -2224,12 +2382,12 @@
       <div class="subscore-row">
         <div class="subscore-meta">
           <div class="subscore-label">評論總數</div>
-          <div class="subscore-raw"><span class="mono-num">77</span> 則總評論</div>
+          <div class="subscore-raw"><span class="mono-num">74</span> 則總評論</div>
           <div class="subscore-meta-footnote">對比行業中位數</div>
         </div>
         <div class="subscore-bar-area">
           <div class="subscore-bar-track">
-            <div class="subscore-bar-fill " style="width: 61%;"></div>
+            <div class="subscore-bar-fill " style="width: 60%;"></div>
             <div class="subscore-mark" style="left: 50%;"></div><div class="subscore-mark" style="left: 70%;"></div><div class="subscore-mark" style="left: 100%;"></div>
           </div>
           <div class="subscore-scale">
@@ -2247,18 +2405,18 @@
               <span class="subscore-scale-tick anchor-right">300+</span>
           </div>
         </div>
-        <div class="subscore-value">61</div>
+        <div class="subscore-value">60</div>
         <div class="subscore-weight">20%</div>
       </div>
       <div class="subscore-row">
         <div class="subscore-meta">
           <div class="subscore-label">近 30 天速率</div>
-          <div class="subscore-raw"><span class="mono-num">8.0 / mo</span></div>
-          <div class="subscore-meta-footnote">8 reviews past 30 days</div>
+          <div class="subscore-raw"><span class="mono-num">5.0 / mo</span></div>
+          <div class="subscore-meta-footnote">5 reviews past 30 days</div>
         </div>
         <div class="subscore-bar-area">
           <div class="subscore-bar-track">
-            <div class="subscore-bar-fill strong" style="width: 95%;"></div>
+            <div class="subscore-bar-fill strong" style="width: 82%;"></div>
             <div class="subscore-mark" style="left: 40%;"></div><div class="subscore-mark" style="left: 75%;"></div><div class="subscore-mark" style="left: 100%;"></div>
           </div>
           <div class="subscore-scale">
@@ -2276,14 +2434,14 @@
               <span class="subscore-scale-tick anchor-right">10+/mo</span>
           </div>
         </div>
-        <div class="subscore-value">95</div>
+        <div class="subscore-value">82</div>
         <div class="subscore-weight">25%</div>
       </div>
       <div class="subscore-row">
         <div class="subscore-meta">
           <div class="subscore-label">近 6 個月速率</div>
-          <div class="subscore-raw"><span class="mono-num">12.8 / mo</span> 平均</div>
-          <div class="subscore-meta-footnote">77 reviews ÷ 6 months</div>
+          <div class="subscore-raw"><span class="mono-num">12.3 / mo</span> 平均</div>
+          <div class="subscore-meta-footnote">74 reviews ÷ 6 months</div>
         </div>
         <div class="subscore-bar-area">
           <div class="subscore-bar-track">
@@ -2311,8 +2469,8 @@
       <div class="subscore-row">
         <div class="subscore-meta">
           <div class="subscore-label">近 12 個月速率</div>
-          <div class="subscore-raw"><span class="mono-num">6.4 / mo</span> 平均</div>
-          <div class="subscore-meta-footnote">77 reviews ÷ 12 months</div>
+          <div class="subscore-raw"><span class="mono-num">6.2 / mo</span> 平均</div>
+          <div class="subscore-meta-footnote">74 reviews ÷ 12 months</div>
         </div>
         <div class="subscore-bar-area">
           <div class="subscore-bar-track">
@@ -2345,7 +2503,7 @@
        velocity drag, projection). -->
   <div class="grade-scale-block">
     <div class="grade-scale-eyebrow">完整等級表 · 每個等級的意義</div>
-    <h3 class="grade-scale-headline">您的 <em>A</em> 級在整體中的位置 · 以及更上一層需要什麼。</h3>
+    <h3 class="grade-scale-headline">您的 <em>B</em> 級在整體中的位置 · 以及更上一層需要什麼。</h3>
     <table class="grade-scale-table">
       <thead>
         <tr>
@@ -2355,15 +2513,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="current">
+        <tr>
           <td><span class="score-range">90 – 100</span></td>
           <td class="grade-cell"><span class="grade-letter-pill g-a">A</span></td>
-          <td><span class="grade-meaning">您在本地市場處於領先地位 · 評論已成為您的競爭護城河。<span class="you-here-pill">您 · 90</span></span></td>
+          <td><span class="grade-meaning">您在本地市場處於領先地位 · 評論已成為您的競爭護城河。</span></td>
         </tr>
-        <tr>
+        <tr class="current">
           <td><span class="score-range">75 – 89</span></td>
           <td class="grade-cell"><span class="grade-letter-pill g-b">B</span></td>
-          <td><span class="grade-meaning">表現強勁 · 但每月都在被頂級競爭對手追上。</span></td>
+          <td><span class="grade-meaning">表現強勁 · 但每月都在被頂級競爭對手追上。<span class="you-here-pill">您 · 86</span></span></td>
         </tr>
         <tr>
           <td><span class="score-range">60 – 74</span></td>
@@ -2414,7 +2572,7 @@
   </div>
 
   <h2 class="section-headline" style="white-space: nowrap;">在眾多競爭對手中，<em>客戶能看見您嗎？</em></h2>
-  <p class="section-deck" style="max-width: 760px;">由 Google Maps 在您的搜尋半徑內排名識別。我們替您挑選競爭對手 — 供您參考</p>
+  <p class="section-deck" style="max-width: 760px;">競爭對手依您搜尋範圍內的 Google 地圖排名識別 — 未必完全精準，但可供您參考。</p>
 
   <table class="competitor-table">
     <thead>
@@ -2432,92 +2590,78 @@
         <tr class="you">
           <td>
             <div class="competitor-name">
-              <span class="competitor-rank">您</span>大唐艾灸 <span class="you-tag"></span>
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Datang Moxibustion</span>
+              <span class="competitor-rank">您</span>
+              <span class="competitor-name-text">大唐艾灸 <span class="you-tag"></span><br><span class="competitor-name-sec">Datang Moxibustion</span></span>
             </div>
           </td>
           <td><div class="competitor-address">36-28A Union Street, Flushing</div></td>
-          <td><strong>90</strong></td>
+          <td><strong>86</strong></td>
           <td>5.0 ★</td>
-          <td>77</td>
-          <td>8</td>
-          <td>33</td>
+          <td>74</td>
+          <td>5</td>
+          <td>26</td>
         </tr>
         <tr>
           <td>
             <div class="competitor-name">
-              <span class="competitor-rank">02</span>华仁堂法拉盛针灸诊所纽约中医诊所物理治疗医生李伟华中医师脊椎病物理治疗尿频尿急失眠背痛痛症诊所最好的中医诊所专家推荐
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">HRT Best Acupuncture-   Jason Yi Dipl.Ac, LAc  | | PCOS</span>
+              <span class="competitor-rank">02</span>
+              <span class="competitor-name-text">华仁堂法拉盛针灸诊所纽约中医诊所物理治疗医生李伟…<br><span class="competitor-name-sec">HRT Best Acupuncture-…</span></span>
             </div>
           </td>
           <td><div class="competitor-address">136-56 39th Avenue, Flushing</div></td>
           <td><strong>77</strong></td>
           <td>4.9 ★</td>
           <td>97</td>
-          <td>6</td>
+          <td>7</td>
           <td>19</td>
         </tr>
         <tr>
           <td>
             <div class="competitor-name">
-              <span class="competitor-rank">03</span>Bill Jiao Acupuncture PLLC.
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Bill Jiao Acupuncture PLLC.</span>
+              <span class="competitor-rank">03</span>
+              <span class="competitor-name-text">德誉堂纽约中医针灸癌症调理痛症不孕不育诊所推荐</span>
             </div>
           </td>
-          <td><div class="competitor-address">142-19 38th Avenue, Flushing</div></td>
-          <td><strong>72</strong></td>
-          <td>4.9 ★</td>
-          <td>86</td>
-          <td>4</td>
-          <td>8</td>
+          <td><div class="competitor-address">136-68 Roosevelt Avenue, Flushing</div></td>
+          <td><strong>71</strong></td>
+          <td>4.3 ★</td>
+          <td>115</td>
+          <td>6</td>
+          <td>12</td>
         </tr>
         <tr>
           <td>
             <div class="competitor-name">
-              <span class="competitor-rank">04</span>德誉堂癌症调理痛症不孕不育诊所推荐
-              
+              <span class="competitor-rank">04</span>
+              <span class="competitor-name-text">Fay Acupuncture &amp; Herbal…</span>
             </div>
           </td>
-          <td><div class="competitor-address">136-68 Roosevelt Avenue, Flushing</div></td>
-          <td><strong>67</strong></td>
-          <td>4.3 ★</td>
-          <td>112</td>
-          <td>4</td>
+          <td><div class="competitor-address">69-20 Main Street, Flushing</div></td>
+          <td><strong>70</strong></td>
+          <td>5.0 ★</td>
+          <td>113</td>
+          <td>2</td>
           <td>11</td>
         </tr>
         <tr>
           <td>
             <div class="competitor-name">
-              <span class="competitor-rank">05</span>Jessica Liang Acupuncture PC
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Jessica Liang Acupuncture PC</span>
+              <span class="competitor-rank">05</span>
+              <span class="competitor-name-text">Bill Jiao Acupuncture PL…</span>
             </div>
           </td>
-          <td><div class="competitor-address">132-59 41st Road, Flushing</div></td>
-          <td><strong>64</strong></td>
-          <td>5.0 ★</td>
-          <td>73</td>
+          <td><div class="competitor-address">142-19 38th Avenue, Flushing</div></td>
+          <td><strong>60</strong></td>
+          <td>4.9 ★</td>
+          <td>86</td>
           <td>3</td>
-          <td>7</td>
+          <td>8</td>
         </tr>
         <tr>
           <td>
             <div class="competitor-name">
-              <span class="competitor-rank">06</span>New York Four Seasons Acupuncture PC
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">New York Four Seasons Acupuncture PC</span>
-            </div>
-          </td>
-          <td><div class="competitor-address">143-36 37th Avenue, Flushing</div></td>
-          <td><strong>61</strong></td>
-          <td>4.8 ★</td>
-          <td>114</td>
-          <td>1</td>
-          <td>14</td>
-        </tr>
-        <tr>
-          <td>
-            <div class="competitor-name">
-              <span class="competitor-rank">07</span>Healthkey Group Med Spa
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Healthkey Group Med Spa</span>
+              <span class="competitor-rank">06</span>
+              <span class="competitor-name-text">Healthkey Group Med Spa</span>
             </div>
           </td>
           <td><div class="competitor-address">38-08 Union Street, Flushing</div></td>
@@ -2525,31 +2669,29 @@
           <td>4.9 ★</td>
           <td>82</td>
           <td>1</td>
-          <td>2</td>
+          <td>1</td>
         </tr>
         <tr>
           <td>
             <div class="competitor-name">
-              <span class="competitor-rank">08</span>Lee Clinic
-              <br><span style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink-mute);">Lee Clinic</span>
+              <span class="competitor-rank">07</span>
+              <span class="competitor-name-text">法拉盛中医诊所｜中药治疗｜寻麻疹湿疹牛皮癣头晕头…<br><span class="competitor-name-sec">||| ||||| IBS|| |</span></span>
             </div>
           </td>
-          <td><div class="competitor-address">143-70 Sanford Avenue, Flushing</div></td>
+          <td><div class="competitor-address">136-56 39th Avenue, Flushing</div></td>
           <td><strong>46</strong></td>
           <td>4.9 ★</td>
-          <td>79</td>
+          <td>74</td>
           <td>0</td>
           <td>6</td>
         </tr>
     </tbody>
   </table>
 
-  <p class="competitor-diagnosis"><strong>觀察</strong> 您在 30 天速率上超越市場所有競爭對手 — 這是您的護城河，請繼續維持。</p>
-
   <div class="ornament">§</div>
 
   <p style="font-family: 'Instrument Serif', 'Noto Serif TC', serif; font-style: italic; font-size: 20px; line-height: 1.45; color: var(--ink-soft); text-align: center; max-width: 640px; margin: 0 auto;">
-    好消息：今天您勝過 7 位競爭對手中的 1 位。較難的消息：若一切不變，到第四季度您將勝過更少。
+    本地每個競爭對手都在至少一個維度上領先您。好消息：堅持 90 天的努力即可縮小大部分差距。
   </p>
 
   <div class="doc-footer">
@@ -2573,23 +2715,23 @@
   </div>
 
   <h2 class="so-big-title">我們幫您逐級攀升 — 帶動業績成長</h2>
-  <h3 class="so-headline">從 <span class="so-score-pill">90</span> 提升至 <em>A 級</em>，僅需 90–120 天。</h3>
+  <h3 class="so-headline">模型基於起始分數 <span class="so-score-pill">86</span> 的推估</h3>
   <p class="so-deck">大多數客戶在 BAAM Review 服務 90–120 天內提升一個等級。下方範圍依您的起始分數保守估算 — 並非保證，但為可信賴的預測。</p>
 
   <div class="so-grid">
     <div class="so-stat">
       <div class="so-stat-label">90 天後</div>
-      <div class="so-stat-value">91–94</div>
+      <div class="so-stat-value">89–94</div>
       <div class="so-stat-sub">進入 A 級 · 速度回升</div>
     </div>
     <div class="so-stat">
       <div class="so-stat-label">180 天後</div>
-      <div class="so-stat-value">92–95</div>
+      <div class="so-stat-value">91–95</div>
       <div class="so-stat-sub">穩固 A 級 · 縮小與競爭對手差距</div>
     </div>
     <div class="so-stat">
       <div class="so-stat-label">12 個月後</div>
-      <div class="so-stat-value">93–95</div>
+      <div class="so-stat-value">94–95</div>
       <div class="so-stat-sub">A 級 · 達成 5× 回報標準</div>
     </div>
   </div>
@@ -2600,19 +2742,18 @@
         <div class="so-tier-name"><em>自己</em>運行</div>
         <div class="so-tier-price">$99 /月</div>
       </div>
-      <p class="so-tier-projection">對 大唐艾灸 而言，這通常意味著 90 天分數 <strong>91–93</strong>，每月恢復 3–5 則評論。您執行計劃，我們提供平台。</p>
+      <p class="so-tier-projection">自動化發送請求。您審核並回覆。我們提供整套系統支援。</p>
       <div class="so-cta-row">
         <a href="/signup?next=/audit/service%3Faudit%3DBR-2606-ZOSM%26plan%3Dself" target="_top" class="so-cta outline">啟動自助方案試用 →</a>
       </div>
     </div>
 
     <div class="so-tier featured">
-      <span class="so-tier-recommended">推薦</span>
       <div class="so-tier-name-row">
         <div class="so-tier-name">由我們<em>替您</em>運行</div>
         <div class="so-tier-price">$399 /月</div>
       </div>
-      <p class="so-tier-projection">對 大唐艾灸 而言，這通常意味著 90 天分數 <strong>91–94</strong>，每月恢復 5–8 則評論。我們執行全部五項行動。</p>
+      <p class="so-tier-projection">自動化發送請求。所有回覆由我們代您處理，保持您的語氣。</p>
       <div class="so-cta-row">
         <a href="/signup?next=/audit/service%3Faudit%3DBR-2606-ZOSM%26plan%3Dfull" target="_top" class="so-cta amber">啟動全託管試用 →</a>
       </div>
@@ -2643,7 +2784,7 @@
     <span class="section-marker-title">預測</span>
   </div>
 
-  <h2 class="section-headline">若您與 BAAM Review 合作 · <em>12 個月後的分數</em></h2>
+  <h2 class="section-headline">在持續收集與回覆下 · <em>12 個月後的分數</em></h2>
   <p class="section-deck">透過持續累積與回覆評論，您的分數穩步攀升 — 而什麼都不做則維持不變。競爭對手維持已測得的速率。</p>
 
   <div class="projection-block">
@@ -2675,52 +2816,73 @@
     </linearGradient>
   </defs>
 
-  <path d="M 50.00 54.00 L 100.83 54.00 L 151.67 54.00 L 202.50 51.60 L 253.33 51.60 L 304.17 51.60 L 355.00 51.60 L 405.83 51.60 L 456.67 51.60 L 507.50 49.20 L 558.33 49.20 L 609.17 49.20 L 660.00 49.20 L 660.00 54.00 L 609.17 54.00 L 558.33 54.00 L 507.50 54.00 L 456.67 54.00 L 405.83 54.00 L 355.00 54.00 L 304.17 54.00 L 253.33 54.00 L 202.50 54.00 L 151.67 54.00 L 100.83 54.00 L 50.00 54.00 Z" fill="url(#gapGradient)" opacity="0.18"/>
+  <path d="M 50.00 63.60 L 100.83 63.60 L 151.67 63.60 L 202.50 63.60 L 253.33 63.60 L 304.17 63.60 L 355.00 63.60 L 405.83 63.60 L 456.67 63.60 L 507.50 63.60 L 558.33 63.60 L 609.17 63.60 L 660.00 63.60 L 660.00 63.60 L 609.17 63.60 L 558.33 63.60 L 507.50 63.60 L 456.67 63.60 L 405.83 63.60 L 355.00 63.60 L 304.17 63.60 L 253.33 63.60 L 202.50 63.60 L 151.67 63.60 L 100.83 63.60 L 50.00 63.60 Z" fill="url(#gapGradient)" opacity="0.18"/>
 
-  <path d="M 50.00 54.00 L 100.83 54.00 L 151.67 54.00 L 202.50 51.60 L 253.33 51.60 L 304.17 51.60 L 355.00 51.60 L 405.83 51.60 L 456.67 51.60 L 507.50 49.20 L 558.33 49.20 L 609.17 49.20 L 660.00 49.20" stroke="#4F7253" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 50.00 54.00 L 100.83 54.00 L 151.67 54.00 L 202.50 54.00 L 253.33 54.00 L 304.17 54.00 L 355.00 54.00 L 405.83 54.00 L 456.67 54.00 L 507.50 54.00 L 558.33 54.00 L 609.17 54.00 L 660.00 54.00" stroke="#A4452A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
+  <path d="M 50.00 63.60 L 100.83 63.60 L 151.67 63.60 L 202.50 63.60 L 253.33 63.60 L 304.17 63.60 L 355.00 63.60 L 405.83 63.60 L 456.67 63.60 L 507.50 63.60 L 558.33 63.60 L 609.17 63.60 L 660.00 63.60" stroke="#4F7253" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 50.00 63.60 L 100.83 63.60 L 151.67 63.60 L 202.50 63.60 L 253.33 63.60 L 304.17 63.60 L 355.00 63.60 L 405.83 63.60 L 456.67 63.60 L 507.50 63.60 L 558.33 63.60 L 609.17 63.60 L 660.00 63.60" stroke="#A4452A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
 
-  <circle cx="50" cy="54" r="5" fill="#1A1814"/>
-  <text x="50" y="45" text-anchor="middle" font-family="Instrument Serif" font-size="14" fill="#1A1814" font-style="italic">90</text>
+  <circle cx="50" cy="63.599999999999994" r="5" fill="#1A1814"/>
+  <text x="50" y="54.599999999999994" text-anchor="middle" font-family="Instrument Serif" font-size="14" fill="#1A1814" font-style="italic">86</text>
 
-  <circle cx="355" cy="54" r="4" fill="#A4452A"/>
-  <text x="355" y="74" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#A4452A" font-weight="500">90</text>
+  <circle cx="355" cy="63.599999999999994" r="4" fill="#A4452A"/>
+  <text x="355" y="83.6" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#A4452A" font-weight="500">86</text>
 
-  <circle cx="355" cy="51.599999999999994" r="4" fill="#4F7253"/>
-  <text x="355" y="41.599999999999994" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4F7253" font-weight="500">91</text>
+  <circle cx="355" cy="63.599999999999994" r="4" fill="#4F7253"/>
+  <text x="355" y="53.599999999999994" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4F7253" font-weight="500">86</text>
 
-  <text x="660" y="41.19999999999999" font-family="Instrument Serif" font-size="13" fill="#4F7253" font-style="italic" text-anchor="end">92 · Tier A</text>
-  <text x="660" y="72" font-family="Instrument Serif" font-size="13" fill="#A4452A" font-style="italic" text-anchor="end">90 · Tier A</text>
+  <text x="660" y="55.599999999999994" font-family="Instrument Serif" font-size="13" fill="#4F7253" font-style="italic" text-anchor="end">86 · Tier B</text>
+  <text x="660" y="81.6" font-family="Instrument Serif" font-size="13" fill="#A4452A" font-style="italic" text-anchor="end">86 · Tier B</text>
 
   <line x1="355" y1="30" x2="355" y2="270" stroke="#6B6259" stroke-width="0.5" stroke-dasharray="2,3"/>
   <text x="355" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="9" letter-spacing="0.1em" fill="#6B6259">SIX MONTH MARK</text>
 
   <text x="500" y="135" text-anchor="middle" font-family="Instrument Serif" font-size="16" fill="#1A1814" font-style="italic">— the gap —</text>
-  <text x="500" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#4F7253">+2 points / 12 months</text>
+  <text x="500" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#4F7253">holds Grade B / 12 months</text>
 </svg>
       </div>
 
       <div class="projection-legend">
-        <div class="legend-item"><span class="legend-swatch red"></span> <strong>什麼都不做</strong> · 依現有努力分數維持不變</div><div class="legend-item"><span class="legend-swatch green"></span> <strong>使用 BAAM Review</strong> · 持續收集與回覆</div>
+        <div class="legend-item"><span class="legend-swatch red"></span> <strong>什麼都不做</strong> · 依現有努力分數維持不變</div><div class="legend-item"><span class="legend-swatch green"></span> <strong>持續收集與回覆</strong> · 執行節奏維持穩定</div>
       </div>
     </div>
 
-    <div class="projection-impact">
-      <div class="impact-cell">
-        <div class="impact-label">12 個月後分數</div>
-        <div class="impact-value gain">90 → 92</div>
-        <div class="impact-sub">已處於領先 — 持續累積評論鞏固您的 A 級優勢，並向 100 分邁進</div>
+    <p class="forecast-results-intro">
+      評論成長只是手段，真正目標是商業結果與營收改善。
+    </p>
+
+    <div class="forecast-results-grid">
+      <div class="forecast-result-card">
+        <div class="forecast-result-icon">G</div>
+        <div class="forecast-result-title"><strong>Google 排名提升</strong></div>
+        <div class="forecast-result-value">+3 to +4</div>
+        <div class="forecast-result-desc">預估本地搜尋包排名提升（6 個月）</div>
       </div>
-      <div class="impact-cell">
-        <div class="impact-label">排名位置</div>
-        <div class="impact-value gain">+2 to +3</div>
-        <div class="impact-sub">預估本地搜尋包排名提升 · 持續領先在地競爭對手</div>
+      <div class="forecast-result-card">
+        <div class="forecast-result-icon">AI</div>
+        <div class="forecast-result-title"><strong>AI 搜尋可見度提升</strong></div>
+        <div class="forecast-result-value">B → B</div>
+        <div class="forecast-result-desc">AI 可見度等級提升（回答中更常被提及）</div>
       </div>
-      <div class="impact-cell">
-        <div class="impact-label">成果</div>
-        <ul class="impact-results">
-          <li><span class="impact-check">✓</span> Google 排名提升</li><li><span class="impact-check">✓</span> AI 搜尋能見度提升</li><li><span class="impact-check">✓</span> 推薦與回頭客成長</li><li><span class="impact-check">✓</span> 營收成長</li>
-        </ul>
+      <div class="forecast-result-card">
+        <div class="forecast-result-icon">R</div>
+        <div class="forecast-result-title"><strong>轉介紹與留存成長</strong></div>
+        <div class="forecast-result-value forecast-result-value-text">回流與轉介紹循環</div>
+        <div class="forecast-result-desc">願意留下評論的人，更可能再次消費，並主動推薦他人。</div>
+      </div>
+      <div class="forecast-result-card">
+        <div class="forecast-result-icon">$</div>
+        <div class="forecast-result-title"><strong>營收增加</strong></div>
+        <div class="forecast-result-value forecast-result-value-text">營收將持續成長</div>
+        <div class="forecast-result-desc">當排名提升、AI 可見度增加、轉介紹與留存同步成長，營收將確定上行。</div>
+      </div>
+    </div>
+
+    <div class="forecast-cited-research">
+      <div class="forecast-cited-research-kicker">
+        引用研究
+      </div>
+      <div class="forecast-cited-research-list">
+          哈佛商學院 · BrightLocal · Whitespark · Berkeley / Economic Journal · 紐約大學斯特恩商學院 · 美國聯邦貿易委員會 · Google 透明度報告
       </div>
     </div>
   </div>
@@ -2738,8 +2900,8 @@
     <span class="section-marker-title">您的 12 個月行動計劃</span>
   </div>
 
-  <h2 class="section-headline">五件事 · <em>不是三件，不是十件</em></h2>
-  <p class="section-deck">先看基本事實 — 在您的行業中一則評論的價值，以及健康商家維持的累積速率。接著是五項行動，依您最低的子分數排序，逐一縮小差距。</p>
+  <h2 class="section-headline">三項行動 · 更多評論<em>，更多客戶</em></h2>
+  <p class="section-deck">先看基本事實 — 在您的行業中一則評論的價值，以及健康商家維持的累積速率。接著是三項行動，依您最低的子分數排序，逐一縮小差距。</p>
 
   <!-- Ground-truth strip: what one review is worth + the pace a healthy business keeps -->
   <div class="ground-truth">
@@ -2757,8 +2919,8 @@
         <div class="velocity-band aggressive">10+</div>
       </div>
       <div class="velocity-pointer-wrap">
-        <div class="velocity-pointer" style="left: 72.72727272727273%;">
-          <div class="velocity-pointer-label">您 · 8.0 則/月</div>
+        <div class="velocity-pointer" style="left: 59.13461538461539%;">
+          <div class="velocity-pointer-label">您 · 5.0 則/月</div>
         </div>
       </div>
     </div>
@@ -2766,100 +2928,48 @@
 
   <ol class="action-list">
       <li class="action-item">
-        <div class="action-number">i</div>
-        <div class="action-body">
-          <div class="action-title">啟用就診後評論請求流程</div>
-          <div class="action-why">在每次就診後 24–72 小時內，以客戶的語言發送請求 — 這是本次審計中影響最大的單一槓桿。</div>
-          <div class="action-tag-row">
-            <div class="action-result-block">
-              <span class="action-result-label">成效</span>
-              <span class="action-result-value">+2 則評論/月</span>
-            </div>
+        <div class="action-main">
+          <div class="action-number">i</div>
+          <div class="action-body">
+            <div class="action-title">啟用就診後評論請求流程</div>
+            <div class="action-why">在每次就診後 24–72 小時內，以客戶的語言發送請求 — 這是本次審計中影響最大的單一槓桿。</div>
           </div>
         </div>
-        <div class="action-value-block">
-          <div class="action-value-amount">+24</div>
-          <div class="action-value-label">則新評論 / 12 個月</div>
+        <div class="action-result-panel">
+          <span class="action-result-label">成效</span>
+          <span class="action-result-value">+5 則評論/月</span>
           <span class="action-owner-pill baam">BAAM Review</span>
         </div>
       </li>
       <li class="action-item">
-        <div class="action-number">ii</div>
-        <div class="action-body">
-          <div class="action-title">48 小時內回覆每則評論 · 負評 24 小時內</div>
-          <div class="action-why">88% 的消費者會選擇對所有評論都回覆的商家，而對未回覆者僅為 47%。雙語回覆讓效果倍增。</div>
-          <div class="action-tag-row">
-            <div class="action-result-block">
-              <span class="action-result-label">成效</span>
-              <span class="action-result-value">+12% 轉化提升</span>
-            </div>
+        <div class="action-main">
+          <div class="action-number">ii</div>
+          <div class="action-body">
+            <div class="action-title">48 小時內回覆每則評論 · 負評 24 小時內</div>
+            <div class="action-why">88% 的消費者會選擇對所有評論都回覆的商家，而對未回覆者僅為 47%。雙語回覆讓效果倍增。</div>
           </div>
         </div>
-        <div class="action-value-block">
-          <div class="action-value-amount">+10</div>
-          <div class="action-value-label">位新客戶 / 12 個月</div>
+        <div class="action-result-panel">
+          <span class="action-result-label">成效</span>
+          <span class="action-result-value">+12% 轉化提升</span>
           <span class="action-owner-pill baam">BAAM Review</span>
         </div>
       </li>
       <li class="action-item">
-        <div class="action-number">iii</div>
-        <div class="action-body">
-          <div class="action-title">完善每個平台檔案 · 重啟沉睡渠道</div>
-          <div class="action-why">Healthgrades、Zocdoc、Avvo 等行業專屬平台與沉睡的 Facebook 信號都會削弱 Google 對您商家活力的判讀。</div>
-          <div class="action-tag-row">
-            <div class="action-result-block">
-              <span class="action-result-label">成效</span>
-              <span class="action-result-value">+15% 本地搜尋觸及</span>
-            </div>
+        <div class="action-main">
+          <div class="action-number">iii</div>
+          <div class="action-body">
+            <div class="action-title">回覆過往 68 則未回應評論</div>
+            <div class="action-why">由 AI 草擬、店主審核並個性化的歷史評論回覆。同時向 Google 與未來讀者傳遞「您在乎」的訊號 — 無需任何作假。</div>
           </div>
         </div>
-        <div class="action-value-block">
-          <div class="action-value-amount">+16</div>
-          <div class="action-value-label">位新客戶 / 12 個月</div>
-          <span class="action-owner-pill">您與員工</span>
-        </div>
-      </li>
-      <li class="action-item">
-        <div class="action-number">iv</div>
-        <div class="action-body">
-          <div class="action-title">回覆過往 71 則未回應評論</div>
-          <div class="action-why">由 AI 草擬、店主審核並個性化的歷史評論回覆。同時向 Google 與未來讀者傳遞「您在乎」的訊號 — 無需任何作假。</div>
-          <div class="action-tag-row">
-            <div class="action-result-block">
-              <span class="action-result-label">成效</span>
-              <span class="action-result-value">+8% 排名信號</span>
-            </div>
-          </div>
-        </div>
-        <div class="action-value-block">
-          <div class="action-value-amount">+6</div>
-          <div class="action-value-label">位新客戶 / 12 個月</div>
+        <div class="action-result-panel">
+          <span class="action-result-label">成效</span>
+          <span class="action-result-value">+8% 排名信號</span>
           <span class="action-owner-pill baam">BAAM Review</span>
-        </div>
-      </li>
-      <li class="action-item">
-        <div class="action-number">v</div>
-        <div class="action-body">
-          <div class="action-title">在您的官網嵌入即時評論小工具</div>
-          <div class="action-why">評論帶動 SEO · SEO 帶動流量 · 流量帶動預約。同一批評論發揮兩次作用，加上 Schema 標記讓它們有機會出現在 Google 富媒體結果。</div>
-          <div class="action-tag-row">
-            <div class="action-result-block">
-              <span class="action-result-label">成效</span>
-              <span class="action-result-value">+18% 網站轉化</span>
-            </div>
-          </div>
-        </div>
-        <div class="action-value-block">
-          <div class="action-value-amount">+7</div>
-          <div class="action-value-label">位新客戶 / 12 個月</div>
-          <span class="action-owner-pill">BAAM Platform</span>
         </div>
       </li>
   </ol>
-
-  <div class="conclusion-block">
-    <div class="conclusion-eyebrow">§ 結論 · 12 個月模型推估</div><div class="conclusion-title">這套方案為您建立什麼。</div><div class="conclusion-rows"><div class="conclusion-row"><span class="conclusion-tag">數量增長</span><span class="conclusion-text">五項行動執行 12 個月，新增 <strong class="summary-stat">+24</strong> 則評論與 <strong class="summary-stat">+39</strong> 位客戶。</span></div><div class="conclusion-row"><span class="conclusion-tag">資產累積</span><span class="conclusion-text">以每則評論 <strong class="summary-stat">$1,400</strong> 計算，這 <strong class="summary-stat">+24</strong> 則新評論將累積成 <strong class="summary-stat">$33,600</strong> 的評論資產 — 這是企業帳上持有的長期資產，並非收入或營收。</span></div><div class="conclusion-row"><span class="conclusion-tag">成果</span><span class="conclusion-text"><span class="conclusion-results">評論 → 推薦 → 留存 → 營收</span></span></div></div>
-  </div>
 
   <div class="cta-block">
     <div class="cta-eyebrow">兩條路徑 · 同一個計劃</div>
@@ -2869,18 +2979,18 @@
       <div class="cta-path">
         <div class="cta-path-label">路徑 A · 自助方案</div>
         <h4 class="cta-path-title">您自己執行</h4>
-        <div class="cta-path-price">$99 / 月 · 單店 · 30 天免費試用</div>
-        <p class="cta-path-desc">登入系統，每週發送評論請求並親自回覆。您主導流程 · BAAM Review 提供平台、AI 草擬與多語言範本。</p>
+        <div class="cta-path-price">$99 / 月 · 30 天免費試用</div>
+        <p class="cta-path-desc">自動化發送請求。您審核並回覆。我們提供整套系統支援。</p>
       </div>
       <div class="cta-path featured">
         <div class="cta-path-label">路徑 B · 全託管方案</div>
         <h4 class="cta-path-title">由我們替您執行</h4>
         <div class="cta-path-price">$399 / 月 · 30 天免費試用</div>
-        <p class="cta-path-desc">每週寄給我們客戶名單，其他全部由我們處理 — 雙語發送、AI 輔助回覆、每月報告、上述 12 個月計劃。</p>
+        <p class="cta-path-desc">自動化發送請求。所有回覆由我們代您處理，保持您的語氣。</p>
       </div>
     </div>
 
-    <p class="promise-line">對比 <strong>Birdeye</strong> 每月 $299 + $5,000 開通費，或 <strong>Podium</strong> 每月 $399 + 入駐流程。BAAM Review 免費起步，按月計費。</p>
+    <p class="promise-line">對比 <strong>Birdeye</strong> 每月 $299 + 入駐費用，或 <strong>Podium</strong> 每月 $399 + 入駐費用。BAAM Review 免費起步，按月計費。</p>
 
     <div class="cta-action-row">
       <a href="/signup?next=/audit/service%3Faudit%3DBR-2606-ZOSM%26plan%3Dself" target="_top" class="btn-svc dark">啟動自助方案試用 →</a>

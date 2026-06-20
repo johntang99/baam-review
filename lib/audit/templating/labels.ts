@@ -515,7 +515,7 @@ export const STRINGS: Record<
       { num: "03", title: "Competitor comparison", sub: "The names customers see before yours" },
       { num: "04", title: "Service opportunity", sub: "Climbing the grade ladder in 90–120 days" },
       { num: "05", title: "The 12-month forecast", sub: "Your projected score with BAAM Review" },
-      { num: "06", title: "Your action plan", sub: "Five moves, prioritized by sub-score" },
+      { num: "06", title: "Your action plan", sub: "Three moves, prioritized by sub-score" },
       { num: "A", title: "Appendix · reference tables", sub: "The full methodology in two tables" },
     ],
     hook_quote_html: "Average businesses become <em>hot and popular</em> by building reviews relentlessly.<br>Excellent businesses become <em>invisible</em> because they ignore them.",
@@ -541,11 +541,11 @@ export const STRINGS: Record<
     methodology_text_html: "Every score is measured against published vertical benchmarks. <strong>Rating Quality</strong> uses a non-linear curve that rewards the 4.0★ threshold (where 70% of consumers filter). <strong>Review Volume</strong> compares total count to the median for your vertical. <strong>Velocity</strong> scores use BAAM Review Research healthy-pace bands. The black tick marks on each bar show where these standards sit on the 0–100 scale. <a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">Full methodology →</a>",
     velocity_drag_line_html: "The drag on your score is <em style=\"color: var(--rust-deep);\">velocity</em> — and velocity is what you can change starting Monday.",
     forecast_eyebrow: "The Forecast",
-    projection_title_html: "Your score in <em>12 months</em> if you work with BAAM Review.",
+    projection_title_html: "Your score in <em>12 months</em> with sustained collection and response.",
     projection_deck: "With sustained review collection and response your score climbs steadily — while a do-nothing path stays flat. Competitors held at their measured pace.",
     projection_legend_lines: [
       "<span class=\"legend-swatch red\"></span> <strong>Do nothing</strong> · score holds flat at current effort",
-      "<span class=\"legend-swatch green\"></span> <strong>With BAAM Review</strong> · sustained collection + response",
+      "<span class=\"legend-swatch green\"></span> <strong>Sustained collection + response</strong> · execution held consistent",
     ],
     projection_impact_labels: { score: "12-Month Score", ranking: "Ranking Position", revenue: "Results" },
     projection_results_items: [
@@ -590,8 +590,8 @@ export const STRINGS: Record<
     section_5_headline_html: "The names customers <em>see before yours.</em>",
     section_5_deck: "Competitors are identified from Google Maps rankings within your search radius — they may not all be exact matches, but they're a useful point of reference.",
     competitor_table_headers: { business: "Business", address: "Address", score: "Score", rating: "Rating", total: "Total Reviews", last_30d: "Last 30d", last_90d: "Last 90d", trend: "Trend" },
-    section_6_headline_html: "Five moves to more reviews — <em>and more customers.</em>",
-    section_6_deck: "First, the ground truth — what one review is worth in your category, and the pace a healthy business keeps. Then the five moves, prioritized by your lowest sub-scores, to close the gap.",
+    section_6_headline_html: "Three moves to more reviews — <em>and more customers.</em>",
+    section_6_deck: "First, the ground truth — what one review is worth in your category, and the pace a healthy business keeps. Then the three moves, prioritized by your lowest sub-scores, to close the gap.",
     summary_block_html: (m) =>
       `<div class=\"conclusion-eyebrow\">§ Conclusion · Modelled over 12 months</div>` +
       `<div class=\"conclusion-title\">What this plan builds.</div>` +
@@ -605,49 +605,39 @@ export const STRINGS: Record<
     cta_self: {
       label: "Path A · Self-Serve",
       title: "Run it yourself",
-      price: "$99 / month · single location · 30-day free trial",
-      desc: "Log in, send your weekly review requests, reply yourself. You drive the system; BAAM Review provides the platform, AI drafting, and multilingual templates.",
+      price: "$99 / month · 30-day free trial",
+      desc: "Automated requests. You review and reply. We power everything.",
     },
     cta_full: {
       label: "Path B · Full Service",
       title: "We run it for you",
       price: "$399 / month · 30-day free trial",
-      desc: "Send us your weekly customer list. We handle every other step — bilingual sends, AI-assisted responses, monthly reports, the 12-month plan above.",
+      desc: "Automated requests. Everything that comes back, we handle — in your voice.",
     },
-    cta_promise_html: "Compare with <strong>Birdeye</strong> at $299/mo + $5,000 setup, or <strong>Podium</strong> at $399/mo + onboarding. BAAM Review starts free and bills monthly.",
+    cta_promise_html: "Compare with <strong>Birdeye</strong> at $299/mo + onboarding fees, or <strong>Podium</strong> at $399/mo + onboarding fees. BAAM Review starts free and bills monthly.",
     cta_action_self_label: "Start Self-Serve trial →",
     cta_action_full_label: "Start Full Service trial →",
     cta_action_compare_label: "Compare tiers in detail →",
     so_big_title:
       "We help you climb the grade ladder — grow your business",
     so_eyebrow: "§ Service opportunity · Tailored to your audit",
-    so_headline_html: (startingScore, d180Grade, m12Grade) => {
-      const base = `From <span class="so-score-pill">${startingScore}</span> to <em>Grade ${d180Grade}</em> in 90–120 days`;
-      // Only mention the 12-month grade when it's a meaningful jump
-      // beyond d180 — otherwise the headline becomes "to Grade B in 120
-      // days · to Grade B in a year", which reads like nothing happens
-      // in the back half. For most starting scores d180 → m12 advances
-      // one letter (e.g. B → A), which is the punchline worth showing.
-      if (m12Grade && m12Grade !== d180Grade) {
-        return `${base} · <em>Grade ${m12Grade}</em> within a year.`;
-      }
-      return `${base}.`;
-    },
+    so_headline_html: (startingScore) =>
+      `What the model projects from a starting score of <span class="so-score-pill">${startingScore}</span>`,
     so_deck: "Most clients reach the next grade up within 90–120 days of BAAM Review Service. Ranges below are conservative estimates by starting score — not a guarantee, but a defensible projection.",
     so_stat_label_90d: "After 90 days",
     so_stat_label_180d: "After 180 days",
     so_stat_label_12mo: "After 12 months",
     so_tier_self_name_html: "Run it <em>yourself</em>",
     so_tier_self_price: "$99 /mo",
-    so_tier_self_projection_html: (businessName, d90) =>
-      `For ${businessName}, this typically means 90-day score <strong>${d90}</strong>, recovering 3–5 reviews/month. You execute the plan. We power the platform.`,
+    so_tier_self_projection_html: () =>
+      "Automated requests. You review and reply. We power everything.",
     so_tier_self_cta: "Start Self-Serve trial →",
     so_tier_full_name_html: "We run it <em>for you</em>",
     so_tier_full_price: "$399 /mo",
-    so_tier_full_projection_html: (businessName, d90) =>
-      `For ${businessName}, this typically means 90-day score <strong>${d90}</strong>, recovering 5–8 reviews/month. We execute all five actions.`,
+    so_tier_full_projection_html: () =>
+      "Automated requests. Everything that comes back, we handle — in your voice.",
     so_tier_full_cta: "Start Full Service trial →",
-    so_tier_full_recommended: "Recommended",
+    so_tier_full_recommended: "",
     so_compare_link: "Compare both tiers in detail →",
     so_trust_line: "30-DAY FREE TRIAL · CARD REQUIRED, NO CHARGE · CANCEL ANYTIME · USES YOUR EXISTING ACCOUNT",
     inline_service_preview_html: "<strong>This loss is preventable.</strong> Most clients starting at your grade reach the next grade up within 90–120 days of BAAM Review Service. See <em>§ Service Opportunity below</em> for the projection.",
@@ -679,7 +669,7 @@ export const STRINGS: Record<
       { num: "03", title: "競爭對手比較", sub: "客戶比您先看到的名字" },
       { num: "04", title: "服務機會", sub: "90–120 天內提升一個等級" },
       { num: "05", title: "12 個月預測", sub: "與 BAAM Review 合作的預測分數" },
-      { num: "06", title: "您的行動計劃", sub: "五項行動，依子分數排序" },
+      { num: "06", title: "您的行動計劃", sub: "三項行動，依子分數排序" },
       { num: "A", title: "附錄 · 參考數據表", sub: "完整方法論，兩張表呈現" },
     ],
     hook_quote_html: "普通的企業因勤於累積評論而<em>蒸蒸日上</em>，<br>卓越的企業卻因忽視評論而<em>逐漸沉寂</em>。",
@@ -705,11 +695,11 @@ export const STRINGS: Record<
     methodology_text_html: "每項分數均對照已發布的行業基準衡量。<strong>評分品質</strong>使用非線性曲線，重點獎勵 4.0 星門檻（70% 消費者以此篩選）。<strong>評論總數</strong>對比您行業的中位數。<strong>速率</strong>使用 BAAM Review 研究的健康節奏帶。每根柱上的黑色刻度標示這些標準在 0–100 分尺上的位置。<a href=\"https://www.baamreview.com/review-value.html\" target=\"_blank\">完整方法 →</a>",
     velocity_drag_line_html: "拖累您分數的是<em style=\"color: var(--rust-deep);\">速率</em> — 而速率正是您下週一就可以開始改變的環節。",
     forecast_eyebrow: "預測",
-    projection_title_html: "若您與 BAAM Review 合作 · <em>12 個月後的分數</em>",
+    projection_title_html: "在持續收集與回覆下 · <em>12 個月後的分數</em>",
     projection_deck: "透過持續累積與回覆評論，您的分數穩步攀升 — 而什麼都不做則維持不變。競爭對手維持已測得的速率。",
     projection_legend_lines: [
       "<span class=\"legend-swatch red\"></span> <strong>什麼都不做</strong> · 依現有努力分數維持不變",
-      "<span class=\"legend-swatch green\"></span> <strong>使用 BAAM Review</strong> · 持續收集與回覆",
+      "<span class=\"legend-swatch green\"></span> <strong>持續收集與回覆</strong> · 執行節奏維持穩定",
     ],
     projection_impact_labels: { score: "12 個月後分數", ranking: "排名位置", revenue: "成果" },
     projection_results_items: [
@@ -754,8 +744,8 @@ export const STRINGS: Record<
     section_5_headline_html: "在眾多競爭對手中，<em>客戶能看見您嗎？</em>",
     section_5_deck: "競爭對手依您搜尋範圍內的 Google 地圖排名識別 — 未必完全精準，但可供您參考。",
     competitor_table_headers: { business: "商家", address: "地址", score: "分數", rating: "評分", total: "總評論", last_30d: "近 30 天", last_90d: "近 90 天", trend: "趨勢" },
-    section_6_headline_html: "五項行動 · 更多評論<em>，更多客戶</em>",
-    section_6_deck: "先看基本事實 — 在您的行業中一則評論的價值，以及健康商家維持的累積速率。接著是五項行動，依您最低的子分數排序，逐一縮小差距。",
+    section_6_headline_html: "三項行動 · 更多評論<em>，更多客戶</em>",
+    section_6_deck: "先看基本事實 — 在您的行業中一則評論的價值，以及健康商家維持的累積速率。接著是三項行動，依您最低的子分數排序，逐一縮小差距。",
     summary_block_html: (m) =>
       `<div class=\"conclusion-eyebrow\">§ 結論 · 12 個月模型推估</div>` +
       `<div class=\"conclusion-title\">這套方案為您建立什麼。</div>` +
@@ -769,44 +759,39 @@ export const STRINGS: Record<
     cta_self: {
       label: "路徑 A · 自助方案",
       title: "您自己執行",
-      price: "$99 / 月 · 單店 · 30 天免費試用",
-      desc: "登入系統，每週發送評論請求並親自回覆。您主導流程 · BAAM Review 提供平台、AI 草擬與多語言範本。",
+      price: "$99 / 月 · 30 天免費試用",
+      desc: "自動化發送請求。您審核並回覆。我們提供整套系統支援。",
     },
     cta_full: {
       label: "路徑 B · 全託管方案",
       title: "由我們替您執行",
       price: "$399 / 月 · 30 天免費試用",
-      desc: "每週寄給我們客戶名單，其他全部由我們處理 — 雙語發送、AI 輔助回覆、每月報告、上述 12 個月計劃。",
+      desc: "自動化發送請求。所有回覆由我們代您處理，保持您的語氣。",
     },
-    cta_promise_html: "對比 <strong>Birdeye</strong> 每月 $299 + $5,000 開通費，或 <strong>Podium</strong> 每月 $399 + 入駐流程。BAAM Review 免費起步，按月計費。",
+    cta_promise_html: "對比 <strong>Birdeye</strong> 每月 $299 + 入駐費用，或 <strong>Podium</strong> 每月 $399 + 入駐費用。BAAM Review 免費起步，按月計費。",
     cta_action_self_label: "啟動自助方案試用 →",
     cta_action_full_label: "啟動全託管試用 →",
     cta_action_compare_label: "詳細比較兩個方案 →",
     so_big_title:
       "我們幫您逐級攀升 — 帶動業績成長",
     so_eyebrow: "§ 服務機會 · 依您的審計量身定制",
-    so_headline_html: (startingScore, d180Grade, m12Grade) => {
-      const base = `從 <span class="so-score-pill">${startingScore}</span> 提升至 <em>${d180Grade} 級</em>，僅需 90–120 天`;
-      if (m12Grade && m12Grade !== d180Grade) {
-        return `${base} · 一年內達到 <em>${m12Grade} 級</em>。`;
-      }
-      return `${base}。`;
-    },
+    so_headline_html: (startingScore) =>
+      `模型基於起始分數 <span class="so-score-pill">${startingScore}</span> 的推估`,
     so_deck: "大多數客戶在 BAAM Review 服務 90–120 天內提升一個等級。下方範圍依您的起始分數保守估算 — 並非保證，但為可信賴的預測。",
     so_stat_label_90d: "90 天後",
     so_stat_label_180d: "180 天後",
     so_stat_label_12mo: "12 個月後",
     so_tier_self_name_html: "<em>自己</em>運行",
     so_tier_self_price: "$99 /月",
-    so_tier_self_projection_html: (businessName, d90) =>
-      `對 ${businessName} 而言，這通常意味著 90 天分數 <strong>${d90}</strong>，每月恢復 3–5 則評論。您執行計劃，我們提供平台。`,
+    so_tier_self_projection_html: () =>
+      "自動化發送請求。您審核並回覆。我們提供整套系統支援。",
     so_tier_self_cta: "啟動自助方案試用 →",
     so_tier_full_name_html: "由我們<em>替您</em>運行",
     so_tier_full_price: "$399 /月",
-    so_tier_full_projection_html: (businessName, d90) =>
-      `對 ${businessName} 而言，這通常意味著 90 天分數 <strong>${d90}</strong>，每月恢復 5–8 則評論。我們執行全部五項行動。`,
+    so_tier_full_projection_html: () =>
+      "自動化發送請求。所有回覆由我們代您處理，保持您的語氣。",
     so_tier_full_cta: "啟動全託管試用 →",
-    so_tier_full_recommended: "推薦",
+    so_tier_full_recommended: "",
     so_compare_link: "詳細比較兩個方案 →",
     so_trust_line: "30 天免費試用 · 需綁定卡片但不扣款 · 可隨時取消 · 沿用您現有帳號",
     inline_service_preview_html: "<strong>此損失可預防。</strong>大多數與您相同等級的客戶，在 BAAM Review 服務 90–120 天內即可提升一個等級。請見下方 <em>§ 服務機會</em> 區塊的預測。",
