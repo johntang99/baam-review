@@ -148,7 +148,7 @@ export async function buildShortReportModel(
   const ui = isZh
     ? {
         back: "返回完整報告",
-        kicker: "REVIEW AUDIT REPORT",
+        kicker: "GOOGLE REVIEW AUDIT REPORT",
         sentenceA: "如果客戶找不到您，就無法選擇您",
         sentenceB: "Google 與 AI 搜尋對商家排序越來越依賴評論",
         scoreTitle: "評分摘要",
@@ -178,7 +178,7 @@ export async function buildShortReportModel(
       }
     : {
         back: "Back to full report",
-        kicker: "REVIEW AUDIT REPORT",
+        kicker: "GOOGLE REVIEW AUDIT REPORT",
         sentenceA: "Customers can't choose you if they can't find you",
         sentenceB: "Google and AI search rank businesses on reviews",
         scoreTitle: "Score Summary",
@@ -282,7 +282,7 @@ export const SHORT_REPORT_STYLES = `
   .short-letter-page.page:last-of-type { page-break-after: auto; }
   .short-letter-kicker {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.16em;
     color: #6b6259;
@@ -303,17 +303,22 @@ export const SHORT_REPORT_STYLES = `
     padding: 0;
   }
   .short-letter-subtitle {
-    margin: 18px 0 4px;
+    margin: 22px 0 4px;
+    padding-top: 18px;
+    border-top: 1px solid #ddd3bf;
     font-size: 21px;
-    line-height: 1.15;
-    font-weight: 700;
+    line-height: 1.16;
+    font-weight: 800;
     white-space: nowrap;
     letter-spacing: -0.01em;
     text-align: center;
+    color: #2c2925;
   }
   .short-letter-subtitle.soft {
-    margin: 0 0 24px;
-    color: #3d3833;
+    margin: 0 0 26px;
+    padding-top: 0;
+    border-top: 0;
+    color: #2f2b27;
   }
   .short-letter-card {
     border: 1px solid #c9bfae;
