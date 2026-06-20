@@ -40,13 +40,13 @@ const GRADE_LADDER_ZH = [
 ] as const;
 
 function pickShortCompetitorRows<
-  T extends { is_you: boolean; score: number; name: string },
+  T extends { isYou: boolean; score: number; name: string },
 >(rows: T[], target = 8): T[] {
   if (rows.length <= target) return rows;
   const sorted = [...rows].sort((a, b) => b.score - a.score);
   const selected = sorted.slice(0, target);
-  const you = sorted.find((row) => row.is_you);
-  if (you && !selected.some((row) => row.is_you)) {
+  const you = sorted.find((row) => row.isYou);
+  if (you && !selected.some((row) => row.isYou)) {
     selected[target - 1] = you;
     selected.sort((a, b) => b.score - a.score);
   }
