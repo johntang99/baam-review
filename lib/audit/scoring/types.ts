@@ -46,6 +46,7 @@ export const AuditScoreSchema = z.object({
   service_context: z
     .object({
       confirmed_service: z.string().nullable().optional(),
+      confirmed_service_canonical: z.string().nullable().optional(),
     })
     .optional(),
 

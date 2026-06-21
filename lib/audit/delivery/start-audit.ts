@@ -21,8 +21,11 @@ export interface StartAuditInput {
    *  for benchmark + scoring purposes. */
   vertical_override?: VerticalKey;
   /** User-confirmed main service (e.g. "bridal boutique"). When set,
-   *  overrides the auto-derived competitor search keyword. */
+   *  preserved as the user-facing phrase for rendering/report copy. */
   service_override?: string;
+  /** Canonical alias for stable matching/querying/scoring.
+   *  If omitted, derived from `service_override`. */
+  service_override_canonical?: string;
   /** User-picked report language. "auto" (or undefined) lets the
    *  language router decide from Google data — Chinese businesses get
    *  both, everyone else gets English. The explicit choices force the
@@ -50,6 +53,11 @@ export async function runAuditPipeline(
   input: StartAuditInput,
 ): Promise<void> {
   try {
+    const confirmedServiceRaw = String(input.service_override ?? "").trim();
+    const confirmedServiceCanonical = canonicalizeService(
+      input.service_override_canonical || confirmedServiceRaw,
+    );
+
     await updateStage(audit_id, 1);
     const google = await getGoogleBusinessData(input.business_ref, "paid");
 
@@ -63,7 +71,7 @@ export async function runAuditPipeline(
     await updateStage(audit_id, 2);
     const [competitors, platforms] = await Promise.all([
       getCompetitorsData(google, "paid", {
-        service_override: input.service_override,
+        service_override: confirmedServiceCanonical || confirmedServiceRaw || undefined,
       }),
       getAllPlatformsData(google, "paid").catch((e) => {
         console.error(`[audit ${audit_id}] platforms fetch failed:`, e);
@@ -79,7 +87,8 @@ export async function runAuditPipeline(
     const score = {
       ...scoreBase,
       service_context: {
-        confirmed_service: canonicalizeService(input.service_override) || null,
+        confirmed_service: confirmedServiceRaw || null,
+        confirmed_service_canonical: confirmedServiceCanonical || null,
       },
     };
 

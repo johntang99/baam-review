@@ -85,7 +85,6 @@ export async function POST(request: Request) {
 
   const verticalOverride = parseVerticalOverride(body.vertical_override);
   const serviceOverrideRaw = (body.service_override ?? "").trim();
-  const serviceOverride = serviceOverrideRaw || undefined;
   const serviceConfirmed = body.service_confirmed === true;
 
   if (!serviceConfirmed) {
@@ -94,14 +93,14 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  if (!serviceOverride) {
+  if (!serviceOverrideRaw) {
     return NextResponse.json(
       { error: "specific_service_required" },
       { status: 400 },
     );
   }
 
-  const canonicalServiceOverride = canonicalizeService(serviceOverride);
+  const canonicalServiceOverride = canonicalizeService(serviceOverrideRaw);
   if (isBroadServiceSelection(canonicalServiceOverride, verticalOverride)) {
     return NextResponse.json(
       { error: "specific_service_required" },
@@ -146,7 +145,8 @@ export async function POST(request: Request) {
     email: auth.user.email ?? "",
     name: profile?.full_name ?? undefined,
     vertical_override: verticalOverride,
-    service_override: canonicalServiceOverride,
+    service_override: serviceOverrideRaw,
+    service_override_canonical: canonicalServiceOverride,
     language_choice: body.language_choice,
   };
 

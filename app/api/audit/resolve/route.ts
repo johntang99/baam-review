@@ -306,7 +306,11 @@ export async function POST(request: Request) {
       detected_service: detectedService,
       gs_service: serviceDecision.gs_service,
       bs_service: serviceDecision.bs_service,
+      bs_service_canonical: canonicalizeService(serviceDecision.bs_service),
       cs_recommended_service: serviceDecision.cs_recommended_service,
+      cs_recommended_service_canonical: canonicalizeService(
+        serviceDecision.cs_recommended_service,
+      ),
       cs_confidence: serviceDecision.cs_confidence,
       cs_reason_codes: serviceDecision.cs_reason_codes,
       service_candidates: serviceCandidates,

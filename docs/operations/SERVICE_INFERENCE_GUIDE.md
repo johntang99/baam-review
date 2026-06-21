@@ -18,6 +18,8 @@ Main production routes/files:
 - `GS` (`gs_service`): Google-derived service hint (category/type mapping).
 - `BS` (`bs_service`): BAAM service after inference/reconciliation.
 - `CS` (`cs_recommended_service`): final recommended service returned by resolve API.
+- `Canonical service`: normalized alias used for stable matching/query/scoring.
+- `Raw service phrase`: user-visible phrase (typically LLM or user-confirmed wording).
 - `Confirmed service`: user-confirmed service from Step 3 and sent as `service_override` to `/api/audit/generate`.
 
 ---
@@ -37,6 +39,7 @@ When user clicks “Find my business”, `/api/audit/resolve` does:
 6. Apply forced LLM default (`applyLlmForcedDefault`) when primary analyst mode is `llm`.
 7. Return UI payload:
    - `gs_service`, `bs_service`, `cs_recommended_service`
+   - `bs_service_canonical`, `cs_recommended_service_canonical`
    - candidate list/options
    - `primary_analyst`, `service_shadow`
    - `service_model_debug` (provider/model/fallback info)
@@ -137,7 +140,8 @@ This is the source of truth to inspect “which model actually answered”.
 Then pipeline input stores:
 
 - `vertical_override`
-- `service_override`
+- `service_override` (raw user phrase)
+- `service_override_canonical` (normalized alias)
 - language choice
 
 ---
@@ -147,8 +151,8 @@ Then pipeline input stores:
 In async generation (`runAuditPipeline`):
 
 - Google is fetched in paid tier.
-- Competitor discovery uses user-confirmed `service_override`:
-  `getCompetitorsData(..., { service_override })`
+- Competitor discovery uses canonical confirmed service (fallback to raw only if canonical is empty):
+  `getCompetitorsData(..., { service_override: service_override_canonical })`
 - Competitor keyword variants are derived from that service.
 
 This means confirmed service drives:
@@ -157,19 +161,24 @@ This means confirmed service drives:
 - competitor set
 - downstream score/projection context
 
+At the same time, the raw phrase is preserved in score context for display fidelity.
+
 ---
 
 ## 7) Report rendering consistency with confirmed service
 
 To make display consistent with user-confirmed service:
 
-1. During generation, `score_data.service_context.confirmed_service` is persisted.
+1. During generation, both fields are persisted:
+   - `score_data.service_context.confirmed_service` (raw phrase)
+   - `score_data.service_context.confirmed_service_canonical` (normalized alias)
 2. In report data-mapper, cover service display resolves in this order:
-   - `score.service_context.confirmed_service` (preferred)
+   - `score.service_context.confirmed_service` (preferred raw phrase)
+   - `score.service_context.confirmed_service_canonical`
    - legacy fallback from `competitors.search_metadata.primary_keyword` (city-stripped)
    - fallback to `resolveServiceKeyword(google)`
 
-So new audits are fully aligned to confirmed service; old audits still get best-effort alignment.
+So new audits keep user/LLM wording for meaning, while canonical remains available for stable system behavior.
 
 ---
 

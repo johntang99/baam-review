@@ -485,16 +485,19 @@ function formatCoverServiceDisplay(
   score: AuditScore,
   language: AuditLanguage,
 ): string {
-  const raw = canonicalizeService(
-    resolveConfirmedService({
-      google,
-      competitors,
-      score,
-    }),
-  );
-  const service = refineBroadEducationService(raw, google);
+  const resolvedService = resolveConfirmedService({
+    google,
+    competitors,
+    score,
+  });
+  const canonicalService = canonicalizeService(resolvedService);
+  const service = refineBroadEducationService({
+    rawService: resolvedService,
+    canonicalService,
+    google,
+  });
   if (language === "zh") {
-    return translateServiceZh(service);
+    return translateServiceZh(canonicalService || canonicalizeService(service) || service);
   }
   return capitalize(service);
 }
@@ -504,8 +507,13 @@ function resolveConfirmedService(args: {
   competitors: AuditCompetitorsData;
   score: AuditScore;
 }) {
-  const fromScore = canonicalizeService(args.score.service_context?.confirmed_service);
-  if (fromScore) return fromScore;
+  const fromScoreRaw = String(args.score.service_context?.confirmed_service ?? "").trim();
+  if (fromScoreRaw) return fromScoreRaw;
+
+  const fromScoreCanonical = canonicalizeService(
+    args.score.service_context?.confirmed_service_canonical,
+  );
+  if (fromScoreCanonical) return fromScoreCanonical;
 
   const fromKeyword = parseServiceFromPrimaryKeyword(
     args.competitors.search_metadata.primary_keyword,
@@ -527,17 +535,22 @@ function parseServiceFromPrimaryKeyword(keyword: string | null | undefined, city
   return trimmed || raw;
 }
 
-function refineBroadEducationService(service: string, google: AuditGoogleData): string {
-  const normalized = canonicalizeService(service);
+function refineBroadEducationService(args: {
+  rawService: string;
+  canonicalService: string;
+  google: AuditGoogleData;
+}): string {
+  const raw = String(args.rawService ?? "").trim();
+  const normalized = args.canonicalService || canonicalizeService(raw);
   if (normalized && !["school", "academy", "education", "training center"].includes(normalized)) {
-    return normalized;
+    return raw || normalized;
   }
   const text = [
-    google.business.name,
-    google.business.description ?? "",
-    google.vertical.primary_category_display ?? "",
-    google.vertical.primary_category ?? "",
-    (google.vertical.google_categories ?? []).join(" "),
+    args.google.business.name,
+    args.google.business.description ?? "",
+    args.google.vertical.primary_category_display ?? "",
+    args.google.vertical.primary_category ?? "",
+    (args.google.vertical.google_categories ?? []).join(" "),
   ]
     .join(" ")
     .toLowerCase();
@@ -548,7 +561,7 @@ function refineBroadEducationService(service: string, google: AuditGoogleData): 
   if (/\b(school|academy|after school|tutor|tutoring|learning center|test prep)\b/.test(text)) {
     return "tutoring service";
   }
-  return normalized || "local business";
+  return normalized || raw || "local business";
 }
 
 function translateServiceZh(service: string): string {
