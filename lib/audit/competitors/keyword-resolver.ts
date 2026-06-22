@@ -12,7 +12,20 @@ import {
   inferDetailedRetailService,
 } from "../retail-detail-rules";
 import { pickTopComprehensiveService } from "../service-candidate-generator";
-import { isGenericServiceValue } from "../service-taxonomy";
+import { canonicalizeService, isGenericServiceValue } from "../service-taxonomy";
+
+const GENERIC_DISCOVERY_KEYWORDS = new Set([
+  "business",
+  "local business",
+  "service",
+  "services",
+  "company",
+  "shop",
+  "store",
+  "contractor",
+  "manufacturer",
+  "manufacturing",
+]);
 
 const KEYWORD_BY_VERTICAL: Record<VerticalKey, string> = {
   tcm_clinic: "acupuncture",
@@ -70,9 +83,31 @@ const TYPE_REFINEMENTS: Array<{ type: string; keyword: string }> = [
   { type: "optician", keyword: "optician" },
   { type: "sunglasses_store", keyword: "eyewear store" },
   { type: "ophthalmologist", keyword: "ophthalmology clinic" },
+  { type: "obstetrician_gynecologist", keyword: "obgyn" },
+  { type: "gynecologist", keyword: "gynecologist" },
+  { type: "obstetrician", keyword: "obgyn" },
+  { type: "fertility_clinic", keyword: "fertility clinic" },
+  { type: "urgent_care_center", keyword: "urgent care" },
+  { type: "family_practice_physician", keyword: "family medicine clinic" },
+  { type: "internist", keyword: "internal medicine clinic" },
+  { type: "pediatrician", keyword: "pediatrics clinic" },
+  { type: "cardiologist", keyword: "cardiology clinic" },
+  { type: "gastroenterologist", keyword: "gastroenterology clinic" },
+  { type: "neurologist", keyword: "neurology clinic" },
+  { type: "psychiatrist", keyword: "psychiatry clinic" },
+  { type: "psychologist", keyword: "psychology clinic" },
+  { type: "oncologist", keyword: "oncology clinic" },
+  { type: "otolaryngologist", keyword: "ent clinic" },
+  { type: "podiatrist", keyword: "podiatry clinic" },
   { type: "hvac_contractor", keyword: "hvac contractor" },
   { type: "air_conditioning_contractor", keyword: "hvac contractor" },
   { type: "heating_contractor", keyword: "hvac contractor" },
+  { type: "plumber", keyword: "plumber" },
+  { type: "electrician", keyword: "electrician" },
+  { type: "roofing_contractor", keyword: "roofing contractor" },
+  { type: "pest_control_service", keyword: "pest control service" },
+  { type: "locksmith", keyword: "locksmith" },
+  { type: "travel_agency", keyword: "travel agency" },
   { type: "dermatologist", keyword: "dermatologist" },
   // Contractor / home-improvement refinements
   { type: "cabinet_maker", keyword: "kitchen cabinet manufacturer" },
@@ -143,6 +178,23 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
   { pattern: /\b(optometr|eye exam|vision care|vision center)\b/i, keyword: "optometry clinic" },
   { pattern: /\b(optician|contact lenses?)\b/i, keyword: "optician" },
   { pattern: /\b(eyewear|eyeglasses?|glasses|spectacles|sunglasses)\b/i, keyword: "eyewear store" },
+  {
+    pattern: /\b(ob[\s-]?gyn|obgyn|gynecolog|women'?s health|obstetric)\b/i,
+    keyword: "obgyn",
+  },
+  { pattern: /\b(fertility|ivf|reproductive endocrinolog)\b/i, keyword: "fertility clinic" },
+  { pattern: /\b(urgent care|walk[\s-]?in clinic)\b/i, keyword: "urgent care" },
+  { pattern: /\b(family medicine|primary care)\b/i, keyword: "family medicine clinic" },
+  { pattern: /\b(internal medicine|internist)\b/i, keyword: "internal medicine clinic" },
+  { pattern: /\b(pediatrician|children'?s clinic|kids clinic)\b/i, keyword: "pediatrics clinic" },
+  { pattern: /\b(cardiolog|heart clinic)\b/i, keyword: "cardiology clinic" },
+  { pattern: /\b(gastroenterolog|gi clinic|digestive health)\b/i, keyword: "gastroenterology clinic" },
+  { pattern: /\b(neurolog|headache clinic)\b/i, keyword: "neurology clinic" },
+  { pattern: /\b(psychiatr|mental health clinic)\b/i, keyword: "psychiatry clinic" },
+  { pattern: /\b(psycholog|counseling center|therapy center)\b/i, keyword: "psychology clinic" },
+  { pattern: /\b(oncolog|cancer center)\b/i, keyword: "oncology clinic" },
+  { pattern: /\b(otolaryngolog|ear nose throat|\bent\b)\b/i, keyword: "ent clinic" },
+  { pattern: /\b(podiatr|foot and ankle)\b/i, keyword: "podiatry clinic" },
   { pattern: /\b(dermatolog|skin clinic)\b/i, keyword: "dermatologist" },
   { pattern: /\b(chiropract)\b/i, keyword: "chiropractor" },
   { pattern: /\b(physical therap|physiotherap)\b/i, keyword: "physical therapy" },
@@ -243,6 +295,11 @@ const NAME_REFINEMENTS: Array<{ pattern: RegExp; keyword: string }> = [
 
   // Contractor / home-improvement sub-types
   { pattern: /\b(curtains?|blinds?|shutters?|drapery|window treatments?)\b/i, keyword: "window treatment store" },
+  { pattern: /\b(plumb|drain cleaning|water heater)\b/i, keyword: "plumber" },
+  { pattern: /\b(electrician|electrical service|wiring)\b/i, keyword: "electrician" },
+  { pattern: /\b(roofing|roofer)\b/i, keyword: "roofing contractor" },
+  { pattern: /\b(pest control|exterminator|termite)\b/i, keyword: "pest control service" },
+  { pattern: /\b(locksmith|lock repair|lockout)\b/i, keyword: "locksmith" },
   {
     pattern:
       /\b(hvac|air conditioning|a\/c|heating\s*(and|&)\s*cooling|cooling\s*(and|&)\s*heating|furnace|heat pump|duct(work)?|ventilation)\b/i,
@@ -385,6 +442,57 @@ export function resolvePrimaryKeyword(
 //   (test with a real Google Places call first).
 // - Cap at 3 variants — each adds one $0.025 API call per audit.
 const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
+  // Women's health specialty cluster: keeps fallback in-obgyn family when
+  // one phrasing is sparse in Google Places.
+  "women's health clinic": [
+    "women's health clinic",
+    "womens health clinic",
+    "obgyn",
+    "gynecologist",
+    "obstetrics gynecology clinic",
+  ],
+  "womens health clinic": [
+    "womens health clinic",
+    "women's health clinic",
+    "obgyn",
+    "gynecologist",
+    "obstetrics gynecology clinic",
+  ],
+  obgyn: [
+    "obgyn",
+    "gynecologist",
+    "women's health clinic",
+    "womens health clinic",
+    "obstetrics gynecology clinic",
+  ],
+  gynecologist: [
+    "gynecologist",
+    "obgyn",
+    "women's health clinic",
+    "womens health clinic",
+    "obstetrics gynecology clinic",
+  ],
+  "obstetrics gynecology clinic": [
+    "obstetrics gynecology clinic",
+    "obgyn",
+    "gynecologist",
+    "women's health clinic",
+    "womens health clinic",
+  ],
+  "fertility clinic": ["fertility clinic", "ivf clinic", "reproductive medicine clinic"],
+  "urgent care": ["urgent care", "walk in clinic", "after hours clinic"],
+  "family medicine clinic": ["family medicine clinic", "primary care clinic", "family doctor"],
+  "internal medicine clinic": ["internal medicine clinic", "internist", "adult primary care"],
+  "pediatrics clinic": ["pediatrics clinic", "pediatrician", "children clinic"],
+  "cardiology clinic": ["cardiology clinic", "cardiologist", "heart clinic"],
+  "gastroenterology clinic": ["gastroenterology clinic", "gastroenterologist", "gi clinic"],
+  "neurology clinic": ["neurology clinic", "neurologist", "headache clinic"],
+  "psychiatry clinic": ["psychiatry clinic", "psychiatrist", "mental health clinic"],
+  "psychology clinic": ["psychology clinic", "psychologist", "counseling center"],
+  "oncology clinic": ["oncology clinic", "cancer center", "oncologist"],
+  "ent clinic": ["ent clinic", "otolaryngologist", "ear nose throat clinic"],
+  "podiatry clinic": ["podiatry clinic", "podiatrist", "foot ankle clinic"],
+
   // ── Retail / apparel ─────────────────────────────────────────────
   "bridal boutique": ["bridal boutique", "wedding dress shop", "wedding gowns"],
   "jewelry store": ["jewelry store", "fine jewelry", "engagement ring store"],
@@ -467,6 +575,12 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
   "real estate agent": ["real estate agent", "realtor", "real estate broker"],
   "insurance agent": ["insurance agent", "insurance broker"],
   "contractor": ["contractor", "general contractor", "home builder"],
+  "plumbing service": ["plumbing service", "plumber", "drain service"],
+  plumber: ["plumber", "plumbing contractor", "drain service"],
+  electrician: ["electrician", "electrical contractor", "electrical service"],
+  "roofing contractor": ["roofing contractor", "roofer", "roof repair"],
+  "pest control service": ["pest control service", "exterminator", "termite control"],
+  locksmith: ["locksmith", "lock repair", "emergency locksmith"],
   "hvac contractor": [
     "hvac contractor",
     "heating and cooling contractor",
@@ -511,6 +625,7 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
     "vocational school",
   ],
   "language school": ["language school", "esl school", "english school"],
+  "travel agency": ["travel agency", "tour operator", "vacation planner"],
   "kitchen & bath plumbing showroom": [
     "kitchen and bath showroom",
     "plumbing showroom",
@@ -578,6 +693,53 @@ const KEYWORD_SYNONYM_VARIANTS: Record<string, string[]> = {
   "hotel": ["hotel", "boutique hotel"],
   "health food store": ["health food store", "natural foods", "organic grocery"],
 };
+const KEYWORD_VARIANTS_BY_NORMALIZED = buildKeywordVariantIndex(
+  KEYWORD_SYNONYM_VARIANTS,
+);
+const BACKFILL_KEYWORD_TIERS: Record<
+  string,
+  { specialty: string[]; controlled_broad: string[] }
+> = {
+  "women's health clinic": {
+    specialty: [
+      "gynecology clinic",
+      "ob-gyn clinic",
+      "women's healthcare center",
+      "female health clinic",
+    ],
+    controlled_broad: ["women's medical clinic", "medical clinic"],
+  },
+  obgyn: {
+    specialty: [
+      "gynecology clinic",
+      "ob-gyn clinic",
+      "women's healthcare center",
+      "female health clinic",
+    ],
+    controlled_broad: ["women's medical clinic", "medical clinic"],
+  },
+  gynecologist: {
+    specialty: [
+      "gynecology clinic",
+      "ob-gyn clinic",
+      "women's healthcare center",
+      "female health clinic",
+    ],
+    controlled_broad: ["women's medical clinic", "medical clinic"],
+  },
+  "obstetrics gynecology clinic": {
+    specialty: [
+      "gynecology clinic",
+      "ob-gyn clinic",
+      "women's healthcare center",
+      "female health clinic",
+    ],
+    controlled_broad: ["women's medical clinic", "medical clinic"],
+  },
+};
+const BACKFILL_KEYWORD_TIERS_BY_NORMALIZED = buildBackfillKeywordIndex(
+  BACKFILL_KEYWORD_TIERS,
+);
 
 /** Returns 1-N keyword variants for multi-pass competitor discovery.
  *  First variant is the canonical keyword. Additional variants surface
@@ -587,10 +749,83 @@ export function resolvePrimaryKeywords(
   primary: AuditGoogleData,
   serviceOverride?: string,
 ): string[] {
-  const baseKeyword = (serviceOverride?.trim() || resolveServiceKeyword(primary)).trim();
-  const variants = KEYWORD_SYNONYM_VARIANTS[baseKeyword] ?? [baseKeyword];
+  const rawKeyword = (serviceOverride?.trim() || resolveServiceKeyword(primary)).trim();
+  const baseKeyword = canonicalizeService(rawKeyword) || rawKeyword;
+  const signature = normalizeKeywordSignature(baseKeyword);
+  const variants =
+    (signature ? KEYWORD_VARIANTS_BY_NORMALIZED.get(signature) : undefined) ??
+    KEYWORD_SYNONYM_VARIANTS[baseKeyword] ??
+    [baseKeyword];
   const city = primary.business.city;
-  return variants.map((v) => (city ? `${v} ${city}` : v));
+  return unique(variants.map((v) => (city ? `${v} ${city}` : v)));
+}
+
+export function isGenericCompetitorKeyword(
+  input: string | null | undefined,
+): boolean {
+  const normalized = normalizeKeywordSignature(input);
+  if (!normalized) return true;
+  if (GENERIC_DISCOVERY_KEYWORDS.has(normalized)) return true;
+  const words = normalized.split(" ").filter(Boolean);
+  if (words.length === 1 && GENERIC_DISCOVERY_KEYWORDS.has(words[0])) return true;
+  return false;
+}
+
+export function resolveRelatedKeywordsFromPrimaryKeyword(args: {
+  primary_keyword: string | null | undefined;
+  city?: string | null;
+}): string[] {
+  const raw = (args.primary_keyword || "").trim();
+  if (!raw) return [];
+  const canonical = canonicalizeService(raw) || raw;
+  const signature = normalizeKeywordSignature(canonical);
+  if (!signature) return [];
+  const variants = KEYWORD_VARIANTS_BY_NORMALIZED.get(signature) ?? [];
+  if (variants.length === 0) return [];
+  const siblings = variants.filter(
+    (variant) => normalizeKeywordSignature(variant) !== signature,
+  );
+  if (siblings.length === 0) return [];
+  const city = (args.city || "").trim();
+  return unique(
+    siblings.map((variant) => (city ? `${variant} ${city}` : variant)),
+  ).slice(0, 3);
+}
+
+export function resolveBackfillKeywordsFromPrimaryKeyword(args: {
+  primary_keyword: string | null | undefined;
+  city?: string | null;
+}) {
+  const raw = (args.primary_keyword || "").trim();
+  if (!raw) {
+    return {
+      specialty: [] as string[],
+      controlled_broad: [] as string[],
+    };
+  }
+  const canonical = canonicalizeService(raw) || raw;
+  const signature = normalizeKeywordSignature(canonical);
+  if (!signature) {
+    return {
+      specialty: [] as string[],
+      controlled_broad: [] as string[],
+    };
+  }
+  const tiers = BACKFILL_KEYWORD_TIERS_BY_NORMALIZED.get(signature);
+  if (!tiers) {
+    return {
+      specialty: [] as string[],
+      controlled_broad: [] as string[],
+    };
+  }
+  const city = (args.city || "").trim();
+  const withCity = (keywords: string[]) =>
+    unique(keywords.map((keyword) => (city ? `${keyword} ${city}` : keyword)));
+
+  return {
+    specialty: withCity(tiers.specialty).slice(0, 4),
+    controlled_broad: withCity(tiers.controlled_broad).slice(0, 3),
+  };
 }
 
 function buildIndustryEvidenceText(primary: AuditGoogleData) {
@@ -639,4 +874,46 @@ function extractWebsiteKeywordSignal(inputUrl: string | null | undefined) {
   } catch {
     return normalizeEvidenceText(raw.replace(/[\/._-]+/g, " "));
   }
+}
+
+function normalizeKeywordSignature(input: string | null | undefined) {
+  return (input || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildKeywordVariantIndex(source: Record<string, string[]>) {
+  const out = new Map<string, string[]>();
+  for (const [key, variants] of Object.entries(source)) {
+    const signature = normalizeKeywordSignature(key);
+    if (!signature) continue;
+    const prior = out.get(signature) ?? [];
+    out.set(signature, unique([...prior, ...variants]));
+  }
+  return out;
+}
+
+function buildBackfillKeywordIndex(
+  source: Record<string, { specialty: string[]; controlled_broad: string[] }>,
+) {
+  const out = new Map<string, { specialty: string[]; controlled_broad: string[] }>();
+  for (const [key, tiers] of Object.entries(source)) {
+    const signature = normalizeKeywordSignature(key);
+    if (!signature) continue;
+    const prior = out.get(signature) ?? { specialty: [], controlled_broad: [] };
+    out.set(signature, {
+      specialty: unique([...prior.specialty, ...tiers.specialty]),
+      controlled_broad: unique([...prior.controlled_broad, ...tiers.controlled_broad]),
+    });
+  }
+  return out;
+}
+
+function unique(values: string[]) {
+  return Array.from(
+    new Set(values.map((value) => value.trim()).filter(Boolean)),
+  );
 }

@@ -210,3 +210,19 @@ When validating service behavior in production:
 4. Verify report display service:
    - should match `score_data.service_context.confirmed_service` for new audits.
 
+---
+
+## 10) Competitor Preview Backfill (Intake Step 3)
+
+For the inline competitor preview (`/api/audit/competitors/preview`), if the
+strict shortlist is sparse, the system runs tiered backfill queries and exposes
+them in `search_metadata.fallback_keyword_variants` + `fallback_reason`.
+
+Current women’s-health backfill tiers:
+
+- Tier 1 (specialty): `gynecology clinic`, `ob-gyn clinic`, `women's healthcare center`, `female health clinic`
+- Tier 2 (controlled broad): `women's medical clinic`, `medical clinic`
+
+The intake UI displays these as **Backfill keywords** in the competitor preview
+note so operators can see exactly why additional competitors appeared.
+

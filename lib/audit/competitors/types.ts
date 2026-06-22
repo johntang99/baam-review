@@ -15,10 +15,17 @@ export const AuditCompetitorsDataSchema = z.object({
   competitors: z.array(AuditCompetitorSchema),
   search_metadata: z.object({
     primary_keyword: z.string(),
+    primary_service_keyword: z.string().optional(),
     keyword_variants: z.array(z.string()).optional(),
+    fallback_keyword_variants: z.array(z.string()).optional(),
+    fallback_reason: z.string().optional(),
+    selected_place_ids: z.array(z.string()).optional(),
+    selection_mode: z.enum(["search", "manual_selected"]).optional(),
     radius_used_miles: z.number(),
     total_candidates_found: z.number().int().min(0),
     candidates_excluded: z.number().int().min(0),
+    discovery_pool_size: z.number().int().min(0).optional(),
+    strict_pool_size: z.number().int().min(0).optional(),
   }),
   competitor_aggregate: z.object({
     avg_rating: z.number().nullable(),
@@ -41,6 +48,10 @@ export interface GetCompetitorsOptions {
   count?: number;
   radius_miles?: number;
   exclude_place_ids?: string[];
+  /** If provided, skip search and use these selected places directly. */
+  include_place_ids?: string[];
+  /** Used by intake preview to favor specialty matches and suppress noisy duplicates. */
+  preview_mode?: boolean;
   /** Force a specific service keyword (e.g. "bridal boutique"). When set,
    *  overrides the auto-detected service from Google types / name tokens. */
   service_override?: string;

@@ -26,6 +26,8 @@ export interface StartAuditInput {
   /** Canonical alias for stable matching/querying/scoring.
    *  If omitted, derived from `service_override`. */
   service_override_canonical?: string;
+  /** Optional competitor place IDs selected during intake preview. */
+  selected_competitor_place_ids?: string[];
   /** User-picked report language. "auto" (or undefined) lets the
    *  language router decide from Google data — Chinese businesses get
    *  both, everyone else gets English. The explicit choices force the
@@ -72,6 +74,7 @@ export async function runAuditPipeline(
     const [competitors, platforms] = await Promise.all([
       getCompetitorsData(google, "paid", {
         service_override: confirmedServiceCanonical || confirmedServiceRaw || undefined,
+        include_place_ids: input.selected_competitor_place_ids,
       }),
       getAllPlatformsData(google, "paid").catch((e) => {
         console.error(`[audit ${audit_id}] platforms fetch failed:`, e);

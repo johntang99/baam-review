@@ -24,6 +24,10 @@ const ERROR_LABELS: Record<string, string> = {
     "Please choose a specific service before generating the audit.",
   specific_service_selection_required:
     "Please pick one service from the suggested specific service options.",
+  competitor_selection_required:
+    "Please generate competitors and select at least one before generating the audit.",
+  competitor_selection_stale:
+    "Service changed after competitor preview. Please regenerate competitors before generating the audit.",
 };
 
 const VERTICAL_LABELS: Record<string, string> = {
@@ -141,6 +145,35 @@ interface ResolvedBusiness {
   website_match: "match" | "mismatch" | "no_user_input" | "no_google_data";
 }
 
+interface CompetitorPreviewItem {
+  rank: number;
+  place_id: string | null;
+  name: string;
+  city: string | null;
+  rating: number | null;
+  total_count: number;
+  distance_miles: number | null;
+  primary_category: string | null;
+}
+
+interface CompetitorPreviewResult {
+  generated_at: string;
+  service_override: string;
+  search_metadata: {
+    primary_keyword: string;
+    primary_service_keyword?: string;
+    keyword_variants?: string[];
+    fallback_keyword_variants?: string[];
+    fallback_reason?: string;
+    radius_used_miles: number;
+    total_candidates_found: number;
+    candidates_excluded: number;
+    discovery_pool_size?: number;
+    strict_pool_size?: number;
+  };
+  competitors: CompetitorPreviewItem[];
+}
+
 export function IntakeForm({ initialError }: IntakeFormProps) {
   const router = useRouter();
   const [step, setStep] = useState<"input" | "confirm">("input");
@@ -158,6 +191,12 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
   const [shakeField, setShakeField] = useState<"address" | "website" | null>(null);
   const [showConfirmReminder, setShowConfirmReminder] = useState(false);
   const [showAllSuggestions, setShowAllSuggestions] = useState(false);
+  const [isPreviewPending, setIsPreviewPending] = useState(false);
+  const [competitorPreview, setCompetitorPreview] =
+    useState<CompetitorPreviewResult | null>(null);
+  const [competitorPreviewError, setCompetitorPreviewError] = useState<string | null>(null);
+  const [selectedPreviewCompetitorPlaceIds, setSelectedPreviewCompetitorPlaceIds] =
+    useState<string[]>([]);
 
   const error = localError ?? initialError ?? null;
 
@@ -228,12 +267,62 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
       );
       setShowAllSuggestions(false);
       setServiceConfirmed(false);
+      setCompetitorPreview(null);
+      setCompetitorPreviewError(null);
+      setSelectedPreviewCompetitorPlaceIds([]);
       setStep("confirm");
     } catch (err) {
       console.error("[intake] resolve failed:", err);
       setLocalError("Couldn't reach the server. Check your connection and try again.");
     } finally {
       setIsPending(false);
+    }
+  }
+
+  async function handleGenerateCompetitors() {
+    if (!resolved) return;
+    const serviceOverride = service.trim();
+    if (!serviceOverride) {
+      setCompetitorPreviewError("Please enter a service before generating competitors.");
+      return;
+    }
+
+    setCompetitorPreviewError(null);
+    setIsPreviewPending(true);
+    try {
+      const res = await fetch("/api/audit/competitors/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          place_id: resolved.place_id,
+          service_override: serviceOverride,
+          count: 7,
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as
+        | CompetitorPreviewResult
+        | { error?: string };
+      if (!res.ok) {
+        const code = "error" in data ? (data.error ?? "") : "";
+        setCompetitorPreviewError(
+          ERROR_LABELS[code] ?? code ?? "Couldn't generate competitors right now.",
+        );
+        return;
+      }
+      const preview = data as CompetitorPreviewResult;
+      setCompetitorPreview(preview);
+      setSelectedPreviewCompetitorPlaceIds(
+        preview.competitors
+          .map((item) => item.place_id)
+          .filter((value): value is string => Boolean(value)),
+      );
+    } catch (err) {
+      console.error("[intake] competitors preview failed:", err);
+      setCompetitorPreviewError(
+        "Couldn't reach the server while generating competitors. Please try again.",
+      );
+    } finally {
+      setIsPreviewPending(false);
     }
   }
 
@@ -247,6 +336,31 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
     if (isBroadServiceInput(service.trim(), vertical)) {
       setLocalError(
         "Please select a specific service. Broad labels are blocked for audit generation.",
+      );
+      return;
+    }
+    const previewIsStaleForGenerate =
+      !!competitorPreview &&
+      normalizePreviewService(service) !==
+        normalizePreviewService(competitorPreview.service_override);
+    const selectedCompetitorPlaceIdsForGenerate = previewIsStaleForGenerate
+      ? []
+      : selectedPreviewCompetitorPlaceIds;
+    if (!competitorPreview) {
+      setLocalError(
+        "Please generate competitors before generating the audit.",
+      );
+      return;
+    }
+    if (previewIsStaleForGenerate) {
+      setLocalError(
+        "Service changed after competitor preview. Please regenerate competitors before generating the audit.",
+      );
+      return;
+    }
+    if (selectedCompetitorPlaceIdsForGenerate.length === 0) {
+      setLocalError(
+        "Please select at least one competitor before generating the audit.",
       );
       return;
     }
@@ -270,6 +384,8 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           service_options: resolved.service_options ?? [],
           service_shadow: resolved.service_shadow,
           service_confirmed: serviceConfirmed,
+          selected_competitor_place_ids: selectedCompetitorPlaceIdsForGenerate,
+          preview_service_override: competitorPreview.service_override,
         }),
       });
       if (!res.ok) {
@@ -309,6 +425,28 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
     const confidencePct = Math.round(resolved.cs_confidence * 100);
     const isModerateConfidence = resolved.cs_confidence < 0.75;
     const finalService = service.trim() || "—";
+    const normalizedCurrentService = normalizePreviewService(service);
+    const normalizedPreviewService = normalizePreviewService(
+      competitorPreview?.service_override ?? "",
+    );
+    const previewIsStale =
+      !!competitorPreview &&
+      !!normalizedCurrentService &&
+      normalizedCurrentService !== normalizedPreviewService;
+    const previewGeneratedAt = competitorPreview?.generated_at
+      ? new Date(competitorPreview.generated_at)
+      : null;
+    const previewGeneratedLabel =
+      previewGeneratedAt && !Number.isNaN(previewGeneratedAt.getTime())
+        ? previewGeneratedAt.toLocaleTimeString()
+        : "";
+    const selectablePreviewPlaceIds = (competitorPreview?.competitors ?? [])
+      .map((item) => item.place_id)
+      .filter((value): value is string => Boolean(value));
+    const selectedPreviewPlaceIdSet = new Set(selectedPreviewCompetitorPlaceIds);
+    const selectedPreviewCount = selectablePreviewPlaceIds.filter((value) =>
+      selectedPreviewPlaceIdSet.has(value),
+    ).length;
     const topServiceCandidates = resolved.service_candidates ?? [];
     const serviceOptions = resolved.service_options ?? [];
     const llmServiceCandidates = resolved.llm_service_candidates ?? [];
@@ -757,7 +895,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 }}
               >
                 <span style={stepCircleStyle}>3</span>
-                <span>Final service selection</span>
+                <span>Final service selection and competitor generation</span>
               </h4>
               {isModerateConfidence ? (
                 <span
@@ -967,6 +1105,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       setVertical(e.target.value);
                       setServiceConfirmed(false);
                       setShowConfirmReminder(false);
+                      setCompetitorPreviewError(null);
                     }}
                     disabled={isPending}
                     style={{
@@ -1009,6 +1148,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       setService(e.target.value);
                       setServiceConfirmed(false);
                       setShowConfirmReminder(false);
+                      setCompetitorPreviewError(null);
                     }}
                     disabled={isPending}
                     placeholder="e.g., bridal boutique, pediatric dentist"
@@ -1077,6 +1217,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                             setService(option);
                             setServiceConfirmed(false);
                             setShowConfirmReminder(false);
+                            setCompetitorPreviewError(null);
                           }}
                           disabled={isPending}
                           style={{
@@ -1121,6 +1262,281 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                   ) : null}
                 </div>
               ) : null}
+
+              <div
+                style={{
+                  marginTop: 12,
+                  border: "1px solid var(--rule-soft)",
+                  borderRadius: 8,
+                  background: "#fff",
+                  padding: 10,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-mute)",
+                    fontWeight: 700,
+                  }}
+                >
+                  Competitor preview (Places)
+                </div>
+                <p style={{ marginTop: 6, fontSize: 12, color: "var(--ink-soft)" }}>
+                  Change service, then generate a fast competitor set preview before final
+                  audit generation.
+                </p>
+
+                <div
+                  style={{
+                    marginTop: 8,
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 8,
+                    alignItems: "center",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={handleGenerateCompetitors}
+                    disabled={isPending || isPreviewPending || !service.trim()}
+                    style={{
+                      border: "1px solid var(--ink)",
+                      borderRadius: 999,
+                      background: "var(--ink)",
+                      color: "var(--cream-light)",
+                      padding: "7px 14px",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor:
+                        isPending || isPreviewPending || !service.trim()
+                          ? "default"
+                          : "pointer",
+                    }}
+                  >
+                    {isPreviewPending
+                      ? "Generating competitors…"
+                      : competitorPreview
+                        ? "Regenerate competitors"
+                        : "Generate competitors"}
+                  </button>
+
+                  {competitorPreview ? (
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: previewIsStale ? "var(--amber-deep)" : "var(--ink-soft)",
+                      }}
+                    >
+                      {previewIsStale
+                        ? "Preview is stale — service changed. Regenerate to refresh."
+                        : previewGeneratedLabel
+                          ? `Generated at ${previewGeneratedLabel}`
+                          : "Preview ready"}
+                    </span>
+                  ) : null}
+                </div>
+
+                {competitorPreviewError ? (
+                  <div
+                    style={{
+                      marginTop: 9,
+                      border: "1px solid rgba(164, 69, 42, 0.3)",
+                      background: "rgba(164, 69, 42, 0.08)",
+                      borderRadius: 8,
+                      padding: "8px 10px",
+                      fontSize: 12,
+                      color: "#842F1B",
+                    }}
+                  >
+                    {competitorPreviewError}
+                  </div>
+                ) : null}
+
+                {competitorPreview ? (
+                  <div
+                    style={{
+                      marginTop: 10,
+                      border: "1px solid var(--rule-soft)",
+                      borderRadius: 8,
+                      background: "var(--cream-light)",
+                      padding: 10,
+                    }}
+                  >
+                    <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.4 }}>
+                      <strong style={{ color: "var(--ink)" }}>Primary query:</strong>{" "}
+                      {competitorPreview.search_metadata.primary_keyword}
+                      {" · "}
+                      <strong style={{ color: "var(--ink)" }}>Variants:</strong>{" "}
+                      {(competitorPreview.search_metadata.keyword_variants ?? []).length}
+                      {" · "}
+                      <strong style={{ color: "var(--ink)" }}>Found:</strong>{" "}
+                      {competitorPreview.search_metadata.total_candidates_found}
+                      {" · "}
+                      <strong style={{ color: "var(--ink)" }}>Returned:</strong>{" "}
+                      {competitorPreview.competitors.length}
+                      {competitorPreview.search_metadata.fallback_reason ? (
+                        <>
+                          {" · "}
+                          <strong style={{ color: "var(--ink)" }}>Fallback:</strong>{" "}
+                          {competitorPreview.search_metadata.fallback_reason}
+                        </>
+                      ) : null}
+                    </div>
+                    {(
+                      competitorPreview.search_metadata.fallback_keyword_variants ??
+                      []
+                    ).length > 0 ? (
+                      <div
+                        style={{
+                          marginTop: 6,
+                          fontSize: 11,
+                          color: "var(--ink-soft)",
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        <strong style={{ color: "var(--ink)" }}>Backfill keywords:</strong>{" "}
+                        {(competitorPreview.search_metadata.fallback_keyword_variants ?? []).join(
+                          " · ",
+                        )}
+                      </div>
+                    ) : null}
+
+                    <div
+                      style={{
+                        marginTop: 8,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 10,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>
+                        Selected for final report:{" "}
+                        <strong style={{ color: "var(--ink)" }}>
+                          {selectedPreviewCount}/{selectablePreviewPlaceIds.length}
+                        </strong>
+                        {previewIsStale ? (
+                          <span style={{ marginLeft: 8, color: "var(--amber-deep)" }}>
+                            (stale preview: regenerate before selection applies)
+                          </span>
+                        ) : null}
+                      </div>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSelectedPreviewCompetitorPlaceIds(selectablePreviewPlaceIds)
+                          }
+                          disabled={selectablePreviewPlaceIds.length === 0}
+                          style={{
+                            border: "1px solid var(--rule)",
+                            background: "#fff",
+                            borderRadius: 999,
+                            padding: "4px 10px",
+                            fontSize: 12,
+                            color: "var(--ink-soft)",
+                            cursor:
+                              selectablePreviewPlaceIds.length === 0 ? "default" : "pointer",
+                          }}
+                        >
+                          Select all
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPreviewCompetitorPlaceIds([])}
+                          disabled={selectedPreviewCount === 0}
+                          style={{
+                            border: "1px solid var(--rule)",
+                            background: "#fff",
+                            borderRadius: 999,
+                            padding: "4px 10px",
+                            fontSize: 12,
+                            color: "var(--ink-soft)",
+                            cursor: selectedPreviewCount === 0 ? "default" : "pointer",
+                          }}
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: 8, display: "grid", gap: 7 }}>
+                      {competitorPreview.competitors.map((item) => (
+                        <div
+                          key={item.place_id ?? `${item.rank}-${item.name}`}
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "26px 40px 1fr auto",
+                            gap: 10,
+                            alignItems: "center",
+                            border: "1px solid var(--rule-soft)",
+                            borderRadius: 8,
+                            background: "#fff",
+                            padding: "7px 9px",
+                          }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "center" }}>
+                            <input
+                              type="checkbox"
+                              checked={
+                                item.place_id
+                                  ? selectedPreviewPlaceIdSet.has(item.place_id)
+                                  : false
+                              }
+                              disabled={!item.place_id}
+                              onChange={(e) => {
+                                const placeId = item.place_id;
+                                if (!placeId) return;
+                                setSelectedPreviewCompetitorPlaceIds((prev) => {
+                                  if (e.target.checked) {
+                                    return prev.includes(placeId)
+                                      ? prev
+                                      : [...prev, placeId];
+                                  }
+                                  return prev.filter((id) => id !== placeId);
+                                });
+                              }}
+                              style={{ cursor: item.place_id ? "pointer" : "default" }}
+                            />
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 700,
+                              color: "var(--ink-soft)",
+                              textAlign: "center",
+                            }}
+                          >
+                            #{item.rank}
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 13, color: "var(--ink)", fontWeight: 600 }}>
+                              {item.name}
+                            </div>
+                            <div style={{ marginTop: 2, fontSize: 11, color: "var(--ink-soft)" }}>
+                              {item.primary_category || "Category unknown"}
+                              {item.city ? ` · ${item.city}` : ""}
+                            </div>
+                          </div>
+                          <div style={{ textAlign: "right", fontSize: 12, color: "var(--ink-soft)" }}>
+                            <div>
+                              ★ {item.rating?.toFixed(1) ?? "—"} · {item.total_count} reviews
+                            </div>
+                            <div style={{ marginTop: 2 }}>
+                              {item.distance_miles != null
+                                ? `${item.distance_miles.toFixed(1)} mi`
+                                : "distance —"}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
 
               {isModerateConfidence ? (
                 <div
@@ -1199,18 +1615,15 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                   style={{ marginTop: 2 }}
                 />
                 <span>
-                  I confirm the selected <strong>Industry</strong> and{" "}
-                  <strong>Final Service</strong> for this audit.
+                  I confirm the selected <strong>Industry</strong>,{" "}
+                  <strong>Final Service</strong>, and <strong>Competitors</strong>{" "}
+                  are correct for this audit.
                   <span style={{ display: "block", marginTop: 6, color: "var(--ink-soft)" }}>
-                    Final service used now: <b>{finalService}</b>. Generate stays blocked until this is checked.
+                    Final service: <b>{finalService}</b>. Competitors selected:{" "}
+                    <b>{selectedPreviewCount}</b>. Review carefully before generating.
                   </span>
                 </span>
               </label>
-              {!serviceConfirmed ? (
-                <div style={{ marginTop: 10, fontSize: 12, color: "var(--amber-deep)" }}>
-                  Please confirm before generating.
-                </div>
-              ) : null}
             </div>
           </section>
 
@@ -1275,7 +1688,8 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                 Please confirm before generating
               </h3>
               <p style={{ margin: "10px 0 0", fontSize: 14, color: "var(--ink-soft)" }}>
-                Review Industry and Recommended Service, then check the confirmation box to continue.
+                Verify Industry, Final Service, and selected Competitors, then check
+                the confirmation box to continue.
               </p>
               <div
                 style={{
@@ -1459,4 +1873,12 @@ function isBroadServiceInput(value: string, vertical?: string) {
   const normalized = value.trim().toLowerCase().replace(/\s+/g, " ");
   if (!normalized) return true;
   return isBroadServiceTerm(normalized, { vertical });
+}
+
+function normalizePreviewService(value: string) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[’`]/g, "'")
+    .replace(/\s+/g, " ");
 }

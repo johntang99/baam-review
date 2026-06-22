@@ -144,6 +144,21 @@ const SERVICE_TAXONOMY: readonly ServiceTaxonomyEntry[] = [
     specificity: 4,
   },
   {
+    canonical: "women's health clinic",
+    aliases: [
+      "womens health clinic",
+      "women's healthcare clinic",
+      "women healthcare clinic",
+      "women's healthcare center",
+      "women healthcare center",
+      "ob gyn clinic",
+      "ob-gyn clinic",
+      "gynecology clinic",
+      "gynecological clinic",
+    ],
+    specificity: 4,
+  },
+  {
     canonical: "cabinet maker",
     aliases: ["cabinetry contractor", "millwork shop"],
     specificity: 3,
@@ -602,6 +617,7 @@ export function normalizeServiceText(input: string | null | undefined) {
   return input
     .trim()
     .toLowerCase()
+    .replace(/[’`]/g, "'")
     .replace(/[_/]+/g, " ")
     .replace(/-/g, " ")
     .replace(/\s+/g, " ");

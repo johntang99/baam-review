@@ -35,6 +35,10 @@ interface GenerateRequest {
   vertical_override?: string;
   /** User-confirmed main-service keyword (e.g. "bridal boutique"). */
   service_override?: string;
+  /** Optional place IDs selected in competitor preview. */
+  selected_competitor_place_ids?: string[];
+  /** Service value used when generating competitor preview. */
+  preview_service_override?: string;
   /** Report-language choice from the intake form. "auto" defers to the
    *  language router (Chinese businesses → both, else English). */
   language_choice?: "auto" | "en" | "zh" | "both";
@@ -85,6 +89,10 @@ export async function POST(request: Request) {
 
   const verticalOverride = parseVerticalOverride(body.vertical_override);
   const serviceOverrideRaw = (body.service_override ?? "").trim();
+  const previewServiceOverrideRaw = (body.preview_service_override ?? "").trim();
+  const selectedCompetitorPlaceIds = parseSelectedCompetitorPlaceIds(
+    body.selected_competitor_place_ids,
+  );
   const serviceConfirmed = body.service_confirmed === true;
 
   if (!serviceConfirmed) {
@@ -104,6 +112,19 @@ export async function POST(request: Request) {
   if (isBroadServiceSelection(canonicalServiceOverride, verticalOverride)) {
     return NextResponse.json(
       { error: "specific_service_required" },
+      { status: 400 },
+    );
+  }
+  if (selectedCompetitorPlaceIds.length === 0) {
+    return NextResponse.json(
+      { error: "competitor_selection_required" },
+      { status: 400 },
+    );
+  }
+  const canonicalPreviewService = canonicalizeService(previewServiceOverrideRaw);
+  if (!canonicalPreviewService || canonicalPreviewService !== canonicalServiceOverride) {
+    return NextResponse.json(
+      { error: "competitor_selection_stale" },
       { status: 400 },
     );
   }
@@ -147,6 +168,7 @@ export async function POST(request: Request) {
     vertical_override: verticalOverride,
     service_override: serviceOverrideRaw,
     service_override_canonical: canonicalServiceOverride,
+    selected_competitor_place_ids: selectedCompetitorPlaceIds,
     language_choice: body.language_choice,
   };
 
@@ -249,4 +271,13 @@ function extractTextFromMapsUrl(input: string): string | null {
   } catch {
     return null;
   }
+}
+
+function parseSelectedCompetitorPlaceIds(input: string[] | undefined) {
+  if (!Array.isArray(input)) return [];
+  const cleaned = input
+    .map((value) => String(value ?? "").trim())
+    .filter((value) => value.length > 0)
+    .filter((value) => value.length <= 256);
+  return Array.from(new Set(cleaned)).slice(0, 12);
 }
