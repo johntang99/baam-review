@@ -9,21 +9,34 @@ import { CacheError } from "../errors";
 
 const TABLE = "audit_business_data";
 
-// Cast: audit_business_data is not yet in generated Database types.
-// Regenerate via supabase gen types once CLI is installed; for now we
-// treat this table as untyped at the client boundary.
 function untypedFrom(supabase: ReturnType<typeof createServiceClient>) {
+  // Cast: audit_business_data is not yet in generated Database types.
+  // Regenerate via supabase gen types once CLI is installed; for now we
+  // treat this table as untyped at the client boundary.
   return (supabase as unknown as {
     from: (table: string) => {
       select: (cols: string) => {
-        eq: (col: string, val: string) => {
-          eq: (col: string, val: string) => {
-            gt: (col: string, val: string) => {
+        eq: (
+          col: string,
+          val: string,
+        ) => {
+          eq: (
+            col: string,
+            val: string,
+          ) => {
+            gt: (
+              col: string,
+              val: string,
+            ) => {
               maybeSingle: () => Promise<{
                 data: { data: unknown } | null;
                 error: { message: string } | null;
               }>;
             };
+            maybeSingle: () => Promise<{
+              data: { data: unknown } | null;
+              error: { message: string } | null;
+            }>;
           };
         };
       };
@@ -80,4 +93,25 @@ export async function writeCachedAuditData(
   });
 
   if (error) throw new CacheError(`write failed: ${error.message}`);
+}
+
+export async function readCachedAuditDataAllowExpired(
+  placeId: string,
+  tier: Tier,
+): Promise<AuditGoogleData | null> {
+  const supabase = createServiceClient();
+
+  const { data, error } = await untypedFrom(supabase)
+    .select("data")
+    .eq("place_id", placeId)
+    .eq("tier", tier)
+    .maybeSingle();
+
+  if (error) throw new CacheError(`read stale failed: ${error.message}`);
+  if (!data) return null;
+
+  const parsed = AuditGoogleDataSchema.safeParse(data.data);
+  if (!parsed.success) return null;
+
+  return { ...parsed.data, meta: { ...parsed.data.meta, cache_hit: true } };
 }

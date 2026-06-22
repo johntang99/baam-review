@@ -62,6 +62,7 @@ export function normalizeGoogleData(input: NormalizeInput): AuditGoogleData {
   const aggregates = aggregateReviews(reviews, fetchedAt);
 
   const isPaidTier = tier === "paid";
+  const hasReliableVelocityWindows = !isPaidTier || hasOutscraperHistory;
   const data_source = hasOutscraperHistory
     ? "place_details_plus_outscraper"
     : "place_details";
@@ -130,15 +131,17 @@ export function normalizeGoogleData(input: NormalizeInput): AuditGoogleData {
       rating: rawPlace.rating ?? 0,
       last_review_date: aggregates.last_review_date,
       last_review_days_ago: aggregates.last_review_days_ago,
-      reviews_30d: aggregates.reviews_30d,
-      reviews_90d: isPaidTier ? aggregates.reviews_90d : null,
-      reviews_180d: isPaidTier ? aggregates.reviews_180d : null,
-      reviews_365d: isPaidTier ? aggregates.reviews_365d : null,
-      velocity_30d_per_month: aggregates.velocity_30d_per_month,
-      velocity_180d_per_month: isPaidTier
+      reviews_30d: hasReliableVelocityWindows ? aggregates.reviews_30d : null,
+      reviews_90d: isPaidTier && hasReliableVelocityWindows ? aggregates.reviews_90d : null,
+      reviews_180d: isPaidTier && hasReliableVelocityWindows ? aggregates.reviews_180d : null,
+      reviews_365d: isPaidTier && hasReliableVelocityWindows ? aggregates.reviews_365d : null,
+      velocity_30d_per_month: hasReliableVelocityWindows
+        ? aggregates.velocity_30d_per_month
+        : null,
+      velocity_180d_per_month: isPaidTier && hasReliableVelocityWindows
         ? aggregates.velocity_180d_per_month
         : null,
-      velocity_365d_per_month: isPaidTier
+      velocity_365d_per_month: isPaidTier && hasReliableVelocityWindows
         ? aggregates.velocity_365d_per_month
         : null,
       response_rate: hasOutscraperHistory ? aggregates.response_rate : null,

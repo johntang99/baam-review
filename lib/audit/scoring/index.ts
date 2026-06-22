@@ -1,6 +1,6 @@
 import type { AuditCompetitorsData } from "../competitors/types";
 import type { VerticalBenchmarks } from "../benchmarks/types";
-import type { AuditGoogleData, Tier } from "../google/types";
+import type { AuditGoogleData } from "../google/types";
 import { computeRatingQuality } from "./component-rating";
 import { computeReviewVolume } from "./component-volume";
 import { computeVelocity } from "./component-velocity";
@@ -33,7 +33,7 @@ export function computeAuditScore(
 ): AuditScore {
   void competitors;
 
-  const effectiveBenchmarks = applyTierWeights(benchmarks, google.meta.tier);
+  const effectiveBenchmarks = applyTierWeights(benchmarks, google);
 
   const components = {
     rating_quality: computeRatingQuality(google, effectiveBenchmarks),
@@ -74,9 +74,16 @@ export function computeAuditScore(
 
 function applyTierWeights(
   benchmarks: VerticalBenchmarks,
-  tier: Tier,
+  google: AuditGoogleData,
 ): VerticalBenchmarks {
-  if (tier === "paid") return benchmarks;
+  const isPaid = google.meta.tier === "paid";
+  const paidRecencyWindowsUnavailable =
+    isPaid &&
+    (google.reviews_aggregate.velocity_30d_per_month == null ||
+      google.reviews_aggregate.velocity_180d_per_month == null ||
+      google.reviews_aggregate.velocity_365d_per_month == null);
+
+  if (isPaid && !paidRecencyWindowsUnavailable) return benchmarks;
   return { ...benchmarks, weights: FREE_TIER_WEIGHTS };
 }
 

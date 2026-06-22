@@ -1,7 +1,8 @@
-import type { AuditCompetitor, AuditCompetitorsData } from "../competitors/types";
+import type { AuditCompetitorsData } from "../competitors/types";
 import { resolveServiceKeyword } from "../competitors/keyword-resolver";
 import type { AuditGoogleData, VerticalKey } from "../google/types";
 import type { AuditProjection } from "../projection/types";
+import { computeAuditScore } from "../scoring";
 import type { AuditScore, ScoreComponent } from "../scoring/types";
 import type { VerticalBenchmarks } from "../benchmarks/types";
 import { canonicalizeService } from "../service-taxonomy";
@@ -904,7 +905,7 @@ function buildCompetitorRows(
     name_secondary: pickSecondaryName(c.google.business, language),
     address: shortAddress(c.google.business),
     is_you: false,
-    score: roughScoreEstimate(c, benchmarks),
+    score: computeAuditScore(c.google, competitors, benchmarks).total,
     rating_display: `${c.google.reviews_aggregate.rating.toFixed(1)} ★`,
     total_count: c.google.reviews_aggregate.total_count,
     last_30d: c.google.reviews_aggregate.reviews_30d ?? "—",
@@ -937,27 +938,6 @@ function buildCompetitorRows(
 function clampName(name: string, max = 24): string {
   const chars = [...name.trim()];
   return chars.length > max ? `${chars.slice(0, max).join("").trim()}…` : name.trim();
-}
-
-function roughScoreEstimate(c: AuditCompetitor, benchmarks: VerticalBenchmarks): number {
-  const rating = c.google.reviews_aggregate.rating;
-  const count = c.google.reviews_aggregate.total_count;
-  const v30 = c.google.reviews_aggregate.velocity_30d_per_month ?? 0;
-
-  let ratingScore = 50;
-  for (const anchor of benchmarks.rubric.rating.curve) {
-    if (rating >= anchor.rating) ratingScore = anchor.score;
-  }
-  let volumeScore = 0;
-  for (const anchor of benchmarks.rubric.volume.thresholds) {
-    if (count >= anchor.count) volumeScore = anchor.score;
-  }
-  let v30Score = 0;
-  for (const anchor of benchmarks.rubric.velocity.thresholds) {
-    if (v30 >= anchor.per_month) v30Score = anchor.score;
-  }
-
-  return Math.round(ratingScore * 0.35 + volumeScore * 0.3 + v30Score * 0.35);
 }
 
 function classifyTrend(

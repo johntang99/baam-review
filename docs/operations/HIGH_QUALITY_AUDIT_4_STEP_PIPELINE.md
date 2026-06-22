@@ -132,12 +132,16 @@ Outscraper is an **enrichment layer**, not the primary discovery layer.
 ### Confirmation UI behavior
 - Show candidate competitors with key context (name, distance/location relevance, rating/reviews, source)
 - Require user to remove irrelevant competitors and keep final list
+- Persist selected competitor place IDs from Step 3 for generation payload (`selected_competitor_place_ids`)
+- Treat preview as stale when service changes; require re-generation before allowing Step 4
 
 ### Quality gate (must pass)
 - Final competitor list reaches minimum quality threshold:
   - relevance to RS
   - local comparability
   - sufficient count for meaningful analysis
+- selected competitor list is non-empty
+- selected list is tied to current confirmed service (no stale preview mismatch)
 
 ### Failure handling
 - If too few relevant competitors, expand radius/keyword variants once, then require manual add.
@@ -159,6 +163,7 @@ Generate paid audit output only from locked, confirmed inputs to minimize halluc
 1. Build report context package from confirmed inputs and fetched evidence.
 2. Produce business-audit modules and review-audit modules against the same locked context.
 3. Persist generation metadata for traceability and QA.
+4. If selected competitor place IDs exist, use them directly and skip broad competitor re-discovery.
 
 ### Outscraper in Step 4
 - If Outscraper enrichment already executed in Step 3, Step 4 reuses stored enriched data.
@@ -215,12 +220,14 @@ Use override data to improve reconciliation and ranking:
 ### Step 3 output contract
 - `competitor_candidates` (scored with source tags)
 - `competitor_final_confirmed` (user-approved set)
+- `selected_competitor_place_ids` (IDs sent to Step 4 generate API)
 - optional `review_history_enrichment` (Outscraper output)
 
 ### Step 4 output contract
 - `report_context_snapshot` (immutable inputs used for generation)
 - `report_modules` (business + review sections)
 - `generation_log` (version, timing, success/failure details)
+- `competitors_data.search_metadata.selection_mode` (`manual_selected` or `search`)
 
 ---
 

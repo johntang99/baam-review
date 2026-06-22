@@ -136,13 +136,23 @@ This is the source of truth to inspect “which model actually answered”.
 - `service_override` must be present
 - broad service values are blocked
 - if `needs_service_selection` is true, selected service must be in `service_options`
+- competitor selection is mandatory:
+  - `selected_competitor_place_ids` must be non-empty
+  - `preview_service_override` must canonicalize to the same value as `service_override`
+  - stale preview/service mismatch is blocked
 
 Then pipeline input stores:
 
 - `vertical_override`
 - `service_override` (raw user phrase)
 - `service_override_canonical` (normalized alias)
+- `selected_competitor_place_ids` (final competitor set chosen in Step 3)
 - language choice
+
+Generate endpoint error codes used by this gate:
+
+- `competitor_selection_required`
+- `competitor_selection_stale`
 
 ---
 
@@ -151,9 +161,14 @@ Then pipeline input stores:
 In async generation (`runAuditPipeline`):
 
 - Google is fetched in paid tier.
-- Competitor discovery uses canonical confirmed service (fallback to raw only if canonical is empty):
-  `getCompetitorsData(..., { service_override: service_override_canonical })`
-- Competitor keyword variants are derived from that service.
+- Competitors are built from both service and selection context:
+  - `service_override` is set to canonical confirmed service (fallback to raw only if canonical is empty)
+  - `include_place_ids` is set from `selected_competitor_place_ids`
+- If `include_place_ids` exists, competitor search runs in `manual_selected` mode:
+  - skips keyword re-discovery
+  - refreshes selected competitor details for scoring/report quality
+  - preserves selected set via `search_metadata.selected_place_ids`
+- If `include_place_ids` is empty, pipeline falls back to normal discovery mode (`selection_mode: "search"`).
 
 This means confirmed service drives:
 
@@ -205,9 +220,14 @@ When validating service behavior in production:
    - `service_model_debug.primary`
    - `bs_service`, `cs_recommended_service`
 2. Confirm generate request carries `service_override`.
-3. Verify competitor metadata on resulting audit:
+3. Confirm generate request also carries:
+   - `preview_service_override`
+   - `selected_competitor_place_ids` (non-empty)
+4. Verify competitor metadata on resulting audit:
    - `competitors_data.search_metadata.primary_keyword`
-4. Verify report display service:
+   - `competitors_data.search_metadata.selection_mode`
+   - `competitors_data.search_metadata.selected_place_ids` (when manual selected)
+5. Verify report display service:
    - should match `score_data.service_context.confirmed_service` for new audits.
 
 ---
@@ -225,4 +245,28 @@ Current women’s-health backfill tiers:
 
 The intake UI displays these as **Backfill keywords** in the competitor preview
 note so operators can see exactly why additional competitors appeared.
+
+---
+
+## 11) Competitor Selection Flow (Current Intake Behavior)
+
+Step 3 in intake is now **Final service selection and competitor generation**.
+
+Current enforced behavior:
+
+1. User confirms/edits service.
+2. User clicks **Generate competitors** (preview API).
+3. User selects one or more competitors from preview list.
+4. If service changes after preview, preview becomes stale and must be regenerated.
+5. Generate is blocked until:
+   - service confirmed
+   - preview exists and is fresh
+   - at least one competitor is selected
+
+Important production note:
+
+- Final audit generation does not re-run broad competitor keyword discovery when
+  selected place IDs are provided.
+- It still refreshes selected competitor details in paid mode so scores,
+  velocity, and forecast inputs stay accurate.
 
