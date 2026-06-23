@@ -598,7 +598,7 @@ function buildGooglePlatformRow(
     healthLabel = t.health.not_claimed;
     healthClass = "missing";
   } else if (!health.has_website || health.photos_count < 5) {
-    healthLabel = `${health.profile_completeness}%`;
+    healthLabel = `${Math.round(health.profile_completeness)}%`;
     healthClass = "warn";
   }
 

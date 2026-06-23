@@ -568,6 +568,11 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
     const selectedPreviewCount = selectablePreviewPlaceIds.filter((value) =>
       selectedPreviewPlaceIdSet.has(value),
     ).length;
+    const hydrationProgressTotal =
+      competitorPreview?.total_competitors ??
+      competitorPreview?.competitors.length ??
+      0;
+    const hydrationProgressDone = competitorPreview?.hydrated_competitors ?? 0;
     const hydrationGuardrail = competitorPreview?.hydration_guardrail;
     const topServiceCandidates = resolved.service_candidates ?? [];
     const serviceOptions = resolved.service_options ?? [];
@@ -1471,9 +1476,11 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       {previewIsStale
                         ? "Preview is stale — service changed. Regenerate to refresh."
                         : competitorPreview.status === "hydrating"
-                          ? `Hydrating ${competitorPreview.hydrated_competitors ?? 0}/${competitorPreview.total_competitors ?? competitorPreview.competitors.length} competitors…`
+                          ? `Fetching full review history and velocity for ${hydrationProgressDone}/${hydrationProgressTotal} competitors…`
                           : competitorPreview.status === "failed"
                             ? "Hydration incomplete. Regenerate to retry."
+                          : competitorPreview.status === "ready"
+                            ? "Competitors review data is ready, you can generate audit now."
                         : previewGeneratedLabel
                           ? `Generated at ${previewGeneratedLabel}`
                           : "Preview ready"}
@@ -1562,7 +1569,23 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                       color: "var(--ink-soft)",
                     }}
                   >
-                    Filling remaining competitors in background. You can keep reviewing while this runs.
+                    Still fetching full review history and velocity in background. You can keep reviewing while this runs.
+                  </div>
+                ) : null}
+                {competitorPreview?.status === "ready" && !previewIsStale ? (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      border: "1px solid rgba(79, 114, 83, 0.35)",
+                      background: "rgba(79, 114, 83, 0.08)",
+                      borderRadius: 8,
+                      padding: "8px 10px",
+                      fontSize: 12,
+                      lineHeight: 1.4,
+                      color: "var(--sage-deep)",
+                    }}
+                  >
+                    Competitors review data is ready, you can generate audit now.
                   </div>
                 ) : null}
                 {competitorPreview?.status === "hydrating" &&
@@ -2055,6 +2078,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={isPending}
+          style={{ width: "min(100%, 460px)" }}
         />
         <div className="field-helper">
           Exact name as it appears on Google. Capitalization and punctuation matter.
