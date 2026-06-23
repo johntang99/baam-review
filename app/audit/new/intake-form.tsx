@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isBroadServiceTerm } from "@/lib/audit/broad-service-terms";
 
@@ -28,6 +28,12 @@ const ERROR_LABELS: Record<string, string> = {
     "Please generate competitors and select at least one before generating the audit.",
   competitor_selection_stale:
     "Service changed after competitor preview. Please regenerate competitors before generating the audit.",
+  competitor_preview_in_progress:
+    "Competitor data is still loading. Please wait until hydration completes.",
+  competitor_preview_failed:
+    "Competitor hydration did not complete. Please regenerate competitors.",
+  competitor_scenario_missing:
+    "Competitor preview session expired. Please regenerate competitors.",
 };
 
 const VERTICAL_LABELS: Record<string, string> = {
@@ -157,6 +163,32 @@ interface CompetitorPreviewItem {
 }
 
 interface CompetitorPreviewResult {
+  fast_mode?: boolean;
+  scenario_id: string | null;
+  scenario_expires_at?: string | null;
+  status?: "ready" | "hydrating" | "failed";
+  total_competitors?: number;
+  hydrated_competitors?: number;
+  failed_competitors?: number;
+  duration_ms?: number;
+  cache_stats?: {
+    total: number;
+    cache_hits: number;
+    cache_misses: number;
+    degraded_results: number;
+    cache_hit_ratio_pct: number;
+  };
+  hydration_guardrail?: {
+    pending_competitors: number;
+    estimated_remaining_ms: number;
+    estimated_ready_total_ms: number;
+    warning_threshold_ms: number;
+    critical_threshold_ms: number;
+    warning_level: "none" | "warning" | "critical";
+    service_switch_overlap_count: number | null;
+    low_overlap_service_switch: boolean;
+    low_overlap_prewarm_triggered?: boolean;
+  };
   generated_at: string;
   service_override: string;
   search_metadata: {
@@ -191,14 +223,89 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
   const [shakeField, setShakeField] = useState<"address" | "website" | null>(null);
   const [showConfirmReminder, setShowConfirmReminder] = useState(false);
   const [showAllSuggestions, setShowAllSuggestions] = useState(false);
+  const [fastCompetitorMode, setFastCompetitorMode] = useState(true);
   const [isPreviewPending, setIsPreviewPending] = useState(false);
   const [competitorPreview, setCompetitorPreview] =
     useState<CompetitorPreviewResult | null>(null);
   const [competitorPreviewError, setCompetitorPreviewError] = useState<string | null>(null);
   const [selectedPreviewCompetitorPlaceIds, setSelectedPreviewCompetitorPlaceIds] =
     useState<string[]>([]);
+  const [isHydrationPolling, setIsHydrationPolling] = useState(false);
+  const hydrationPollAbortRef = useRef<AbortController | null>(null);
 
   const error = localError ?? initialError ?? null;
+
+  useEffect(() => {
+    const scenarioId = competitorPreview?.scenario_id;
+    const status = competitorPreview?.status;
+    if (!scenarioId || status !== "hydrating") {
+      setIsHydrationPolling(false);
+      return;
+    }
+
+    let isCancelled = false;
+    setIsHydrationPolling(true);
+
+    const poll = async () => {
+      hydrationPollAbortRef.current?.abort();
+      const controller = new AbortController();
+      hydrationPollAbortRef.current = controller;
+      try {
+        const res = await fetch(
+          `/api/audit/competitors/scenario?scenario_id=${encodeURIComponent(scenarioId)}`,
+          { signal: controller.signal },
+        );
+        const body = (await res.json().catch(() => ({}))) as
+          | CompetitorPreviewResult
+          | { error?: string };
+        if (isCancelled) return;
+        if (!res.ok) {
+          const code = "error" in body ? String(body.error ?? "") : "";
+          setCompetitorPreviewError(
+            ERROR_LABELS[code] ??
+              code ??
+              "Competitor hydration status could not be loaded. Please regenerate.",
+          );
+          setIsHydrationPolling(false);
+          return;
+        }
+        const next = body as CompetitorPreviewResult;
+        setCompetitorPreview((prev) => {
+          if (!prev) return next;
+          return {
+            ...prev,
+            ...next,
+            hydration_guardrail: next.hydration_guardrail
+              ? {
+                  ...(prev.hydration_guardrail ?? {}),
+                  ...next.hydration_guardrail,
+                }
+              : prev.hydration_guardrail,
+            generated_at: next.generated_at || prev.generated_at,
+            service_override: next.service_override || prev.service_override,
+          };
+        });
+        if (next.status && next.status !== "hydrating") {
+          setIsHydrationPolling(false);
+        }
+      } catch (err) {
+        if (isCancelled) return;
+        console.error("[intake] scenario poll failed:", err);
+      }
+    };
+
+    void poll();
+    const timer = setInterval(() => {
+      void poll();
+    }, 2500);
+
+    return () => {
+      isCancelled = true;
+      clearInterval(timer);
+      hydrationPollAbortRef.current?.abort();
+      setIsHydrationPolling(false);
+    };
+  }, [competitorPreview?.scenario_id, competitorPreview?.status]);
 
   function flash(field: "address" | "website") {
     setShakeField(field);
@@ -290,6 +397,9 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
     setCompetitorPreviewError(null);
     setIsPreviewPending(true);
     try {
+      const previousCompetitorPlaceIds = (competitorPreview?.competitors ?? [])
+        .map((item) => item.place_id)
+        .filter((value): value is string => Boolean(value));
       const res = await fetch("/api/audit/competitors/preview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -297,6 +407,8 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           place_id: resolved.place_id,
           service_override: serviceOverride,
           count: 7,
+          fast_mode: fastCompetitorMode,
+          previous_competitor_place_ids: previousCompetitorPlaceIds,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as
@@ -358,6 +470,14 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
       );
       return;
     }
+    if (competitorPreview.status === "hydrating") {
+      setLocalError(ERROR_LABELS.competitor_preview_in_progress);
+      return;
+    }
+    if (competitorPreview.status === "failed") {
+      setLocalError(ERROR_LABELS.competitor_preview_failed);
+      return;
+    }
     if (selectedCompetitorPlaceIdsForGenerate.length === 0) {
       setLocalError(
         "Please select at least one competitor before generating the audit.",
@@ -385,6 +505,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
           service_shadow: resolved.service_shadow,
           service_confirmed: serviceConfirmed,
           selected_competitor_place_ids: selectedCompetitorPlaceIdsForGenerate,
+          competitor_scenario_id: competitorPreview.scenario_id,
           preview_service_override: competitorPreview.service_override,
         }),
       });
@@ -447,6 +568,7 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
     const selectedPreviewCount = selectablePreviewPlaceIds.filter((value) =>
       selectedPreviewPlaceIdSet.has(value),
     ).length;
+    const hydrationGuardrail = competitorPreview?.hydration_guardrail;
     const topServiceCandidates = resolved.service_candidates ?? [];
     const serviceOptions = resolved.service_options ?? [];
     const llmServiceCandidates = resolved.llm_service_candidates ?? [];
@@ -1321,6 +1443,23 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                         ? "Regenerate competitors"
                         : "Generate competitors"}
                   </button>
+                  <label
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      fontSize: 12,
+                      color: "var(--ink-soft)",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={fastCompetitorMode}
+                      onChange={(event) => setFastCompetitorMode(event.target.checked)}
+                      disabled={isPending || isPreviewPending}
+                    />
+                    Fast mode (quick preview, background fill)
+                  </label>
 
                   {competitorPreview ? (
                     <span
@@ -1331,12 +1470,74 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                     >
                       {previewIsStale
                         ? "Preview is stale — service changed. Regenerate to refresh."
+                        : competitorPreview.status === "hydrating"
+                          ? `Hydrating ${competitorPreview.hydrated_competitors ?? 0}/${competitorPreview.total_competitors ?? competitorPreview.competitors.length} competitors…`
+                          : competitorPreview.status === "failed"
+                            ? "Hydration incomplete. Regenerate to retry."
                         : previewGeneratedLabel
                           ? `Generated at ${previewGeneratedLabel}`
                           : "Preview ready"}
                     </span>
                   ) : null}
                 </div>
+                {competitorPreview && !previewIsStale ? (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 8,
+                      alignItems: "center",
+                    }}
+                  >
+                    <span
+                      style={{
+                        border: "1px solid var(--rule-soft)",
+                        borderRadius: 999,
+                        padding: "3px 9px",
+                        fontSize: 11,
+                        color: "var(--ink-soft)",
+                        background: "#fff",
+                      }}
+                    >
+                      Status:{" "}
+                      <strong style={{ color: "var(--ink)" }}>
+                        {competitorPreview.status ?? "ready"}
+                      </strong>
+                    </span>
+                    {hydrationGuardrail?.service_switch_overlap_count != null ? (
+                      <span
+                        style={{
+                          border: "1px solid var(--rule-soft)",
+                          borderRadius: 999,
+                          padding: "3px 9px",
+                          fontSize: 11,
+                          color: "var(--ink-soft)",
+                          background: "#fff",
+                        }}
+                      >
+                        Overlap vs previous service:{" "}
+                        <strong style={{ color: "var(--ink)" }}>
+                          {hydrationGuardrail.service_switch_overlap_count}
+                        </strong>
+                      </span>
+                    ) : null}
+                    {hydrationGuardrail?.low_overlap_prewarm_triggered ? (
+                      <span
+                        style={{
+                          border: "1px solid #9bb5d6",
+                          borderRadius: 999,
+                          padding: "3px 9px",
+                          fontSize: 11,
+                          color: "#2b5d95",
+                          background: "#edf4ff",
+                        }}
+                      >
+                        Low-overlap prewarm started
+                      </span>
+                    ) : null}
+                  </div>
+                ) : null}
 
                 {competitorPreviewError ? (
                   <div
@@ -1351,6 +1552,60 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                     }}
                   >
                     {competitorPreviewError}
+                  </div>
+                ) : null}
+                {isHydrationPolling && competitorPreview?.status === "hydrating" ? (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      fontSize: 12,
+                      color: "var(--ink-soft)",
+                    }}
+                  >
+                    Filling remaining competitors in background. You can keep reviewing while this runs.
+                  </div>
+                ) : null}
+                {competitorPreview?.status === "hydrating" &&
+                hydrationGuardrail &&
+                hydrationGuardrail.warning_level !== "none" ? (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      border:
+                        hydrationGuardrail.warning_level === "critical"
+                          ? "1px solid rgba(164, 69, 42, 0.35)"
+                          : "1px solid #e1c89f",
+                      background:
+                        hydrationGuardrail.warning_level === "critical"
+                          ? "rgba(164, 69, 42, 0.08)"
+                          : "#fbf0df",
+                      borderRadius: 8,
+                      padding: "8px 10px",
+                      fontSize: 12,
+                      lineHeight: 1.4,
+                      color:
+                        hydrationGuardrail.warning_level === "critical"
+                          ? "#842F1B"
+                          : "var(--amber-deep)",
+                    }}
+                  >
+                    Estimated time-to-ready:{" "}
+                    <strong style={{ color: "var(--ink)" }}>
+                      {formatDurationMs(
+                        hydrationGuardrail.estimated_ready_total_ms,
+                      )}
+                    </strong>
+                    {" · "}remaining{" "}
+                    <strong style={{ color: "var(--ink)" }}>
+                      {hydrationGuardrail.pending_competitors}
+                    </strong>{" "}
+                    competitors
+                    {hydrationGuardrail.low_overlap_service_switch
+                      ? " · low-overlap service switch detected"
+                      : ""}
+                    {hydrationGuardrail.warning_level === "critical"
+                      ? " · This run may take longer than usual."
+                      : " · This run may take around a minute."}
                   </div>
                 ) : null}
 
@@ -1384,6 +1639,36 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
                         </>
                       ) : null}
                     </div>
+                    {competitorPreview.duration_ms != null ||
+                    competitorPreview.cache_stats ? (
+                      <div
+                        style={{
+                          marginTop: 6,
+                          fontSize: 11,
+                          color: "var(--ink-soft)",
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        {competitorPreview.duration_ms != null ? (
+                          <>
+                            <strong style={{ color: "var(--ink)" }}>Generation time:</strong>{" "}
+                            {(competitorPreview.duration_ms / 1000).toFixed(1)}s
+                          </>
+                        ) : null}
+                        {competitorPreview.cache_stats ? (
+                          <>
+                            {competitorPreview.duration_ms != null ? " · " : null}
+                            <strong style={{ color: "var(--ink)" }}>Cache:</strong>{" "}
+                            {competitorPreview.cache_stats.cache_hits}/
+                            {competitorPreview.cache_stats.total} hits (
+                            {competitorPreview.cache_stats.cache_hit_ratio_pct}%)
+                            {competitorPreview.cache_stats.degraded_results > 0
+                              ? ` · degraded ${competitorPreview.cache_stats.degraded_results}`
+                              : ""}
+                          </>
+                        ) : null}
+                      </div>
+                    ) : null}
                     {(
                       competitorPreview.search_metadata.fallback_keyword_variants ??
                       []
@@ -1648,9 +1933,17 @@ export function IntakeForm({ initialError }: IntakeFormProps) {
             <button
               type="submit"
               className="found-action-generate"
-              disabled={isPending || !service.trim()}
+              disabled={
+                isPending ||
+                !service.trim() ||
+                competitorPreview?.status === "hydrating"
+              }
             >
-              {isPending ? "Starting audit…" : "Generate audit →"}
+              {isPending
+                ? "Starting audit…"
+                : competitorPreview?.status === "hydrating"
+                  ? "Competitors still loading…"
+                  : "Generate audit →"}
             </button>
           </div>
         </div>
@@ -1881,4 +2174,14 @@ function normalizePreviewService(value: string) {
     .toLowerCase()
     .replace(/[’`]/g, "'")
     .replace(/\s+/g, " ");
+}
+
+function formatDurationMs(value: number) {
+  if (!Number.isFinite(value) || value <= 0) return "0s";
+  const seconds = Math.round(value / 1000);
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  if (remainder === 0) return `${minutes}m`;
+  return `${minutes}m ${remainder}s`;
 }

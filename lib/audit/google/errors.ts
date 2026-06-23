@@ -52,6 +52,17 @@ export class OutscraperError extends AuditDataError {
   }
 }
 
+export class ReviewHistoryUnavailableError extends AuditDataError {
+  constructor(message: string) {
+    super(
+      `Paid review history unavailable: ${message}. Please retry.`,
+      "OUTSCRAPER_HISTORY_REQUIRED",
+      true,
+    );
+    this.name = "ReviewHistoryUnavailableError";
+  }
+}
+
 export class CacheError extends AuditDataError {
   constructor(message: string) {
     super(`Cache error: ${message}`, "CACHE", true);

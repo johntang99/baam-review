@@ -1,9 +1,12 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { createServiceClient } from "@/lib/supabase/service";
-import type { BusinessReference, VerticalKey } from "../google/types";
+import { aggregateCompetitorStats } from "../competitors/aggregator";
+import type { AuditCompetitorsData } from "../competitors/types";
+import type { AuditGoogleData, BusinessReference, VerticalKey } from "../google/types";
 import { getGoogleBusinessData } from "../google";
 import { getCompetitorsData } from "../competitors";
+import { readCompetitorScenario } from "../competitors/scenario-cache";
 import { getAllPlatformsData } from "../platforms";
 import { getBenchmarks, getBenchmarksForBusiness } from "../benchmarks";
 import { computeAuditScore } from "../scoring";
@@ -28,6 +31,8 @@ export interface StartAuditInput {
   service_override_canonical?: string;
   /** Optional competitor place IDs selected during intake preview. */
   selected_competitor_place_ids?: string[];
+  /** Server-side snapshot id produced by competitor preview. */
+  competitor_scenario_id?: string;
   /** User-picked report language. "auto" (or undefined) lets the
    *  language router decide from Google data — Chinese businesses get
    *  both, everyone else gets English. The explicit choices force the
@@ -72,9 +77,11 @@ export async function runAuditPipeline(
 
     await updateStage(audit_id, 2);
     const [competitors, platforms] = await Promise.all([
-      getCompetitorsData(google, "paid", {
-        service_override: confirmedServiceCanonical || confirmedServiceRaw || undefined,
-        include_place_ids: input.selected_competitor_place_ids,
+      resolveCompetitorsForPipeline({
+        google,
+        input,
+        confirmedServiceRaw,
+        confirmedServiceCanonical,
       }),
       getAllPlatformsData(google, "paid").catch((e) => {
         console.error(`[audit ${audit_id}] platforms fetch failed:`, e);
@@ -201,4 +208,90 @@ async function markFailed(audit_id: string, reason: string): Promise<void> {
     .from("audits")
     .update({ status: "failed", failed_reason: reason })
     .eq("id", audit_id);
+}
+
+async function resolveCompetitorsForPipeline(args: {
+  google: AuditGoogleData;
+  input: StartAuditInput;
+  confirmedServiceRaw: string;
+  confirmedServiceCanonical: string;
+}): Promise<AuditCompetitorsData> {
+  const { google, input, confirmedServiceRaw, confirmedServiceCanonical } = args;
+  const serviceOverride = confirmedServiceCanonical || confirmedServiceRaw || undefined;
+  const selectedPlaceIds = input.selected_competitor_place_ids ?? [];
+
+  if (input.competitor_scenario_id) {
+    const scenario = await readCompetitorScenario({
+      scenario_id: input.competitor_scenario_id,
+      user_id: input.user_id,
+    }).catch((err) => {
+      console.error("[audit] read competitor scenario failed:", err);
+      return null;
+    });
+
+    const scenarioCanonical = canonicalizeService(
+      scenario?.service_override_canonical || scenario?.service_override || "",
+    );
+    const isScenarioServiceMatch =
+      !serviceOverride ||
+      !scenarioCanonical ||
+      canonicalizeService(serviceOverride) === scenarioCanonical;
+    const isScenarioPrimaryMatch =
+      !!scenario && scenario.primary_place_id === google.business.place_id;
+    const isScenarioReady = scenario?.status === "ready";
+
+    if (scenario && isScenarioServiceMatch && isScenarioPrimaryMatch && isScenarioReady) {
+      const selectedSet = new Set(
+        (selectedPlaceIds.length > 0
+          ? selectedPlaceIds
+          : scenario.selected_place_ids
+        ).map((id) => String(id).trim()),
+      );
+      const hydratedSet = new Set(scenario.hydrated_place_ids);
+      const selectedIncludesUnhydrated = Array.from(selectedSet).some(
+        (placeId) => !hydratedSet.has(placeId),
+      );
+      if (selectedIncludesUnhydrated) {
+        return getCompetitorsData(google, "paid", {
+          service_override: serviceOverride,
+          include_place_ids: selectedPlaceIds,
+        });
+      }
+      const filtered = scenario.competitors_data.competitors
+        .filter((item) => {
+          if (selectedSet.size === 0) return true;
+          const placeId = item.google.business.place_id;
+          return placeId ? selectedSet.has(placeId) : false;
+        })
+        .map((item, index) => ({ ...item, rank: index + 1 }));
+
+      if (filtered.length > 0) {
+        return {
+          ...scenario.competitors_data,
+          competitors: filtered,
+          search_metadata: {
+            ...scenario.competitors_data.search_metadata,
+            primary_service_keyword:
+              serviceOverride ??
+              scenario.competitors_data.search_metadata.primary_service_keyword,
+            selected_place_ids:
+              selectedSet.size > 0 ? Array.from(selectedSet) : undefined,
+            selection_mode: "manual_selected",
+            strict_pool_size: filtered.length,
+            discovery_pool_size: filtered.length,
+          },
+          competitor_aggregate: aggregateCompetitorStats(google, filtered),
+          meta: {
+            ...scenario.competitors_data.meta,
+            fetched_at: new Date().toISOString(),
+          },
+        };
+      }
+    }
+  }
+
+  return getCompetitorsData(google, "paid", {
+    service_override: serviceOverride,
+    include_place_ids: selectedPlaceIds,
+  });
 }

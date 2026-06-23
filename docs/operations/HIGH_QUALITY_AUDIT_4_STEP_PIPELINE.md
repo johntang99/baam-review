@@ -129,6 +129,20 @@ Outscraper is an **enrichment layer**, not the primary discovery layer.
 - Use Outscraper after candidate competitors are selected/confirmed to pull deeper review history and richer review signals.
 - Do not rely on Outscraper alone to define the competitor list.
 
+### Fast mode + timeout resilience (current production behavior)
+Step 3 supports **fast mode** so users can see a competitor preview quickly while
+paid enrichment continues in the background.
+
+- Preview can return with status `ready` or `hydrating`.
+- Scenario snapshot (`scenario_id`) is created so Step 4 can reuse Step 3 work.
+- Enrichment calls use configured timeout and retry strategy.
+- If live enrichment times out/fails, system attempts paid-cache fallback before degrading.
+- Background hydration continues until scenario becomes `ready` or `failed`.
+
+**Important quality rule:** timeout does **not** mean immediate data loss; in most
+cases the system still reaches complete competitor data via retry/cache/hydration.
+When completion is not achieved, generation is blocked and user must regenerate.
+
 ### Confirmation UI behavior
 - Show candidate competitors with key context (name, distance/location relevance, rating/reviews, source)
 - Require user to remove irrelevant competitors and keep final list
@@ -142,10 +156,13 @@ Outscraper is an **enrichment layer**, not the primary discovery layer.
   - sufficient count for meaningful analysis
 - selected competitor list is non-empty
 - selected list is tied to current confirmed service (no stale preview mismatch)
+- if scenario status is `hydrating` or `failed`, Step 4 is blocked
 
 ### Failure handling
 - If too few relevant competitors, expand radius/keyword variants once, then require manual add.
 - If results are noisy, tighten RS keyword and re-run shortlist.
+- If hydration remains incomplete after retries/background work, mark scenario
+  `failed` and require user re-generation before Step 4.
 
 ---
 
@@ -168,6 +185,8 @@ Generate paid audit output only from locked, confirmed inputs to minimize halluc
 ### Outscraper in Step 4
 - If Outscraper enrichment already executed in Step 3, Step 4 reuses stored enriched data.
 - Step 4 should not require a second Outscraper run unless data freshness policy explicitly requires it.
+- If Step 3 scenario is `ready`, Step 4 should consume scenario snapshot first to avoid duplicate timeout exposure.
+- If selected competitors are not fully hydrated, Step 4 must refuse generation rather than silently using partial data.
 
 ### Quality gate (must pass)
 - Report generation is blocked if RS or competitor confirmation is missing.
@@ -200,6 +219,7 @@ Use override data to improve reconciliation and ranking:
 ### D. Safe defaults
 - If confidence is low, force explicit visible user action
 - Prefer conservative blocking over silent wrong auto-generation
+- Prefer “block + clear retry message” over generating reports from incomplete competitor hydration
 
 ---
 

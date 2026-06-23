@@ -3,6 +3,7 @@ import { getAuditGoogleConfig } from "./config";
 import {
   BusinessHasNoReviewsError,
   InvalidBusinessReferenceError,
+  ReviewHistoryUnavailableError,
 } from "./errors";
 import { fetchPlaceDetails } from "./clients/place-details-client";
 import { searchPlaceIdByText } from "./clients/place-search-client";
@@ -31,13 +32,14 @@ export {
   GoogleApiError,
   InvalidBusinessReferenceError,
   OutscraperError,
+  ReviewHistoryUnavailableError,
   CacheError,
 } from "./errors";
 
 export async function getGoogleBusinessData(
   input: BusinessReference,
   tier: Tier,
-  options: { reviewsTimeoutMs?: number; reviewsLimit?: number } = {},
+  options: { reviewsTimeoutMs?: number } = {},
 ): Promise<AuditGoogleData> {
   const parsed = BusinessReferenceSchema.safeParse(input);
   if (!parsed.success) throw new InvalidBusinessReferenceError();
@@ -67,19 +69,17 @@ export async function getGoogleBusinessData(
 
   let outscraperReviews: RawOutscraperReview[] | null = null;
   let degraded: { outscraper_failed: boolean; reason: string } | undefined;
-  let usedReducedOutscraperLimit = false;
 
   if (tier === "paid") {
     const client = new OutscraperGoogleReviewsClient(config.outscraperApiKey);
     const errors: string[] = [];
-    const attempts: Array<{ limit?: number; timeoutMs?: number }> = [
-      { limit: options.reviewsLimit, timeoutMs: options.reviewsTimeoutMs },
+    const attempts: Array<{ timeoutMs?: number }> = [
+      { timeoutMs: options.reviewsTimeoutMs },
     ];
-    // Competitor fetches often run with a strict 30s budget. Retry once with a
-    // lighter payload and longer timeout before degrading to Place-only data.
+    // Competitor fetches often run with a strict timeout budget. Retry once with
+    // a longer timeout before degrading to Place-only data.
     if (typeof options.reviewsTimeoutMs === "number") {
       attempts.push({
-        limit: Math.min(options.reviewsLimit ?? 1000, 250),
         timeoutMs: Math.max(options.reviewsTimeoutMs + 15_000, 45_000),
       });
     }
@@ -88,18 +88,10 @@ export async function getGoogleBusinessData(
       const attempt = attempts[i];
       try {
         const reviews = await client.fetchReviews(placeId, {
-          limit: attempt.limit,
           timeoutMs: attempt.timeoutMs,
         });
         if (reviews.length > 0) {
           outscraperReviews = reviews;
-          if (
-            typeof attempt.limit === "number" &&
-            attempt.limit > 0 &&
-            attempt.limit < 1000
-          ) {
-            usedReducedOutscraperLimit = true;
-          }
           break;
         }
         errors.push(
@@ -136,6 +128,12 @@ export async function getGoogleBusinessData(
         };
       }
 
+      if (config.strictPaidReviewHistory) {
+        throw new ReviewHistoryUnavailableError(
+          fallbackReason || "outscraper failed and no paid cache was available",
+        );
+      }
+
       degraded = {
         outscraper_failed: true,
         reason: fallbackReason || "outscraper failed",
@@ -157,7 +155,7 @@ export async function getGoogleBusinessData(
     degraded,
   });
 
-  if (!degraded && !usedReducedOutscraperLimit) {
+  if (!degraded) {
     await writeCachedAuditData(normalized, ttlMs).catch((err) => {
       console.error("[audit-google] cache write failed:", err);
     });

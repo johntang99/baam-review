@@ -325,6 +325,8 @@ async function fetchCompetitorsInParallel(
   candidates: NearbyCandidate[],
   tier: Tier,
 ): Promise<AuditCompetitor[]> {
+  const config = getAuditGoogleConfig();
+  const competitorReviewsTimeoutMs = config.competitorOutscraperTimeoutMs;
   const primaryLat = primary.business.lat ?? 0;
   const primaryLng = primary.business.lng ?? 0;
 
@@ -336,14 +338,14 @@ async function fetchCompetitorsInParallel(
       // businesses). Paid tier uses Outscraper's full chronological
       // history → accurate velocity numbers for the comparison table.
       //
-      // Competitors are secondary data: cap their Outscraper review fetch at
-      // 30s so one slow/hung scrape can't push the whole pipeline past the
-      // serverless time limit. On timeout it degrades to Google reviews (the
+      // Competitors are secondary data: cap their Outscraper review fetch with
+      // a configurable timeout (default 60s) so one slow scrape doesn't hang
+      // generation forever. On timeout it degrades to Google reviews (the
       // competitor still appears) rather than stalling generation.
       const data = await getGoogleBusinessData(
         { placeId: candidate.id },
         tier,
-        { reviewsTimeoutMs: 30_000 },
+        { reviewsTimeoutMs: competitorReviewsTimeoutMs },
       );
 
       const distance_miles =
@@ -387,6 +389,8 @@ async function fetchCompetitorsByPlaceIds(
   placeIds: string[],
   tier: Tier,
 ): Promise<AuditCompetitor[]> {
+  const config = getAuditGoogleConfig();
+  const competitorReviewsTimeoutMs = config.competitorOutscraperTimeoutMs;
   const primaryLat = primary.business.lat;
   const primaryLng = primary.business.lng;
 
@@ -395,7 +399,7 @@ async function fetchCompetitorsByPlaceIds(
       const data = await getGoogleBusinessData(
         { placeId },
         tier,
-        { reviewsTimeoutMs: 30_000 },
+        { reviewsTimeoutMs: competitorReviewsTimeoutMs },
       );
       if (data.business.place_id === primary.business.place_id) {
         return null;

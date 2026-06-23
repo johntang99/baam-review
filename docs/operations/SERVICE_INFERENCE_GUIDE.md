@@ -270,3 +270,62 @@ Important production note:
 - It still refreshes selected competitor details in paid mode so scores,
   velocity, and forecast inputs stay accurate.
 
+---
+
+## 12) Fast Mode, Timeout, and Completion Guarantees (Competitor Pipeline)
+
+This section clarifies current production behavior for competitor generation in
+Step 3 and reuse in Step 4.
+
+### 12.1 Is there timeout?
+
+Yes.
+
+- Competitor enrichment uses a configurable Outscraper timeout:
+  - `AUDIT_COMPETITOR_OUTSCRAPER_TIMEOUT_MS` (default 60s)
+- Preview route has server runtime budget (`maxDuration`).
+- Cache policy and refresh windows are configurable:
+  - `AUDIT_CACHE_TTL_PAID_HOURS`
+  - `AUDIT_COMPETITOR_BG_REFRESH_AGE_HOURS`
+
+### 12.2 Can we still get complete competitor data if timeout happens?
+
+Usually yes, but not absolutely guaranteed in every run.
+
+Current recovery chain:
+
+1. live fetch attempt(s) with timeout controls
+2. retry strategy (including adjusted Outscraper request shape)
+3. paid-cache fallback when live call fails
+4. fast-mode background hydration until scenario becomes `ready`
+
+If completion still fails:
+
+- scenario status becomes `failed`
+- generate is blocked (`competitor_preview_failed` / `competitor_preview_in_progress`)
+- user must regenerate competitors
+
+So system behavior is intentionally quality-first:
+
+- avoid silent partial reports
+- prefer explicit block + retry over wrong output
+
+### 12.3 Fast mode quality contract
+
+Fast mode is designed for speed without lowering final report quality.
+
+- Initial preview can return quickly with `status: "hydrating"` or `status: "ready"`.
+- Scenario snapshot (`scenario_id`) is persisted and polled by intake UI.
+- User can review candidates while hydration runs.
+- Final audit generation is allowed only when:
+  - preview is fresh for current service
+  - selected competitors are present
+  - selected competitors are fully hydrated in scenario
+
+### 12.4 Operational interpretation
+
+- Fast mode improves perceived responsiveness.
+- Warm cache dramatically improves completion speed.
+- A small long tail can still exist for difficult/low-overlap service shifts.
+- Guardrail ETA/warning indicators communicate expected wait in those cases.
+
