@@ -1157,12 +1157,25 @@
     min-width: 240px;
   }
   .competitor-address {
+    display: block;
+    line-height: 1.35;
+  }
+  .competitor-address-main {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.35;
+  }
+  .competitor-distance {
+    margin-top: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink);
   }
   .competitor-table tr.you {
     background: var(--cream-deep);

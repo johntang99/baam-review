@@ -261,6 +261,8 @@ export interface CompetitorRowVM {
    *  full state/ZIP/country would crowd the row. Empty string when the
    *  upstream data doesn't carry a street line (rare). */
   address: string;
+  /** Distance from the audited business, shown under address when known. */
+  distance_display: string;
   is_you: boolean;
   score: number;
   rating_display: string;

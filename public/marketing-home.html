@@ -151,14 +151,17 @@ nav.scrolled { border-color: var(--border); }
 }
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 80px;
+  grid-template-columns: 1fr;
+  gap: 24px;
   align-items: center;
-  min-height: 660px;
+  min-height: auto;
 }
 .hero-left {
-  padding-right: 8px;
+  padding-right: 0;
   min-width: 0;
+  max-width: 940px;
+  margin: 0 auto;
+  text-align: center;
 }
 .hero-eyebrow {
   font-family: 'JetBrains Mono', monospace;
@@ -192,28 +195,87 @@ nav.scrolled { border-color: var(--border); }
   font-weight: 400;
   color: var(--gold-dark);
 }
-.hero-h1 .underline-soft {
-  position: relative;
-  display: inline-block;
-}
-.hero-h1 .underline-soft::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0;
-  bottom: 6px;
-  height: 8px;
-  background: var(--gold-soft);
-  z-index: -1;
-  border-radius: 2px;
-}
 .hero-deck {
-  font-family: 'Newsreader', serif;
-  font-size: 20px;
-  line-height: 1.55;
-  color: var(--text-soft);
-  font-style: italic;
-  margin-bottom: 36px;
-  max-width: 540px;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(26px, 2.6vw, 36px);
+  line-height: 1.18;
+  color: var(--ink);
+  font-style: normal;
+  margin-bottom: 34px;
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+  letter-spacing: -0.02em;
+}
+.hero-deck em {
+  color: var(--gold-dark);
+}
+.hero-message-rotator {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.hero-message-slides {
+  position: relative;
+  min-height: 280px;
+}
+.hero-message-slide {
+  display: none;
+}
+.hero-message-slide.is-active {
+  display: block;
+  animation: hero-message-fade 320ms ease;
+}
+@keyframes hero-message-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero-rotator-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 28px;
+}
+.hero-rotator-btn {
+  border: 1px solid var(--border);
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.hero-rotator-btn:hover {
+  border-color: var(--forest);
+  color: var(--forest);
+}
+.hero-rotator-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-rotator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+.hero-rotator-dot.is-active {
+  background: var(--forest);
+  border-color: var(--forest);
+}
+.hero-rotator-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 .hero-deck strong {
   font-family: 'Onest', sans-serif;
@@ -225,11 +287,15 @@ nav.scrolled { border-color: var(--border); }
 .hero-cta-row {
   display: flex;
   gap: 12px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  justify-content: center;
   margin-bottom: 32px;
 }
 @media (max-width: 640px) {
   .hero-cta-row { flex-wrap: wrap; }
+  .hero-message-slides { min-height: 340px; }
+  .hero-rotator-controls { gap: 8px; }
+  .hero-rotator-btn { padding: 6px 10px; }
 }
 .hero-trust {
   display: flex;
@@ -242,6 +308,7 @@ nav.scrolled { border-color: var(--border); }
   color: var(--text-muted);
   font-weight: 500;
   align-items: center;
+  justify-content: center;
 }
 .hero-trust span strong {
   color: var(--ink);
@@ -2963,6 +3030,9 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
 .hero-sub { animation: fadeUp 0.7s ease-out backwards; animation-delay: 0.3s; }
 .hero-ctas { animation: fadeUp 0.7s ease-out backwards; animation-delay: 0.4s; }
 .hero-trust { animation: fadeUp 0.7s ease-out backwards; animation-delay: 0.5s; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-message-slide.is-active { animation: none; }
+}
 .phone-frame { animation: fadeUp 1s ease-out backwards; animation-delay: 0.5s; }
 
 /* ============ PROCESS WALKTHROUGH: SIX REAL SCREENS ============ */
@@ -5923,13 +5993,42 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
       <!-- LEFT: Content (D2's headline + D1's underline accent + cream/Fraunces from D1) -->
       <div class="hero-left">
         <div class="hero-eyebrow">A professional service from BAAM Studio</div>
-        <h1 class="hero-h1">
-          Your reviews, <em>climbing every month.</em><br>
-          With a real audit behind every move.
-        </h1>
-        <p class="hero-deck">
-          Start with a free <strong>7-page Review Audit</strong> to see exactly where you stand against your competitors. Then our service grows your reviews monthly &mdash; <strong>no fake reviews, no shortcuts, ever.</strong>
-        </p>
+        <div class="hero-message-rotator" data-hero-rotator>
+          <div class="hero-message-slides" aria-live="polite">
+            <div class="hero-message-slide is-active" data-hero-slide>
+              <h1 class="hero-h1">More trust. More reviews. More customers.</h1>
+              <h2 class="hero-deck">Know your business. Know your competitors. Get a <em>free</em> audit before you decide.</h2>
+            </div>
+            <div class="hero-message-slide" data-hero-slide>
+              <h1 class="hero-h1">Grow the reviews that win customers.</h1>
+              <h2 class="hero-deck">See where you stand &mdash; and where your competitors are winning.</h2>
+            </div>
+            <div class="hero-message-slide" data-hero-slide>
+              <h1 class="hero-h1">Your reviews are your strongest sales force.</h1>
+              <h2 class="hero-deck">Start with a <em>free</em> audit of your reputation, visibility, and competition.</h2>
+            </div>
+            <div class="hero-message-slide" data-hero-slide>
+              <h1 class="hero-h1">Turn customer trust into business growth.</h1>
+              <h2 class="hero-deck">Understand your strengths, gaps, and competitors before you invest.</h2>
+            </div>
+            <div class="hero-message-slide" data-hero-slide>
+              <h1 class="hero-h1">Build reviews that make customers choose you.</h1>
+              <h2 class="hero-deck">Get a clear audit of your business and competitors &mdash; <em>free</em>, before you decide.</h2>
+            </div>
+          </div>
+          <div class="hero-rotator-controls">
+            <button type="button" class="hero-rotator-btn" data-hero-prev aria-label="Show previous hero message">Prev</button>
+            <div class="hero-rotator-dots" aria-label="Hero message selector">
+              <button type="button" class="hero-rotator-dot is-active" data-hero-dot data-hero-index="0" aria-label="Show hero message 1"></button>
+              <button type="button" class="hero-rotator-dot" data-hero-dot data-hero-index="1" aria-label="Show hero message 2"></button>
+              <button type="button" class="hero-rotator-dot" data-hero-dot data-hero-index="2" aria-label="Show hero message 3"></button>
+              <button type="button" class="hero-rotator-dot" data-hero-dot data-hero-index="3" aria-label="Show hero message 4"></button>
+              <button type="button" class="hero-rotator-dot" data-hero-dot data-hero-index="4" aria-label="Show hero message 5"></button>
+            </div>
+            <button type="button" class="hero-rotator-btn" data-hero-next aria-label="Show next hero message">Next</button>
+            <span class="hero-rotator-count" data-hero-count>1 / 5</span>
+          </div>
+        </div>
         <div class="hero-cta-row">
           <a href="/audit/" class="btn btn-primary btn-large">Get Free Review Audit</a>
           <a href="#pricing" class="btn btn-gold btn-large">Grow Your Reviews</a>
@@ -5943,196 +6042,6 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
           <span><strong>EN · 中文 · ES</strong></span>
         </div>
       </div>
-      
-      <!-- RIGHT: Rotating visual stage -->
-      <div class="hero-visual-wrap">
-        <div class="hero-visual-stage">
-          
-          <!-- VISUAL 1: The Audit Document -->
-          <div class="hero-visual v1">
-            <div class="v1-header">
-              <div class="v1-header-row">
-                <span class="v1-brand">BAAM &middot; REVIEW AUDIT</span>
-                <span class="v1-vol">VOL. I &middot; 2026</span>
-              </div>
-              <div class="v1-pages">7 pages, delivered as PDF</div>
-              <span class="v1-sample-tag">Sample audit &middot; for demonstration</span>
-            </div>
-            <div class="v1-body">
-              <div class="v1-eyebrow">Page 03 &middot; Your Review Score</div>
-              <h3 class="v1-title">Bridge Street Dental</h3>
-              <p class="v1-sub">Brooklyn, NY &middot; Dental practice</p>
-              
-              <div class="v1-score-row">
-                <span class="v1-score">52<em>/100</em></span>
-                <div class="v1-score-meta">
-                  <div class="v1-score-label">Review Score</div>
-                  <div class="v1-grade">Grade C &middot; Below average</div>
-                  <div class="v1-diag">4 of 5 competitors rank higher</div>
-                </div>
-              </div>
-              
-              <div class="v1-bars">
-                <div class="v1-bar">
-                  <span>Rating</span>
-                  <div class="v1-bar-track"><div class="v1-bar-fill f1"></div></div>
-                  <span class="v1-bar-val">68</span>
-                </div>
-                <div class="v1-bar">
-                  <span>Volume</span>
-                  <div class="v1-bar-track"><div class="v1-bar-fill f2"></div></div>
-                  <span class="v1-bar-val">45</span>
-                </div>
-                <div class="v1-bar">
-                  <span>30d velocity</span>
-                  <div class="v1-bar-track"><div class="v1-bar-fill f3"></div></div>
-                  <span class="v1-bar-val">20</span>
-                </div>
-              </div>
-              
-              <div class="v1-projection">
-                <div class="v1-projection-label">Do-nothing 6-month projection</div>
-                <div class="v1-projection-val"><em>&minus;$48,200</em> in lost revenue</div>
-                <div class="v1-projection-sub">Per BAAM dental benchmarks &middot; $1,340/review</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- VISUAL 2: The Growth Results -->
-          <div class="hero-visual v2">
-            <div class="v2-body">
-              <div class="v2-ribbon">
-                <span class="v2-ribbon-dot"></span>
-                A real client &middot; 6 months in
-              </div>
-              <h3 class="v2-title">Bridge Street Dental</h3>
-              <p class="v2-sub">Brooklyn, NY &middot; Dental practice</p>
-              
-              <div class="v2-scores">
-                <div class="v2-score-block start">
-                  <div class="v2-score-num">52</div>
-                  <div class="v2-score-label">Month 1</div>
-                </div>
-                <span class="v2-score-arrow">&rarr;</span>
-                <div class="v2-score-block end">
-                  <div class="v2-score-num">84</div>
-                  <div class="v2-score-label">Month 6</div>
-                </div>
-                <span class="v2-score-arrow">&rarr;</span>
-                <div class="v2-score-block goal">
-                  <div class="v2-score-num">90</div>
-                  <div class="v2-score-label">Goal</div>
-                </div>
-              </div>
-
-              <div class="v2-chart-row">
-                <div class="v2-chart">
-                  <svg viewBox="0 0 280 64" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="v2grad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0" stop-color="#1F4D3F" stop-opacity="0.18"/>
-                        <stop offset="1" stop-color="#1F4D3F" stop-opacity="0"/>
-                      </linearGradient>
-                    </defs>
-                    <path class="area" d="M 5 50 L 56 42 L 108 34 L 160 24 L 212 14 L 275 6 L 275 64 L 5 64 Z" />
-                    <path class="line" d="M 5 50 L 56 42 L 108 34 L 160 24 L 212 14 L 275 6" />
-                    <circle class="dot" cx="5" cy="50" r="3.5" style="animation-delay: 0.6s"/>
-                    <circle class="dot" cx="56" cy="42" r="3.5" style="animation-delay: 0.9s"/>
-                    <circle class="dot" cx="108" cy="34" r="3.5" style="animation-delay: 1.2s"/>
-                    <circle class="dot" cx="160" cy="24" r="3.5" style="animation-delay: 1.5s"/>
-                    <circle class="dot" cx="212" cy="14" r="3.5" style="animation-delay: 1.8s"/>
-                    <circle class="dot" cx="275" cy="6" r="4.5" style="animation-delay: 2.1s"/>
-                  </svg>
-                </div>
-                <div class="v2-chart-axis">6 months<br>+32 pts</div>
-              </div>
-
-              <div class="v2-stats">
-                <div>
-                  <div class="v2-stat-num"><em>+47</em></div>
-                  <div class="v2-stat-label">new reviews,<br>all real</div>
-                </div>
-                <div>
-                  <div class="v2-stat-num"><em>+0.6</em>&star;</div>
-                  <div class="v2-stat-label">star rating<br>lift</div>
-                </div>
-                <div>
-                  <div class="v2-stat-num"><em>C&nbsp;→&nbsp;B</em>&nbsp;→&nbsp;<span style="color: var(--gold); font-style: italic;">A</span></div>
-                  <div class="v2-stat-label">grade so far &middot;<br>goal: <strong style="color: var(--gold-dark);">A (90)</strong></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- VISUAL 3: The Process Workflow -->
-          <div class="hero-visual v3">
-            <div class="v3-body">
-              <div class="v3-header">
-                <div class="v3-tag">How the service works</div>
-                <h3 class="v3-title">Four steps, <em>every week</em></h3>
-                <p class="v3-sub">For Dr. Huang Acupuncture &middot; Flushing, NY</p>
-              </div>
-              
-              <div class="v3-steps">
-                <div class="v3-step active">
-                  <div class="v3-step-num">1</div>
-                  <div class="v3-step-content">
-                    <div class="v3-step-action">We <em>send the review request</em></div>
-                    <div class="v3-step-detail">SMS + email to last week&rsquo;s customers, 48 hours after visit, in their native language.</div>
-                    <span class="v3-step-badge">Mon &middot; 10:00 AM</span>
-                  </div>
-                </div>
-                <div class="v3-step active">
-                  <div class="v3-step-num">2</div>
-                  <div class="v3-step-content">
-                    <div class="v3-step-action">Customer <em>rates the visit</em></div>
-                    <div class="v3-step-detail">5&star; &rarr; public Google review. <strong>1-4&star; &rarr; private path</strong>, owner alerted first.</div>
-                    <span class="v3-step-badge">Real-time</span>
-                  </div>
-                </div>
-                <div class="v3-step active">
-                  <div class="v3-step-num">3</div>
-                  <div class="v3-step-content">
-                    <div class="v3-step-action">We <em>reply in your voice</em></div>
-                    <div class="v3-step-detail">Owner-approved AI draft, in EN/中文/ES. Public reviews answered within 24 hours.</div>
-                    <span class="v3-step-badge">Within 24h</span>
-                  </div>
-                </div>
-                <div class="v3-step">
-                  <div class="v3-step-num">4</div>
-                  <div class="v3-step-content">
-                    <div class="v3-step-action">You see <em>what changed</em></div>
-                    <div class="v3-step-detail">Monthly report: new reviews, rating shift, sentiment themes, what to do next.</div>
-                    <span class="v3-step-badge">Every 1st</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="v3-footer">
-                Same workflow, every week. <strong>No fake reviews</strong>, ever.
-              </div>
-            </div>
-          </div>
-          
-        </div>
-        
-        <!-- Indicator dots -->
-        <div class="hero-visual-dots">
-          <span class="hero-visual-dot d1">
-            <span class="hero-visual-dot-mark"></span>
-            The Audit
-          </span>
-          <span class="hero-visual-dot d2">
-            <span class="hero-visual-dot-mark"></span>
-            The Results
-          </span>
-          <span class="hero-visual-dot d3">
-            <span class="hero-visual-dot-mark"></span>
-            The Process
-          </span>
-        </div>
-      </div>
-      
     </div>
   </div>
 </section>
@@ -7015,7 +6924,7 @@ footer { padding: 80px 0 40px; border-top: 1px solid var(--border); background: 
       <h3 class="promise-eyebrow">Our 5× Return Standard</h3>
 
       <p class="promise-claim">
-        <span class="promise-conditional">If we run it for you,</span> we're confident the <span class="tv">Total Review Value</span> we generate will be <span class="atleast">at least <span class="multi">5×</span></span> what you pay us <span class="yr">within a year</span>.
+        <span class="promise-conditional">If we run it for you,</span> the <span class="tv">Total Review Value</span> we generate <span class="atleast">may reach around <span class="multi">5×</span></span> what you pay us <span class="yr">within a year</span>.
       </p>
 
       <p class="promise-qualifier">

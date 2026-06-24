@@ -448,6 +448,18 @@ function shortAddress(business: AuditGoogleData["business"]): string {
   return business.formatted_address ?? "";
 }
 
+function formatDistanceLabel(
+  distanceMiles: number | null | undefined,
+  language: AuditLanguage,
+): string {
+  if (distanceMiles == null || !Number.isFinite(distanceMiles)) return "";
+  const rounded = distanceMiles < 10
+    ? Math.round(distanceMiles * 10) / 10
+    : Math.round(distanceMiles);
+  const value = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+  return language === "zh" ? `距離 ${value} 英里` : `${value} mi away`;
+}
+
 function formatZhAddressLine2(google: AuditGoogleData): string {
   const stateZh = google.business.state === "NY" ? "紐約州" : google.business.state;
   return `${stateZh}${google.business.city} · ${google.business.zip}`.trim();
@@ -881,6 +893,7 @@ function buildCompetitorRows(
     name: pickPrimaryName(google.business.name, language),
     name_secondary: pickSecondaryName(google.business, language),
     address: shortAddress(google.business),
+    distance_display: "",
     is_you: true,
     score: score.total,
     rating_display: `${google.reviews_aggregate.rating.toFixed(1)} ★`,
@@ -904,6 +917,7 @@ function buildCompetitorRows(
     name: pickPrimaryName(c.google.business.name, language),
     name_secondary: pickSecondaryName(c.google.business, language),
     address: shortAddress(c.google.business),
+    distance_display: formatDistanceLabel(c.distance_miles, language),
     is_you: false,
     score: computeAuditScore(c.google, competitors, benchmarks).total,
     rating_display: `${c.google.reviews_aggregate.rating.toFixed(1)} ★`,

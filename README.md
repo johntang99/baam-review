@@ -36,7 +36,17 @@ baamplatform@gmail.com
 baamplatform
 
 
+Typical complete audit (7 competitors + LLM service + tools): 
+~$0.8 to $1.6 per report
 
+Good planning budget: 
+$1.2 per report
+
+Best case (cache hits / fewer LLM passes): 
+~$0.4–$0.8
+
+Heavy case (extra verifier/model passes + more external fetches): 
+~$1.8–$3.0
 
 
 

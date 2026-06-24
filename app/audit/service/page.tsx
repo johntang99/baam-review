@@ -250,6 +250,7 @@ function StateAMarketing({ requestedPlan }: { requestedPlan: Plan | null }) {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
+      <SectionHeaderAlignmentOverrides />
 
       <AuditTopNav active="audit-service" />
 
@@ -372,6 +373,7 @@ function StateBPersonalized({
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
+      <SectionHeaderAlignmentOverrides />
 
       <AuditTopNav active="audit-service" />
 
@@ -464,23 +466,25 @@ function StateBPersonalized({
         </div>
       )}
 
+      <LatestAuditScopeNotice businessName={businessName} />
+
       <AuditSummaryCard audit={audit} businessName={businessName} />
 
       <ProjectedOutcomeSection
         projection={projection}
         businessName={businessName}
+        eyebrow="§ 01 · What service typically delivers"
       />
 
-      <RhythmSection />
+      <RhythmSection eyebrow="§ 02 · What we actually do" />
 
       <TiersSection
         loggedIn
         recommended={recommendedTier}
         auditId={audit.id}
         projection={projection}
+        eyebrow="§ 03 · Two ways to start"
       />
-
-      <PersonalizedPromiseSection audit={audit} />
 
       <section className="final-cta">
         <div className="container">
@@ -514,16 +518,91 @@ function StateBPersonalized({
   );
 }
 
+function LatestAuditScopeNotice({ businessName }: { businessName: string }) {
+  return (
+    <section style={{ padding: "14px 0 4px" }}>
+      <div className="container">
+        <div
+          style={{
+            border: "1px solid var(--rule-soft)",
+            background: "var(--cream-deep)",
+            borderRadius: 10,
+            padding: "10px 14px",
+            fontFamily: "'Newsreader', serif",
+            fontSize: 15,
+            lineHeight: 1.45,
+            color: "var(--ink-soft)",
+          }}
+        >
+          <strong style={{ color: "var(--ink)" }}>Scope note:</strong> This page
+          is based on one business only — <strong>{businessName}</strong> (your
+          latest completed audit by default). It does not combine data from
+          your other audited businesses.{" "}
+          <Link
+            href="/audit/list"
+            style={{ color: "var(--ink)", textDecoration: "underline" }}
+          >
+            Switch audit
+          </Link>
+          .
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SectionHeaderAlignmentOverrides() {
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: `
+          .rhythm-header,
+          .tiers-header,
+          .projected-outcome-header,
+          .faq-header {
+            text-align: center;
+          }
+          .rhythm-header .section-title,
+          .rhythm-header .section-sub,
+          .tiers-header .section-title,
+          .tiers-header .section-sub,
+          .projected-outcome-header .section-title,
+          .projected-outcome-header .section-sub,
+          .faq-header .section-title,
+          .faq-header .section-sub {
+            margin-left: auto;
+            margin-right: auto;
+          }
+          .audit-offramp-text .section-eyebrow,
+          .audit-offramp-text .section-title,
+          .audit-offramp-text .section-sub {
+            text-align: center;
+          }
+          .audit-offramp-text .section-title,
+          .audit-offramp-text .section-sub {
+            margin-left: auto;
+            margin-right: auto;
+          }
+        `,
+      }}
+    />
+  );
+}
+
 // =============================================================================
 // SHARED SECTIONS
 // =============================================================================
 
-function RhythmSection() {
+function RhythmSection({
+  eyebrow = "§ 01 · What we actually do",
+}: {
+  eyebrow?: string;
+}) {
   return (
     <section className="rhythm-section">
       <div className="container">
         <div className="rhythm-header">
-          <div className="section-eyebrow">§ 01 · What we actually do</div>
+          <div className="section-eyebrow">{eyebrow}</div>
           <h2 className="section-title">
             Three phases. <em>A simple rhythm.</em> No mystery.
           </h2>
@@ -621,17 +700,19 @@ function TiersSection({
   recommended,
   auditId,
   projection,
+  eyebrow = "§ 02 · Two ways to start",
 }: {
   loggedIn: boolean;
   recommended: Plan;
   auditId?: string;
   projection?: ScoreProjection;
+  eyebrow?: string;
 }) {
   return (
     <section className="tiers-section" id="tiers">
       <div className="container">
         <div className="tiers-header">
-          <div className="section-eyebrow">§ 02 · Two ways to start</div>
+          <div className="section-eyebrow">{eyebrow}</div>
           <h2 className="section-title">
             $99 or $399. <em>You decide who does the work.</em>
           </h2>
@@ -817,59 +898,6 @@ function PromiseSection() {
               <div className="promise-stat-label">
                 Avg new reviews per month for service clients in the first 90
                 days.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PersonalizedPromiseSection({ audit }: { audit: PersonAudit }) {
-  const yearlyFull = 399 * 12;
-  const minTrackedFull = yearlyFull * 5;
-  const sixMoLoss = audit.projection_data?.revenue_impact?.six_month_loss_usd ?? 0;
-  return (
-    <section className="promise-section">
-      <div className="container">
-        <div className="promise-inner">
-          <div className="promise-eyebrow">§ 05 · Our 5× Return Standard</div>
-          <h2 className="promise-title">
-            For{" "}
-            {audit.google_data?.business?.name ?? "your business"} specifically:{" "}
-            <em>$24K minimum</em> in tracked Review Revenue at Full Service.
-          </h2>
-          <p className="promise-sub">
-            $399/month × 12 = ${(399 * 12).toLocaleString()}. Our 5× commitment
-            puts your 12-month floor at ${minTrackedFull.toLocaleString()}.
-            Anything less and your next month is on us.
-          </p>
-          <div className="promise-stats">
-            <div className="promise-stat">
-              <div className="promise-stat-num">
-                5<em>×</em>
-              </div>
-              <div className="promise-stat-label">
-                Minimum commitment. Below this floor, next month is on us.
-              </div>
-            </div>
-            <div className="promise-stat">
-              <div className="promise-stat-num">
-                ${(minTrackedFull / 1000).toFixed(0)}
-                <em>K</em>
-              </div>
-              <div className="promise-stat-label">
-                Your specific 12-month minimum at Full Service tier.
-              </div>
-            </div>
-            <div className="promise-stat">
-              <div className="promise-stat-num">
-                ${Math.round(sixMoLoss / 1000)}
-                <em>K</em>
-              </div>
-              <div className="promise-stat-label">
-                Your do-nothing 6-month projection. We aim to invert this.
               </div>
             </div>
           </div>
@@ -1182,17 +1210,17 @@ function AuditSummaryCard({
 function ProjectedOutcomeSection({
   projection,
   businessName,
+  eyebrow = "§ 02 · What service typically delivers",
 }: {
   projection: ScoreProjection;
   businessName: string;
+  eyebrow?: string;
 }) {
   return (
     <section className="projected-outcome-section">
       <div className="container">
         <div className="projected-outcome-header">
-          <div className="section-eyebrow">
-            § 02 · What service typically delivers
-          </div>
+          <div className="section-eyebrow">{eyebrow}</div>
           <h2 className="section-title">
             Where {businessName} <em>could land</em>.
           </h2>

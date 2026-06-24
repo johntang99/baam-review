@@ -122,6 +122,110 @@ export function MarketingScripts() {
       for (const s of sectionToLink.keys()) spy.observe(s);
     }
 
+    // Hero message rotator (homepage only): one message at a time,
+    // auto-advance every ~5.5s, pause on hover/touch/focus, and
+    // disable autoplay when reduced-motion is requested.
+    const heroRotator = document.querySelector<HTMLElement>("[data-hero-rotator]");
+    const heroSlides = heroRotator
+      ? Array.from(heroRotator.querySelectorAll<HTMLElement>("[data-hero-slide]"))
+      : [];
+    const heroDots = heroRotator
+      ? Array.from(heroRotator.querySelectorAll<HTMLButtonElement>("[data-hero-dot]"))
+      : [];
+    const heroPrevButton =
+      heroRotator?.querySelector<HTMLButtonElement>("[data-hero-prev]") ?? null;
+    const heroNextButton =
+      heroRotator?.querySelector<HTMLButtonElement>("[data-hero-next]") ?? null;
+    const heroCount =
+      heroRotator?.querySelector<HTMLElement>("[data-hero-count]") ?? null;
+
+    const heroReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let heroCurrent = 0;
+    let heroAutoTimer: number | null = null;
+    const heroDotHandlers: Array<() => void> = [];
+
+    const heroSetSlide = (index: number) => {
+      if (heroSlides.length === 0) return;
+      const total = heroSlides.length;
+      heroCurrent = ((index % total) + total) % total;
+      heroSlides.forEach((slide, i) => {
+        slide.classList.toggle("is-active", i === heroCurrent);
+      });
+      heroDots.forEach((dot, i) => {
+        const active = i === heroCurrent;
+        dot.classList.toggle("is-active", active);
+        dot.setAttribute("aria-current", active ? "true" : "false");
+      });
+      if (heroCount) heroCount.textContent = `${heroCurrent + 1} / ${total}`;
+    };
+
+    const heroStopAuto = () => {
+      if (heroAutoTimer !== null) {
+        window.clearInterval(heroAutoTimer);
+        heroAutoTimer = null;
+      }
+    };
+    const heroStartAuto = () => {
+      if (heroSlides.length <= 1 || heroReducedMotion.matches || heroAutoTimer !== null) {
+        return;
+      }
+      heroAutoTimer = window.setInterval(() => {
+        heroSetSlide(heroCurrent + 1);
+      }, 5500);
+    };
+    const heroRestartAuto = () => {
+      heroStopAuto();
+      heroStartAuto();
+    };
+    const onHeroPrev = () => {
+      heroSetSlide(heroCurrent - 1);
+      heroRestartAuto();
+    };
+    const onHeroNext = () => {
+      heroSetSlide(heroCurrent + 1);
+      heroRestartAuto();
+    };
+    const onHeroPointerEnter = () => heroStopAuto();
+    const onHeroPointerLeave = () => heroStartAuto();
+    const onHeroTouchStart = () => heroStopAuto();
+    const onHeroTouchEnd = () => heroStartAuto();
+    const onHeroFocusIn = () => heroStopAuto();
+    const onHeroFocusOut = () => {
+      if (!heroRotator?.contains(document.activeElement)) heroStartAuto();
+    };
+    const onHeroReducedMotionChange = () => {
+      if (heroReducedMotion.matches) heroStopAuto();
+      else heroStartAuto();
+    };
+
+    if (heroRotator && heroSlides.length > 0) {
+      heroSetSlide(0);
+      heroStartAuto();
+
+      heroPrevButton?.addEventListener("click", onHeroPrev);
+      heroNextButton?.addEventListener("click", onHeroNext);
+      for (const dot of heroDots) {
+        const onHeroDotClick = () => {
+          const raw = dot.getAttribute("data-hero-index");
+          const target = raw ? Number.parseInt(raw, 10) : Number.NaN;
+          if (!Number.isNaN(target)) {
+            heroSetSlide(target);
+            heroRestartAuto();
+          }
+        };
+        heroDotHandlers.push(onHeroDotClick);
+        dot.addEventListener("click", onHeroDotClick);
+      }
+
+      heroRotator.addEventListener("mouseenter", onHeroPointerEnter);
+      heroRotator.addEventListener("mouseleave", onHeroPointerLeave);
+      heroRotator.addEventListener("touchstart", onHeroTouchStart, { passive: true });
+      heroRotator.addEventListener("touchend", onHeroTouchEnd, { passive: true });
+      heroRotator.addEventListener("focusin", onHeroFocusIn);
+      heroRotator.addEventListener("focusout", onHeroFocusOut);
+      heroReducedMotion.addEventListener("change", onHeroReducedMotionChange);
+    }
+
     return () => {
       window.removeEventListener("scroll", onScroll);
       if (recalc) {
@@ -131,6 +235,21 @@ export function MarketingScripts() {
       }
       document.removeEventListener("click", onStartNow);
       spy?.disconnect();
+
+      heroStopAuto();
+      heroPrevButton?.removeEventListener("click", onHeroPrev);
+      heroNextButton?.removeEventListener("click", onHeroNext);
+      for (const [index, dot] of heroDots.entries()) {
+        const handler = heroDotHandlers[index];
+        if (handler) dot.removeEventListener("click", handler);
+      }
+      heroRotator?.removeEventListener("mouseenter", onHeroPointerEnter);
+      heroRotator?.removeEventListener("mouseleave", onHeroPointerLeave);
+      heroRotator?.removeEventListener("touchstart", onHeroTouchStart);
+      heroRotator?.removeEventListener("touchend", onHeroTouchEnd);
+      heroRotator?.removeEventListener("focusin", onHeroFocusIn);
+      heroRotator?.removeEventListener("focusout", onHeroFocusOut);
+      heroReducedMotion.removeEventListener("change", onHeroReducedMotionChange);
     };
   }, []);
 

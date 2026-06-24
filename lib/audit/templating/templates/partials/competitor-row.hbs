@@ -5,7 +5,12 @@
       <span class="competitor-name-text">{{name}}{{#if is_you}} <span class="you-tag">{{../t.you_tag}}</span>{{/if}}{{#if name_secondary}}<br><span class="competitor-name-sec">{{name_secondary}}</span>{{/if}}</span>
     </div>
   </td>
-  <td><div class="competitor-address">{{address}}</div></td>
+  <td>
+    <div class="competitor-address">
+      <div class="competitor-address-main">{{address}}</div>
+      {{#if distance_display}}<div class="competitor-distance">{{distance_display}}</div>{{/if}}
+    </div>
+  </td>
   <td><strong>{{score}}</strong></td>
   <td>{{rating_display}}</td>
   <td>{{total_count}}</td>
