@@ -46,8 +46,8 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
             .
           </p>
           <p className="mt-1">
-            BAAM Review is operated by BAAM Platform Inc., a New York
-            corporation. 90 North St, Middletown, NY 10940.
+            BAAM Review is operated by Harmonia Strategy Inc. 28 Pine St,
+            Middletown, NY 10940.
           </p>
         </footer>
       </div>
