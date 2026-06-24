@@ -50,7 +50,7 @@ export function BlogShell({ children, active }: BlogShellProps) {
         <div className="blog-footer-inner">
           <div className="blog-footer-brand">BAAM Review</div>
           <p className="blog-footer-tagline">
-            A Review-to-Revenue Engine for local businesses. From BAAM Studio.
+            A Review-to-Revenue Engine for local businesses.
           </p>
           <div className="blog-footer-links">
             <Link href="/about">About</Link>
@@ -59,7 +59,10 @@ export function BlogShell({ children, active }: BlogShellProps) {
             <Link href="/legal/privacy">Privacy</Link>
             <Link href="/legal/terms">Terms</Link>
           </div>
-          <p className="blog-footer-copy">© BAAM Studio. All rights reserved.</p>
+          <p className="blog-footer-copy">
+            © Harmonia Strategy Inc. BAAM Review and BAAM Platform are products
+            of Harmonia Strategy Inc.
+          </p>
         </div>
       </footer>
     </>

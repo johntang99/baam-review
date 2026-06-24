@@ -42,7 +42,7 @@ export function MarketingFooter() {
             </span>
           </div>
           <p className="max-w-[280px] font-serif text-[15px] italic leading-relaxed text-text-soft">
-            A Review-to-Revenue Engine for local businesses. From BAAM Studio.
+            A Review-to-Revenue Engine for local businesses.
           </p>
         </div>
 
@@ -69,9 +69,9 @@ export function MarketingFooter() {
 
       <div className="border-t border-border-soft">
         <div className="mx-auto flex max-w-[1240px] flex-col items-start justify-between gap-3 px-8 py-6 text-[12.5px] text-text-muted sm:flex-row sm:items-center">
-          <p>© 2026 BAAM Studio</p>
+          <p>© 2026 Harmonia Strategy Inc.</p>
           <p className="font-serif italic">
-            Built in New York · Designed for local businesses everywhere
+            BAAM Review and BAAM Platform are products of Harmonia Strategy Inc.
           </p>
         </div>
       </div>
