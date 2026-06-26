@@ -50,6 +50,12 @@ export async function GET(
 
   const model = await buildShortReportModel(data, language);
   const bodyHtml = renderShortReportBodyHtml(model);
+  const fontBase =
+    process.env.AUDIT_FONT_BASE ??
+    (process.env.NODE_ENV === "production"
+      ? (process.env.NEXT_PUBLIC_APP_URL ?? "https://baamreview.com")
+      : "http://localhost:4001");
+  const shortReportStyles = SHORT_REPORT_STYLES.replace(/__FONT_BASE__/g, fontBase);
   const fullHtml = [
     "<!doctype html>",
     `<html lang="${language}">`,
@@ -57,7 +63,7 @@ export async function GET(
     '<meta charset="utf-8" />',
     '<meta name="viewport" content="width=device-width, initial-scale=1" />',
     "<title>BAAM Short Report</title>",
-    `<style>${SHORT_REPORT_STYLES}</style>`,
+    `<style>${shortReportStyles}</style>`,
     "</head>",
     "<body>",
     bodyHtml,

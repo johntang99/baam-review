@@ -228,12 +228,24 @@ export async function buildShortReportModel(
 }
 
 export const SHORT_REPORT_STYLES = `
+  @font-face { font-family: 'Instrument Serif'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/instrument-serif-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/archivo-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 600; font-display: swap; src: url('__FONT_BASE__/fonts/archivo-600.woff2') format('woff2'); }
+  @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 700; font-display: swap; src: url('__FONT_BASE__/fonts/archivo-700.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/jetbrains-mono-400.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url('__FONT_BASE__/fonts/jetbrains-mono-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Serif TC'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/noto-serif-tc-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Serif TC'; font-style: normal; font-weight: 700; font-display: swap; src: url('__FONT_BASE__/fonts/noto-serif-tc-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 400; font-display: swap; src: url('__FONT_BASE__/fonts/noto-sans-tc-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 500; font-display: swap; src: url('__FONT_BASE__/fonts/noto-sans-tc-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Noto Sans TC'; font-style: normal; font-weight: 700; font-display: swap; src: url('__FONT_BASE__/fonts/noto-sans-tc-700.woff2') format('woff2'); }
+
   .short-letter-root {
     background: #ffffff;
     min-height: 100vh;
     padding: 20px 16px 40px;
     color: #1a1814;
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    font-family: 'Archivo', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     line-height: 1.45;
   }
   .short-letter-topbar {
@@ -267,7 +279,7 @@ export const SHORT_REPORT_STYLES = `
     font-weight: 600;
   }
   .short-letter-audit-id {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 12px;
     color: #6b6259;
   }
@@ -281,7 +293,7 @@ export const SHORT_REPORT_STYLES = `
   }
   .short-letter-page.page:last-of-type { page-break-after: auto; }
   .short-letter-kicker {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -293,7 +305,7 @@ export const SHORT_REPORT_STYLES = `
   }
   .short-letter-title {
     margin: 0 auto;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', Georgia, "Times New Roman", serif;
     font-size: 42px;
     line-height: 1.02;
     color: #842f1b;
@@ -328,7 +340,7 @@ export const SHORT_REPORT_STYLES = `
   }
   .score-title {
     margin: 0 0 10px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.16em;
@@ -345,14 +357,14 @@ export const SHORT_REPORT_STYLES = `
     margin-bottom: 10px;
   }
   .score-big {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', Georgia, "Times New Roman", serif;
     font-size: 72px;
     line-height: 0.92;
     letter-spacing: -0.02em;
     color: #1a1814;
   }
   .score-big span {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 13px;
     color: #6b6259;
     margin-left: 6px;
@@ -364,7 +376,7 @@ export const SHORT_REPORT_STYLES = `
     align-items: center;
   }
   .grade-letter {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', Georgia, "Times New Roman", serif;
     font-size: 58px;
     line-height: 0.92;
     color: #842f1b;
@@ -383,7 +395,7 @@ export const SHORT_REPORT_STYLES = `
     font-size: 12px;
   }
   .metric .label {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -403,13 +415,13 @@ export const SHORT_REPORT_STYLES = `
   }
   .num {
     text-align: right;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 12px;
     font-weight: 600;
   }
   .section-title {
     margin: 26px 0 10px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.16em;
@@ -440,7 +452,7 @@ export const SHORT_REPORT_STYLES = `
     text-align: left;
     padding: 8px 9px;
     border-bottom: 1px solid #c9bfae;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -464,7 +476,7 @@ export const SHORT_REPORT_STYLES = `
     font-size: 12px;
   }
   .grade-letter-pill {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', Georgia, "Times New Roman", serif;
     font-size: 22px;
     line-height: 1;
     color: #842f1b;
@@ -475,7 +487,7 @@ export const SHORT_REPORT_STYLES = `
     margin-left: 8px;
     padding: 2px 7px;
     border-radius: 2px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 8px;
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -496,7 +508,7 @@ export const SHORT_REPORT_STYLES = `
     text-align: left;
     padding: 8px 9px;
     border-bottom: 1px solid #c9bfae;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -511,7 +523,7 @@ export const SHORT_REPORT_STYLES = `
   }
   .mini-table tr:last-child td { border-bottom: none; }
   .mini-table tr.you-grade { background: #faf7f0; }
-  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .mono { font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   .action-headline {
     margin: 6px 0 18px;
     font-size: 28px;
@@ -568,7 +580,7 @@ export const SHORT_REPORT_STYLES = `
     max-width: 560px;
   }
   .ps-prefix {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: 'Instrument Serif', 'Noto Serif TC', Georgia, "Times New Roman", serif;
     font-size: 28px;
     color: #1a1814;
     margin-right: 8px;
