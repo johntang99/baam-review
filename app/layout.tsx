@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   title:
     "BAAM Review — Turn happy customers into reviews, referrals, and revenue",
   description:
-    "The Review-to-Revenue Engine for local businesses. Collect Google reviews in 60 seconds, display them on your website, distribute to Xiaohongshu and social, turn happy customers into referrals. From $49/month.",
+    "The Review-to-Revenue Engine for local businesses. Collect Google reviews, turn happy customers into reviewers, referrals.",
 };
 
 export default function RootLayout({
