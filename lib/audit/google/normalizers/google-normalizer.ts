@@ -223,9 +223,15 @@ function parseAddress(
   formatted: string,
 ): { street: string; city: string; state: string; zip: string; country: string } {
   const byType = (type: string, short = false): string => {
-    const c = components.find((x) => x.types.includes(type));
+    const c = components.find((x) => Array.isArray(x?.types) && x.types.includes(type));
     if (!c) return "";
-    return short ? c.shortText : c.longText;
+    const longText =
+      typeof c.longText === "string" ? c.longText : (c as { long_text?: string }).long_text;
+    const shortText =
+      typeof c.shortText === "string"
+        ? c.shortText
+        : (c as { short_text?: string }).short_text;
+    return short ? shortText || longText || "" : longText || shortText || "";
   };
 
   const streetNumber = byType("street_number");
