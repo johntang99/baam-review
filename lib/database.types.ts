@@ -635,6 +635,52 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["opt_outs"]["Insert"]>;
         Relationships: [];
       };
+      sms_consents: {
+        Row: {
+          id: string;
+          account_id: string | null;
+          location_id: string | null;
+          business_name: string | null;
+          first_name: string | null;
+          phone_e164: string;
+          consent_status: "opted_in" | "opted_out";
+          consent_method: string;
+          consent_text: string;
+          form_version: string;
+          source_url: string;
+          source_path: string;
+          source_label: string | null;
+          ip_address: string | null;
+          user_agent: string | null;
+          metadata: Json;
+          consented_at: string;
+          opted_out_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          account_id?: string | null;
+          location_id?: string | null;
+          business_name?: string | null;
+          first_name?: string | null;
+          phone_e164: string;
+          consent_status?: "opted_in" | "opted_out";
+          consent_method?: string;
+          consent_text: string;
+          form_version?: string;
+          source_url: string;
+          source_path: string;
+          source_label?: string | null;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          metadata?: Json;
+          consented_at?: string;
+          opted_out_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["sms_consents"]["Insert"]>;
+        Relationships: [];
+      };
       booking_requests: {
         Row: {
           id: string;

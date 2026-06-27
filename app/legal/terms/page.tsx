@@ -207,6 +207,47 @@ export default function TermsPage() {
         <a href="/legal/privacy">Privacy Policy</a>. If you need a separate DPA,
         contact <a href="mailto:support@baamplatform.com">support@baamplatform.com</a>.
       </p>
+      <h3>SMS Program Terms (US)</h3>
+      <p>
+        BAAM Review may send SMS messages on behalf of participating businesses
+        for review requests and service follow-ups. By providing your mobile
+        number and checking an unchecked consent checkbox, you provide express
+        consent to receive these SMS messages.
+      </p>
+      <ul>
+        <li>
+          <strong>Program name:</strong> BAAM Review SMS Program
+        </li>
+        <li>
+          <strong>Program description:</strong> post-visit review requests and
+          related follow-up messages
+        </li>
+        <li>
+          <strong>Message frequency:</strong> varies (typically 1-2 messages per
+          visit)
+        </li>
+        <li>
+          <strong>Message and data rates:</strong> may apply
+        </li>
+        <li>
+          <strong>Consent:</strong> not a condition of purchase
+        </li>
+        <li>
+          <strong>Opt-out:</strong> reply <strong>STOP</strong>,{" "}
+          <strong>UNSUBSCRIBE</strong>, <strong>CANCEL</strong>,{" "}
+          <strong>END</strong>, or <strong>QUIT</strong> to opt out
+        </li>
+        <li>
+          <strong>Help:</strong> reply <strong>HELP</strong> for help or contact{" "}
+          <a href="mailto:support@baamplatform.com">
+            support@baamplatform.com
+          </a>
+        </li>
+        <li>
+          <strong>Carrier notice:</strong> carriers are not liable for delayed
+          or undelivered messages
+        </li>
+      </ul>
 
       <h2>8. Confidentiality</h2>
       <p>

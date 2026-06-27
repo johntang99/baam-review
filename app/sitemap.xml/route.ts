@@ -68,6 +68,7 @@ const STATIC_ENTRIES: StaticEntry[] = [
   { path: "/start/how-we-work", priority: 0.7, changefreq: "monthly" },
   { path: "/start/welcome", priority: 0.5, changefreq: "monthly" },
   { path: "/book", priority: 0.6, changefreq: "monthly", zhPath: "/book/zh" },
+  { path: "/sms-consent", priority: 0.4, changefreq: "yearly" },
   { path: "/legal/privacy", priority: 0.3, changefreq: "yearly" },
   { path: "/legal/terms", priority: 0.3, changefreq: "yearly" },
   { path: "/legal/dpa", priority: 0.3, changefreq: "yearly" },
