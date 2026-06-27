@@ -34,6 +34,8 @@ export interface CreateListInput {
   locationId: string;
   defaultLanguage: Lang;
   rows: RawRow[];
+  consentAttested: boolean;
+  consentSourceUrl: string;
   // "draft" → back to /app/lists ; "review" → /app/lists/[id]/review
   destination: "draft" | "review";
 }
@@ -57,6 +59,31 @@ export async function createList(
   }
   if (input.rows.length === 0) {
     return { ok: false, error: "Import at least one customer." };
+  }
+  if (!input.consentAttested) {
+    return {
+      ok: false,
+      error:
+        "Confirm consent collection before uploading: the client must collect SMS consent before sharing contacts.",
+    };
+  }
+
+  const consentSourceUrl = input.consentSourceUrl.trim();
+  let parsedConsentUrl: URL;
+  try {
+    parsedConsentUrl = new URL(consentSourceUrl);
+  } catch {
+    return {
+      ok: false,
+      error:
+        "Provide a valid consent-source URL (where your client collects consent).",
+    };
+  }
+  if (!["http:", "https:"].includes(parsedConsentUrl.protocol)) {
+    return {
+      ok: false,
+      error: "Consent-source URL must start with http:// or https://",
+    };
   }
 
   // Resolve the public.users row id for created_by (matches the
@@ -90,6 +117,11 @@ export async function createList(
       status: "draft",
       customer_count: validated.length,
       created_by: profile?.id ?? null,
+      consent_attested: true,
+      consent_attested_at: new Date().toISOString(),
+      consent_source_url: parsedConsentUrl.toString(),
+      consent_attestation_method: "client_collected",
+      consent_attested_by: profile?.id ?? null,
     })
     .select("id")
     .single();

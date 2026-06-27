@@ -814,6 +814,16 @@ export interface Database {
           max_touches: number;
           notes: string | null;
           template_variants: Json | null;
+          consent_attested: boolean;
+          consent_attested_at: string | null;
+          consent_source_url: string | null;
+          consent_attestation_method:
+            | "client_collected"
+            | "first_party_form"
+            | "api_import"
+            | "other"
+            | null;
+          consent_attested_by: string | null;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -832,6 +842,16 @@ export interface Database {
           max_touches?: number;
           notes?: string | null;
           template_variants?: Json | null;
+          consent_attested?: boolean;
+          consent_attested_at?: string | null;
+          consent_source_url?: string | null;
+          consent_attestation_method?:
+            | "client_collected"
+            | "first_party_form"
+            | "api_import"
+            | "other"
+            | null;
+          consent_attested_by?: string | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
