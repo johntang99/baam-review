@@ -143,17 +143,25 @@ function renderShortReportBodyHtml(model: ShortReportModel): string {
     .join("");
 
   const competitorRowsHtml = model.competitorRows
-    .map(
-      (row) => `
+    .map((row) => {
+      const businessMeta = [row.addressLine, row.distanceDisplay]
+        .filter((v) => typeof v === "string" && v.trim().length > 0)
+        .join(" · ");
+      return `
         <tr${row.isYou ? ' class="you-grade"' : ""}>
           <td class="mono">${row.rank}</td>
-          <td>${escapeHtml(row.name)}${row.isYou ? ` <span class="you-tag">${escapeHtml(ui.yourRowTag)}</span>` : ""}</td>
+          <td class="mini-business-cell">
+            <div class="mini-business-row-top">
+              <div class="mini-business-name">${escapeHtml(row.name)}${row.isYou ? ` <span class="you-tag">${escapeHtml(ui.yourRowTag)}</span>` : ""}</div>
+              ${row.websiteDisplay ? `<span class="mini-business-website">${escapeHtml(row.websiteDisplay)}</span>` : ""}
+            </div>
+            ${businessMeta ? `<div class="mini-business-meta">${escapeHtml(businessMeta)}</div>` : ""}
+          </td>
           <td class="mono">${row.score}</td>
-          <td class="mono">${escapeHtml(row.rating)}</td>
-          <td class="mono">${row.total}</td>
+          <td class="mono">${escapeHtml(row.rating)} · ${row.total}</td>
           <td class="mono">${escapeHtml(String(row.last30d))}</td>
-        </tr>`,
-    )
+        </tr>`;
+    })
     .join("");
 
   const actionsHtml = model.actions
@@ -162,12 +170,26 @@ function renderShortReportBodyHtml(model: ShortReportModel): string {
 
   const gradeMeaning =
     model.gradeLadder.find((row) => row.grade === model.grade)?.meaning ?? "";
+  const businessAddressLine = [model.businessAddressLine1, model.businessAddressLine2]
+    .filter((v) => v && v.trim().length > 0)
+    .join(" · ");
+  const businessMetaHtml = [
+    businessAddressLine
+      ? `<p class="line address">${escapeHtml(businessAddressLine)}</p>`
+      : "",
+    model.businessWebsiteLine
+      ? `<p class="line website">${escapeHtml(model.businessWebsiteLine)}</p>`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("");
 
   return `
     <main class="short-letter-root">
       <section class="short-letter-page page">
         <div class="short-letter-kicker">${escapeHtml(ui.kicker)}</div>
         <h1 class="short-letter-title">${escapeHtml(model.businessName)}</h1>
+        ${businessMetaHtml ? `<div class="short-letter-business-meta">${businessMetaHtml}</div>` : ""}
         <p class="short-letter-subtitle">${escapeHtml(ui.sentenceA)}</p>
         <p class="short-letter-subtitle soft">${escapeHtml(ui.sentenceB)}</p>
 
@@ -199,7 +221,7 @@ function renderShortReportBodyHtml(model: ShortReportModel): string {
         </table>
       </section>
 
-      <section class="short-letter-page page">
+      <section class="short-letter-page page page-2">
         <p class="section-title-strong">${escapeHtml(ui.competitorsTitle)} (${model.competitorRows.length} ${escapeHtml(ui.businessesWord)})</p>
         <table class="mini-table">
           <thead>
@@ -207,8 +229,7 @@ function renderShortReportBodyHtml(model: ShortReportModel): string {
               <th>${escapeHtml(ui.rankCol)}</th>
               <th>${escapeHtml(ui.businessCol)}</th>
               <th>${escapeHtml(ui.scoreCol)}</th>
-              <th>${escapeHtml(ui.ratingCol)}</th>
-              <th>${escapeHtml(ui.totalCol)}</th>
+              <th>${escapeHtml(ui.ratingTotalCol)}</th>
               <th>${escapeHtml(ui.last30dCol)}</th>
             </tr>
           </thead>

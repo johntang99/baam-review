@@ -12,6 +12,19 @@ export interface PostReplyResult {
   error?: string;
 }
 
+function normalizeGbpReplyError(error: unknown): string {
+  const message =
+    error instanceof Error ? error.message : "Google rejected the reply.";
+  const isNotFound =
+    message.includes("GBP reply failed (404)") ||
+    message.includes("GBP reply delete failed (404)") ||
+    message.includes('"status":"NOT_FOUND"');
+  if (isNotFound) {
+    return "Google can't find this review anymore (it may have been removed or moved). Click Sync now, then try again. If it still fails, reconnect Google for this location.";
+  }
+  return message;
+}
+
 export async function postReply(opts: {
   reviewId: string;
   comment: string;
@@ -85,7 +98,7 @@ export async function postReply(opts: {
   } catch (e) {
     return {
       ok: false,
-      error: e instanceof Error ? e.message : "Google rejected the reply.",
+      error: normalizeGbpReplyError(e),
     };
   }
 
@@ -159,7 +172,7 @@ export async function removeReply(reviewId: string): Promise<PostReplyResult> {
   } catch (e) {
     return {
       ok: false,
-      error: e instanceof Error ? e.message : "Google rejected the delete.",
+      error: normalizeGbpReplyError(e),
     };
   }
 

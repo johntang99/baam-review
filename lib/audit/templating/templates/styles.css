@@ -1177,6 +1177,22 @@
     text-transform: none;
     color: var(--ink);
   }
+  .competitor-meta-sep {
+    margin: 0 6px;
+    color: var(--ink-mute);
+  }
+  .competitor-site-link,
+  .competitor-site-text {
+    font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+    text-transform: lowercase;
+  }
+  .competitor-site-link {
+    text-decoration: none;
+    border-bottom: 1px dotted var(--rule-soft);
+    padding-bottom: 1px;
+  }
   .competitor-table tr.you {
     background: var(--cream-deep);
   }

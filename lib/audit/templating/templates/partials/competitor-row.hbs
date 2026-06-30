@@ -8,7 +8,43 @@
   <td>
     <div class="competitor-address">
       <div class="competitor-address-main">{{address}}</div>
-      {{#if distance_display}}<div class="competitor-distance">{{distance_display}}</div>{{/if}}
+      {{#if distance_display}}
+        <div class="competitor-distance">
+          <span>{{distance_display}}</span>
+          {{#if website_display}}
+            <span class="competitor-meta-sep">·</span>
+            {{#if website_url}}
+              <a
+                class="competitor-site-link"
+                href="{{website_url}}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{website_display}}
+              </a>
+            {{else}}
+              <span class="competitor-site-text">{{website_display}}</span>
+            {{/if}}
+          {{/if}}
+        </div>
+      {{else}}
+        {{#if website_display}}
+          <div class="competitor-distance">
+            {{#if website_url}}
+              <a
+                class="competitor-site-link"
+                href="{{website_url}}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{website_display}}
+              </a>
+            {{else}}
+              <span class="competitor-site-text">{{website_display}}</span>
+            {{/if}}
+          </div>
+        {{/if}}
+      {{/if}}
     </div>
   </td>
   <td><strong>{{score}}</strong></td>

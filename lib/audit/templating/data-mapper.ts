@@ -460,6 +460,17 @@ function formatDistanceLabel(
   return language === "zh" ? `距離 ${value} 英里` : `${value} mi away`;
 }
 
+function normalizeWebsiteUrl(input: string | null | undefined): string {
+  const raw = (input ?? "").trim();
+  if (!raw) return "";
+  try {
+    const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+    return new URL(withProtocol).toString();
+  } catch {
+    return "";
+  }
+}
+
 function formatZhAddressLine2(google: AuditGoogleData): string {
   const stateZh = google.business.state === "NY" ? "紐約州" : google.business.state;
   return `${stateZh}${google.business.city} · ${google.business.zip}`.trim();
@@ -894,6 +905,8 @@ function buildCompetitorRows(
     name_secondary: pickSecondaryName(google.business, language),
     address: shortAddress(google.business),
     distance_display: "",
+    website_display: displayWebsite(google.business.website),
+    website_url: normalizeWebsiteUrl(google.business.website),
     is_you: true,
     score: score.total,
     rating_display: `${google.reviews_aggregate.rating.toFixed(1)} ★`,
@@ -918,6 +931,8 @@ function buildCompetitorRows(
     name_secondary: pickSecondaryName(c.google.business, language),
     address: shortAddress(c.google.business),
     distance_display: formatDistanceLabel(c.distance_miles, language),
+    website_display: displayWebsite(c.google.business.website),
+    website_url: normalizeWebsiteUrl(c.google.business.website),
     is_you: false,
     score: computeAuditScore(c.google, competitors, benchmarks).total,
     rating_display: `${c.google.reviews_aggregate.rating.toFixed(1)} ★`,

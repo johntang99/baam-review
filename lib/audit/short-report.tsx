@@ -58,12 +58,18 @@ export interface ShortReportModel {
   isZh: boolean;
   auditId: string;
   businessName: string;
+  businessAddressLine1: string;
+  businessAddressLine2: string;
+  businessWebsiteLine: string;
   score: number;
   grade: "A" | "B" | "C" | "D" | "F";
   metrics: Array<{ label: string; fillPct: number; score: number }>;
   competitorRows: Array<{
     rank: number;
     name: string;
+    websiteDisplay: string;
+    addressLine: string;
+    distanceDisplay: string;
     isYou: boolean;
     score: number;
     rating: string;
@@ -98,8 +104,7 @@ export interface ShortReportModel {
     rankCol: string;
     businessCol: string;
     scoreCol: string;
-    ratingCol: string;
-    totalCol: string;
+    ratingTotalCol: string;
     last30dCol: string;
   };
 }
@@ -137,6 +142,9 @@ export async function buildShortReportModel(
     .map((row, index) => ({
       rank: index + 1,
       name: row.name,
+      websiteDisplay: row.website_display ?? "",
+      addressLine: row.address ?? "",
+      distanceDisplay: row.distance_display ?? "",
       isYou: row.is_you,
       score: row.score,
       rating: String(row.rating_display).replace(" ★", "★"),
@@ -172,8 +180,7 @@ export async function buildShortReportModel(
         rankCol: "名次",
         businessCol: "商家",
         scoreCol: "分數",
-        ratingCol: "評分",
-        totalCol: "總評論",
+        ratingTotalCol: "評分 · 總評論",
         last30dCol: "近30天",
       }
     : {
@@ -203,8 +210,7 @@ export async function buildShortReportModel(
         rankCol: "Rank",
         businessCol: "Business",
         scoreCol: "Score",
-        ratingCol: "Rating",
-        totalCol: "Total",
+        ratingTotalCol: "Rating · Total",
         last30dCol: "Last 30d",
       };
 
@@ -213,6 +219,9 @@ export async function buildShortReportModel(
     isZh,
     auditId: audit.id,
     businessName: view.business_name,
+    businessAddressLine1: view.business_address_line_1 ?? "",
+    businessAddressLine2: view.business_address_line_2 ?? "",
+    businessWebsiteLine: view.business_website_line ?? "",
     score: view.score_total,
     grade: view.score_grade,
     metrics: view.subscore_rows.slice(0, 5).map((m) => ({
@@ -313,6 +322,27 @@ export const SHORT_REPORT_STYLES = `
     width: 100%;
     text-align: center;
     padding: 0;
+  }
+  .short-letter-business-meta {
+    margin: 8px 0 14px;
+    text-align: center;
+    color: #6b6259;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .short-letter-business-meta .line {
+    margin: 0;
+  }
+  .short-letter-business-meta .line.address {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .short-letter-business-meta .website {
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.03em;
   }
   .short-letter-subtitle {
     margin: 22px 0 4px;
@@ -506,7 +536,7 @@ export const SHORT_REPORT_STYLES = `
   }
   .mini-table th {
     text-align: left;
-    padding: 8px 9px;
+    padding: 7px 8px;
     border-bottom: 1px solid #c9bfae;
     font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 11px;
@@ -516,14 +546,128 @@ export const SHORT_REPORT_STYLES = `
     font-weight: 500;
   }
   .mini-table td {
-    padding: 8px 9px;
+    padding: 7px 8px;
     border-bottom: 1px solid #ddd3bf;
     vertical-align: middle;
     font-size: 13px;
   }
+  .mini-table th:nth-child(2),
+  .mini-table td:nth-child(2) {
+    width: 360px;
+    max-width: 360px;
+  }
+  .mini-table th:nth-child(1),
+  .mini-table td:nth-child(1) {
+    width: 48px;
+  }
+  .mini-table th:nth-child(3),
+  .mini-table td:nth-child(3) {
+    width: 64px;
+  }
+  .mini-table th:nth-child(4),
+  .mini-table td:nth-child(4) {
+    width: 124px;
+  }
+  .mini-table th:nth-child(5),
+  .mini-table td:nth-child(5) {
+    width: 72px;
+  }
   .mini-table tr:last-child td { border-bottom: none; }
   .mini-table tr.you-grade { background: #faf7f0; }
   .mono { font-family: 'JetBrains Mono', 'Noto Sans TC', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .mini-business-cell {
+    max-width: 360px;
+  }
+  .mini-business-row-top {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+  .mini-business-name {
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .mini-business-website {
+    font-size: 11px;
+    color: #6b6259;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 1 120px;
+    line-height: 1.2;
+  }
+  .mini-business-meta {
+    margin-top: 2px;
+    font-size: 11px;
+    color: #6b6259;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+  .short-letter-page.page-2 .section-title-strong {
+    margin: 2px 0 12px;
+    font-size: 24px;
+  }
+  .short-letter-page.page-2 .mini-table {
+    margin-bottom: 18px;
+  }
+  .short-letter-page.page-2 .mini-table th {
+    padding: 6px 7px;
+    font-size: 10px;
+  }
+  .short-letter-page.page-2 .mini-table td {
+    padding: 6px 7px;
+    font-size: 12px;
+  }
+  .short-letter-page.page-2 .mini-business-website,
+  .short-letter-page.page-2 .mini-business-meta {
+    font-size: 10px;
+  }
+  .short-letter-page.page-2 .action-headline {
+    margin: 8px 0 12px;
+    font-size: 23px;
+    line-height: 1.16;
+  }
+  .short-letter-page.page-2 .short-action-list {
+    font-size: 15px;
+    line-height: 1.28;
+  }
+  .short-letter-page.page-2 .short-action-list li {
+    margin: 5px 0;
+  }
+  .short-letter-page.page-2 .para {
+    margin: 14px 0 0;
+    font-size: 17px;
+    line-height: 1.3;
+  }
+  .short-letter-page.page-2 .offer-layout {
+    margin-top: 14px;
+  }
+  .short-letter-page.page-2 .offer-block {
+    padding: 10px 12px;
+    font-size: 15px;
+    line-height: 1.28;
+  }
+  .short-letter-page.page-2 .offer-notes-box {
+    min-height: 118px;
+  }
+  .short-letter-page.page-2 .ps-block {
+    margin-top: 18px;
+    padding-top: 12px;
+  }
+  .short-letter-page.page-2 .ps-inline {
+    font-size: 15px;
+    line-height: 1.3;
+  }
+  .short-letter-page.page-2 .ps-prefix {
+    font-size: 24px;
+  }
   .action-headline {
     margin: 6px 0 18px;
     font-size: 28px;
@@ -622,6 +766,65 @@ export const SHORT_REPORT_STYLES = `
       page-break-after: always;
       break-after: page;
     }
+    .short-letter-page.page-2 {
+      padding: 6mm 5mm;
+    }
+    .short-letter-page.page-2 .section-title-strong {
+      margin: 4px 0 14px;
+      font-size: 22px;
+    }
+    .short-letter-page.page-2 .mini-table {
+      margin-bottom: 18px;
+    }
+    .short-letter-page.page-2 .mini-table th {
+      padding: 7px 8px;
+      font-size: 9.5px;
+    }
+    .short-letter-page.page-2 .mini-table td {
+      padding: 7px 8px;
+      font-size: 11.5px;
+    }
+    .short-letter-page.page-2 .mini-business-website,
+    .short-letter-page.page-2 .mini-business-meta {
+      font-size: 9.5px;
+      margin-top: 1px;
+    }
+    .short-letter-page.page-2 .action-headline {
+      margin: 9px 0 14px;
+      font-size: 21px;
+    }
+    .short-letter-page.page-2 .short-action-list {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+    .short-letter-page.page-2 .short-action-list li {
+      margin: 6px 0;
+    }
+    .short-letter-page.page-2 .para {
+      margin-top: 16px;
+      font-size: 15px;
+    }
+    .short-letter-page.page-2 .offer-layout {
+      margin-top: 16px;
+    }
+    .short-letter-page.page-2 .offer-block {
+      font-size: 13.5px;
+      padding: 12px 14px;
+    }
+    .short-letter-page.page-2 .offer-notes-box {
+      min-height: 132px;
+    }
+    .short-letter-page.page-2 .ps-block {
+      margin-top: 16px;
+      padding-top: 10px;
+    }
+    .short-letter-page.page-2 .ps-inline {
+      font-size: 13.5px;
+      line-height: 1.35;
+    }
+    .short-letter-page.page-2 .ps-prefix {
+      font-size: 20px;
+    }
     .short-letter-page:last-of-type {
       page-break-after: auto;
       break-after: auto;
@@ -652,7 +855,10 @@ export function ShortReportBody({
   model: ShortReportModel;
   topbar?: TopbarProps;
 }) {
-  const { isZh, ui } = model;
+  const { ui } = model;
+  const businessAddressLine = [model.businessAddressLine1, model.businessAddressLine2]
+    .filter((v) => v && v.trim().length > 0)
+    .join(" · ");
 
   return (
     <main className="short-letter-root">
@@ -681,6 +887,16 @@ export function ShortReportBody({
       <section className="short-letter-page page">
         <div className="short-letter-kicker">{ui.kicker}</div>
         <h1 className="short-letter-title">{model.businessName}</h1>
+        {(businessAddressLine || model.businessWebsiteLine) && (
+          <div className="short-letter-business-meta">
+            {businessAddressLine ? (
+              <p className="line address">{businessAddressLine}</p>
+            ) : null}
+            {model.businessWebsiteLine ? (
+              <p className="line website">{model.businessWebsiteLine}</p>
+            ) : null}
+          </div>
+        )}
         <p className="short-letter-subtitle">{ui.sentenceA}</p>
         <p className="short-letter-subtitle soft">{ui.sentenceB}</p>
 
@@ -743,7 +959,7 @@ export function ShortReportBody({
         </table>
       </section>
 
-      <section className="short-letter-page page">
+      <section className="short-letter-page page page-2">
         <p className="section-title-strong">
           {ui.competitorsTitle} ({model.competitorRows.length} {ui.businessesWord})
         </p>
@@ -753,8 +969,7 @@ export function ShortReportBody({
               <th>{ui.rankCol}</th>
               <th>{ui.businessCol}</th>
               <th>{ui.scoreCol}</th>
-              <th>{ui.ratingCol}</th>
-              <th>{ui.totalCol}</th>
+              <th>{ui.ratingTotalCol}</th>
               <th>{ui.last30dCol}</th>
             </tr>
           </thead>
@@ -762,13 +977,28 @@ export function ShortReportBody({
             {model.competitorRows.map((row) => (
               <tr key={`${row.rank}-${row.name}`} className={row.isYou ? "you-grade" : undefined}>
                 <td className="mono">{row.rank}</td>
-                <td>
-                  {row.name}
-                  {row.isYou ? <span className="you-tag">{ui.yourRowTag}</span> : null}
+                <td className="mini-business-cell">
+                  <div className="mini-business-row-top">
+                    <div className="mini-business-name">
+                      {row.name}
+                      {row.isYou ? <span className="you-tag">{ui.yourRowTag}</span> : null}
+                    </div>
+                    {row.websiteDisplay ? (
+                      <span className="mini-business-website">{row.websiteDisplay}</span>
+                    ) : null}
+                  </div>
+                  {row.addressLine || row.distanceDisplay ? (
+                    <div className="mini-business-meta">
+                      {[row.addressLine, row.distanceDisplay]
+                        .filter((v) => typeof v === "string" && v.trim().length > 0)
+                        .join(" · ")}
+                    </div>
+                  ) : null}
                 </td>
                 <td className="mono">{row.score}</td>
-                <td className="mono">{row.rating}</td>
-                <td className="mono">{row.total}</td>
+                <td className="mono">
+                  {row.rating} · {row.total}
+                </td>
                 <td className="mono">{row.last30d}</td>
               </tr>
             ))}

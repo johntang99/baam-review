@@ -263,6 +263,10 @@ export interface CompetitorRowVM {
   address: string;
   /** Distance from the audited business, shown under address when known. */
   distance_display: string;
+  /** Normalized competitor website host (e.g. example.com). */
+  website_display: string;
+  /** Absolute URL used for the clickable website link. */
+  website_url: string;
   is_you: boolean;
   score: number;
   rating_display: string;
