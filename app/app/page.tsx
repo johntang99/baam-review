@@ -2,7 +2,6 @@ import Link from "next/link";
 import {
   AlertTriangle,
   ArrowRight,
-  Calendar,
   Code,
   MessageSquareReply,
   Send,
@@ -404,15 +403,14 @@ export default async function DashboardPage() {
         <BillingRequiredBanner locationName={selectedLocation.display_name} />
       )}
       {/* TOP BAR */}
-      <header className="flex items-end justify-between gap-6 flex-wrap">
+      <header className="flex items-end gap-6 flex-wrap">
         <div className="space-y-1">
           <p className="text-[11px] uppercase tracking-[0.14em] text-text-muted">
-            {todayLong} · Last {WINDOW_DAYS} days
+            {todayLong}
             {selectedLocation ? ` · ${selectedLocation.display_name}` : ""}
           </p>
           <h1 className="font-display text-[30px] leading-tight text-ink">
-            Good {greetingPart()},{" "}
-            <em className="italic text-forest font-normal">{firstName}.</em>
+            Hello <span className="text-forest">{capitalize(firstName)}</span>,
           </h1>
           {!selectedLocation && account?.name && (() => {
             const label = planLabel(account);
@@ -423,12 +421,6 @@ export default async function DashboardPage() {
               </p>
             );
           })()}
-        </div>
-        <div className="flex items-center gap-2.5">
-          <span className="inline-flex items-center gap-2 rounded-lg border border-border-base bg-paper px-3.5 py-2 text-[13px] font-medium text-text">
-            <Calendar className="h-3.5 w-3.5 text-text-soft" />
-            Last {WINDOW_DAYS} days
-          </span>
         </div>
       </header>
 
@@ -1198,13 +1190,6 @@ function EmptyDashboard() {
 // ============================================================
 // Helpers
 // ============================================================
-
-function greetingPart(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "morning";
-  if (h < 18) return "afternoon";
-  return "evening";
-}
 
 function planLabel(account: {
   review_plan: "self_service" | "full_service" | null;
