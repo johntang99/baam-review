@@ -68,8 +68,6 @@ export function NewListForm({
       : (locations[0]?.id ?? ""),
   );
   const [defaultLanguage, setDefaultLanguage] = useState<Lang>("zh");
-  const [consentAttested, setConsentAttested] = useState(false);
-  const [consentSourceUrl, setConsentSourceUrl] = useState("");
 
   const [tab, setTab] = useState<Tab>("csv");
   const [pasteText, setPasteText] = useState("");
@@ -215,8 +213,6 @@ export function NewListForm({
         locationId,
         defaultLanguage,
         rows: rawRows,
-        consentAttested,
-        consentSourceUrl,
         destination,
       });
       // Only returns when there's an error; success path redirects.
@@ -316,44 +312,6 @@ export function NewListForm({
           </div>
         </div>
 
-        <div className="mt-6 border-t border-border-base pt-5">
-          <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-text-muted">
-            Consent attestation (required)
-          </p>
-          <label className="mt-2 flex items-start gap-2.5 text-[13.5px] leading-relaxed text-text">
-            <input
-              type="checkbox"
-              checked={consentAttested}
-              onChange={(e) => setConsentAttested(e.target.checked)}
-              className="mt-[3px] h-4 w-4 rounded border-border-base"
-            />
-            <span>
-              I confirm this client collected SMS/email consent before sharing
-              these contacts with BAAM Review. Consent is stored by the client
-              and available on request.
-            </span>
-          </label>
-
-          <div className="mt-3 max-w-[560px]">
-            <label
-              htmlFor="consent-source-url"
-              className="block text-[12px] font-medium text-text mb-2 tracking-[0.02em]"
-            >
-              Client consent form/source URL
-              <span className="ml-1 font-normal text-text-muted">
-                (for compliance evidence)
-              </span>
-            </label>
-            <input
-              id="consent-source-url"
-              type="url"
-              value={consentSourceUrl}
-              onChange={(e) => setConsentSourceUrl(e.target.value)}
-              placeholder="https://clientsite.com/consent-form"
-              className="w-full rounded-lg border border-border-base bg-cream px-3.5 py-2.5 text-[14px] text-text focus:border-forest focus:bg-paper focus:outline-none"
-            />
-          </div>
-        </div>
       </div>
 
       {/* INTAKE CARD */}
