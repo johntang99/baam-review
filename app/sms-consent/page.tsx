@@ -37,16 +37,16 @@ export default async function SmsConsentPage(props: {
 
         {isSuccess ? (
           <p className="mb-4 rounded-md border border-[#C8E4D5] bg-[#F1FBF6] px-3 py-2 text-sm text-[#1F5D3F]">
-            Consent submitted and stored successfully.
+            {reason === "submitted_without_sms"
+              ? "Form submitted without SMS opt-in. No SMS consent was recorded."
+              : "SMS consent submitted and stored successfully."}
           </p>
         ) : null}
         {isError ? (
           <p className="mb-4 rounded-md border border-[#EBCBCB] bg-[#FFF5F5] px-3 py-2 text-sm text-[#8C2F2F]">
             {reason === "invalid_phone"
               ? "Please enter a valid mobile number."
-              : reason === "consent_required"
-                ? "You must check the consent box before submitting."
-                : "We could not save consent right now. Please try again."}
+              : "We could not save consent right now. Please try again."}
           </p>
         ) : null}
 
@@ -99,22 +99,25 @@ export default async function SmsConsentPage(props: {
                 id="smsConsent"
                 name="smsConsent"
                 type="checkbox"
-                required
                 className="mt-1 h-4 w-4 rounded border-border-base"
               />
               <span>
                 {SMS_CONSENT_DISCLOSURE_TEXT.split(" Terms: ")[0]} Terms:{" "}
-                <a href="/legal/terms" className="text-forest underline">
+                <Link href="/legal/terms" className="text-forest underline">
                   https://baamreview.com/legal/terms
-                </a>{" "}
+                </Link>{" "}
                 Privacy:{" "}
-                <a href="/legal/privacy" className="text-forest underline">
+                <Link href="/legal/privacy" className="text-forest underline">
                   https://baamreview.com/legal/privacy
-                </a>
+                </Link>
                 .
               </span>
             </label>
           </div>
+
+          <p className="text-xs leading-5 text-text-muted">
+            You may submit this form without agreeing to receive SMS messages.
+          </p>
 
           <button
             type="submit"

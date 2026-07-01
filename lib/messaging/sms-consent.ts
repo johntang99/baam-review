@@ -2,7 +2,7 @@ export const SMS_CONSENT_FORM_VERSION = "sms-consent-v1";
 export const SMS_CONSENT_SOURCE_PATH = "/sms-consent";
 
 export const SMS_CONSENT_DISCLOSURE_TEXT =
-  "By checking this box, you agree to receive SMS messages from [BusinessName] via BAAM Review for post-visit review requests and related follow-ups. Message frequency varies (typically 1-2 messages per visit). Message and data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. Terms: https://baamreview.com/legal/terms Privacy: https://baamreview.com/legal/privacy.";
+  "Optional SMS Consent: By checking this optional box, you agree to receive SMS messages from BAAM Review on behalf of the business name entered above for post-visit review requests and related follow-ups. Message frequency varies (typically 1-2 messages per visit). Message and data rates may apply. Reply STOP to opt out, HELP for help. Consent is not required to use services, submit this form, make a purchase, or complete any transaction. Terms: https://baamreview.com/legal/terms Privacy: https://baamreview.com/legal/privacy.";
 
 /**
  * Normalizes user-entered phone numbers to a best-effort E.164 value.

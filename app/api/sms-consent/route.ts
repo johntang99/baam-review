@@ -50,10 +50,8 @@ export async function POST(request: NextRequest) {
     .slice(0, 120);
   const mobileRaw = String(formData.get("mobileNumber") ?? "").trim();
   const smsConsent = formData.get("smsConsent");
-
-  if (smsConsent !== "on" && smsConsent !== "true" && smsConsent !== "1") {
-    return redirectWithStatus(request, "error", "consent_required");
-  }
+  const consentChecked =
+    smsConsent === "on" || smsConsent === "true" || smsConsent === "1";
 
   const phoneE164 = normalizePhoneToE164(mobileRaw);
   if (!phoneE164) {
@@ -73,8 +71,8 @@ export async function POST(request: NextRequest) {
     business_name: businessName || null,
     first_name: firstName || null,
     phone_e164: phoneE164,
-    consent_status: "opted_in",
-    consent_method: "web_form_checkbox",
+    consent_status: consentChecked ? "opted_in" : "opted_out",
+    consent_method: "web_form_checkbox_optional",
     consent_text: SMS_CONSENT_DISCLOSURE_TEXT,
     form_version: SMS_CONSENT_FORM_VERSION,
     source_url: sourceUrl,
@@ -82,9 +80,11 @@ export async function POST(request: NextRequest) {
     source_label: "Public Twilio proof page",
     ip_address: readClientIp(request),
     user_agent: userAgent,
+    opted_out_at: consentChecked ? null : new Date().toISOString(),
     metadata: {
       referer,
       raw_phone_input: mobileRaw,
+      consent_checkbox_checked: consentChecked,
       submitted_from: "app/api/sms-consent",
     },
   });
@@ -97,5 +97,9 @@ export async function POST(request: NextRequest) {
     return redirectWithStatus(request, "error", "save_failed");
   }
 
-  return redirectWithStatus(request, "success");
+  return redirectWithStatus(
+    request,
+    "success",
+    consentChecked ? "opted_in" : "submitted_without_sms",
+  );
 }
