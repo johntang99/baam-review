@@ -16,7 +16,12 @@ import {
   Download,
 } from "lucide-react";
 import { parseTable, mapColumns } from "@/lib/lists/parse";
-import { validateRow, type Lang, type RawRow } from "@/lib/lists/normalize";
+import {
+  formatPhone,
+  validateRow,
+  type Lang,
+  type RawRow,
+} from "@/lib/lists/normalize";
 import { createList } from "../actions";
 import { ReviewProgressBar } from "../[id]/review/review-progress-bar";
 
@@ -653,7 +658,7 @@ export function NewListForm({
                 <table className="w-full border-collapse text-[13.5px]">
                   <thead>
                     <tr>
-                      {["Name", "Contact", "Lang", "Notes", "Status"].map(
+                      {["Name", "Email", "Phone", "Lang", "Notes", "Status"].map(
                         (h) => (
                           <th
                             key={h}
@@ -689,7 +694,10 @@ export function NewListForm({
                             {v.name}
                           </td>
                           <td className="px-3.5 py-2.5 font-mono text-[12px] text-text-soft">
-                            {v.email ?? v.phone ?? "—"}
+                            {v.email ?? "—"}
+                          </td>
+                          <td className="px-3.5 py-2.5 font-mono text-[12px] text-text-soft">
+                            {v.phone ? formatPhone(v.phone) : "—"}
                           </td>
                           <td className="px-3.5 py-2.5">
                             <span

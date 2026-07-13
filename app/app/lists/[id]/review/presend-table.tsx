@@ -17,6 +17,7 @@ import { formatPhone } from "@/lib/lists/normalize";
 import {
   updateListCustomer,
   saveListAsDraft,
+  sendList,
   prepareGmailDraftsForList,
   getPreparedGmailDraftQueue,
 } from "../../actions";
@@ -61,10 +62,12 @@ export function PresendTable({
   const [, startTransition] = useTransition();
   type SendNotice =
     | { kind: "billing" }
+    | { kind: "success"; message: string }
     | { kind: "generic"; message: string }
     | null;
   const [sendNotice, setSendNotice] = useState<SendNotice>(null);
   const [savingDraft, setSavingDraft] = useState(false);
+  const [sendingNow, setSendingNow] = useState(false);
   const [preparingGmail, setPreparingGmail] = useState(false);
   const [gmailQueue, setGmailQueue] = useState<
     Array<{ customerId: string; name: string; href: string }>
@@ -101,6 +104,16 @@ export function PresendTable({
     (r) => r.selected && !r.excludedReason && r.status === "pending" && r.channel === "sms",
   );
   const smsCount = smsBlockingRows.length;
+  const pendingSelectedRows = rows.filter(
+    (r) => r.selected && !r.excludedReason && r.status === "pending",
+  );
+  const bulkSmsTargets = pendingSelectedRows.filter((r) => Boolean(r.phone));
+  const bulkEmailTargets = pendingSelectedRows.filter((r) => Boolean(r.email));
+  const bulkSmsActive =
+    bulkSmsTargets.length > 0 && bulkSmsTargets.every((r) => r.channel === "sms");
+  const bulkEmailActive =
+    bulkEmailTargets.length > 0 && bulkEmailTargets.every((r) => r.channel === "email");
+  const canSendSmsNow = selectedCount > 0 && smsCount > 0 && emailCount === 0;
   const sentCount = rows.filter(
     (r) => r.status === "sent" && !r.excludedReason,
   ).length;
@@ -155,7 +168,9 @@ export function PresendTable({
       (r) =>
         r.selected &&
         !r.excludedReason &&
-        !(channel === "sms" && !r.phone),
+        r.status === "pending" &&
+        !(channel === "sms" && !r.phone) &&
+        !(channel === "email" && !r.email),
     );
     setRows((rs) =>
       rs.map((r) =>
@@ -246,7 +261,12 @@ export function PresendTable({
           <button
             type="button"
             onClick={() => bulkChannel("sms")}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3 py-2 text-[12.5px] font-medium text-text hover:bg-cream-deep"
+            disabled={readOnly || bulkSmsTargets.length === 0}
+            className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-[12.5px] font-medium disabled:opacity-50 ${
+              bulkSmsActive
+                ? "border-forest bg-forest text-cream"
+                : "border-border-base bg-paper text-text hover:bg-cream-deep"
+            }`}
           >
             <MessageSquare className="h-3.5 w-3.5" />
             SMS all
@@ -254,7 +274,12 @@ export function PresendTable({
           <button
             type="button"
             onClick={() => bulkChannel("email")}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-paper px-3 py-2 text-[12.5px] font-medium text-text hover:bg-cream-deep"
+            disabled={readOnly || bulkEmailTargets.length === 0}
+            className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-[12.5px] font-medium disabled:opacity-50 ${
+              bulkEmailActive
+                ? "border-forest bg-forest text-cream"
+                : "border-border-base bg-paper text-text hover:bg-cream-deep"
+            }`}
           >
             <Mail className="h-3.5 w-3.5" />
             Email all
@@ -272,7 +297,10 @@ export function PresendTable({
                 Customer
               </th>
               <th className="bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
-                Contact
+                Email
+              </th>
+              <th className="bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
+                Phone
               </th>
               <th className="bg-cream-deep px-3.5 py-2.5 text-left text-[10.5px] uppercase tracking-[0.08em] text-text-muted font-semibold border-b border-border-base">
                 Channel
@@ -328,23 +356,21 @@ export function PresendTable({
                     )}
                   </td>
                   <td className="px-3.5 py-3 align-top">
-                    <div className="space-y-0.5 font-mono text-[12px] text-text-soft">
-                      <div
-                        className={`flex items-center gap-1.5 ${
-                          !r.email ? "text-text-muted/50" : ""
-                        }`}
-                      >
-                        <Mail className="h-3 w-3" />
-                        {r.email ?? "—"}
-                      </div>
-                      <div
-                        className={`flex items-center gap-1.5 ${
-                          !r.phone ? "text-text-muted/50" : ""
-                        }`}
-                      >
-                        <MessageSquare className="h-3 w-3" />
-                        {r.phone ? formatPhone(r.phone) : "—"}
-                      </div>
+                    <div
+                      className={`font-mono text-[12px] ${
+                        !r.email ? "text-text-muted/50" : "text-text-soft"
+                      }`}
+                    >
+                      {r.email ?? "—"}
+                    </div>
+                  </td>
+                  <td className="px-3.5 py-3 align-top">
+                    <div
+                      className={`font-mono text-[12px] ${
+                        !r.phone ? "text-text-muted/50" : "text-text-soft"
+                      }`}
+                    >
+                      {r.phone ? formatPhone(r.phone) : "—"}
                     </div>
                   </td>
                   <td className="px-3.5 py-3 align-top">
@@ -501,11 +527,58 @@ export function PresendTable({
             </div>
           )}
           <span className="h-8 w-px bg-border-base" />
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-cream px-3 py-2 text-[12.5px] text-text">
+          <button
+            type="button"
+            disabled={readOnly || sendingNow || !canSendSmsNow}
+            title={
+              canSendSmsNow
+                ? "Send selected SMS rows now"
+                : emailCount > 0
+                  ? "To send SMS now, selected rows must all be SMS. Use Email flow for email rows."
+                  : "No SMS rows selected."
+            }
+            onClick={() => {
+              setSendNotice(null);
+              setSendingNow(true);
+              startTransition(async () => {
+                const res = await sendList(listId);
+                setSendingNow(false);
+                if (!res.ok) {
+                  const detail = res.errors?.[0];
+                  if (detail?.includes("Billing required")) {
+                    setSendNotice({ kind: "billing" });
+                  } else {
+                    setSendNotice({
+                      kind: "generic",
+                      message: detail || res.error || "Could not send SMS batch.",
+                    });
+                  }
+                  return;
+                }
+
+                const sentIds = new Set(res.sentCustomerIds ?? []);
+                if (sentIds.size > 0) {
+                  setRows((rs) =>
+                    rs.map((r) =>
+                      sentIds.has(r.id) ? { ...r, status: "sent" } : r,
+                    ),
+                  );
+                }
+                setSendNotice({
+                  kind: "success",
+                  message:
+                    res.failed > 0
+                      ? `SMS sent: ${res.sent} succeeded, ${res.failed} failed.`
+                      : `SMS sent: ${res.sent} customer${res.sent === 1 ? "" : "s"}.`,
+                });
+              });
+            }}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-cream px-3 py-2 text-[12.5px] text-text hover:bg-cream-deep disabled:opacity-50"
+          >
             <Clock className="h-3.5 w-3.5 text-text-soft" />
-            Send <strong className="font-semibold">now</strong>
+            {sendingNow ? "Sending SMS…" : <>Send <strong className="font-semibold">SMS now</strong></>}
             <ChevronDown className="h-3 w-3 text-text-muted" />
-          </span>
+          </button>
           <label
             className="inline-flex items-center gap-1.5 rounded-lg border border-border-base bg-cream px-3 py-2 text-[12.5px] text-text cursor-text"
             title="Pause between Gmail draft opens (min 60s)"
@@ -535,6 +608,11 @@ export function PresendTable({
           )}
           {sendNotice?.kind === "generic" && (
             <span className="text-[12.5px] text-warn font-medium mr-2">
+              {sendNotice.message}
+            </span>
+          )}
+          {sendNotice?.kind === "success" && (
+            <span className="text-[12.5px] text-success font-medium mr-2">
               {sendNotice.message}
             </span>
           )}

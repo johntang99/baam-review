@@ -3,7 +3,7 @@ import { Check } from "lucide-react";
 interface ReviewProgressBarProps {
   /** Which step is currently active. 1 → on the lists overview, the user
    *  hasn't started a list yet. 2 → reviewing content / generating variants.
-   *  3 → Gmail send flow underway. */
+   *  3 → send flow underway. */
   current: 1 | 2 | 3;
   /** When true, step 3 is also complete (every selected, non-excluded row is
    *  sent). The whole bar then reads as finished. */
@@ -13,7 +13,7 @@ interface ReviewProgressBarProps {
 const STEPS = [
   { n: 1, label: "Import customer list" },
   { n: 2, label: "Generate variations" },
-  { n: 3, label: "Send in Gmail one by one" },
+  { n: 3, label: "Send one by one" },
 ] as const;
 
 export function ReviewProgressBar({ current, allDone }: ReviewProgressBarProps) {

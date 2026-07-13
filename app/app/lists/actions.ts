@@ -170,6 +170,7 @@ export interface SendListResult {
   ok: boolean;
   sent: number;
   failed: number;
+  sentCustomerIds?: string[];
   errors?: string[];
   error?: string;
 }
@@ -199,6 +200,16 @@ export interface PreparedGmailDraftQueueResult {
   error?: string;
 }
 
+function inferVariantsChannel(
+  variants: ListVariant[] | null,
+): "email" | "sms" | null {
+  if (!variants || variants.length === 0) return null;
+  // Email variants always carry a subject; SMS variants are body-only.
+  return variants.some((v) => (v.subject ?? "").trim().length > 0)
+    ? "email"
+    : "sms";
+}
+
 /**
  * Session 14 · Phase Gate 1 — batch send.
  *
@@ -207,8 +218,8 @@ export interface PreparedGmailDraftQueueResult {
  * be transactionally rolled back. Implemented as best-effort per-customer:
  * each success flips that customer to 'sent' + logs a list_event; failures
  * stay 'pending' and are collected. This is exactly the partial-success model
- * §4.8 is designed around. The only hard abort is the can't-send-twice guard
- * (list must be 'draft').
+ * §4.8 is designed around. We only block terminal states (completed/archived)
+ * and send rows still marked pending.
  *
  * Sends are synchronous and sequential via the existing v1 sendReviewRequest
  * (no queue/edge-function exists despite §5's assumption). v1's per-send
@@ -228,12 +239,12 @@ export async function sendList(listId: string): Promise<SendListResult> {
     .eq("id", listId)
     .maybeSingle();
   if (!list) return { ok: false, sent: 0, failed: 0, error: "List not found." };
-  if (list.status !== "draft") {
+  if (list.status === "completed" || list.status === "archived") {
     return {
       ok: false,
       sent: 0,
       failed: 0,
-      error: `List is already ${list.status} — can't send again.`,
+      error: `List is ${list.status} — can't send anymore.`,
     };
   }
 
@@ -242,7 +253,8 @@ export async function sendList(listId: string): Promise<SendListResult> {
     .select("id, name, email, phone, language, channel")
     .eq("list_id", listId)
     .eq("selected", true)
-    .is("excluded_reason", null);
+    .is("excluded_reason", null)
+    .eq("status", "pending");
 
   const targets = customers ?? [];
   if (targets.length === 0) {
@@ -258,13 +270,20 @@ export async function sendList(listId: string): Promise<SendListResult> {
     ? (list.template_variants as unknown as ListVariant[])
     : null;
   const variantLang = list.default_language;
+  const variantsChannel = inferVariantsChannel(variants);
 
   // Customers eligible for a variant — same language as the variants.
   // Build a balanced round-robin assignment ONLY across eligible customers
   // so the variant rotation stays even within the eligible subset.
   const eligibleIndices: number[] = [];
   targets.forEach((c, i) => {
-    if (c.language === variantLang) eligibleIndices.push(i);
+    if (
+      c.language === variantLang &&
+      variantsChannel !== null &&
+      c.channel === variantsChannel
+    ) {
+      eligibleIndices.push(i);
+    }
   });
   // Map customer-index → assigned variant index (only for eligible customers).
   const customerVariant = new Map<number, number>();
@@ -288,6 +307,7 @@ export async function sendList(listId: string): Promise<SendListResult> {
   const service = createServiceClient();
 
   let sent = 0;
+  const sentCustomerIds: string[] = [];
   const errors: string[] = [];
 
   for (let idx = 0; idx < targets.length; idx++) {
@@ -350,6 +370,7 @@ export async function sendList(listId: string): Promise<SendListResult> {
         metadata: { channel: c.channel, touch_number: 1 },
       });
       sent += 1;
+      sentCustomerIds.push(c.id);
     } else {
       errors.push(`${c.name}: ${res.error ?? "send failed"}`);
     }
@@ -359,11 +380,15 @@ export async function sendList(listId: string): Promise<SendListResult> {
 
   if (sent === 0) {
     // Nothing went out — revert to draft so the user can retry.
-    await supabase.from("lists").update({ status: "draft" }).eq("id", listId);
+    await supabase
+      .from("lists")
+      .update({ status: list.status === "active" ? "active" : "draft" })
+      .eq("id", listId);
     return {
       ok: false,
       sent: 0,
       failed,
+      sentCustomerIds,
       errors,
       error: "No sends succeeded — list left as draft.",
     };
@@ -385,6 +410,7 @@ export async function sendList(listId: string): Promise<SendListResult> {
     ok: true,
     sent,
     failed,
+    sentCustomerIds,
     errors: errors.length > 0 ? errors : undefined,
   };
 }
@@ -473,10 +499,16 @@ export async function prepareGmailDraftsForList(
     ? (list.template_variants as unknown as ListVariant[])
     : null;
   const variantLang = list.default_language;
+  const variantsChannel = inferVariantsChannel(variants);
 
   const eligibleIndices: number[] = [];
   targets.forEach((c, i) => {
-    if (c.language === variantLang) eligibleIndices.push(i);
+    if (
+      c.language === variantLang &&
+      variantsChannel === "email"
+    ) {
+      eligibleIndices.push(i);
+    }
   });
   const customerVariant = new Map<number, number>();
   if (variants && variants.length > 0 && eligibleIndices.length > 0) {
@@ -664,6 +696,7 @@ export async function getPreparedGmailDraftQueue(
   const variants: ListVariant[] | null = Array.isArray(list.template_variants)
     ? (list.template_variants as unknown as ListVariant[])
     : null;
+  const variantsChannel = inferVariantsChannel(variants);
 
   const drafts: PreparedGmailDraftQueueResult["drafts"] = [];
   for (const c of prepared) {
@@ -678,6 +711,7 @@ export async function getPreparedGmailDraftQueue(
       c.variant_index !== null &&
       variants &&
       variants[c.variant_index] &&
+      variantsChannel === "email" &&
       c.language === list.default_language
     ) {
       subject = personalizeVariant(variants[c.variant_index], c.name).subject;
@@ -725,11 +759,21 @@ export async function getPreparedGmailDraftQueue(
 export interface GenerateVariantsResult {
   ok: boolean;
   count?: number;
+  variants?: ListVariant[];
   error?: string;
   /** Notice when the list has customers in languages other than the
    * variants' language — those customers will fall back to the default
    * template instead of receiving a variant. */
   mixedLanguageNote?: string;
+}
+
+export interface GenerateVariantsInput {
+  /** Force the generation channel for this run. */
+  channel?: "email" | "sms";
+  /** Optional custom base body (used as AI input instead of default template). */
+  baseBody?: string;
+  /** Optional custom base subject (email only). */
+  baseSubject?: string;
 }
 
 /**
@@ -746,6 +790,7 @@ export interface GenerateVariantsResult {
  */
 export async function generateVariantsForList(
   listId: string,
+  input: GenerateVariantsInput = {},
 ): Promise<GenerateVariantsResult> {
   const supabase = await createClient();
   const {
@@ -773,10 +818,8 @@ export async function generateVariantsForList(
     .maybeSingle();
   if (!location) return { ok: false, error: "Location not found." };
 
-  // Inspect the list's customers to decide channel coverage. If any have
-  // email we generate email variants; if any have SMS we generate SMS too.
-  // For now we generate the channel matching the location's predominant
-  // path (email is the default); SMS lists can be added when SMS is wired.
+  // Default to a customer-channel sample, but allow caller override so the
+  // review UI can explicitly generate SMS or email variants on demand.
   const { data: anyCustomer } = await supabase
     .from("list_customers")
     .select("channel")
@@ -784,7 +827,8 @@ export async function generateVariantsForList(
     .eq("selected", true)
     .limit(1)
     .maybeSingle();
-  const channel: "email" | "sms" = anyCustomer?.channel === "sms" ? "sms" : "email";
+  const channel: "email" | "sms" =
+    input.channel ?? (anyCustomer?.channel === "sms" ? "sms" : "email");
 
   // Use {name} placeholder so each customer gets personalized at send time.
   const vars = {
@@ -792,14 +836,40 @@ export async function generateVariantsForList(
     businessName: location.display_name,
     link: "https://baamreview.com/r/<slug>?t=<token>",
   };
-  const base =
+  const defaultBase =
     channel === "email"
       ? buildEmail(list.default_language, vars)
       : { subject: "", body: buildSmsBody(list.default_language, vars).body };
+  const baseBody = (input.baseBody ?? defaultBase.body).trim();
+  const baseSubject =
+    channel === "email"
+      ? (input.baseSubject ?? defaultBase.subject).trim()
+      : "";
+
+  if (!baseBody) return { ok: false, error: "Body cannot be empty." };
+  if (!baseBody.includes(location.display_name)) {
+    return {
+      ok: false,
+      error: `Body must include the business name "${location.display_name}".`,
+    };
+  }
+  if (!baseBody.includes("<slug>") || !baseBody.includes("<token>")) {
+    return {
+      ok: false,
+      error:
+        "Body must include the URL placeholders <slug> and <token> so we can fill in each customer's tracking link.",
+    };
+  }
+  if (channel === "email" && !baseSubject) {
+    return { ok: false, error: "Subject cannot be empty for email variants." };
+  }
+  if (baseSubject.length > 120) {
+    return { ok: false, error: "Subject is too long (max 120 chars)." };
+  }
 
   const result = await generateListVariants({
-    baseSubject: base.subject,
-    baseBody: base.body,
+    baseSubject,
+    baseBody,
     businessName: location.display_name,
     language: list.default_language,
     channel,
@@ -849,6 +919,7 @@ export async function generateVariantsForList(
   return {
     ok: true,
     count: result.variants.length,
+    variants: result.variants,
     mixedLanguageNote,
   };
 }

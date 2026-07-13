@@ -39,8 +39,34 @@ const CHANNEL_LIMITS: Record<"email" | "sms", string> = {
   sms: "Length: 1–3 short sentences, under 320 characters total. No greeting/sign-off lines — just the message and the link.",
 };
 
+const SMS_OPT_OUT_LINE: Record<RewriteLang, string> = {
+  en: "Reply STOP to opt out.",
+  zh: "回复 STOP 取消订阅。",
+  es: "Responda STOP para cancelar.",
+};
+
+function ensureSmsOptOutLine(body: string, language: RewriteLang): string {
+  const required = SMS_OPT_OUT_LINE[language] ?? SMS_OPT_OUT_LINE.en;
+  if (body.includes(required)) return body;
+
+  // If model included a different STOP sentence, normalize that line to our
+  // canonical compliant wording; otherwise append it as a final line.
+  const lines = body
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const stopLineIndex = lines.findIndex((line) => /\bstop\b/i.test(line));
+  if (stopLineIndex >= 0) {
+    lines[stopLineIndex] = required;
+    return lines.join("\n");
+  }
+
+  return `${body.trimEnd()}\n${required}`;
+}
+
 function buildSystemPrompt(inputs: RewriteInputs): string {
   const emailMode = inputs.channel === "email";
+  const requiredSmsOptOutLine = SMS_OPT_OUT_LINE[inputs.language] ?? SMS_OPT_OUT_LINE.en;
   return [
     `You rewrite review-request ${inputs.channel} messages for small businesses.`,
     "",
@@ -63,6 +89,9 @@ function buildSystemPrompt(inputs: RewriteInputs): string {
     "6. NEVER offer incentives, discounts, gifts, or rewards in exchange for a review. NEVER imply the reviewer should leave a specific rating. NEVER use urgency tactics ('limited time', 'today only').",
     "7. NEVER mention BAAM, AI, rewriting, or any tooling. Sound like a real person from the business wrote it.",
     "8. NO emojis. NO hashtags. NO ALL-CAPS headlines.",
+    emailMode
+      ? ""
+      : `9. The BODY MUST include this opt-out sentence EXACTLY once: "${requiredSmsOptOutLine}"`,
     "",
     emailMode
       ? 'Output ONLY a JSON object with this exact shape (no preamble, no markdown fence, no commentary): {"subject":"…","body":"…"}'
@@ -172,7 +201,7 @@ export async function rewriteReviewRequestBody(
         body = parsed.body.trim();
         subject = parsed.subject.trim();
       } else {
-        body = text;
+        body = ensureSmsOptOutLine(text, inputs.language);
       }
 
       // Validate — body must keep business name + both URL placeholders +
@@ -186,9 +215,12 @@ export async function rewriteReviewRequestBody(
       const hasSlug = body.includes("<slug>");
       const hasToken = body.includes("<token>");
       const hasName = body.includes("{name}");
+      const hasSmsOptOut =
+        inputs.channel !== "sms" ||
+        body.includes(SMS_OPT_OUT_LINE[inputs.language] ?? SMS_OPT_OUT_LINE.en);
       const subjectOk = !emailMode || (subject && subject.length > 0 && subject.length <= 120);
 
-      if (hasBusinessName && hasSlug && hasToken && hasName && subjectOk) {
+      if (hasBusinessName && hasSlug && hasToken && hasName && hasSmsOptOut && subjectOk) {
         return { ok: true, body, subject: emailMode ? subject : undefined };
       }
       // else fall through to retry

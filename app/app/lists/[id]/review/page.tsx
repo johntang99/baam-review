@@ -9,8 +9,8 @@ import {
   getVisibleLocationIds,
 } from "@/lib/auth/staff";
 import { PresendTable, type PresendCustomer } from "./presend-table";
-import { VariantsPanel, type ListVariant } from "./variants-panel";
-import { DefaultContentPanel } from "./default-content-panel";
+import { type ListVariant } from "./variants-panel";
+import { ComposePanels } from "./compose-panels";
 import { ReviewProgressBar } from "./review-progress-bar";
 import type { Language } from "@/lib/i18n/review";
 
@@ -142,9 +142,12 @@ export default async function ReviewPage({
       </div>
 
       {(() => {
-        const channel: "email" | "sms" =
-          rows.some((r) => r.channel === "sms") &&
-          !rows.some((r) => r.channel === "email")
+        const pendingSelected = rows.filter(
+          (r) => r.selected && !r.excludedReason && r.status === "pending",
+        );
+        const initialChannel: "email" | "sms" =
+          pendingSelected.length > 0 &&
+          pendingSelected.every((r) => r.channel === "sms")
             ? "sms"
             : "email";
         const language = (list.default_language ?? "en") as Language;
@@ -152,21 +155,14 @@ export default async function ReviewPage({
           ? (list.template_variants as unknown as ListVariant[])
           : null;
         return (
-          <>
-            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-4 mb-12">
-              <DefaultContentPanel
-                language={language}
-                channel={channel}
-                businessName={location?.display_name ?? "your business"}
-              />
-              <VariantsPanel
-                listId={list.id}
-                initialVariants={initialVariants}
-                channel={channel}
-                readOnly={readOnly}
-              />
-            </div>
-          </>
+          <ComposePanels
+            listId={list.id}
+            language={language}
+            businessName={location?.display_name ?? "your business"}
+            initialVariants={initialVariants}
+            initialChannel={initialChannel}
+            readOnly={readOnly}
+          />
         );
       })()}
 

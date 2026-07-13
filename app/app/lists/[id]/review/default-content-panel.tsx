@@ -10,16 +10,22 @@ interface DefaultContentPanelProps {
   language: Language;
   channel: "email" | "sms";
   businessName: string;
+  smsDraftBody?: string;
+  onSmsDraftBodyChange?: (next: string) => void;
+  onSmsDraftReset?: () => void;
 }
 
-/** Read-only preview of what BAAM Review sends when no AI variants exist
+/** Preview/edit panel for the base template used when no AI variants exist
  *  (or for variant 0, which is always the default template as-is). Built
  *  from `lib/messaging/templates.ts` with sample vars so customers can
- *  see the exact copy before generating variations. */
+ *  review and tune copy before generating variations. */
 export function DefaultContentPanel({
   language,
   channel,
   businessName,
+  smsDraftBody,
+  onSmsDraftBodyChange,
+  onSmsDraftReset,
 }: DefaultContentPanelProps) {
   const vars: TemplateVars = {
     name: "{name}",
@@ -44,7 +50,13 @@ export function DefaultContentPanel({
       {channel === "email" ? (
         <EmailPreview language={language} vars={vars} />
       ) : (
-        <SmsPreview language={language} vars={vars} />
+        <SmsPreview
+          language={language}
+          vars={vars}
+          smsDraftBody={smsDraftBody}
+          onSmsDraftBodyChange={onSmsDraftBodyChange}
+          onSmsDraftReset={onSmsDraftReset}
+        />
       )}
 
       <p className="text-[11.5px] text-text-muted italic mt-auto pt-3">
@@ -85,19 +97,53 @@ function EmailPreview({
 function SmsPreview({
   language,
   vars,
+  smsDraftBody,
+  onSmsDraftBodyChange,
+  onSmsDraftReset,
 }: {
   language: Language;
   vars: TemplateVars;
+  smsDraftBody?: string;
+  onSmsDraftBodyChange?: (next: string) => void;
+  onSmsDraftReset?: () => void;
 }) {
-  const { body } = buildSmsBody(language, vars);
+  const defaultBody = buildSmsBody(language, vars).body;
+  const body = smsDraftBody ?? defaultBody;
+  const smsChars = body.length;
+  const smsSegments = smsChars <= 160 ? 1 : Math.ceil(smsChars / 153);
+  const editable = typeof onSmsDraftBodyChange === "function";
   return (
     <div className="rounded-xl border border-border-soft bg-cream/30 p-4 flex-1 min-h-0 overflow-y-auto">
-      <p className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted font-medium mb-1">
-        SMS body
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <p className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted font-medium">
+          SMS body
+        </p>
+        {editable && onSmsDraftReset && (
+          <button
+            type="button"
+            onClick={onSmsDraftReset}
+            className="text-[11.5px] text-text-soft underline-offset-2 hover:underline"
+          >
+            Reset
+          </button>
+        )}
+      </div>
+      {editable ? (
+        <textarea
+          value={body}
+          onChange={(e) => onSmsDraftBodyChange?.(e.target.value)}
+          rows={8}
+          className="w-full rounded-md border border-border-base bg-paper px-3 py-2 font-sans text-[12.5px] leading-relaxed text-ink focus:outline-none focus:ring-2 focus:ring-forest/30"
+        />
+      ) : (
+        <pre className="whitespace-pre-wrap font-sans text-[13px] leading-relaxed text-text">
+          {body}
+        </pre>
+      )}
+      <p className="mt-2 text-[11.5px] text-text-muted">
+        {smsChars} characters · {smsSegments} SMS segment
+        {smsSegments === 1 ? "" : "s"}
       </p>
-      <pre className="whitespace-pre-wrap font-sans text-[13px] leading-relaxed text-text">
-        {body}
-      </pre>
     </div>
   );
 }

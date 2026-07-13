@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useEffect, useState, useTransition } from "react";
 import {
   Sparkles,
   RefreshCw,
@@ -25,6 +25,8 @@ interface VariantsPanelProps {
   listId: string;
   initialVariants: ListVariant[] | null;
   channel: "email" | "sms";
+  /** Optional custom SMS base body used for generation. */
+  smsBaseBody?: string;
   /** When true, hide Generate/Regenerate/Clear/Edit controls and render
    * the variants as a read-only showcase. Used for Full Service customers
    * who see what BAAM is doing on their behalf without operational levers. */
@@ -42,6 +44,7 @@ export function VariantsPanel({
   listId,
   initialVariants,
   channel,
+  smsBaseBody,
   readOnly = false,
 }: VariantsPanelProps) {
   const [variants, setVariants] = useState<ListVariant[] | null>(initialVariants);
@@ -51,30 +54,29 @@ export function VariantsPanel({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const hasVariants = variants && variants.length > 0;
-
-  // After a generate() reload, recover the mixed-language notice we stashed
-  // in sessionStorage so it shows up alongside the freshly-loaded variants.
-  useEffect(() => {
-    const stashed = sessionStorage.getItem(`lang-note:${listId}`);
-    if (stashed) {
-      setMixedLanguageNote(stashed);
-      sessionStorage.removeItem(`lang-note:${listId}`);
-    }
-  }, [listId]);
+  const variantsChannel: "email" | "sms" | null =
+    hasVariants
+      ? variants!.some((v) => (v.subject ?? "").trim().length > 0)
+        ? "email"
+        : "sms"
+      : null;
+  const hasVariantsForActiveChannel =
+    hasVariants && variantsChannel !== null && variantsChannel === channel;
 
   function generate() {
     setError(null);
     setMixedLanguageNote(null);
     startTransition(async () => {
-      const r = await generateVariantsForList(listId);
+      const r = await generateVariantsForList(listId, {
+        channel,
+        baseBody: channel === "sms" ? smsBaseBody : undefined,
+      });
       if (!r.ok) {
         setError(r.error ?? "Generation failed.");
         return;
       }
-      if (r.mixedLanguageNote) {
-        sessionStorage.setItem(`lang-note:${listId}`, r.mixedLanguageNote);
-      }
-      window.location.reload();
+      setVariants(r.variants ?? null);
+      setMixedLanguageNote(r.mixedLanguageNote ?? null);
     });
   }
 
@@ -101,12 +103,16 @@ export function VariantsPanel({
               <p className="text-[14px] font-medium text-ink">AI variations</p>
               <p className="text-[12px] text-text-muted leading-snug mt-0.5">
                 {hasVariants
-                  ? `${variants!.length} ${channel} variants ready — each customer in this list gets a random one at send time.`
-                  : "Generate 5 unique subject + body variants so each customer in this list gets a slightly different email — helps deliverability."}
+                  ? hasVariantsForActiveChannel
+                    ? `${variants!.length} ${channel} variants ready — each customer in this list gets a random one at send time.`
+                    : `Current saved variants are for ${variantsChannel}. Generate ${channel} variants to replace them.`
+                  : channel === "sms"
+                    ? "Generate 5 unique SMS body variations so each customer gets slightly different copy while keeping required placeholders/compliance."
+                    : "Generate 5 unique subject + body variants so each customer in this list gets a slightly different email — helps deliverability."}
               </p>
             </div>
           </div>
-          {hasVariants && !readOnly && (
+          {hasVariantsForActiveChannel && !readOnly && (
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 type="button"
@@ -131,7 +137,7 @@ export function VariantsPanel({
           )}
         </div>
 
-        {!hasVariants && !readOnly && (
+        {!hasVariantsForActiveChannel && !readOnly && (
           <div className="mt-auto pt-5">
             <button
               type="button"
@@ -155,7 +161,7 @@ export function VariantsPanel({
       </div>
 
       {/* CARDS ROW (spans both grid columns, wraps to next row) */}
-      {hasVariants && (
+      {hasVariantsForActiveChannel && (
         <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {variants!.map((v, i) => (
             <VariantCard
@@ -170,7 +176,7 @@ export function VariantsPanel({
         </div>
       )}
 
-      {editingIndex !== null && variants && (
+      {editingIndex !== null && variants && hasVariantsForActiveChannel && (
         <EditVariantModal
           listId={listId}
           index={editingIndex}
