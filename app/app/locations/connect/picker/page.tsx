@@ -3,10 +3,7 @@ import Link from "next/link";
 import { ExternalLink, AlertCircle, UserCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import {
-  isUserBaamInternal,
-  isFullServiceCustomerReadOnly,
-} from "@/lib/auth/staff";
+import { isUserBaamInternal } from "@/lib/auth/staff";
 import {
   getValidAccessToken,
   listGoogleAccounts,
@@ -41,14 +38,6 @@ export default async function PickerPage({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/app/locations");
-
-  // Full Service customers don't connect their own GBP — BAAM staff does.
-  // Send them to /app/billing where the trial card explains the current
-  // state ("BAAM is connecting your GBP — we'll reach out within 1
-  // business day").
-  if (await isFullServiceCustomerReadOnly(supabase, user.id)) {
-    redirect("/app/billing");
-  }
 
   const { data: profile } = await supabase
     .from("users")

@@ -55,10 +55,7 @@ interface SidebarProps {
   isBaamInternal?: boolean;
   /**
    * True when the viewer is a Full-Service customer (not BAAM staff).
-   * Full Service customers don't operate the request/lists pipeline —
-   * BAAM staff does, on their behalf. Hides "Request a Review" entirely
-   * and locks Bulk Review Requests into a read-only showcase mode (see
-   * the page-level guards in /app/lists/* for the rest of the gating).
+   * Reserved for future customer-specific sidebar visibility rules.
    */
   isFullServiceCustomer?: boolean;
 }
@@ -165,15 +162,10 @@ export function Sidebar({
   isBaamInternal,
   isFullServiceCustomer,
 }: SidebarProps) {
-  // Filter operational items for Full-Service customers — BAAM staff
-  // does the operational work on their behalf, so these items are hidden:
-  //   • "Request a Review" (/app/send) — single-send is BAAM's job
-  //   • "Connect a new location" — BAAM connects the GBP for them; once
-  //     connected, the location appears under "Manage all locations"
-  const hiddenForFullService = new Set([
-    "/app/send",
-    "/api/auth/google/start",
-  ]);
+  // Currently no workspace items are hidden for full-service customers.
+  // Keep this filter path so future customer-specific visibility rules
+  // can be added without reworking the nav structure.
+  const hiddenForFullService = new Set<string>();
   const workspaceItemsForViewer = isFullServiceCustomer
     ? workspaceItems.filter((i) => !hiddenForFullService.has(i.href))
     : workspaceItems;
