@@ -10,7 +10,6 @@ import {
 import type { Language } from "@/lib/i18n/review";
 import { STRINGS } from "@/lib/i18n/review";
 import { ChipGroup } from "./chip-group";
-import { StarRating } from "./star-rating";
 import { ConsentCheckbox } from "./consent-checkbox";
 import { track, type TrackContext } from "./track";
 import { DraftPicker, type Draft } from "./draft-picker";
@@ -156,16 +155,6 @@ export function ReviewFlow({
           }}
           otherLabel={s.other_chip}
           otherPlaceholder={s.other_placeholder}
-        />
-      </Section>
-
-      <Section title={s.step_rating}>
-        <StarRating
-          value={rating}
-          onChange={(n) => {
-            setRating(n);
-            commit("rating", n);
-          }}
         />
       </Section>
 

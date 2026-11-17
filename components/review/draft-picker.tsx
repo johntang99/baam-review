@@ -150,7 +150,6 @@ export function DraftPicker({
       <InputsSummary
         lang={lang}
         service={inputsSummary.service}
-        rating={inputsSummary.rating}
         descriptor={inputsSummary.descriptor}
         onBack={onBack}
       />
@@ -341,21 +340,18 @@ export function DraftPicker({
 function InputsSummary({
   lang,
   service,
-  rating,
   descriptor,
   onBack,
 }: {
   lang: Language;
   service: readonly string[];
-  rating: number;
   descriptor: readonly string[];
   onBack: () => void;
 }) {
   const s = STRINGS[lang];
-  const ratingLabel = s.drafts_summary_rating.replace("{n}", String(rating));
   const serviceLabel = service.length ? service.join(", ") : "";
   const descriptorLabel = descriptor.length ? descriptor.join(", ") : "";
-  const parts = [serviceLabel, ratingLabel, descriptorLabel].filter(
+  const parts = [serviceLabel, descriptorLabel].filter(
     (p): p is string => !!p && p.length > 0,
   );
 

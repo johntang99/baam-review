@@ -176,7 +176,7 @@ export const STRINGS = {
 
     step_service: "您接受的服务",
     step_rating: "您的评分",
-    step_descriptor: "如何形容",
+    step_descriptor: "服务体验",
 
     optional: "可选",
     other_chip: "其他",
@@ -189,7 +189,7 @@ export const STRINGS = {
     cta_back: "返回",
     cta_generate: "帮我写一段评论",
     cta_generating: "正在生成草稿…",
-    cta_post: "就用这条—去 Google 发布",
+    cta_post: "就用这条到 Google 发布",
     cta_regenerate: "再生成几条不同的草稿",
     cta_edit: "编辑",
     cta_edit_save: "保存",
