@@ -46,17 +46,24 @@ const copyByLanguage: Record<"en" | "zh", PosterCopy> = {
 
 let cachedRegularWoff2DataUrl: string | null = null;
 let cachedBoldWoff2DataUrl: string | null = null;
+let cachedArchivoBoldWoff2DataUrl: string | null = null;
 
-async function loadEmbeddedFonts(): Promise<{ regular: string; bold: string }> {
-  if (!cachedRegularWoff2DataUrl || !cachedBoldWoff2DataUrl) {
-    const [regularBytes, boldBytes] = await Promise.all([
+async function loadEmbeddedFonts(): Promise<{ regular: string; bold: string; archivoBold: string }> {
+  if (!cachedRegularWoff2DataUrl || !cachedBoldWoff2DataUrl || !cachedArchivoBoldWoff2DataUrl) {
+    const [regularBytes, boldBytes, archivoBoldBytes] = await Promise.all([
       readFile(path.join(process.cwd(), "public/fonts/noto-sans-tc-400.woff2")),
       readFile(path.join(process.cwd(), "public/fonts/noto-sans-tc-700.woff2")),
+      readFile(path.join(process.cwd(), "public/fonts/archivo-700.woff2")),
     ]);
     cachedRegularWoff2DataUrl = `data:font/woff2;base64,${regularBytes.toString("base64")}`;
     cachedBoldWoff2DataUrl = `data:font/woff2;base64,${boldBytes.toString("base64")}`;
+    cachedArchivoBoldWoff2DataUrl = `data:font/woff2;base64,${archivoBoldBytes.toString("base64")}`;
   }
-  return { regular: cachedRegularWoff2DataUrl, bold: cachedBoldWoff2DataUrl };
+  return {
+    regular: cachedRegularWoff2DataUrl,
+    bold: cachedBoldWoff2DataUrl,
+    archivoBold: cachedArchivoBoldWoff2DataUrl,
+  };
 }
 
 function escapeHtml(input: string): string {
@@ -79,7 +86,7 @@ export function resolvePosterLanguage(langParam: string | null): "en" | "zh" {
 export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array> {
   const lang = normalizePosterLanguage(opts.language);
   const copy = copyByLanguage[lang];
-  const cleanName = opts.businessName.trim() || "Your Business";
+  const cleanName = normalizeBusinessName(opts.businessName) || "Your Business";
   const headline = copy.headline(cleanName);
   const qrDataUrl = await generateQrDataUrl(opts.url, 960);
   const fonts = await loadEmbeddedFonts();
@@ -93,6 +100,7 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
     @page { size: Letter; margin: 0; }
     @font-face { font-family: "NotoSansTC"; src: url("${fonts.regular}") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
     @font-face { font-family: "NotoSansTC"; src: url("${fonts.bold}") format("woff2"); font-weight: 700; font-style: normal; font-display: block; }
+    @font-face { font-family: "ArchivoPoster"; src: url("${fonts.archivoBold}") format("woff2"); font-weight: 700; font-style: normal; font-display: block; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -133,16 +141,23 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
     }
     .headline {
       margin-top: 34px;
-      font-size: 56px;
+      font-size: 52px;
       font-weight: 700;
-      line-height: 1.08;
+      line-height: 1.04;
       text-align: center;
       max-width: 100%;
-      word-break: break-word;
+      word-break: keep-all;
+      overflow-wrap: normal;
+      letter-spacing: 0;
+    }
+    .headline.en {
+      font-family: "ArchivoPoster", "NotoSansTC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 62px;
+      line-height: 0.98;
     }
     .subhead {
       margin-top: 10px;
-      font-size: 28px;
+      font-size: 25px;
       color: #5a6660;
       line-height: 1.25;
       text-align: center;
@@ -193,13 +208,15 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
       margin-top: 12px;
       width: 100%;
       max-width: 520px;
-      font-size: 16px;
-      line-height: 1.65;
+      font-size: 15px;
+      line-height: 1.48;
       color: #5a6660;
+      margin-bottom: 96px;
     }
     .steps div { margin: 4px 0; }
     .venue {
-      margin-top: 8px;
+      position: absolute;
+      bottom: 66px;
       font-size: 11px;
       color: #8a938e;
       font-weight: 700;
@@ -231,7 +248,7 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
     <div class="card">
       <div class="logo">BAAM</div>
       <div class="tagline">Always On. Always Visible.</div>
-      <div class="headline">${escapeHtml(headline)}</div>
+      <div class="headline ${lang}">${escapeHtml(headline)}</div>
       <div class="subhead">${escapeHtml(copy.subhead)}</div>
 
       <div class="qr-frame">
@@ -255,4 +272,12 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
 
   const { pdf_buffer } = await renderHtmlToPdf(html);
   return pdf_buffer;
+}
+
+function normalizeBusinessName(name: string): string {
+  return name
+    .replace(/[‘’]/g, "'")
+    .replace(/\s+'\s+/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
 }
