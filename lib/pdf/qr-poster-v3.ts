@@ -97,6 +97,7 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
 <head>
   <meta charset="utf-8" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap');
     @page { size: Letter; margin: 0; }
     @font-face { font-family: "NotoSansTC"; src: url("${fonts.regular}") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
     @font-face { font-family: "NotoSansTC"; src: url("${fonts.bold}") format("woff2"); font-weight: 700; font-style: normal; font-display: block; }
@@ -108,7 +109,7 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
       height: 11in;
       background: #faf7f2;
       color: #0f1f1a;
-      font-family: "NotoSansTC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Noto Sans SC", "NotoSansTC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     .sheet {
       width: 100%;
@@ -164,6 +165,9 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
       font-family: "ArchivoPoster", "NotoSansTC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 56px;
       line-height: 0.98;
+    }
+    .headline.zh {
+      font-family: "Noto Sans SC", "NotoSansTC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     .subhead {
       margin-top: 10px;
