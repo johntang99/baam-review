@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
-  buildQrPosterV2,
+  buildQrPosterV3,
   resolvePosterLanguage,
-} from "@/lib/pdf/qr-poster-v2";
+} from "@/lib/pdf/qr-poster-v3";
 import { isLanguage, type Language } from "@/lib/i18n/review";
 
 const VENUE_LABEL: Record<string, string> = {
@@ -55,7 +55,7 @@ export async function GET(
       ? VENUE_LABEL[source]
       : null;
 
-  const pdfBytes = await buildQrPosterV2({
+  const pdfBytes = await buildQrPosterV3({
     businessName: location.display_name,
     url: target.toString(),
     language: resolvePosterLanguage(lang),
