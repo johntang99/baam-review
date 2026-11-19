@@ -144,15 +144,6 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
       display: inline-block;
       padding: 0 4px;
     }
-    .logo::after {
-      content: "";
-      position: absolute;
-      left: 27%;
-      right: 12%;
-      top: 48%;
-      border-top: 4px solid #0f1f1a;
-      transform: rotate(-8deg);
-    }
     .tagline {
       margin-top: 4px;
       font-size: 10px;
