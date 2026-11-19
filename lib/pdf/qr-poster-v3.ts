@@ -127,12 +127,31 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
       padding: 20px 40px 22px;
       position: relative;
     }
-    .logo {
+    .logo-wrap {
       margin-top: 2px;
-      font-size: 34px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .logo {
+      position: relative;
+      font-family: "ArchivoPoster", "NotoSansTC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 54px;
       font-weight: 700;
-      letter-spacing: 0.02em;
-      line-height: 1;
+      line-height: 0.95;
+      letter-spacing: 0.03em;
+      color: #0f1f1a;
+      display: inline-block;
+      padding: 0 4px;
+    }
+    .logo::after {
+      content: "";
+      position: absolute;
+      left: 27%;
+      right: 12%;
+      top: 48%;
+      border-top: 4px solid #0f1f1a;
+      transform: rotate(-8deg);
     }
     .tagline {
       margin-top: 4px;
@@ -152,7 +171,7 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
     }
     .headline.en {
       font-family: "ArchivoPoster", "NotoSansTC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 62px;
+      font-size: 56px;
       line-height: 0.98;
     }
     .subhead {
@@ -183,23 +202,23 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 86px;
-      height: 86px;
+      width: 102px;
+      height: 102px;
       border-radius: 999px;
       border: 1.5px solid #e8e2d5;
       background: #fff;
       box-shadow: 0 1px 4px rgba(15, 31, 26, 0.1);
       display: grid;
       place-items: center;
-      font-size: 23px;
+      font-size: 30px;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       color: #1f4d3f;
-      padding-left: 3px;
+      padding-left: 5px;
     }
     .cta {
       margin-top: 22px;
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 700;
       line-height: 1.12;
       text-align: center;
@@ -208,15 +227,15 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
       margin-top: 12px;
       width: 100%;
       max-width: 520px;
-      font-size: 15px;
-      line-height: 1.48;
+      font-size: 13.5px;
+      line-height: 1.38;
       color: #5a6660;
-      margin-bottom: 96px;
+      margin-bottom: 132px;
     }
     .steps div { margin: 4px 0; }
     .venue {
       position: absolute;
-      bottom: 66px;
+      bottom: 84px;
       font-size: 11px;
       color: #8a938e;
       font-weight: 700;
@@ -226,18 +245,18 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
       position: absolute;
       left: 36px;
       right: 36px;
-      bottom: 52px;
+      bottom: 60px;
       border-top: 1px solid #e8e2d5;
     }
     .footer-web {
       position: absolute;
-      bottom: 27px;
+      bottom: 30px;
       font-size: 18px;
       font-weight: 700;
     }
     .footer-contact {
       position: absolute;
-      bottom: 10px;
+      bottom: 12px;
       font-size: 11px;
       color: #8a938e;
     }
@@ -246,8 +265,10 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
 <body>
   <section class="sheet">
     <div class="card">
-      <div class="logo">BAAM</div>
-      <div class="tagline">Always On. Always Visible.</div>
+      <div class="logo-wrap">
+        <div class="logo">BAAM</div>
+        <div class="tagline">Always On. Always Visible.</div>
+      </div>
       <div class="headline ${lang}">${escapeHtml(headline)}</div>
       <div class="subhead">${escapeHtml(copy.subhead)}</div>
 

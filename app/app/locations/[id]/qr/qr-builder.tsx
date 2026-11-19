@@ -222,8 +222,8 @@ export function QrBuilder({
                 className="h-56 w-56"
               />
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-border-base bg-paper shadow-sm">
-                  <span className="text-[20px] font-extrabold tracking-[0.06em] text-forest">BAAM</span>
+                <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-border-base bg-paper shadow-sm">
+                  <span className="text-[28px] font-extrabold tracking-[0.05em] text-forest">BAAM</span>
                 </div>
               </div>
             </div>
