@@ -1,13 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { buildQrPoster } from "@/lib/pdf/qr-poster";
+import {
+  buildQrPosterV2,
+  resolvePosterLanguage,
+} from "@/lib/pdf/qr-poster-v2";
 import { isLanguage, type Language } from "@/lib/i18n/review";
-
-const INSTRUCTION_BY_LANG: Record<Language, string> = {
-  en: "Scan to leave a review",
-  zh: "Scan to leave a review", // Helvetica can't render CJK
-  es: "Escanee para dejar una reseña",
-};
 
 const VENUE_LABEL: Record<string, string> = {
   front_desk: "Front desk",
@@ -52,29 +49,20 @@ export async function GET(
 
   const lang: Language = isLanguage(langParam) ? langParam : "en";
 
-  // Secondary instructions in other supported languages (Latin-only renders).
-  const otherLangs = location.supported_languages
-    .filter((l) => l !== lang)
-    .filter(isLanguage);
-  const secondaryInstructions = otherLangs
-    .map((l) => INSTRUCTION_BY_LANG[l])
-    .filter((s) => s && s !== INSTRUCTION_BY_LANG[lang]);
-
   const venueLabel = venueLabelRaw
     ? venueLabelRaw
     : source && VENUE_LABEL[source]
       ? VENUE_LABEL[source]
       : null;
 
-  const pdfBytes = await buildQrPoster({
+  const pdfBytes = await buildQrPosterV2({
     businessName: location.display_name,
     url: target.toString(),
-    instruction: INSTRUCTION_BY_LANG[lang],
-    secondaryInstructions,
+    language: resolvePosterLanguage(lang),
     venueLabel: venueLabel ?? undefined,
   });
 
-  const filenameBase = `${slug}${source ? `-${source}` : ""}`;
+  const filenameBase = `${slug}-${resolvePosterLanguage(lang)}${source ? `-${source}` : ""}`;
   // The Uint8Array from pdf-lib is what Response expects directly.
   return new Response(pdfBytes as unknown as BodyInit, {
     headers: {
