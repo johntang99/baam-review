@@ -183,19 +183,19 @@ export async function buildQrPosterV3(opts: QrPosterV3Opts): Promise<Uint8Array>
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 68px;
-      height: 68px;
+      width: 86px;
+      height: 86px;
       border-radius: 999px;
       border: 1.5px solid #e8e2d5;
       background: #fff;
       box-shadow: 0 1px 4px rgba(15, 31, 26, 0.1);
       display: grid;
       place-items: center;
-      font-size: 17px;
+      font-size: 23px;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       color: #1f4d3f;
-      padding-left: 2px;
+      padding-left: 3px;
     }
     .cta {
       margin-top: 22px;
